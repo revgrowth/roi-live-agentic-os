@@ -32,16 +32,17 @@ Ask these four questions. No more than four before doing work.
 
 Capture answers. You'll use them to build brand_context/.
 
-### Step 3: URL Extraction (Optional)
+### Step 3: Collect Brand Assets + URL Extraction
 
-Offer: "Got a website, YouTube channel, or social profile I can scan for your voice?"
+Ask: "Got a website, LinkedIn, YouTube, or any other brand links I should know about?"
 
 If yes:
+- Save all provided URLs and handles to `brand_context/assets.md`
 - Use web_fetch to retrieve content from provided URLs
 - Extract 5-10 gold-standard sentences that represent their voice
 - Note what makes each sentence representative
 
-If no: skip and continue.
+If no: skip URL extraction, but still create `brand_context/assets.md` with empty fields so it's ready for later.
 
 ### Step 4: Local File Scan (Conditional)
 
@@ -52,7 +53,7 @@ If yes: read provided files, extract voice signals and strong sentences.
 
 ### Step 5: Build brand_context/
 
-Run the foundation skill methodologies to create all five brand files.
+Run the foundation skill methodologies to create the brand files.
 Use answers from Step 2 + extracted content from Steps 3-4.
 
 Read each skill's SKILL.md for the full methodology:

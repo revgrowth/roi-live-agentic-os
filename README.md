@@ -39,14 +39,15 @@ repeated task earns its own skill.
 
 Two folders hold everything the system knows about you:
 
-- `brand_context/` — your brand data: voice, positioning, ICP, samples
-- `context/` — agent state: identity, preferences, learnings, session logs
+- `context/` — agent & session context: it's identity, your identity and preferences, learnings from each session, memories
+- `brand_context/` — your brand data: voice, positioning, ICP, samples, asset links
 
 The first time you run `/start-here`, it creates your brand foundation:
 - `brand_context/voice-profile.md` — How your brand sounds
 - `brand_context/positioning.md` — Your market angle and differentiators
 - `brand_context/icp.md` — Your ideal customer profile
 - `brand_context/samples.md` — Gold-standard copy from real sources
+- `brand_context/assets.md` — Your website, socials, handles, and visual brand references
 - `context/learnings.md` — Performance feedback that makes future output sharper
 
 Skills only load the brand files they need. Selective context keeps output
@@ -156,8 +157,8 @@ agentic-os/
 │   ├── learnings.md                   <- Skill performance feedback
 │   └── memory/                        <- Daily session logs (YYYY-MM-DD.md)
 │
-├── ccnotify/                          <- Desktop notifications (bundled)
-│   └── ccnotify.py
+│   ├── hooks_info/                    <- Hook scripts (bundled)
+│   │   └── ccnotify.py                <- Desktop notifications
 │
 ├── .env                               <- API keys (gitignored)
 │
@@ -179,7 +180,8 @@ agentic-os/
 │   ├── voice-profile.md
 │   ├── positioning.md
 │   ├── icp.md
-│   └── samples.md
+│   ├── samples.md
+│   └── assets.md                      <- Website, socials, handles, visual refs
 │
 └── projects/                          <- Everything the system produces
     └── {category}-{output-type}/
@@ -236,7 +238,7 @@ terminal.
 
 **Setup:**
 
-The script is bundled at `ccnotify/ccnotify.py` and hooks are
+The script is bundled at `.claude/hooks_info/ccnotify.py` and hooks are
 pre-configured in `.claude/settings.json`. The only external dependency
 is `terminal-notifier`:
 
@@ -247,7 +249,7 @@ brew install terminal-notifier
 That's it. Hooks fire automatically on `UserPromptSubmit`, `Stop`, and
 `Notification` events.
 
-**Logs:** `ccnotify/ccnotify.log` (created on first run)
+**Logs:** `.claude/hooks_info/ccnotify.log` (created on first run)
 
 ---
 

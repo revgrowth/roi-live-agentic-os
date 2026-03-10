@@ -131,12 +131,12 @@ Every skill and its output folder uses a category prefix. This keeps skills, out
 
 Which `brand_context/` files each skill reads. Load only what's listed — no skill gets more context than it needs.
 
-| Skill | voice-profile | positioning | icp | samples | learnings |
-|-------|:---:|:---:|:---:|:---:|:---:|
-| `mkt-brand-voice` | **writes** | summary | — | **writes** | `## mkt-brand-voice` |
-| `mkt-positioning` | — | **writes** | full | — | `## mkt-positioning` |
-| `mkt-icp` | — | summary | **writes** | — | `## mkt-icp` |
-| `meta-wrap-up` | — | — | — | — | `## meta-wrap-up` |
+| Skill | voice-profile | positioning | icp | samples | assets | learnings |
+|-------|:---:|:---:|:---:|:---:|:---:|:---:|
+| `mkt-brand-voice` | **writes** | summary | — | **writes** | links only | `## mkt-brand-voice` |
+| `mkt-positioning` | — | **writes** | full | — | — | `## mkt-positioning` |
+| `mkt-icp` | — | summary | **writes** | — | — | `## mkt-icp` |
+| `meta-wrap-up` | — | — | — | — | — | `## meta-wrap-up` |
 
 *New skills declare their own row when added.*
 
