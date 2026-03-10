@@ -39,11 +39,13 @@ Compare what's on disk against what's registered in this file. Fix any drift sil
 ### Task Routing
 
 When the user asks a question or requests a task:
-1. **Search installed skills first.** Scan `.claude/skills/` frontmatter for a matching skill.
-2. **Skill found** → invoke it.
-3. **No skill found** → tell the user: "I don't have a dedicated skill for this yet. I can either: (a) find/build one so I do this well every time, or (b) handle it now with my base knowledge." Let them choose.
+1. **Search installed skills first.** Check `.claude/skills/` frontmatter for a matching skill.
+2. **Skill found** → invoke it. Always prefer the dedicated skill over base knowledge.
+3. **No matching skill** → inform the user explicitly and offer the choice:
+   - **(a) Find or build a skill** — search for an existing skill to install, or build one with `meta-skill-creator`, so the system handles this task well every time
+   - **(b) Handle it now with base knowledge** — complete the task without a skill, understanding output won't benefit from a tested methodology or the learnings loop
 
-This ensures skills are always used when available, and gaps are surfaced rather than silently worked around.
+Never silently fall back to base knowledge when a skill exists. Never silently handle a task without telling the user a skill gap was found.
 
 ### Before Major Deliverables
 - Is the relevant brand_context file loaded per the context matrix below?

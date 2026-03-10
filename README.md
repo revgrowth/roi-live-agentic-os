@@ -1,11 +1,11 @@
 # Agentic OS
 
-Your complete Agentic Operating System for your business. A skills-based
-agent that learns your brand, remembers your context, and gets sharper
-every time you use it.
+A self-maintaining operating system for your business. Built on Claude Code,
+powered by skills that learn your brand, remember your context, and get
+sharper with every session.
 
-Built for Claude Code. Designed for founders, solo marketers, and small
-teams who need senior-level output without the senior-level headcount.
+Designed for founders, solo marketers, and small teams who need senior-level
+output without the senior-level headcount.
 
 ---
 
@@ -15,13 +15,81 @@ teams who need senior-level output without the senior-level headcount.
 /start-here
 ```
 
-That is the only command you need to remember. The orchestrator scans your
-project, asks a few questions, builds your brand foundation, and routes
-you to the right skill for whatever you are working on.
+That is the only command you need. The orchestrator scans your project, asks
+a few questions, builds your brand foundation, and routes you to the right
+skill for whatever you are working on.
 
 ---
 
-## What You Get
+## How It Works
+
+### Skill-First Routing
+
+When you ask for anything, the system checks installed skills first. If a
+matching skill exists, it runs automatically. If no skill covers the task,
+you are told upfront and given the choice:
+
+- **(a) Find or build a skill** — so the system handles this well every time
+- **(b) Handle it now** — using base knowledge, no skill needed
+
+This means gaps are surfaced, not silently worked around. Over time, every
+repeated task earns its own skill.
+
+### Brand Memory
+
+Two folders hold everything the system knows about you:
+
+- `brand_context/` — your brand data: voice, positioning, ICP, samples
+- `context/` — agent state: identity, preferences, learnings, session logs
+
+The first time you run `/start-here`, it creates your brand foundation:
+- `brand_context/voice-profile.md` — How your brand sounds
+- `brand_context/positioning.md` — Your market angle and differentiators
+- `brand_context/icp.md` — Your ideal customer profile
+- `brand_context/samples.md` — Gold-standard copy from real sources
+- `context/learnings.md` — Performance feedback that makes future output sharper
+
+Skills only load the brand files they need. Selective context keeps output
+focused and specific.
+
+### Learnings Loop
+
+`context/learnings.md` is the system's long-term feedback memory. After
+major deliverables, skills ask how the output landed. Responses are logged
+under the skill's own section. Every skill reads its learnings before
+running — the more you use it, the better it matches your preferences.
+
+### Self-Maintenance
+
+Agentic OS keeps itself in sync. You never need to manually update
+registry files or remember to register a new skill.
+
+**Heartbeat (every session start):**
+The agent scans `.claude/skills/` and `.claude/settings.json`, then
+compares what's on disk against what's documented in CLAUDE.md and
+README.md.
+
+- New skill folder found → auto-registered in CLAUDE.md (Skill Registry,
+  Context Matrix), README.md, and `context/learnings.md`
+- Registered skill missing from disk → asks you before removing
+- New MCP server in settings → documented in README.md
+- Documented MCP removed → asks you before removing
+
+**Wrap-up (every session end):**
+The same sync runs again before committing, catching anything that changed
+mid-session. Skills that were built, modified, or removed during the
+session are reconciled automatically.
+
+**Skill ecosystem awareness:**
+When building a new skill, the system reads every installed skill's
+frontmatter first. It maps overlaps, upstream dependencies, downstream
+consumers, and trigger conflicts — so new skills fit cleanly into the
+existing ecosystem rather than duplicating or colliding with what's
+already there.
+
+---
+
+## Skills
 
 ### Foundation Skills
 
@@ -38,68 +106,39 @@ writes like you, for your audience, with your angle.
 
 | Skill | What it does |
 |-------|-------------|
-| `meta-skill-creator` | Build and validate new skills — extend the system for any domain |
+| `meta-skill-creator` | Build, test, and validate new skills — extend the system for any domain |
+| `meta-wrap-up` | End-of-session checklist: feedback, learnings, sync, commit |
 
-New execution skills are added over time. The architecture supports
-unlimited skills across any domain — marketing, operations, sales,
-client onboarding, or anything else.
+### Skill Categories
+
+Every skill uses a category prefix that matches its output folder.
+
+| Prefix | Domain | Examples |
+|--------|--------|----------|
+| `mkt` | Marketing | `mkt-brand-voice`, `mkt-positioning`, `mkt-email-sequence` |
+| `str` | Strategy | `str-keyword-plan`, `str-competitor-analysis` |
+| `ops` | Operations | `ops-client-onboarding`, `ops-invoice-generator` |
+| `vid` | Video / Visual | `vid-thumbnail-creator`, `vid-ugc-generator` |
+| `meta` | System / Meta | `meta-skill-creator`, `meta-wrap-up` |
+
+New categories are added when the first skill in a new domain is built.
+The architecture supports unlimited skills across any domain.
 
 ---
 
-## How It Works
+## Projects
 
-### Brand Memory
-
-Every skill reads from `brand_context/` (brand data) and `context/`
-(agent state, learnings, session logs). This is how the system remembers
-who you are across sessions.
-
-The first time you run `/start-here`, it creates your brand foundation:
-- `brand_context/voice-profile.md` — How your brand sounds
-- `brand_context/positioning.md` — Your market angle and differentiators
-- `brand_context/icp.md` — Your ideal customer profile
-- `brand_context/samples.md` — Gold-standard copy from real sources
-- `context/learnings.md` — Performance feedback that makes future output sharper
-
-Skills only load the brand files they need. Selective context keeps
-output focused and specific.
-
-### Learnings Loop
-
-`context/learnings.md` is the system's long-term memory. After major
-deliverables, skills ask for feedback. Responses are logged with domain
-tags. Every skill reads relevant learnings before running — it's like a
-CLAUDE.md for each individual skill. The more you use it, the better the
-system gets at matching your preferences.
-
-### Projects
-
-Output is organised by type, not by skill. Each output type gets its own
-folder inside `projects/` with a category prefix:
+Output is organised by category, not by skill. Each output type gets its
+own folder inside `projects/`:
 
 ```
 projects/
 ├── mkt-landing-page/        <- Landing pages and sales pages
 ├── mkt-email-sequence/      <- Email flows
 ├── mkt-blog-post/           <- SEO articles
-├── mkt-linkedin-carousel/   <- LinkedIn carousels
+├── str-keyword-plan/        <- Keyword research
 └── ...                      <- Folders created on first use
 ```
-
-Category prefixes: `mkt` (marketing), `str` (strategy), `ops` (operations),
-`vid` (video/visual). New categories are added as the system grows.
-
-### Schemas
-
-Schemas validate structured data and live next to what they describe:
-
-| What it validates | Where the schema lives |
-|-------------------|----------------------|
-| Brand context data | `brand_context/schemas/` |
-| Output files | `projects/{folder}/00-schemas/` |
-
-Not every output needs a schema. They are created when structured,
-repeatable data contracts are useful for downstream automation.
 
 ---
 
@@ -107,24 +146,27 @@ repeatable data contracts are useful for downstream automation.
 
 ```
 agentic-os/
+├── CLAUDE.md                          <- System instructions, skill registry,
+│                                         context matrix, self-maintenance rules
+│
 ├── context/                           <- Agent, user, and session state
 │   ├── SOUL.md                        <- Agent identity and behaviour
 │   ├── USER.md                        <- Your preferences (built by /start-here)
 │   ├── MEMORY.md                      <- Long-term business knowledge
-│   ├── learnings.md                   <- Skill-specific performance feedback
+│   ├── learnings.md                   <- Skill performance feedback
 │   └── memory/                        <- Daily session logs (YYYY-MM-DD.md)
 │
 ├── .env                               <- API keys (gitignored)
 │
 ├── .claude/
-│   ├── settings.json                  <- Permissions and hooks
+│   ├── settings.json                  <- Permissions, hooks, MCP servers
 │   ├── commands/
 │   │   └── start-here.md              <- The one command you need
 │   └── skills/
 │       ├── mkt-brand-voice/           <- Voice extraction and building
 │       ├── mkt-positioning/           <- Market angle discovery
 │       ├── mkt-icp/                   <- Ideal customer profiling
-│       ├── meta-wrap-up/              <- End-of-session checklist
+│       ├── meta-wrap-up/              <- End-of-session checklist + sync
 │       ├── meta-skill-creator/        <- Build new skills
 │       └── ...                        <- New skills added over time
 │
@@ -141,6 +183,39 @@ agentic-os/
         ├── 00-schemas/                <- Output-specific schemas (when needed)
         └── {name}_{YYYY-MM-DD}.md     <- Generated content
 ```
+
+---
+
+## Extending the System
+
+Agentic OS is built to grow. The `meta-skill-creator` skill scaffolds new
+skills that follow the architecture automatically.
+
+Every skill is a self-contained folder:
+```
+.claude/skills/{category}-{skill-name}/
+├── SKILL.md          <- Instructions (~200 lines max)
+└── references/       <- Deep knowledge, one topic per file
+```
+
+Skills work at any context level:
+- **No brand context** — standalone mode, solid generic output
+- **Partial context** — uses what exists, defaults for the rest
+- **Full context** — fully personalised to your brand
+
+Brand context enhances. It never gates.
+
+### Schemas
+
+Schemas validate structured data and live next to what they describe:
+
+| What it validates | Where the schema lives |
+|-------------------|----------------------|
+| Brand context data | `brand_context/schemas/` |
+| Output files | `projects/{folder}/00-schemas/` |
+
+Not every output needs a schema. They are created when structured,
+repeatable data contracts are useful for downstream automation.
 
 ---
 
@@ -181,27 +256,6 @@ events.
 
 ---
 
-## Extending the System
-
-Agentic OS is built to grow. The `meta-skill-creator` skill scaffolds new
-skills that follow the system's architecture automatically.
-
-Every skill is a self-contained folder:
-```
-.claude/skills/{category}-{skill-name}/
-├── SKILL.md          <- Instructions (~200 lines max)
-└── references/       <- Deep knowledge, one topic per file
-```
-
-Skills work at any context level:
-- **No brand context** — standalone mode, solid generic output
-- **Partial context** — uses what exists, defaults for the rest
-- **Full context** — fully personalised to your brand
-
-Brand context enhances. It never gates.
-
----
-
 ## FAQ
 
 **How do I update my brand voice after it's set?**
@@ -223,6 +277,15 @@ Yes. The architecture is domain-agnostic. Use `meta-skill-creator` to build
 skills for operations, sales, client onboarding, or anything else. The
 category prefix system (`ops-`, `str-`, `vid-`) is already in place.
 
+**What happens when I add a skill manually?**
+Drop the folder into `.claude/skills/` and start a new session. The
+Heartbeat detects it automatically and registers it across CLAUDE.md,
+README.md, and context/learnings.md. No manual registration needed.
+
+**What happens when I add an MCP server?**
+Add it to `.claude/settings.json` and start a new session. The Heartbeat
+picks it up and documents it in README.md.
+
 ---
 
 ## System Requirements
@@ -233,6 +296,7 @@ category prefix system (`ops-`, `str-`, `vid-`) is already in place.
 
 **Optional:**
 - API keys for connected tools added to `.env`
+- MCP servers configured in `.claude/settings.json`
 - Skills detect connected tools automatically and adapt
 
 ---
