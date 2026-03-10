@@ -47,7 +47,7 @@ The first time you run `/start-here`, it creates your brand foundation:
 - `brand_context/positioning.md` — Your market angle and differentiators
 - `brand_context/icp.md` — Your ideal customer profile
 - `brand_context/samples.md` — Gold-standard copy from real sources
-- `brand_context/assets.md` — Your website, socials, handles, and visual brand references
+- `brand_context/assets.md` — Business and personal links, handles, and visual brand references
 - `context/learnings.md` — Performance feedback that makes future output sharper
 
 Skills only load the brand files they need. Selective context keeps output
@@ -200,7 +200,8 @@ Every skill is a self-contained folder:
 ```
 .claude/skills/{category}-{skill-name}/
 ├── SKILL.md          <- Instructions (~200 lines max)
-└── references/       <- Deep knowledge, one topic per file
+├── references/       <- Deep knowledge, one topic per file
+└── assets/           <- Example outputs, design references, templates
 ```
 
 Skills work at any context level:

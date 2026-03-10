@@ -93,6 +93,24 @@ When writing or editing a skill, ensure the SKILL.md includes:
 
 This creates a feedback loop: every skill run benefits from all previous runs, and every piece of feedback makes the next run better.
 
+### Example Outputs & Design Assets (Required for output-producing skills)
+
+Every skill that produces deliverables should capture examples of good output in its `assets/` folder. These examples become the skill's quality benchmark — the standard it aims for on every run.
+
+**During skill creation, ask the user:**
+1. "Do you have examples of what great output looks like for this? (e.g., a carousel you love, a landing page that converts, an image style you want to match)"
+2. If yes → save them to `{skill-folder}/assets/` with descriptive filenames
+3. If no → note in the SKILL.md that examples should be added after the first good output
+
+**What goes in assets/:**
+- **Example outputs** — finished deliverables that represent the quality bar (e.g., a carousel PDF, a landing page screenshot, a blog post that nailed the voice)
+- **Design references** — style guides, colour palettes, image styles, layout templates that visual/design skills should match
+- **Templates** — reusable structures the skill fills in
+
+**SKILL.md must reference assets/ explicitly.** Add an instruction like: "Before generating output, read the examples in `assets/` to calibrate quality and style." For visual skills, be specific: "Match the layout style in `assets/carousel-example.pdf`" or "Use the image style shown in `assets/style-reference.png`."
+
+**After a skill produces great output,** offer to save it as a new example: "That came out well — want me to save it to the skill's assets folder as a reference for next time?" This way the assets folder grows with proven good output over time.
+
 ### Skill Writing Guide
 
 #### Anatomy of a Skill
@@ -105,7 +123,7 @@ skill-name/
 └── Bundled Resources (optional)
     ├── scripts/    - Executable code for deterministic/repetitive tasks
     ├── references/ - Docs loaded into context as needed
-    └── assets/     - Files used in output (templates, icons, fonts)
+    └── assets/     - Example outputs, design references, templates, icons, fonts
 ```
 
 #### Progressive Disclosure

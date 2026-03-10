@@ -2,7 +2,7 @@
 
 > Stable brand references that skills pull from. Populated by /start-here, updated as needed.
 
-## Links
+## Business Links
 - Website:
 - LinkedIn:
 - Twitter/X:
@@ -10,7 +10,20 @@
 - Newsletter:
 - Other:
 
-## Handles
+## Business Handles
+- LinkedIn:
+- Twitter/X:
+- YouTube:
+- Other:
+
+## Personal Links
+- LinkedIn:
+- Twitter/X:
+- YouTube:
+- Personal site/blog:
+- Other:
+
+## Personal Handles
 - LinkedIn:
 - Twitter/X:
 - YouTube:

@@ -185,7 +185,8 @@ When a skill produces structured output, it should read the relevant schema befo
 ```
 .claude/skills/{category}-{skill-name}/
 ├── SKILL.md          ← YAML frontmatter + methodology (~200 lines max)
-└── references/       ← Depth material, one topic per file (~200-300 lines each)
+├── references/       ← Depth material, one topic per file (~200-300 lines each)
+└── assets/           ← Example outputs, design references, templates (optional)
 ```
 
 ### YAML frontmatter rules

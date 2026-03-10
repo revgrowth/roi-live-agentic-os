@@ -34,11 +34,12 @@ Capture answers. You'll use them to build brand_context/.
 
 ### Step 3: Collect Brand Assets + URL Extraction
 
-Ask: "Got a website, LinkedIn, YouTube, or any other brand links I should know about?"
+Ask: "Got a website, LinkedIn, YouTube, or any other links I should know about — both business and personal?"
 
 If yes:
-- Save all provided URLs and handles to `brand_context/assets.md`
-- Use web_fetch to retrieve content from provided URLs
+- Separate into business vs personal links and handles
+- Save all to `brand_context/assets.md` under the correct sections
+- Use web_fetch to retrieve content from provided URLs for voice extraction
 - Extract 5-10 gold-standard sentences that represent their voice
 - Note what makes each sentence representative
 
