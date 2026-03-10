@@ -178,7 +178,7 @@ If no deliverables were produced (e.g., session was planning or discussion only)
 
 ## Step 5: Show Usage
 
-After the session summary, run the `/usage` command so the user can see their current plan usage, limits, and remaining capacity.
+After the session summary, tell the user to run `/usage` to check their plan usage, limits, and remaining capacity. This is a built-in CLI command that must be typed by the user — it cannot be invoked programmatically by the agent.
 
 ---
 
