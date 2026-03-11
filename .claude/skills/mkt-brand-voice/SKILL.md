@@ -5,8 +5,9 @@ description: >
   Triggers on: "brand voice", "writing style", "make this sound like me",
   "define our voice", "analyze my content", "voice guide", "how should we
   sound", "tone of voice", "brand personality", "analyze my website".
-  Three modes: Extract (analyze existing content), Build (interview from
-  scratch), Auto-Scrape (URL provided, skill researches). Produces
+  Four modes: Import (existing brand guidelines), Extract (analyze existing
+  content), Build (interview from scratch), Auto-Scrape (URL provided,
+  skill researches). Produces
   brand_context/voice-profile.md and brand_context/samples.md.
   Foundation skill — run before any execution skill that reads voice context.
   Does NOT trigger for positioning, audience research, or keyword work.
@@ -16,9 +17,10 @@ description: >
 
 ## Outcome
 
-Two files saved to `brand_context/`:
+Files saved to `brand_context/`:
 - `voice-profile.md` — the full voice system (tone, vocabulary, rhythm, platform rules)
 - `samples.md` — 5-10 gold-standard sentences with source and reason noted
+- `assets.md` — (Auto-Scrape only, if Firecrawl available) visual brand assets auto-discovered from URL: logo, colors, fonts, brand traits. Reports what was found and what wasn't.
 
 The voice profile includes a structured JSON data block validated against `brand_context/schemas/voice-profile.schema.json`. This enables downstream skills and automation to read voice data programmatically.
 
@@ -43,18 +45,42 @@ If it exists → **Update mode.** Read the existing profile, show a one-paragrap
 
 If it doesn't exist → **Mode selection.** Ask:
 
-> "Do you have existing content that represents how you want to sound?
-> 1. Yes — paste it in and I'll extract your voice from it
-> 2. No — I'll build it from scratch with a few questions
-> 3. Give me your URL — I'll research it myself"
+> "How do you want to set up your voice?
+> 1. I have brand guidelines — import them and I'll map everything across
+> 2. I have content samples — paste them and I'll extract your voice
+> 3. Start from scratch — I'll ask a few questions and build it
+> 4. Here's my URL — research it yourself"
 
-If the user provides a URL in their first message, skip mode selection and go directly to Auto-Scrape.
+If the user provides a URL in their first message, skip mode selection and go directly to Auto-Scrape. If they attach or paste a structured brand guide, go directly to Import.
 
 ---
 
-## Mode 1: Extract
+## Mode 1: Import
 
-Best for: website copy, emails, social posts, newsletters, transcripts.
+Best for: brands that already have voice/tone guidelines, brand books, or style guides.
+
+**Accepts:** Pasted text, PDF, or any document containing existing brand voice guidelines.
+
+**Process:**
+1. Read the provided guidelines fully
+2. Map their structure into the voice-profile.md format (see `references/voice-profile-template.md`)
+3. Flag any gaps — common missing pieces: real samples, anti-patterns (what the brand does NOT sound like), platform-specific rules, vocabulary lists
+4. Present a summary: "Here's what your guidelines cover and what's missing"
+5. **Enrich offer:** Ask if they want to layer on additional sources to fill gaps and add real-world samples:
+   - "Want me to pull from your LinkedIn, website, or other content to add real samples and fill the gaps?"
+   - If yes → run Auto-Scrape or Extract on the additional sources, then merge findings into the imported profile
+   - If no → proceed with what's there, noting gaps in the profile
+
+**Merge rules when enriching:**
+- The imported guidelines are the authority — enriched content fills gaps, it doesn't override
+- If enriched content contradicts the guidelines, flag it: "Your guidelines say X but your LinkedIn sounds more like Y — which is the real you?"
+- Samples from real content always go to `samples.md`, even when the guidelines provided example copy
+
+---
+
+## Mode 2: Extract
+
+Best for: raw content — website copy, emails, social posts, newsletters, transcripts.
 
 **Sample gate:** Minimum 3 samples OR 500+ total words. Under 500 words → offer Quick mode (top 5 traits + 3 rules) or ask for more content.
 
@@ -71,7 +97,7 @@ After analyzing, collect 5-10 sentences that best represent the voice for `sampl
 
 ---
 
-## Mode 2: Build
+## Mode 3: Build
 
 Best for: starting fresh, or existing content is too generic to reliably extract from.
 
@@ -83,20 +109,56 @@ After building, ask the user for 2-3 sample sentences in their voice for `sample
 
 ---
 
-## Mode 3: Auto-Scrape
+## Mode 4: Auto-Scrape
 
 Best for: user provides a URL and wants research done for them.
 
-1. Fetch: homepage, About page, 2-3 blog posts, LinkedIn bio + recent posts, Twitter/X
+### Scraping Strategy
+
+Try sources in this order, using the cheapest tool that works:
+
+1. **WebFetch first** (free) — try homepage, About page, 2-3 blog posts, LinkedIn
+2. **If WebFetch fails** (JS-heavy site, bot protection, empty content) → fall back to `tool-firecrawl-scraper` skill
+   - Check `.env` for `FIRECRAWL_API_KEY` first
+   - If missing, tell the user: "This site needs Firecrawl to scrape properly. Add `FIRECRAWL_API_KEY=fc-your-key` to your `.env` file (free tier at firecrawl.dev)."
+   - If present, use Firecrawl scrape endpoint with `formats=["markdown"]`
+
+### Brand Asset Extraction
+
+When a URL is provided, also run **Firecrawl branding extraction** (if API key available) to auto-discover visual brand assets:
+
+```
+formats=["branding"]  →  colors, fonts, logos, spacing, brand traits
+```
+
+Report back to the user:
+> **Found from your site:**
+> - Logo: [URL or "not found"]
+> - Primary colors: [hex values or "not found"]
+> - Fonts: [font names or "not found"]
+> - Brand traits: [if detected]
+>
+> **Couldn't find automatically:**
+> - [List anything missing — social handles, brand photography, etc.]
+>
+> You can add these manually to `brand_context/assets.md`.
+
+If Firecrawl isn't available, skip branding extraction and note: "I couldn't auto-detect your visual brand assets. You can add them manually to `brand_context/assets.md` later."
+
+### Voice Extraction Process
+
+1. Fetch content from: homepage, About page, 2-3 blog posts, LinkedIn bio + recent posts, Twitter/X
 2. Report what was found (pages, word count, quality signal)
-3. Feed all content into Extract mode
+3. Feed all content into Extract mode (Mode 2)
 4. Follow up with 2-3 gap-filling questions: evolution intent, hated phrases, voice inspiration
 
-If web tools unavailable, fall back gracefully: "I can't access URLs in this environment — want to paste your content or answer a few questions instead?"
+### Fallback
+
+If both WebFetch and Firecrawl are unavailable: "I can't access URLs in this environment — want to paste your content or answer a few questions instead?"
 
 ---
 
-## Step 4: Voice Test (All Modes)
+## Step 5: Voice Test (All Modes)
 
 After producing any voice profile, validate before saving. Do not skip.
 
@@ -115,7 +177,7 @@ Cap at 3 rounds. If still unresolved, offer to save current version and refine o
 
 ---
 
-## Step 5: Save Output
+## Step 6: Save Output
 
 **`brand_context/voice-profile.md`**
 Read `references/voice-profile-template.md` for the exact format. All sections required.

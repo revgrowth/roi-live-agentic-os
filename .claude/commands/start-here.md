@@ -35,21 +35,32 @@ Read README.md and give the user a brief, genuine explanation of what they've se
 
 Keep it conversational — 4-6 sentences max, not a feature dump. End with the first question.
 
-### Step 2: Core Questions (ONE AT A TIME)
+### Step 2: Core Questions (ONE AT A TIME, SKIP IF ALREADY ANSWERED)
 
-Ask these four questions sequentially. Wait for each answer before asking the next.
+Ask up to four questions sequentially. Wait for each answer before asking the next.
 Do NOT present all four at once.
+
+**Before each question, check if the user already provided the answer in a previous response.** People often cover multiple topics in one answer (e.g., describing their business AND their ideal customer together). If you already have enough information for a question, skip it and move to the next one. Acknowledge what you picked up so the user knows you were listening.
 
 **Question 1:** "What does your business do? Give me the one-sentence version."
 → Wait for answer.
 
 **Question 2:** "Who's your ideal customer — who do you help?"
-→ Wait for answer.
+→ Skip if Q1 answer already described the customer clearly enough to build an ICP.
 
 **Question 3:** "What makes you different from the alternatives?"
 → Wait for answer.
 
-**Question 4:** "How do you want to come across? (e.g. direct, warm, authoritative, playful)"
+**Question 4:** "How do you want to come across? Here are some common tones with examples:"
+
+> **Direct** — gets to the point, no fluff. *"Here's what works. Do this, skip that."*
+> **Warm** — friendly, approachable, like talking to someone who genuinely cares. *"I've been there — let me show you what helped me."*
+> **Authoritative** — expert-led, confident, data-backed. *"The data is clear: businesses that automate X see 3x output."*
+> **Playful** — casual, witty, doesn't take itself too seriously. *"Look, nobody wakes up excited about admin. That's the whole point."*
+> **Provocative** — challenges assumptions, gets people to rethink. *"You don't have a hiring problem. You have an automation problem."*
+> **Empathetic** — leads with understanding, validates the struggle. *"Scaling alone is exhausting. You shouldn't need a team of 10 to get there."*
+
+"You can pick one, mix a couple, or describe it your own way."
 → Wait for answer.
 
 Capture all answers. You'll use them to build brand_context/.
@@ -61,11 +72,27 @@ Ask: "Got a website, LinkedIn, YouTube, or any other links I should know about �
 If yes:
 - Separate into business vs personal links and handles
 - Save all to `brand_context/assets.md` under the correct sections
-- Use web_fetch to retrieve content from provided URLs for voice extraction
+- Try WebFetch first to retrieve content from provided URLs for voice extraction
+- If WebFetch fails (JS-heavy, bot-blocked), check `.env` for `FIRECRAWL_API_KEY`:
+  - **Key present** → use Firecrawl scrape + branding extraction (auto-discover logo, colors, fonts)
+  - **Key missing** → tell the user: "Your site needs a more powerful scraper to read properly. If you add a Firecrawl API key to your `.env` file, I can pull your brand assets (logo, colors, fonts) automatically. Free tier at firecrawl.dev — 500 credits/month. For now, I'll work with what I can access."
 - Extract 5-10 gold-standard sentences that represent their voice
 - Note what makes each sentence representative
+- If Firecrawl branding was used, report what was found vs what wasn't (see mkt-brand-voice Mode 4 for the format)
 
 If no: skip URL extraction, but still create `brand_context/assets.md` with empty fields so it's ready for later.
+
+### Step 3b: Environment Check
+
+Scan `.env.example` for all documented API keys. Check which are configured in `.env`.
+
+If any keys are missing, mention them once (not as a blocker):
+> "A few optional integrations are available. You can add these to your `.env` file anytime:"
+> - `FIRECRAWL_API_KEY` — powers advanced web scraping and auto-detects your brand assets (logo, colors, fonts). Free tier at firecrawl.dev.
+>
+> "None of these are required — everything works without them, they just unlock extra features."
+
+If all keys are present, skip this step silently.
 
 ### Step 4: Local File Scan (Conditional)
 

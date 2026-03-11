@@ -1,1 +1,4 @@
 .env
+.mcp.json
+settings.local.json
+cron/logs/

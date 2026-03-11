@@ -103,6 +103,37 @@ writes like you, for your audience, with your angle.
 | `mkt-positioning` | Finds the market angle that makes your offer stand out and sell |
 | `mkt-icp` | Maps your ideal customer — their pain, language, objections, and buying triggers |
 
+### Strategy Skills
+
+| Skill | What it does |
+|-------|-------------|
+| `str-trending-research` | Research what's trending in the last 30 days across Reddit, X, and the web. Uses OpenAI + xAI APIs for real engagement data (upvotes, likes, comments) with WebSearch fallback. Produces research briefs other skills consume. Adapted from [last30days by Ronnie-Nutrition](https://github.com/Ronnie-Nutrition/last30days-skill). |
+
+### Utility Skills
+
+| Skill | What it does |
+|-------|-------------|
+| `tool-firecrawl-scraper` | Web scraping backend — JS rendering, anti-bot bypass, branding extraction. Used by other skills when default tools fail |
+| `tool-humanizer` | Strips AI writing patterns from text. 50+ pattern detection, human-ness scoring, voice-matched replacements. Called automatically by execution skills before saving output |
+| `tool-youtube` | Fetch latest YouTube videos from channels and pull full transcripts. Two modes: channel listing (YouTube Data API) and transcript extraction (yt-dlp). Used by content repurposing as a source |
+
+### Execution Skills
+
+| Skill | What it does |
+|-------|-------------|
+| `mkt-content-repurposing` | Repurpose one piece of content into platform-native posts across LinkedIn, X, Instagram, TikTok, YouTube, Threads, Bluesky, and Reddit |
+| `mkt-copywriting` | Write persuasive copy that converts — landing pages, sales pages, emails, ads, social posts. Scores on 7 dimensions with variant generation |
+| `viz-excalidraw-diagram` | Generate Excalidraw diagram JSON files that argue visually — workflows, architectures, concepts, protocols. Renders to PNG via Playwright with validation loop |
+| `viz-nano-banana` | Generate images and infographics via Gemini 3 Pro Image. Five styles: technical (annotated schematics), notebook (sketchnotes), comic (B&W storyboard), color (warm illustrated), mono (sketchy ink). Direct prompt or SVG blueprint mode |
+| `viz-ugc-heygen` | Create UGC-style avatar videos via HeyGen API. Two modes: Video Agent (prompt-driven, one-shot) and Precise (exact script, specific avatar look + voice). Loads brand voice for scripting. Polls for completion and returns download URL |
+| `mkt-ugc-scripts` | Write short-form UGC video scripts for talking-head and avatar delivery. Research-driven topic selection via trending research, 10 script frameworks, hook library. Feeds into viz-ugc-heygen for video generation |
+
+### Operations Skills
+
+| Skill | What it does |
+|-------|-------------|
+| `ops-cron` | Schedule persistent cron jobs that run Claude Code headlessly. Job files in `cron/jobs/` with YAML frontmatter, installed to system crontab. Survives reboots, no 3-day limit |
+
 ### Meta Skills
 
 | Skill | What it does |
@@ -122,6 +153,7 @@ Every skill uses a category prefix that matches its output folder.
 | `viz` | Visual / Video | `viz-thumbnail-creator`, `viz-ugc-generator` |
 | `acc` | Accounting | `acc-invoice-generator`, `acc-expense-tracker` |
 | `meta` | System / Meta | `meta-skill-creator`, `meta-wrap-up` |
+| `tool` | Utility / Integration | `tool-firecrawl-scraper` |
 
 New categories are added when the first skill in a new domain is built.
 The architecture supports unlimited skills across any domain.
@@ -159,6 +191,7 @@ agentic-os/
 │   └── memory/                        <- Daily session logs (YYYY-MM-DD.md)
 │
 ├── .env                               <- API keys (gitignored)
+├── .env.example                       <- Template showing available keys
 │
 ├── .claude/
 │   ├── hooks_info/                    <- Hook scripts (bundled)
@@ -172,8 +205,25 @@ agentic-os/
 │       ├── mkt-positioning/           <- Market angle discovery
 │       ├── mkt-icp/                   <- Ideal customer profiling
 │       ├── meta-wrap-up/              <- End-of-session checklist + sync
+│       ├── str-trending-research/     <- Trending topic research (last 30 days)
+│       │   └── scripts/              <- Python backend for Reddit/X API access
 │       ├── meta-skill-creator/        <- Build new skills
+│       ├── mkt-content-repurposing/    <- Content repurposing across platforms
+│       ├── mkt-copywriting/           <- Persuasive copy (landing pages, emails, ads)
+│       ├── tool-firecrawl-scraper/    <- Web scraping backend (Firecrawl API)
+│       ├── tool-humanizer/           <- AI pattern removal + human voice restoration
+│       ├── tool-youtube/            <- YouTube channel listing + transcript extraction
+│       ├── viz-excalidraw-diagram/    <- Excalidraw diagram generation with render validation
+│       ├── viz-nano-banana/           <- Image generation via Gemini (5 styles + SVG blueprint mode)
+│       ├── viz-ugc-heygen/           <- UGC avatar video creation via HeyGen API
+│       ├── mkt-ugc-scripts/         <- Short-form UGC script writing (10 frameworks + hook library)
+│       ├── ops-cron/                 <- Persistent cron job scheduling
 │       └── ...                        <- New skills added over time
+│
+├── cron/                              <- Scheduled jobs (system crontab)
+│   ├── jobs/                         <- Job definitions (YAML + prompt)
+│   ├── logs/                         <- Run output (gitignored)
+│   └── install.sh                    <- Register/unregister with crontab
 │
 ├── brand_context/                     <- Client brand data (version controlled)
 │   ├── schemas/                       <- Data contracts for brand context
@@ -252,6 +302,17 @@ Hooks fire automatically on `UserPromptSubmit`, `Stop`, and
 
 ---
 
+## Connected Tools (MCP Servers)
+
+| Server | Transport | What it provides |
+|--------|-----------|-----------------|
+| HeyGen | stdio (`uvx heygen-mcp`) | AI avatar video generation — list avatars, voices, generate videos, check status, credits |
+
+MCP servers are configured in `.mcp.json` at the project root. When you add a new
+server, the Heartbeat detects and documents it automatically.
+
+---
+
 ## FAQ
 
 **How do I update my brand voice after it's set?**
@@ -291,9 +352,31 @@ picks it up and documents it in README.md.
 - macOS or Windows 10+ (for desktop notifications)
 
 **Optional:**
-- API keys for connected tools added to `.env`
+- API keys for connected tools added to `.env` (see `.env.example` for all available keys)
 - MCP servers configured in `.claude/settings.json`
 - Skills detect connected tools automatically and adapt
+
+### External Services
+
+Some skills use external APIs for enhanced functionality. None are required —
+everything works without them, they just unlock extra features.
+
+| Service | Key | What it adds | Without it |
+|---------|-----|-------------|------------|
+| [Firecrawl](https://www.firecrawl.dev) | `FIRECRAWL_API_KEY` | JS-heavy site scraping, brand asset auto-detection (logo, colors, fonts) | Falls back to WebFetch, then manual paste |
+| [OpenAI](https://platform.openai.com) | `OPENAI_API_KEY` | Reddit search with real upvotes, comments, and discussion insights | Falls back to WebSearch (no engagement data) |
+| [xAI](https://console.x.ai) | `XAI_API_KEY` | X/Twitter search with real likes, reposts, and reply counts | Falls back to WebSearch (no engagement data) |
+| [YouTube Data API v3](https://console.cloud.google.com/) | `YOUTUBE_API_KEY` | Channel video listing, @handle resolution, video search | Transcript mode still works with direct URLs. Channel listing unavailable |
+| [Google Gemini](https://ai.google.dev/) | `GEMINI_API_KEY` | Image generation via Gemini 3 Pro Image (5 visual styles) | No fallback — image generation requires the API key. Free tier available |
+| [HeyGen](https://app.heygen.com) | `HEYGEN_API_KEY` | AI avatar video generation with cloned avatars and custom voices | No fallback — video generation requires the API key and HeyGen plan credits |
+
+Copy `.env.example` to `.env` and add your keys:
+```
+cp .env.example .env
+```
+
+Skills will prompt you if they need a key you haven't added yet, and always
+offer a fallback so work isn't blocked.
 
 ---
 

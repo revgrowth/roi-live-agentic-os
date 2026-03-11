@@ -2,27 +2,32 @@
 
 ## About
 
-- Name: [filled during /start-here setup]
-- Business: [filled during /start-here setup]
-- Role: [founder / marketer / agency / student]
-- Website: [filled during /start-here setup]
+- Name: Simon Coton
+- Business: Simon Scrapes / Agentic Academy (Scrapes.ai)
+- Role: Founder
+- Website: https://skool.com/scrapes
+- Location: Bristol, UK
 
 ## Preferences
 
-- Communication style: [direct / detailed / casual — filled during setup]
-- Output format: [markdown / files / both — filled during setup]
-- Preferred output length: [concise / detailed — filled during setup]
+- Communication style: Direct, casual
+- Output format: markdown / files
+- Preferred output length: Concise — get to the point
 
 ## Working Style
 
-- [Anything learned about how this person likes to work]
-- [Preferred feedback cadence]
-- [Any known constraints or context]
+- Prefers action over discussion — gives context in natural language, expects the system to pick up signals without asking redundant questions
+- Will flag when something needs improving in the system itself (not just the output)
+- Iterates on the OS and its skills as a product, not just as a user
 
 ## Notes
 
-[Anything else learned over time about working style, preferences, or context
-that doesn't fit the above categories. Updated by the agent as patterns emerge.]
+- Background in mechanical engineering (University of Bath), transitioned to AI automation
+- Runs a Skool community + YouTube channel as primary channels
+- Teaches Claude Code + n8n to business owners and agency builders
+- This Agentic OS project is both his tool AND his product — he uses it and teaches others to build their own
+- 3K LinkedIn followers, 500+ connections
+- Certified Scrum Product Owner, former COO-track
 
 ---
 

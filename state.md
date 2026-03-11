@@ -44,12 +44,12 @@ Tracks progress against PRD.md §14 build phases. Updated as work completes.
 
 | Skill | Status | Notes |
 |-------|--------|-------|
-| direct-response-copy | ⬜ Pending | Needs reference skill from user |
+| mkt-copywriting | ✅ Done | Rebuilt from direct-response-copy reference. 156-line SKILL.md + 3 references (persuasion-toolkit, variants-and-scoring, classic-frameworks) |
 | seo-content | ⬜ Pending | Needs reference skill from user |
 | email-sequences | ⬜ Pending | Needs reference skill from user |
 | lead-magnet | ⬜ Pending | Needs reference skill from user |
 | keyword-research | ⬜ Pending | Needs reference skill from user |
-| content-atomizer | ⬜ Pending | Needs reference skill from user |
+| mkt-content-atomizer | ✅ Done | Renamed from content-atomizer, registered in CLAUDE.md + README |
 
 ## Phase 5: Expand ⬜
 

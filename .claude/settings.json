@@ -26,7 +26,7 @@
       "Bash(ssh *)",
       "Bash(scp *)",
       "Read(.env)",
-      "Read(.env.*)",
+      "Read(.env.local)",
       "Read(**/secrets/*)",
       "Read(**/*credential*)",
       "Read(**/*.pem)",

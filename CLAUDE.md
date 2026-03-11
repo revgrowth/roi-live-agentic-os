@@ -46,11 +46,12 @@ Compare what's on disk against what's registered in this file. Fix any drift sil
 
 **Skills — compare `.claude/skills/` folders vs the Skill Registry and Context Matrix tables above:**
 
-1. **New skill on disk, not in CLAUDE.md?** → Read its YAML frontmatter, then:
+1. **New skill on disk, not in CLAUDE.md?** → Read its YAML frontmatter and full SKILL.md, then:
    - Add a row to the **Skill Registry** table (under the correct category heading)
    - Add a row to the **Context Matrix** table (read `## Context Needs` from its SKILL.md)
    - Add a `## {folder-name}` section to `context/learnings.md` under `# Individual Skills`
    - Add the skill to the **README.md** skill tables and file structure diagram
+   - **Scan for external service dependencies** (see below)
    - Tell the user: "Registered `{skill-name}` — added to CLAUDE.md Skill Registry, Context Matrix, README.md, and context/learnings.md."
 
 2. **Skill in CLAUDE.md but folder missing from disk?** → Ask the user: "`{skill-name}` is in the CLAUDE.md Skill Registry but the folder is gone. Remove it from CLAUDE.md Skill Registry, Context Matrix, README.md, and context/learnings.md?"
@@ -60,6 +61,22 @@ Compare what's on disk against what's registered in this file. Fix any drift sil
 3. **New MCP server in settings.json, not documented?** → Add it to the README.md under a Connected Tools section (create the section if it doesn't exist). Tell the user what was added.
 
 4. **Documented MCP removed from settings.json?** → Ask the user: "`{mcp-name}` is documented but no longer in settings.json. Remove from README.md?"
+
+**External service detection — runs as part of step 1 above (new skill registration):**
+
+5. **Scan the new skill's SKILL.md and references/ for external API dependencies.** Look for:
+   - Environment variable references (e.g. `FIRECRAWL_API_KEY`, `OPENAI_API_KEY`, any `*_API_KEY` or `*_SECRET` pattern)
+   - API endpoint URLs (e.g. `api.firecrawl.dev`, `api.openai.com`)
+   - SDK imports (e.g. `from firecrawl import`, `import openai`)
+   - Explicit mentions of requiring API keys or external services
+
+6. **For each external service found**, check if it's already documented:
+   - **Not in CLAUDE.md Service Registry?** → Add a row to the **External Services & API Keys → Service Registry** table with: service name, key name, which skills use it, what it enables, fallback without it
+   - **Not in `.env.example`?** → Add the key with a comment explaining the service, signup URL if found, and which skill uses it
+   - **Not in README.md External Services table?** → Add a row
+   - Tell the user: "Found external dependency: `{service}` (`{KEY_NAME}`). Added to Service Registry, `.env.example`, and README. Add your key to `.env` when ready — the skill works without it using [fallback]."
+
+7. **If a skill is removed** and was the last skill using a particular service → ask the user: "`{service}` is no longer used by any skill. Remove from Service Registry, `.env.example`, and README?"
 
 ### Task Routing
 
@@ -118,6 +135,7 @@ Every skill and its output folder uses a category prefix. This keeps skills, out
 | `viz` | Visual / Video | `viz-thumbnail-creator`, `viz-ugc-generator` |
 | `acc` | Accounting | `acc-invoice-generator`, `acc-expense-tracker` |
 | `meta` | System / Meta | `meta-skill-creator`, `meta-wrap-up` |
+| `tool` | Utility / Integration | `tool-firecrawl-scraper` — backend tools used by other skills |
 
 **Rules:**
 - Skill folder name = `{category}-{skill-name}` in kebab-case
@@ -147,7 +165,36 @@ Every skill and its output folder uses a category prefix. This keeps skills, out
 | `mkt-positioning` | "differentiation", "angle", "hooks", "USP" | `positioning.md` |
 | `mkt-icp` | "target audience", "buyer persona", "ideal customer" | `icp.md` |
 
+### Utility Skills (backends used by other skills)
+
+| Skill | Triggers on | Used by |
+|-------|------------|---------|
+| `tool-firecrawl-scraper` | "scrape website", "crawl site", "extract data from URL", "brand assets from URL" | `mkt-brand-voice` (Auto-Scrape fallback + branding extraction) |
+| `tool-humanizer` | "humanize this", "de-AI this", "make this sound human", "remove AI patterns", "clean up this copy" | All execution skills (auto post-processing) |
+| `tool-youtube` | "latest youtube video", "get transcript", "youtube transcript", "what did they post", "fetch from youtube", "channel updates" | `mkt-content-repurposing` (content source). Saves transcripts to `projects/tool-youtube/` |
+
+### Strategy Skills
+
+| Skill | Triggers on | Writes to |
+|-------|------------|-----------|
+| `str-trending-research` | "research", "research X", "what's trending", "what are people saying about", "last 30 days", "look into", "dig into", "what's new with" | `projects/str-trending-research/` |
+
 ### Execution Skills
+
+| Skill | Triggers on | Writes to |
+|-------|------------|-----------|
+| `mkt-content-repurposing` | "repurpose this", "turn this into social posts", "atomize", "LinkedIn post from this", "thread from this", "content calendar" | `projects/mkt-content-repurposing/` |
+| `mkt-copywriting` | "write copy for", "landing page copy", "sales page", "help me sell", "punch this up", "make this convert", "score this copy", "ad copy" | `projects/mkt-copywriting/` |
+| `viz-excalidraw-diagram` | "excalidraw diagram", "draw a diagram", "visualize this workflow", "architecture diagram", "system diagram", "diagram this", "excalidraw" | `projects/viz-excalidraw-diagram/` |
+| `viz-nano-banana` | "generate an image", "create an infographic", "nano banana", "notebook sketch", "comic strip", "hand-drawn diagram", "visual for", "make an image of", "sketchnote", "storyboard" | `projects/viz-nano-banana/` |
+| `viz-ugc-heygen` | "create a video", "UGC video", "heygen video", "talking head video", "avatar video", "make a video about", "video script", "generate video" | `projects/viz-ugc-heygen/` |
+| `mkt-ugc-scripts` | "write a script", "UGC script", "video script for", "short form script", "TikTok script", "Reels script", "Shorts script", "script ideas for", "what should I make a video about" | `projects/mkt-ugc-scripts/` |
+
+### Operations Skills
+
+| Skill | Triggers on | Writes to |
+|-------|------------|-----------|
+| `ops-cron` | "schedule a job", "cron job", "run this every morning", "automate daily", "recurring task", "list scheduled jobs", "check cron logs" | `cron/jobs/`, system crontab |
 
 *Add new skills to this table when built and registered.*
 
@@ -159,10 +206,21 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 
 | Skill | voice-profile | positioning | icp | samples | assets | learnings |
 |-------|:---:|:---:|:---:|:---:|:---:|:---:|
-| `mkt-brand-voice` | **writes** | summary | — | **writes** | links only | `## mkt-brand-voice` |
+| `mkt-brand-voice` | **writes** | summary | — | **writes** | **writes** (via firecrawl branding) | `## mkt-brand-voice` |
 | `mkt-positioning` | — | **writes** | full | — | — | `## mkt-positioning` |
 | `mkt-icp` | — | summary | **writes** | — | — | `## mkt-icp` |
 | `meta-wrap-up` | — | — | — | — | — | `## meta-wrap-up` |
+| `tool-firecrawl-scraper` | — | — | — | — | — | `## tool-firecrawl-scraper` |
+| `str-trending-research` | — | — | language section | — | — | `## str-trending-research` |
+| `mkt-content-repurposing` | full | — | — | yes | — | `## mkt-content-repurposing` |
+| `mkt-copywriting` | full | angle only | full | yes | — | `## mkt-copywriting` |
+| `tool-humanizer` | full | — | — | tone refs | — | `## tool-humanizer` |
+| `tool-youtube` | — | — | — | — | — | `## tool-youtube` |
+| `viz-excalidraw-diagram` | — | — | — | — | — | `## viz-excalidraw-diagram` |
+| `viz-nano-banana` | — | — | — | — | — | `## viz-nano-banana` |
+| `viz-ugc-heygen` | full | — | language section | tone refs | — | `## viz-ugc-heygen` |
+| `mkt-ugc-scripts` | full | angle only | language section | tone refs | — | `## mkt-ugc-scripts` |
+| `ops-cron` | — | — | — | — | — | `## ops-cron` |
 
 *New skills declare their own row when added.*
 
@@ -181,6 +239,17 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 - Folders are created on first use by the skill. No empty pre-scaffolding.
 - Default format: markdown unless user specifies otherwise
 - After major deliverables: ask for feedback, log to `context/learnings.md`
+
+### Humanizer Gate
+
+**Every skill that produces publishable text must run its output through `tool-humanizer` as a final step before saving.** This is not optional.
+
+- Execution skills (copywriting, content repurposing, email sequences, blog posts, etc.) call the humanizer in pipeline mode after generating content
+- The humanizer uses `deep` mode when `brand_context/voice-profile.md` exists, `standard` mode otherwise
+- Only show the score summary to the user if the change was significant (delta > 2 points)
+- Skills that produce non-publishable output (research briefs, ICP profiles, positioning docs, schemas) skip this step
+
+When building new skills, include a humanizer step in the methodology if the skill writes content meant for an audience. Reference `tool-humanizer` in pipeline mode.
 
 ### Schemas (Two-Tier System)
 
@@ -212,13 +281,43 @@ When a skill produces structured output, it should read the relevant schema befo
 .claude/skills/{category}-{skill-name}/
 ├── SKILL.md          ← YAML frontmatter + methodology (~200 lines max)
 ├── references/       ← Depth material, one topic per file (~200-300 lines each)
+├── scripts/          ← Executable scripts including setup.sh for auto-install (optional)
 └── assets/           ← Example outputs, design references, templates (optional)
 ```
+
+### Auto-Setup Convention
+
+Skills that need external binaries (e.g. `uv`, `yt-dlp`, `ffmpeg`) must include a `scripts/setup.sh` that auto-detects and installs them. The SKILL.md should include a **Step 0: Auto-Setup** that runs this script before any other operation.
+
+**Rules:**
+- The setup script checks `command -v` first — never reinstall what already exists
+- Uses `brew` on macOS if available, falls back to `curl`/`pip`/other package managers
+- Reports clear success/failure per dependency
+- Only runs once per machine — skip on subsequent calls if all binaries are present
+- Never requires user interaction (no prompts, no sudo unless absolutely necessary)
 
 ### YAML frontmatter rules
 - ~100 words, under 1024 characters
 - Include trigger phrases AND negative triggers
 - No XML angle brackets
+
+### Skill Dependencies
+
+Skills can depend on other skills. Declare dependencies in a `## Dependencies` section in SKILL.md so the system knows what's needed.
+
+```markdown
+## Dependencies
+
+| Skill | Required? | What it provides | Without it |
+|-------|-----------|-----------------|------------|
+| `tool-youtube` | Optional | YouTube transcript fetching | Ask user to paste content manually |
+```
+
+**Rules:**
+- **Required** dependencies must be installed for the skill to function at all
+- **Optional** dependencies enhance the skill but it works without them — always declare the fallback
+- At session start, if a skill is invoked and a required dependency is missing, tell the user which skill to install
+- Dependencies are one-way — utility (`tool-`) skills never depend on execution skills
 
 ### Registration checklist
 - [ ] Folder name = `{category}-{skill-name}` matching the Skill Categories table
@@ -228,8 +327,11 @@ When a skill produces structured output, it should read the relevant schema befo
 - [ ] Frontmatter < 1024 chars
 - [ ] SKILL.md < 200 lines
 - [ ] References are self-contained
+- [ ] If the skill depends on other skills: add a `## Dependencies` section to SKILL.md
 - [ ] If the skill produces structured/repeatable output: create a schema in `brand_context/schemas/` (for brand context data) or `projects/{folder}/00-schemas/` (for output data) and reference it from SKILL.md
 - [ ] Declare which `projects/` subfolder(s) the skill writes to (must use same category prefix)
+- [ ] **External services**: If the skill uses any external API, ensure the key is in the Service Registry (CLAUDE.md), `.env.example`, and README.md External Services table. The reconciliation does this automatically, but verify it ran.
+- [ ] **Humanizer gate**: If the skill produces publishable text (blog posts, social content, copy, emails), include a step that runs output through `tool-humanizer` in pipeline mode before saving
 
 ### Folder naming
 - Format: `{category}-{skill-name}` in kebab-case (e.g., `mkt-brand-voice`, `ops-client-onboarding`)
@@ -258,8 +360,39 @@ Brand context **enhances**. It never gates functionality.
 
 ---
 
+## External Services & API Keys
+
+Some skills use external services for enhanced functionality. API keys are stored in `.env` (gitignored). `.env.example` documents all available keys.
+
+### Service Registry
+
+| Service | API Key | Used by | What it enables | Without it |
+|---------|---------|---------|----------------|------------|
+| Firecrawl | `FIRECRAWL_API_KEY` | `tool-firecrawl-scraper`, `mkt-brand-voice` (Auto-Scrape) | JS-heavy site scraping, anti-bot bypass, brand asset extraction (logo, colors, fonts) | Falls back to WebFetch (free). If that also fails, asks user to paste content manually |
+| OpenAI | `OPENAI_API_KEY` | `str-trending-research` | Reddit search via Responses API with `web_search` tool — real upvotes, comments, top comment insights | Falls back to WebSearch (free, no engagement metrics) |
+| xAI | `XAI_API_KEY` | `str-trending-research` | X/Twitter search via xAI API with `x_search` tool — real likes, reposts, reply counts | Falls back to WebSearch (free, no engagement metrics) |
+| YouTube Data API v3 | `YOUTUBE_API_KEY` | `tool-youtube` | Channel video listing, @handle resolution, search | Transcript mode still works with direct URLs (free via yt-dlp). Channel listing unavailable |
+| Google Gemini | `GEMINI_API_KEY` | `viz-nano-banana` | Image generation via Gemini 3 Pro Image | No fallback — image generation requires the API key. Free tier available |
+| HeyGen | `HEYGEN_API_KEY` | `viz-ugc-heygen` | AI avatar video generation with cloned avatars and custom voices | No fallback — video generation requires the API key and HeyGen plan credits |
+
+*Add new services to this table and to `.env.example` when skills are built that use them.*
+
+### Rules for Skills Using External Services
+
+1. **Check before using.** Before calling any external API, check `.env` for the required key. Never assume it's there.
+2. **Tell the user what they're missing.** If the key is absent, explain clearly:
+   - What the service does
+   - What they'll miss without it
+   - How to get a key (signup URL, free tier info)
+   - Where to put it: "Add `KEY_NAME=your-key` to your `.env` file"
+3. **Always have a fallback.** No skill should break because an API key is missing. Degrade gracefully — use free tools first, then prompt for the key only when the free path fails.
+4. **Don't block work.** If the fallback produces usable (even if less rich) output, proceed and note what would improve with the API key.
+5. **Update `.env.example`** when adding a new external service dependency.
+
+---
+
 ## Permissions
 
 `.claude/settings.json` allows: `cat`, `ls`, `npm run *`, basic git commands, edits to `/src/**`
 
-Denied: package installs, `rm`/`curl`/`wget`/`ssh`, reading `.env` or credential files.
+Denied: package installs, `rm`/`curl`/`wget`/`ssh`, reading `.env`/`.env.local` or credential files. `.env.example` is readable and editable (it's a template, not secrets).

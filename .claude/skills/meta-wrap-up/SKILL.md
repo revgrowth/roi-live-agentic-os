@@ -124,7 +124,12 @@ Run the reconciliation described in CLAUDE.md's **Skill & MCP Reconciliation** s
    - New skill folder not yet registered → add to CLAUDE.md Skill Registry, Context Matrix, README.md skill tables, and `context/learnings.md`
    - Registered skill whose folder was deleted → ask user: "Remove `{skill-name}` from CLAUDE.md Skill Registry, Context Matrix, README.md, and context/learnings.md?"
 
-2. **MCPs** — compare `.claude/settings.json` MCP entries against README.md:
+2. **External services** — for any new or modified skills, scan for API key dependencies (see CLAUDE.md § External service detection). Auto-add any new services to:
+   - CLAUDE.md Service Registry table
+   - `.env.example`
+   - README.md External Services table
+
+3. **MCPs** — compare `.claude/settings.json` MCP entries against README.md:
    - New MCP not documented → add to README.md Connected Tools section
    - Documented MCP removed from settings → ask user: "Remove `{mcp-name}` from README.md?"
 

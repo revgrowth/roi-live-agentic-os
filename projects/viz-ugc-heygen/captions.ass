@@ -1,0 +1,36 @@
+[Script Info]
+Title: movio
+ScriptType: v4.00+
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+
+Style: Default,Roboto-Bold,18.0,&H00FFFFFF,&H000000FF,&H00F56E2E,&H80000000,1,0,0,0,100,100,0,0,3,3,0,2,10,10,30,1
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:0:0.00,0:0:2.13,Default,,0000,0000,0000,,I just set up something \nin Claude Code that 
+Dialogue: 0,0:0:2.13,0:0:4.26,Default,,0000,0000,0000,,completely changed how I \nuse it day to day. 
+Dialogue: 0,0:0:4.26,0:0:6.54,Default,,0000,0000,0000,,So Claude Code now has \nthis slash loop feature 
+Dialogue: 0,0:0:6.54,0:0:8.72,Default,,0000,0000,0000,,which basically lets you \ntell Claude to keep 
+Dialogue: 0,0:0:8.72,0:0:10.14,Default,,0000,0000,0000,,running a prompt on a \ntimer. 
+Dialogue: 0,0:0:10.14,0:0:12.46,Default,,0000,0000,0000,,Every five minutes, \nevery ten minutes, whatever 
+Dialogue: 0,0:0:12.46,0:0:12.93,Default,,0000,0000,0000,,you want. 
+Dialogue: 0,0:0:12.93,0:0:15.16,Default,,0000,0000,0000,,And the reason this is \nso useful is because I 
+Dialogue: 0,0:0:15.16,0:0:17.19,Default,,0000,0000,0000,,was spending a stupid \namount of time just 
+Dialogue: 0,0:0:17.19,0:0:18.47,Default,,0000,0000,0000,,checking things manually . 
+Dialogue: 0,0:0:18.47,0:0:19.37,Default,,0000,0000,0000,,Is the build done? 
+Dialogue: 0,0:0:19.37,0:0:20.32,Default,,0000,0000,0000,,Did the tests pass? 
+Dialogue: 0,0:0:20.32,0:0:21.74,Default,,0000,0000,0000,,Has anyone replied to my \nPR? 
+Dialogue: 0,0:0:21.74,0:0:23.83,Default,,0000,0000,0000,,I 'd just keep going \nback to the terminal, 
+Dialogue: 0,0:0:23.83,0:0:26.05,Default,,0000,0000,0000,,running the same command \nwaiting, going back. 
+Dialogue: 0,0:0:26.05,0:0:28.28,Default,,0000,0000,0000,,Now I just type slash \nloop, five m, check the 
+Dialogue: 0,0:0:28.28,0:0:30.08,Default,,0000,0000,0000,,build status, and Claude \nhandles it. 
+Dialogue: 0,0:0:30.08,0:0:32.30,Default,,0000,0000,0000,,It runs in the \nbackground while I 'm actually 
+Dialogue: 0,0:0:32.30,0:0:33.11,Default,,0000,0000,0000,,doing real work. 
+Dialogue: 0,0:0:33.11,0:0:35.43,Default,,0000,0000,0000,,And the crazy thing is \nit also works with slash 
+Dialogue: 0,0:0:35.43,0:0:37.75,Default,,0000,0000,0000,,commands, so I can loop \nany of my custom skills 
+Dialogue: 0,0:0:37.75,0:0:38.46,Default,,0000,0000,0000,,on a schedule. 
+Dialogue: 0,0:0:38.46,0:0:40.69,Default,,0000,0000,0000,,If you want to see \nexactly how I set this up, 
+Dialogue: 0,0:0:40.69,0:0:41.59,Default,,0000,0000,0000,,link 's in my bio. 
