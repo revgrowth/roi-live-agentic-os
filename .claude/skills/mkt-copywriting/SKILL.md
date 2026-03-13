@@ -153,6 +153,8 @@ Suggest logical next skills based on what was created (e.g., after landing page 
 
 *Updated automatically when the user flags issues. Read before every run.*
 
+- **LinkedIn posts must NOT end with a question.** Close with a strong declarative statement, a CTA, or a punchy fragment instead. This overrides any "end with a question" guidance in reference files. (2026-03-13)
+
 ---
 
 ## Self-Update
