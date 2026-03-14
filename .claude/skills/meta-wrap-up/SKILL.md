@@ -17,9 +17,9 @@ End-of-session checklist. Four steps: review what was done, collect feedback, ap
 ## Outcome
 
 - Updated `context/learnings.md` with session feedback
-- Updated `context/memory/{today}.md` with session log
-- Promoted important insights to `context/MEMORY.md` if business-level
+- Updated `context/memory/{today}.md` with session log (4-section format)
 - Updated `context/USER.md` if new preferences were observed
+- Proposed `context/SOUL.md` updates if behaviour corrections were observed
 - Direct fixes applied to any skills that need them
 - CLAUDE.md Skill Registry, Context Matrix, and README.md synced with any new or removed skills/MCPs
 - Clean git commit of all session work
@@ -30,8 +30,8 @@ End-of-session checklist. Four steps: review what was done, collect feedback, ap
 | File | Load level | How it shapes this skill |
 |------|-----------|--------------------------|
 | `context/learnings.md` | `## meta-wrap-up` section | Check for previous wrap-up insights |
-| `context/MEMORY.md` | Full | Know what's already in long-term memory to avoid duplicates |
 | `context/USER.md` | Full | Check if preferences need updating |
+| `context/SOUL.md` | Full | Check if behaviour rules need updating based on session corrections |
 | All `brand_context/` files | Scan only | Identify which files were created or modified this session |
 
 Load if they exist. Proceed without them if not.
@@ -76,6 +76,7 @@ Two types of updates based on the feedback:
 Log feedback to `context/learnings.md`:
 - Skill-specific feedback → `# Individual Skills` → `## {skill-folder-name}` section
 - Cross-skill patterns → `# General` → `## What works well` or `## What doesn't work well`
+- **Dedup guard:** Before appending, scan the skill's section for duplicate entries. If the same lesson already exists, skip or update the date.
 
 Each entry format:
 ```
@@ -100,17 +101,35 @@ One file per day: `context/memory/{YYYY-MM-DD}.md`. Multiple sessions in one day
 
 **If the file already exists**, append a new `## Session N` block (increment the session number). **If it doesn't exist**, create it.
 
-Each session block must include:
-- `### Goal` — what the user set out to do
-- `### What happened` — bullet points covering tasks completed, deliverables produced, decisions made, feedback received, and anything the next session should know
+Each session block uses a 4-section format:
 
-**Never leave placeholder text** like `[Waiting for user goal]`. Replace placeholders with actual content from the session. If the heartbeat created the file with placeholders, overwrite them now.
+```
+## Session N
 
-### 3d: Promote to Long-Term Memory
+### Goal
+[One line — what the user set out to do]
 
-Review the session for anything that matters beyond today. If you learned something significant — a business fact, a strategic decision, a user preference, an important date — add it to `context/MEMORY.md` under the appropriate section.
+### Deliverables
+- `path/to/file` — what it is
 
-Not every session produces long-term memories. Most won't. Only promote what would be useful weeks from now.
+### Decisions
+- [Decision and rationale]
+
+### Open threads
+- [Anything unfinished for the next session]
+```
+
+**Never leave placeholder text** like `[Waiting for user goal]`. Replace placeholders with actual content from the session. If the heartbeat created the file with placeholders, overwrite them now. Omit sections that don't apply (e.g., no Decisions section if none were made).
+
+### 3d: Evolve SOUL.md (agent-suggested, user-approved)
+
+Review the session for behaviour corrections — moments where the user pushed back, corrected your approach, or expressed frustration with how you handled something. If a correction points to a missing or wrong rule in `context/SOUL.md`, **propose the change to the user**:
+
+- Tell them what you observed: "You corrected me twice about X"
+- Show the proposed SOUL.md edit (the specific line to add/change)
+- Only apply it if they approve
+
+Most sessions won't trigger this. Only propose changes for patterns, not one-off corrections. This keeps SOUL.md sharp over time without silent rewrites.
 
 ### 3e: Update User Preferences
 
@@ -170,7 +189,7 @@ Registry sync:
 
 Memory:
 - Daily log: context/memory/{YYYY-MM-DD}.md
-- Long-term: {what was added to context/MEMORY.md, or "Nothing promoted"}
+- SOUL.md: {proposed change, or "No evolution needed"}
 - User prefs: {what was updated in context/USER.md, or "No changes"}
 
 Committed: {commit hash} — {commit message}

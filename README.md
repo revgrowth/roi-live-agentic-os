@@ -24,7 +24,7 @@ When it finishes, open Claude Code and say **"start here"**. That walks you thro
 
 Agentic OS is built on three layers:
 
-1. **Agent Identity** -- Personality (SOUL.md), memory (MEMORY.md), and your profile (USER.md). This is what makes it feel like working with someone who knows your business.
+1. **Agent Identity** -- Personality (SOUL.md), your profile (USER.md), and session memory. This is what makes it feel like working with someone who knows your business.
 
 2. **Skills** -- Modular capabilities that can be added or removed. Each skill follows a tested methodology and gets better as you give feedback.
 
@@ -98,14 +98,39 @@ Skills will tell you when they could use a key you haven't added yet, and they a
 
 ---
 
+## Always-On Scheduled Jobs
+
+Want your jobs to run even when Claude Code is closed? Install the watchdog:
+
+**Mac:**
+```bash
+bash scripts/install-watchdog.sh
+```
+
+**Windows (PowerShell as admin):**
+```powershell
+powershell scripts/install-watchdog.ps1
+```
+
+That's it. The watchdog checks your jobs every hour in the background. It runs them using your Claude plan credits -- each job has a built-in spending cap (`max_budget_usd` in the job file).
+
+To stop it:
+- **Mac:** `bash scripts/uninstall-watchdog.sh`
+- **Windows:** `powershell scripts/uninstall-watchdog.ps1`
+
+Your job files in `cron/jobs/` are never deleted -- only the background scheduler is removed.
+
+---
+
 ## File Structure
 
 ```
 ├── context/           <- Your agent's identity + memory
 ├── brand_context/     <- Your brand data (voice, positioning, ICP)
 ├── .claude/skills/    <- Installed skill packs
+├── cron/jobs/         <- Scheduled job definitions
 ├── projects/          <- All generated output
-├── scripts/           <- Install, update, manage skills
+├── scripts/           <- Install, update, manage skills, watchdog
 └── CLAUDE.md          <- Agent orchestration (don't edit manually)
 ```
 

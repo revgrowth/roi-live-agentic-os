@@ -34,7 +34,7 @@ PROTECTED_PATHS=(
     ".mcp.json"
     "context/USER.md"
     "context/SOUL.md"
-    "context/MEMORY.md"
+
     "context/learnings.md"
     "context/memory/"
     "brand_context/*.md"

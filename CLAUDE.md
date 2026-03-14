@@ -9,12 +9,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Before doing anything else in any session:
 1. Read `context/SOUL.md` — who you are, how you behave
 2. Read `context/USER.md` — who you're helping and their preferences
-3. Read `context/MEMORY.md` — long-term business knowledge
-4. Read `context/memory/{today}.md` + `context/memory/{yesterday}.md` — recent session context
-5. **Create or open today's memory file** — if `context/memory/{YYYY-MM-DD}.md` doesn't exist, create it with a session start timestamp. If it already exists (second session today), append a new session header. See **Daily Memory** below.
-6. Scan `brand_context/` — what exists? Flag anything older than 30 days: "Your [file] is from [date]. Want to refresh, or keep going?"
-7. Scan `.claude/skills/` — know what skills are installed and available
-8. **Sync check** — run the skill & MCP reconciliation (see below)
+3. Read `context/memory/{today}.md` + `context/memory/{yesterday}.md` — recent session context. Pay special attention to `### Open threads` from the last session — these are your starting point.
+4. **Create or open today's memory file** — if `context/memory/{YYYY-MM-DD}.md` doesn't exist, create it with a session start timestamp. If it already exists (second session today), append a new session header. See **Daily Memory** below.
+5. Scan `brand_context/` — what exists? Flag anything older than 30 days: "Your [file] is from [date]. Want to refresh, or keep going?"
+6. Scan `.claude/skills/` — know what skills are installed and available
+7. **Sync check** — run the skill & MCP reconciliation (see below)
+8. **Scheduled jobs** — check if the watchdog is installed (look for `~/Library/LaunchAgents/com.agentic-os.watchdog.plist` on Mac). If installed, report: *"Watchdog is active — your N enabled jobs run automatically in the background."* If not installed, scan `cron/jobs/` for enabled jobs and mention: *"You have N scheduled jobs. Install the watchdog to run them automatically: `bash scripts/install-watchdog.sh`"*
 
 ### Daily Memory
 
@@ -27,14 +27,19 @@ Every session writes to `context/memory/{YYYY-MM-DD}.md`. This is how continuity
 ## Session N
 
 ### Goal
-[Filled once the user states their goal]
+[One line — filled once the user states their goal]
+
+### Deliverables
+- `path/to/file` — what it is
+
+### Decisions
+- [Decision and rationale]
+
+### Open threads
+- [Anything unfinished for the next session]
 ```
 
-**During the session:** Update the current session block with key events as they happen:
-- Deliverables produced (with file paths)
-- Decisions made
-- Feedback received
-- Anything the next session should know
+**During the session:** Update the current session block incrementally as events happen. Don't wait for wrap-up — if a deliverable is produced or a decision is made, log it immediately.
 
 **At session end (via /wrap-up):** The wrap-up skill finalises the session block — replacing any placeholder text with real content. Even without `/wrap-up`, the file should have useful context because it was written incrementally.
 
@@ -103,7 +108,7 @@ Never silently fall back to base knowledge when a skill exists. Never silently h
 
 ## What This Project Is
 
-Agentic OS is a Claude Code project template that turns any client folder into an intelligent business assistant. It is **agent-first**: personality lives in context/SOUL.md, long-term knowledge lives in context/MEMORY.md, brand memory lives in `brand_context/`, and functionality lives in `.claude/skills/`.
+Agentic OS is a Claude Code project template that turns any client folder into an intelligent business assistant. It is **agent-first**: personality lives in `context/SOUL.md`, user preferences in `context/USER.md`, session continuity in `context/memory/`, accumulated learnings in `context/learnings.md`, brand memory in `brand_context/`, and functionality in `.claude/skills/`.
 
 **One command to start: `/start-here`**. Everything else is a skill that triggers automatically or gets invoked by the orchestrator.
 
@@ -115,7 +120,7 @@ The full specification lives in `PRD.md`. Read it when building any new componen
 
 | Layer | Files | Purpose |
 |-------|-------|---------|
-| **Agent Identity** | CLAUDE.md, `context/SOUL.md`, `context/USER.md`, `context/MEMORY.md` | Who the agent is and how it behaves |
+| **Agent Identity** | CLAUDE.md, `context/SOUL.md`, `context/USER.md` | Who the agent is and how it behaves |
 | **Skills Pack** | `.claude/skills/{category}-{skill-name}/` | Capabilities. Grows over time. |
 | **Brand Context** | `brand_context/` | Client brand data. Version controlled. |
 
@@ -208,7 +213,7 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 - Execution skills (copywriting, content repurposing, email sequences, blog posts, etc.) call the humanizer in pipeline mode after generating content
 - The humanizer uses `deep` mode when `brand_context/voice-profile.md` exists, `standard` mode otherwise
 - Only show the score summary to the user if the change was significant (delta > 2 points)
-- Skills that produce non-publishable output (research briefs, ICP profiles, positioning docs, schemas) skip this step
+- Skills that produce non-publishable output (research briefs, ICP profiles, positioning docs) skip this step
 
 When building new skills, include a humanizer step in the methodology if the skill writes content meant for an audience. Reference `tool-humanizer` in pipeline mode.
 
@@ -293,7 +298,7 @@ Skills can depend on other skills. Declare dependencies in a `## Dependencies` s
 
 ## Build Order (from PRD)
 
-1. **Phase 1 — Agent Identity:** context/SOUL.md → context/USER.md → context/MEMORY.md ✓
+1. **Phase 1 — Agent Identity:** context/SOUL.md → context/USER.md ✓
 2. **Phase 2 — Command + Foundation Skills:** `start-here.md` ✓ → `mkt-brand-voice/` ✓ → `mkt-positioning/` ✓ → `mkt-icp/` ✓
 3. **Phase 3 — Validate:** End-to-end test with a real business
 4. **Phase 4 — Execution Skills:** Build incrementally, each with reference skills
