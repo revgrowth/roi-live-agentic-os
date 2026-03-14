@@ -112,19 +112,74 @@ if has_protected_changes; then
 fi
 
 # =========================================================
-# Step 5: Pull upstream changes
+# Step 5: Backup locally-modified skills before pull
+# =========================================================
+# Skills are updated by the self-improvement loop (Rules, direct fixes).
+# We backup any modified skills so the user can review upstream changes
+# and approve/deny per skill.
+SKILL_BACKUP_DIR="$BACKUP_DIR/skills-$(date +%s)"
+MODIFIED_SKILLS=()
+
+info "Checking for locally-modified skills..."
+
+if [[ -d "$REPO_ROOT/.claude/skills" ]]; then
+    for skill_dir in "$REPO_ROOT/.claude/skills"/*/; do
+        [[ -d "$skill_dir" ]] || continue
+        skill_name=$(basename "$skill_dir")
+        [[ "$skill_name" == "_catalog" ]] && continue
+
+        # Check if any files in this skill have local modifications
+        if git diff --name-only -- ".claude/skills/$skill_name/" 2>/dev/null | grep -q .; then
+            mkdir -p "$SKILL_BACKUP_DIR/$skill_name"
+            cp -r "$skill_dir"* "$SKILL_BACKUP_DIR/$skill_name/" 2>/dev/null || true
+            MODIFIED_SKILLS+=("$skill_name")
+        fi
+    done
+fi
+
+if [[ ${#MODIFIED_SKILLS[@]} -gt 0 ]]; then
+    ok "Backed up ${#MODIFIED_SKILLS[@]} locally-modified skill(s)"
+else
+    info "No locally-modified skills found"
+fi
+
+# =========================================================
+# Step 6: Pull upstream changes
 # =========================================================
 info "Pulling from origin main..."
 echo ""
 PULL_OUTPUT=$(git pull origin main 2>&1) || {
-    echo "$PULL_OUTPUT"
     # If pull fails, restore stash before exiting
     if $STASHED; then
-        warn "Restoring stashed files after failed pull..."
         git stash pop --quiet 2>/dev/null || true
     fi
-    echo ""
-    echo "  Pull failed. Your files are safe — nothing was changed."
+
+    # Check if this is an authentication failure
+    if echo "$PULL_OUTPUT" | grep -qi "authentication\|403\|could not read\|repository not found\|invalid credentials"; then
+        echo ""
+        printf "${YELLOW}${BOLD}═══════════════════════════════════════════════${NC}\n"
+        printf "${YELLOW}${BOLD}  Authentication Failed${NC}\n"
+        printf "${YELLOW}${BOLD}═══════════════════════════════════════════════${NC}\n"
+        echo ""
+        warn "Your access token has been rotated."
+        echo ""
+        info "To fix this:"
+        echo ""
+        echo "  1. Get the latest token from:"
+        printf "     ${CYAN}https://www.skool.com/scrapes/classroom/d1cfafed?md=552b0ba753df4c738843913fb3eb8312${NC}\n"
+        echo ""
+        echo "  2. Update your remote URL:"
+        printf "     ${BOLD}git remote set-url origin https://<NEW-TOKEN>@github.com/simonc602/agentic-os.git${NC}\n"
+        echo ""
+        echo "  3. Run this script again:"
+        printf "     ${BOLD}bash scripts/update.sh${NC}\n"
+        echo ""
+        info "Your local files are untouched — nothing was changed."
+    else
+        echo "$PULL_OUTPUT"
+        echo ""
+        echo "  Pull failed. Your files are safe — nothing was changed."
+    fi
     exit 1
 }
 
@@ -145,6 +200,109 @@ if echo "$PULL_OUTPUT" | grep -q "Already up to date"; then
 fi
 
 NEW_HEAD=$(git rev-parse HEAD)
+
+# =========================================================
+# Step 6b: Review upstream skill changes vs local modifications
+# =========================================================
+# For each skill that was locally modified AND changed upstream,
+# show the diff and let the user approve or deny the upstream version.
+SKILL_REVIEW_MSG=""
+
+if [[ ${#MODIFIED_SKILLS[@]} -gt 0 ]]; then
+    echo ""
+    printf "${CYAN}${BOLD}═══════════════════════════════════════════════${NC}\n"
+    printf "${CYAN}${BOLD}  Skill Update Review${NC}\n"
+    printf "${CYAN}${BOLD}═══════════════════════════════════════════════${NC}\n"
+    echo ""
+    info "Some skills you've customised have upstream changes."
+    info "Review each one and choose: accept upstream or keep yours."
+    echo ""
+
+    for skill_name in "${MODIFIED_SKILLS[@]}"; do
+        skill_dir="$REPO_ROOT/.claude/skills/$skill_name"
+        backup_skill_dir="$SKILL_BACKUP_DIR/$skill_name"
+
+        # Check if upstream actually changed this skill (vs only local changes)
+        if [[ ! -d "$skill_dir" ]]; then
+            # Skill was removed upstream — restore user's version
+            warn "$skill_name was removed upstream but you had local changes."
+            mkdir -p "$skill_dir"
+            cp -r "$backup_skill_dir"/* "$skill_dir/" 2>/dev/null || true
+            ok "Kept your version of $skill_name"
+            SKILL_REVIEW_MSG="${SKILL_REVIEW_MSG}\n    $skill_name: kept (removed upstream)"
+            continue
+        fi
+
+        # Show what changed between the user's version and upstream
+        echo "  ─────────────────────────────────────────"
+        printf "  ${BOLD}%s${NC}\n" "$skill_name"
+        echo "  ─────────────────────────────────────────"
+        echo ""
+
+        # Show diff between backup (user's version) and current (upstream)
+        diff_output=$(diff -u "$backup_skill_dir/SKILL.md" "$skill_dir/SKILL.md" 2>/dev/null || true)
+
+        if [[ -z "$diff_output" ]]; then
+            info "No upstream changes to SKILL.md — keeping your version."
+            # Restore user's version since only they changed it
+            cp -r "$backup_skill_dir"/* "$skill_dir/" 2>/dev/null || true
+            SKILL_REVIEW_MSG="${SKILL_REVIEW_MSG}\n    $skill_name: kept (no upstream changes)"
+            continue
+        fi
+
+        # Show the diff (coloured)
+        echo "$diff_output" | while IFS= read -r line; do
+            case "$line" in
+                +*) printf "${GREEN}%s${NC}\n" "$line" ;;
+                -*) printf "${YELLOW}%s${NC}\n" "$line" ;;
+                @*) printf "${CYAN}%s${NC}\n" "$line" ;;
+                *)  echo "$line" ;;
+            esac
+        done
+        echo ""
+
+        printf "  ${BOLD}Accept upstream changes?${NC} [y/n/d] "
+        printf "${DIM}(y=accept upstream, n=keep yours, d=show full diff)${NC} "
+        while true; do
+            read -r choice
+            case "$choice" in
+                [yY])
+                    ok "Accepted upstream version of $skill_name"
+                    SKILL_REVIEW_MSG="${SKILL_REVIEW_MSG}\n    $skill_name: accepted upstream"
+                    break
+                    ;;
+                [nN])
+                    # Restore user's version
+                    cp -r "$backup_skill_dir"/* "$skill_dir/" 2>/dev/null || true
+                    ok "Kept your version of $skill_name"
+                    SKILL_REVIEW_MSG="${SKILL_REVIEW_MSG}\n    $skill_name: kept yours"
+                    break
+                    ;;
+                [dD])
+                    echo ""
+                    # Show full diff of entire skill directory
+                    diff -ru "$backup_skill_dir" "$skill_dir" 2>/dev/null | while IFS= read -r line; do
+                        case "$line" in
+                            +*) printf "${GREEN}%s${NC}\n" "$line" ;;
+                            -*) printf "${YELLOW}%s${NC}\n" "$line" ;;
+                            @*) printf "${CYAN}%s${NC}\n" "$line" ;;
+                            *)  echo "$line" ;;
+                        esac
+                    done
+                    echo ""
+                    printf "  ${BOLD}Accept upstream changes?${NC} [y/n] "
+                    ;;
+                *)
+                    printf "  Please enter y, n, or d: "
+                    ;;
+            esac
+        done
+        echo ""
+    done
+
+    info "Backups saved to .backup/ in case you change your mind."
+    echo ""
+fi
 
 # =========================================================
 # Step 6: Restore stashed protected files
@@ -184,7 +342,7 @@ if $STASHED; then
 fi
 
 # =========================================================
-# Step 7: Re-remove skills the user previously removed
+# Step 8: Re-remove skills the user previously removed
 # =========================================================
 # git pull may restore skill folders that the user explicitly removed.
 # installed.json tracks these in its "removed_skills" list.
@@ -216,7 +374,7 @@ except Exception:
 fi
 
 # =========================================================
-# Step 8: Detect newly added upstream skills
+# Step 9: Detect newly added upstream skills
 # =========================================================
 NEW_SKILLS_MSG=""
 
@@ -261,7 +419,7 @@ for s in sorted(new_skills):
 fi
 
 # =========================================================
-# Step 9: Version tag and changelog
+# Step 10: Version tag and changelog
 # =========================================================
 NEW_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 VERSION_LINE=""
@@ -278,7 +436,7 @@ elif [[ "$OLD_HEAD" != "$NEW_HEAD" ]]; then
 fi
 
 # =========================================================
-# Step 10: Summary
+# Step 11: Summary
 # =========================================================
 echo ""
 echo "========================================="
@@ -294,6 +452,12 @@ fi
 if [[ -n "$CHANGES" ]]; then
     echo "  Changes:"
     echo "$CHANGES"
+    echo ""
+fi
+
+if [[ -n "$SKILL_REVIEW_MSG" ]]; then
+    echo "  Skill updates:"
+    printf "$SKILL_REVIEW_MSG\n"
     echo ""
 fi
 

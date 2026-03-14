@@ -7,6 +7,7 @@ Usage:
 
 Features:
 - Splits HeyGen's multi-word subtitle chunks into 1-2 word segments
+- Normalizes phonetic TTS forms back to written forms (e.g., "slash loop" → "/loop")
 - Restyles with branded fonts/colors when --restyle is passed
 - Burns using ffmpeg's native libass filter (high quality rendering)
 """
@@ -22,6 +23,35 @@ BRANDED_STYLE = (
 )
 
 MAX_WORDS_PER_SEGMENT = 2
+
+# Phonetic-to-written replacements for captions.
+# HeyGen TTS needs spoken forms ("slash loop") but captions should show written forms ("/loop").
+# Case-insensitive, applied per dialogue line. Order matters — longer patterns first.
+NORMALIZATIONS = [
+    # Symbols spelled out for TTS
+    (r"\bslash\s+", "/"),
+    (r"\bdot\s+com\b", ".com"),
+    (r"\bdot\s+co\b", ".co"),
+    (r"\bdot\s+io\b", ".io"),
+    (r"\bdot\s+ai\b", ".ai"),
+    (r"\bdot\s+org\b", ".org"),
+    (r"\bdot\s+net\b", ".net"),
+    (r"\bdot\s+md\b", ".md"),
+    (r"\bdot\s+js\b", ".js"),
+    (r"\bdot\s+py\b", ".py"),
+    (r"\bhashtag\s+", "#"),
+    (r"\bat sign\s+", "@"),
+    (r"\bdollar sign\s+", "$"),
+    (r"\bpercent\b", "%"),
+    (r"\bampersand\b", "&"),
+]
+
+
+def normalize_text(text: str) -> str:
+    """Convert phonetic/spoken forms back to written forms for display."""
+    for pattern, replacement in NORMALIZATIONS:
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    return text
 
 
 def parse_ass_time(time_str: str) -> float:
@@ -64,6 +94,9 @@ def split_dialogues(content: str) -> str:
         # Clean up the text: remove \n and \N, collapse whitespace
         clean_text = text.replace("\\n", " ").replace("\\N", " ")
         clean_text = re.sub(r"\s+", " ", clean_text).strip()
+
+        # Convert phonetic/spoken forms to written forms
+        clean_text = normalize_text(clean_text)
 
         words = clean_text.split()
         if not words:

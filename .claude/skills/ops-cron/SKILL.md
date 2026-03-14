@@ -1,33 +1,35 @@
 ---
 name: ops-cron
 description: >
-  Schedule persistent cron jobs that run Claude Code headlessly on a recurring
-  schedule. Create, list, install, uninstall, and check logs for scheduled
-  jobs. Each job is a prompt file in cron/jobs/ with YAML frontmatter
-  defining schedule, model, budget, and allowed tools. An install script
-  registers them with the system crontab. Jobs survive reboots and run
-  indefinitely — no 3-day limit. Triggers on: "schedule a job",
-  "cron job", "run this every morning", "automate daily", "recurring task",
-  "set up a scheduled job", "check cron logs", "list scheduled jobs",
-  "install cron jobs", "uninstall cron jobs".
-  Does NOT trigger for one-off tasks, in-session loops, or reminders.
+  Schedule recurring tasks that run automatically via a system-level watchdog,
+  even when Claude Code is closed. Job definitions persist in cron/jobs/ as the
+  registry. The watchdog (launchd on Mac, Task Scheduler on Windows) checks
+  every hour and runs due jobs headlessly via claude -p. Triggers on:
+  "schedule a job", "cron job", "run this every morning", "automate daily",
+  "recurring task", "set up a scheduled job", "check scheduled jobs",
+  "list scheduled jobs", "install watchdog", "uninstall watchdog".
+  Does NOT trigger for one-off tasks or in-session reminders.
 ---
 
-# Cron Jobs
+# Scheduled Jobs
 
-Persistent scheduled tasks that run Claude Code headlessly via system crontab. No 3-day limit — jobs run until you uninstall them.
+Recurring tasks that persist across sessions and run automatically. Job definitions live in `cron/jobs/`. Execution uses a system-level watchdog that runs `claude -p` headlessly -- jobs keep running even when Claude Code is closed.
+
+## How It Works
+
+The watchdog is a background process registered with your OS scheduler (launchd on Mac, Task Scheduler on Windows). Every hour it scans `cron/jobs/`, checks what's due, and runs each due job via `claude -p` with the model and budget from the job file. Each execution is stateless and self-contained. Install once, forget about it.
 
 ## Outcome
 
-Job definition files in `cron/jobs/`, registered with the system crontab via `cron/install.sh`. Logs written to `cron/logs/`. Jobs run whether or not Claude Code is open.
+Job definition files in `cron/jobs/`. Automatic execution in the background. Logs for completed runs in `cron/logs/`.
 
 ## Context Needs
 
 | File | Load level | How it shapes this skill |
 |------|-----------|--------------------------|
-| `context/learnings.md` | `## ops-cron` section | Known issues with specific jobs, scheduling lessons |
+| `context/learnings.md` | `## ops-cron` section | Known issues with specific jobs |
 
-No brand context needed — this is infrastructure.
+No brand context needed -- this is infrastructure.
 
 ---
 
@@ -35,90 +37,88 @@ No brand context needed — this is infrastructure.
 
 | Action | User says | What to do |
 |--------|----------|------------|
-| **Create** | "schedule a job", "run X every morning" | Build a job file (Step 2) |
-| **List** | "list cron jobs", "what's scheduled" | Read all files in `cron/jobs/`, show table |
-| **Install** | "install cron", "activate jobs" | Run `cron/install.sh` |
-| **Uninstall** | "remove cron", "stop all jobs" | Run `cron/install.sh --uninstall` |
-| **Logs** | "check cron logs", "did the job run" | Read latest from `cron/logs/` |
-| **Remove one** | "remove the morning briefing job" | Delete the job file, re-run install |
+| **Create** | "schedule a job", "run X every morning" | Build a job file (Step 2) then offer to install watchdog (Step 3) |
+| **List** | "list jobs", "what's scheduled" | Read all files in `cron/jobs/`, show status table |
+| **Install** | "install watchdog", "start scheduled jobs" | Run `bash scripts/install-watchdog.sh` |
+| **Uninstall** | "uninstall watchdog", "stop all jobs" | Run `bash scripts/uninstall-watchdog.sh` |
+| **Stop job** | "stop the X job", "disable X" | Set `enabled: false` in the job file |
+| **Remove** | "remove the morning briefing job" | Delete the job file |
+| **Logs** | "check job logs", "did the job run" | Read latest from `cron/logs/` |
+| **Status** | "is the watchdog running" | Check for launchd plist (Mac) or scheduled task (Windows) |
 
 ## Step 2: Create a Job File
 
 Ask the user (max 3 questions):
-1. **What should it do?** — The task in plain language
-2. **When should it run?** — "every morning at 8", "weekdays at 9", "every 6 hours"
-3. **Any constraints?** — Budget cap, specific model, tool restrictions
+1. **What should it do?** -- The task in plain language
+2. **How often?** -- "every 30 minutes", "every 2 hours", etc.
+3. **Any constraints?** -- Budget cap, specific model
 
-Create the job file at `cron/jobs/{job-name}.md` using the format in `references/job-format.md`.
+Create the job file at `cron/jobs/{job-name}.md`. See `references/job-format.md` for the format.
 
-**Job file structure:**
-```yaml
----
-name: job-name
-schedule: "3 8 * * 1-5"
-description: What this job does
-model: sonnet
-permission_mode: auto
-max_budget_usd: 0.50
-allowed_tools: "Read,Write,Edit,Bash(git:*),WebSearch,WebFetch,Grep,Glob"
----
+**Key rules for job prompts:**
+- Self-contained -- each execution has no memory of the last
+- Reference specific file paths
+- Say where to save output
+- Keep prompts focused -- one clear task per job
 
-[The prompt that Claude executes]
+## Step 3: Install the Watchdog
+
+If the watchdog isn't already installed, offer to install it:
+
+**Mac:**
+```bash
+bash scripts/install-watchdog.sh
 ```
 
-**Rules for writing job prompts:**
-- Self-contained — no conversation history exists. State everything the job needs to know.
-- Reference specific file paths (e.g., "Read context/memory/ for today's date")
-- Say where to save output (e.g., "Save to projects/str-trending-research/")
-- Include the project directory: the install script handles `cd` automatically
-- Keep prompts focused — one clear task per job
-
-## Step 3: Verify Infrastructure
-
-Check that `cron/` directory structure exists:
-
-```
-cron/
-├── jobs/           <- Job definition files (.md)
-├── logs/           <- Output logs (gitignored)
-└── install.sh      <- Registers jobs with system crontab
+**Windows (PowerShell as admin):**
+```powershell
+powershell scripts/install-watchdog.ps1
 ```
 
-If missing, create it. The `install.sh` script and `.gitignore` entry for `cron/logs/` should already exist — if not, create them from `references/job-format.md`.
+The installer:
+1. Checks `claude` CLI is available
+2. Calculates estimated daily cost from enabled jobs
+3. Registers with the OS scheduler
+4. Starts running immediately
 
-## Step 4: Install
+## Step 4: Verify
 
-After creating or modifying job files, ask: "Want me to install this to your crontab now?"
-
-If yes, run `bash cron/install.sh`. Show the user what was installed.
-
-## Step 5: Verify
-
-After installation, show:
+Show the user:
 ```
-Installed jobs:
-  morning-briefing    8:03 AM weekdays    sonnet    $0.50 cap
-  weekly-audit        9:17 AM Mondays     sonnet    $1.00 cap
+Watchdog: installed (checking every 60 minutes)
 
-Next run: morning-briefing at 8:03 AM tomorrow
+Scheduled jobs:
+  trending-research    every 2h    enabled    sonnet    $0.50 cap
+  inbox-check          every 30m   enabled    haiku     $0.25 cap
 
-Check logs: cron/logs/morning-briefing.log
+Estimated daily cost: $0.40 - $1.50
+Logs: cron/logs/
 ```
 
 ---
 
-## Schedule Syntax Quick Reference
+## Schedule Reference
 
-| Human | Cron expression | Notes |
-|-------|----------------|-------|
-| Every morning at 8 | `3 8 * * *` | Offset from :00 to avoid load spikes |
-| Weekdays at 9 | `17 9 * * 1-5` | Mon-Fri |
-| Every 6 hours | `7 */6 * * *` | At :07 past |
-| Monday mornings | `23 8 * * 1` | |
-| Twice daily (8am + 5pm) | `3 8,17 * * *` | |
-| First of month | `0 9 1 * *` | |
+| User says | `schedule` value | How often it runs |
+|-----------|-----------------|-------------------|
+| Every 10 minutes | `every_10m` | 6x/hour |
+| Every 30 minutes | `every_30m` | 2x/hour |
+| Every hour | `every_1h` | 1x/hour |
+| Every 2 hours | `every_2h` | Every 2 hours |
+| Every 4 hours | `every_4h` | Every 4 hours |
+| When I open Claude | `session_start` | Once per session (watchdog skips these) |
 
-Always offset minutes from :00 and :30 to spread load.
+No cron expressions. Human-readable intervals only.
+
+---
+
+## Heartbeat Integration
+
+At session start (CLAUDE.md heartbeat step 9):
+
+1. Check if watchdog is installed (launchd plist exists on Mac)
+2. If installed: report status: "Watchdog is active -- your N jobs run automatically"
+3. If not installed but enabled jobs exist: suggest installing the watchdog
 
 ---
 
@@ -130,13 +130,4 @@ Always offset minutes from :00 and :30 to spread load.
 
 ## Self-Update
 
-If the user reports a job failing, a prompt not working headlessly, or a scheduling issue — update the `## Rules` section immediately with the fix and today's date. Also log to `context/learnings.md` under `## ops-cron`.
-
----
-
-## Troubleshooting
-
-- **Job not running**: Check `crontab -l` to verify registration. Check `cron/logs/` for errors. Ensure the machine was on at the scheduled time.
-- **Prompt fails headlessly**: The prompt is missing context. Headless runs have no conversation history — make prompts fully self-contained with explicit paths.
-- **Permission denied**: Ensure `cron/install.sh` is executable (`chmod +x`). Check that Claude Code has the required tool permissions.
-- **Schedule confusion**: Use `## Schedule Syntax Quick Reference` above. Remember to offset minutes from :00.
+If the user reports a job failing or a scheduling issue -- update the `## Rules` section immediately with the fix and today's date. Also log to `context/learnings.md` under `## ops-cron`.

@@ -205,6 +205,7 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 - Default format: markdown unless user specifies otherwise
 - After major deliverables: ask for feedback, log to `context/learnings.md`
 - **Auto-download binary outputs.** After saving any non-markdown file (PNG, PDF, SVG, video, JSON diagrams, etc.), copy it to `~/Downloads/` using `cp <filepath> ~/Downloads/`. This applies to all skills — the user should never have to manually navigate to a generated file.
+- **Show clickable file path.** After saving any output, show the user the full absolute file path so they can click it directly to open the file. Example: "Saved to `/Users/simoncoton/Desktop/agentic-os/projects/mkt-copywriting/landing-page_2026-03-14.md`". This applies to all skills — the user should never have to navigate to find what was just created.
 
 ### Humanizer Gate
 

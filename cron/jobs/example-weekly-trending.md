@@ -1,17 +1,15 @@
 ---
 name: example-weekly-trending
-schedule: "23 8 * * 1"
-description: Weekly AI automation trending research (Mondays 8:23am)
+schedule: every_2h
+description: AI automation trending research every 2 hours
 model: sonnet
-permission_mode: auto
 max_budget_usd: 0.75
-allowed_tools: "Read,Write,Grep,Glob,WebSearch,WebFetch"
 enabled: false
 ---
 
-You are running as an automated cron job for Agentic OS.
+You are running as a scheduled job for Agentic OS.
 
-Read CLAUDE.md for system context. Read context/SOUL.md for voice guidelines.
+Read CLAUDE.md for system context. Read context/SOUL.md for voice.
 
 Task: Research what's trending in AI automation over the last 7 days.
 Focus on: Claude Code, n8n workflows, agentic systems, MCP servers.
@@ -30,5 +28,4 @@ Include in the brief:
 - Key themes and emerging patterns
 - 3-5 content angles that could be turned into posts
 
-If web search is unavailable, write a note to cron/logs/example-weekly-trending.log
-explaining the failure and exit without creating the output file.
+If web search is unavailable, note the failure and exit without creating the output file.

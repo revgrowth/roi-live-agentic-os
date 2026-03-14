@@ -1,6 +1,6 @@
 # Job File Format
 
-Every cron job is a markdown file in `cron/jobs/` with YAML frontmatter and a prompt body.
+Every scheduled job is a markdown file in `cron/jobs/` with YAML frontmatter and a prompt body.
 
 ---
 
@@ -9,55 +9,61 @@ Every cron job is a markdown file in `cron/jobs/` with YAML frontmatter and a pr
 ```yaml
 ---
 name: job-name                    # Kebab-case, unique, matches filename
-schedule: "3 8 * * 1-5"          # 5-field cron expression (local timezone)
+schedule: every_2h                # See schedule values below
 description: What this job does   # One-liner for the jobs table
-model: sonnet                     # sonnet (cheap, fast) | opus (powerful) | haiku (cheapest)
-permission_mode: auto             # auto | bypassPermissions (use auto unless you're sure)
-max_budget_usd: 0.50              # Hard cap per run. Prevents runaway costs.
-allowed_tools: "Read,Write,Edit,Bash(git:*),WebSearch,WebFetch,Grep,Glob"
-                                  # Restrict tools to only what the job needs
+model: sonnet                     # sonnet (default) | haiku | opus
+max_budget_usd: 0.50              # Hard cap per execution
 enabled: true                     # Set to false to skip without deleting
 ---
 ```
 
 ### Required fields
-- `name` — must match the filename (without .md)
-- `schedule` — valid 5-field cron expression
-- `description` — what humans see in the jobs list
+- `name` -- must match the filename (without .md)
+- `schedule` -- one of the schedule values below
+- `description` -- what humans see in the jobs list
 
 ### Optional fields (with defaults)
-- `model` — defaults to `sonnet` (cheapest model that's still capable)
-- `permission_mode` — defaults to `auto`
-- `max_budget_usd` — defaults to `0.50`
-- `allowed_tools` — defaults to all tools. Restrict for safety.
-- `enabled` — defaults to `true`
+- `model` -- defaults to `sonnet`
+- `max_budget_usd` -- defaults to `0.50`
+- `enabled` -- defaults to `true`
+
+### Schedule values
+
+| Value | Meaning | Runs per day (approx) |
+|-------|---------|----------------------|
+| `every_10m` | Every 10 minutes | 144 |
+| `every_30m` | Every 30 minutes | 48 |
+| `every_1h` | Every hour | 24 |
+| `every_2h` | Every 2 hours | 12 |
+| `every_4h` | Every 4 hours | 6 |
+| `session_start` | Run once when session opens | Watchdog skips these |
 
 ---
 
 ## Prompt Body
 
-Everything after the frontmatter `---` is the prompt sent to `claude -p`.
+Everything after the frontmatter `---` is the prompt executed by `claude -p` each time the job runs.
 
 ### Rules for good job prompts
 
-1. **Self-contained.** No conversation history. State everything needed.
+1. **Self-contained.** Each execution has no memory of the last. State everything needed.
 2. **Specific file paths.** "Read brand_context/voice-profile.md" not "check voice context".
 3. **Explicit output location.** "Save results to projects/str-trending-research/daily_{date}.md"
-4. **Date-aware.** Use "today's date" — Claude resolves it at runtime.
+4. **Date-aware.** Use "today's date" -- Claude resolves it at runtime.
 5. **Bounded scope.** One clear task. Don't chain 5 skills in one job.
-6. **Error handling.** Say what to do if something fails: "If WebSearch fails, log the error to cron/logs/ and exit."
+6. **Error handling.** Say what to do if something fails (e.g., "If web search fails, exit without creating output").
 
 ### Example prompt body
 
 ```markdown
-You are running as an automated cron job for Agentic OS.
+You are running as a scheduled job for Agentic OS.
 
 Read CLAUDE.md for system context. Read context/SOUL.md for voice.
 
 Task: Research what's trending in AI automation on Reddit and X over the
 last 7 days. Focus on Claude Code, n8n, and agentic workflows.
 
-Save the brief to: projects/str-trending-research/weekly-ai-automation_{today's date}.md
+Save the brief to: projects/str-trending-research/weekly-ai-automation_{today's date in YYYY-MM-DD format}.md
 
 Format: Use the str-trending-research skill methodology. Include:
 - Top 5 Reddit threads with engagement counts
@@ -65,71 +71,33 @@ Format: Use the str-trending-research skill methodology. Include:
 - Key themes and patterns
 - Actionable content angles
 
-If web search fails, log "Web search unavailable" to cron/logs/weekly-ai-research.log
-and exit without creating the output file.
+If web search fails, note the failure and exit without creating the output file.
 ```
 
 ---
 
-## How install.sh Processes Jobs
+## How Jobs Get Executed
 
-The install script:
+The watchdog (`scripts/watchdog.sh`) runs every hour via your OS scheduler. For each enabled job:
 
-1. Reads every `.md` file in `cron/jobs/`
-2. Skips files where `enabled: false`
-3. Extracts frontmatter fields
-4. Builds a crontab entry for each job:
+1. Parse the YAML frontmatter
+2. Check if the job is due (based on schedule interval and last run time)
+3. Run: `claude -p "{prompt}" --model {model} --max-turns 25 --allowedTools "Read,Write,Edit,Bash,Glob,Grep,WebSearch,WebFetch"`
+4. Log output to `cron/logs/{name}_{date}.log`
+5. Record the run time in `cron/watchdog.state.json`
 
-```bash
-# [agentic-os] job-name: description
-SCHEDULE cd /path/to/agentic-os && /path/to/claude -p "$(cat cron/jobs/job-name.md | sed '1,/^---$/d; 1,/^---$/d')" --model MODEL --permission-mode MODE --max-budget-usd BUDGET --allowed-tools "TOOLS" --no-session-persistence >> cron/logs/job-name.log 2>&1
-```
-
-Key flags:
-- `-p` — headless mode, no interactive prompts
-- `--model` — from frontmatter, defaults to sonnet
-- `--permission-mode auto` — approves tool use without asking
-- `--max-budget-usd` — hard spending cap per invocation
-- `--allowed-tools` — restricts available tools
-- `--no-session-persistence` — don't save cron sessions to history
-- Output piped to `cron/logs/{job-name}.log`
-
-### Marker comments
-
-All entries are wrapped between marker comments so install/uninstall is clean:
-
-```
-# BEGIN agentic-os-cron
-...entries...
-# END agentic-os-cron
-```
-
-This means `install.sh --uninstall` only removes our entries, leaving the user's other crontab entries untouched.
-
----
-
-## Claude CLI Flags Reference
-
-| Flag | Purpose | Cron default |
-|------|---------|-------------|
-| `-p "prompt"` | Headless mode — run and exit | Always used |
-| `--model sonnet` | Which model to use | sonnet (cheapest capable) |
-| `--permission-mode auto` | Auto-approve tool use | auto |
-| `--max-budget-usd 0.50` | Spending cap per run | 0.50 |
-| `--allowed-tools "..."` | Restrict available tools | All tools |
-| `--no-session-persistence` | Don't save session to disk | Always used |
-| `--append-system-prompt "..."` | Add context to system prompt | Optional |
+Jobs with `schedule: session_start` are skipped by the watchdog -- they only run inside interactive Claude Code sessions.
 
 ---
 
 ## Cost Estimation
 
-| Model | Input (1M tokens) | Output (1M tokens) | Typical job cost |
-|-------|-------------------|--------------------|--------------------|
-| haiku | $0.80 | $4.00 | $0.01-0.05 |
-| sonnet | $3.00 | $15.00 | $0.05-0.25 |
-| opus | $15.00 | $75.00 | $0.25-2.00 |
+| Model | Typical cost per execution |
+|-------|-----------------------------|
+| haiku | $0.01-0.05 |
+| sonnet | $0.05-0.25 |
+| opus | $0.25-2.00 |
 
-A daily sonnet job reading context + running one skill typically costs $0.05-0.15 per run. At $0.10/run, that's ~$3/month for a daily job.
+A sonnet job running every 2 hours for an 8-hour day = 4 executions = ~$0.40-1.00/day.
 
-**Budget guard:** Always set `max_budget_usd`. A runaway job without a cap could burn through tokens. Start low ($0.50) and increase only if the job needs it.
+**Budget guard:** Always set `max_budget_usd`. Start low ($0.50) and increase only if the job needs it.
