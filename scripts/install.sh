@@ -24,6 +24,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
+# Convert MSYS/Git Bash paths to Windows-native for Python compatibility
+case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) REPO_ROOT="$(cygpath -m "$REPO_ROOT")" ;;
+esac
+
 # ---------- Colors ----------
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -71,6 +76,7 @@ info "Checking prerequisites..."
 echo ""
 
 PREREQ_FAIL=0
+PYTHON_CMD="python3"
 
 # Git
 printf "  git .......... "
@@ -92,10 +98,20 @@ else
     PREREQ_FAIL=1
 fi
 
-# Python 3
+# Python 3 — check python3 first, fall back to python (Windows often uses 'python')
 printf "  python3 ...... "
 if command -v python3 &>/dev/null; then
     printf "${GREEN}$(python3 --version 2>&1 | awk '{print $2}')${NC}\n"
+    PYTHON_CMD="python3"
+elif command -v python &>/dev/null; then
+    PY_VER=$(python --version 2>&1 | awk '{print $2}')
+    case "$PY_VER" in
+        3.*) printf "${GREEN}${PY_VER} (as 'python')${NC}\n"
+             PYTHON_CMD="python" ;;
+        *)   printf "${RED}found python ${PY_VER} — need Python 3${NC}\n"
+             fail "Install Python 3: https://www.python.org/downloads/"
+             PREREQ_FAIL=1 ;;
+    esac
 else
     printf "${RED}not found${NC}\n"
     fail "Install Python 3: https://www.python.org/downloads/"
@@ -138,7 +154,7 @@ info "Installing system dependencies..."
 echo ""
 
 if [[ -f "$REPO_ROOT/scripts/setup.sh" ]]; then
-    bash "$REPO_ROOT/scripts/setup.sh"
+    PYTHON_CMD="$PYTHON_CMD" bash "$REPO_ROOT/scripts/setup.sh"
 else
     warn "scripts/setup.sh not found — skipping dependency install"
 fi
@@ -156,11 +172,11 @@ fi
 # =============================================================================
 # 6. Parse catalog and build skill menu
 # =============================================================================
-# We use python3 to parse JSON since jq may not be installed.
+# We use Python to parse JSON since jq may not be installed.
 # The python script outputs structured data the bash script consumes.
 
 # Extract core skills list
-CORE_SKILLS=$(python3 -c "
+CORE_SKILLS=$($PYTHON_CMD -c "
 import json, sys
 with open('$CATALOG') as f:
     cat = json.load(f)
@@ -170,7 +186,7 @@ for s in cat['core_skills']:
 
 # Extract optional skills grouped by category, with metadata
 # Output format: name|category|description|services|dependencies
-OPTIONAL_SKILLS=$(python3 -c "
+OPTIONAL_SKILLS=$($PYTHON_CMD -c "
 import json
 with open('$CATALOG') as f:
     cat = json.load(f)
@@ -206,7 +222,7 @@ echo ""
 printf "${BOLD}  CORE (always installed):${NC}\n"
 while IFS= read -r skill; do
     # Look up description from catalog
-    desc=$(python3 -c "
+    desc=$($PYTHON_CMD -c "
 import json
 with open('$CATALOG') as f:
     cat = json.load(f)
@@ -256,7 +272,7 @@ for i in "${!SKILL_NAMES[@]}"; do
     # Print category header when it changes
     if [[ "$cat" != "$CURRENT_CATEGORY" ]]; then
         # Capitalize first letter of category
-        cat_display="$(echo "$cat" | python3 -c "import sys; print(sys.stdin.read().strip().title())")"
+        cat_display="$(echo "$cat" | $PYTHON_CMD -c "import sys; print(sys.stdin.read().strip().title())")"
         printf "    ${BOLD}%s:${NC}\n" "$cat_display"
         CURRENT_CATEGORY="$cat"
     fi
@@ -293,7 +309,7 @@ read -r USER_INPUT
 
 echo ""
 
-python3 << PYEOF
+$PYTHON_CMD << PYEOF
 import json, datetime, os, sys, shutil
 
 catalog_path = "$CATALOG"

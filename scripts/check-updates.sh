@@ -25,6 +25,7 @@ fail()    { printf "${RED}  ✗ %s${NC}\n" "$1"; }
 # ---------- Repo root from script location ----------
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) REPO_ROOT="$(cygpath -m "$REPO_ROOT")" ;; esac
 cd "$REPO_ROOT"
 
 # ---------- Verify git repo ----------

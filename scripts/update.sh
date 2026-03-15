@@ -21,6 +21,8 @@ warn()  { printf "${YELLOW}  → %s${NC}\n" "$1"; }
 # ---------- Repo root from script location ----------
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) REPO_ROOT="$(cygpath -m "$REPO_ROOT")" ;; esac
+PYTHON_CMD="python3"; command -v python3 &>/dev/null || PYTHON_CMD="python"
 cd "$REPO_ROOT"
 
 CATALOG="$REPO_ROOT/.claude/skills/_catalog/catalog.json"
@@ -349,7 +351,7 @@ fi
 REMOVED_SKILLS_MSG=""
 
 if $HAVE_INSTALLED_JSON && [[ -f "$INSTALLED" ]]; then
-    REMOVED_SKILLS=$(python3 -c "
+    REMOVED_SKILLS=$($PYTHON_CMD -c "
 import json, sys
 try:
     with open('$INSTALLED') as f:
@@ -379,7 +381,7 @@ fi
 NEW_SKILLS_MSG=""
 
 if [[ -f "$CATALOG" ]]; then
-    NEW_SKILLS=$(python3 -c "
+    NEW_SKILLS=$($PYTHON_CMD -c "
 import json, sys, os
 
 catalog_path = '$CATALOG'

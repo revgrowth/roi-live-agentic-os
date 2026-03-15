@@ -2,6 +2,8 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) REPO_ROOT="$(cygpath -m "$REPO_ROOT")" ;; esac
+PYTHON_CMD="python3"; command -v python3 &>/dev/null || PYTHON_CMD="python"
 CATALOG="$REPO_ROOT/.claude/skills/_catalog/catalog.json"
 INSTALLED_JSON="$REPO_ROOT/.claude/skills/_catalog/installed.json"
 SKILLS_DIR="$REPO_ROOT/.claude/skills"
@@ -33,8 +35,8 @@ fi
 
 SKILL_NAME="$1"
 
-# Use python3 to validate, resolve deps, and do the work
-python3 -c "
+# Use Python to validate, resolve deps, and do the work
+$PYTHON_CMD -c "
 import json, sys, os, subprocess
 
 skill_name = sys.argv[1]
