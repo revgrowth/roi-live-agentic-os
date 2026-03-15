@@ -75,7 +75,7 @@ if dependents:
     print(','.join(dependents), end='')
 else:
     print('OK', end='')
-" "$SKILL_NAME" "$CATALOG" "$SKILLS_DIR")
+" "$SKILL_NAME" "$CATALOG" "$SKILLS_DIR" | tr -d '\r')
 
 # Handle error cases
 case "$DEPENDENTS" in

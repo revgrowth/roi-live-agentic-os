@@ -175,14 +175,14 @@ fi
 # We use Python to parse JSON since jq may not be installed.
 # The python script outputs structured data the bash script consumes.
 
-# Extract core skills list
+# Extract core skills list (tr -d '\r' strips Windows carriage returns)
 CORE_SKILLS=$($PYTHON_CMD -c "
 import json, sys
 with open('$CATALOG') as f:
     cat = json.load(f)
 for s in cat['core_skills']:
     print(s)
-")
+" | tr -d '\r')
 
 # Extract optional skills grouped by category, with metadata
 # Output format: name|category|description|services|dependencies
@@ -191,7 +191,6 @@ import json
 with open('$CATALOG') as f:
     cat = json.load(f)
 core = set(cat['core_skills'])
-# Category display order
 order = {'utility': 1, 'strategy': 2, 'execution': 3, 'visual': 4, 'operations': 5}
 skills = []
 for name, info in cat['skills'].items():
@@ -207,7 +206,7 @@ for name, info in cat['skills'].items():
 skills.sort(key=lambda x: (x[0], x[2]))
 for s in skills:
     print(f'{s[2]}|{s[1]}|{s[3]}|{s[4]}|{s[5]}')
-")
+" | tr -d '\r')
 
 # =============================================================================
 # 7. Display the skill selection menu
@@ -218,28 +217,18 @@ printf "${CYAN}${BOLD}  Skill Selection${NC}\n"
 printf "${CYAN}${BOLD}═══════════════════════════════════════════════${NC}\n"
 echo ""
 
-# Show core skills
+# Show core skills (descriptions hardcoded to avoid encoding issues on Windows)
 printf "${BOLD}  CORE (always installed):${NC}\n"
 while IFS= read -r skill; do
-    # Look up description from catalog
-    desc=$($PYTHON_CMD -c "
-import json
-with open('$CATALOG') as f:
-    cat = json.load(f)
-# Core skills might not be in 'skills' dict — use a hardcoded fallback
-descs = {
-    'meta-skill-creator': 'Build and iterate on new skills',
-    'meta-wrap-up': 'End-of-session wrap-up',
-    'mkt-brand-voice': 'Extract or build your brand voice',
-    'mkt-positioning': 'Develop positioning angles',
-    'mkt-icp': 'Define ideal customer profiles',
-}
-if '$skill' in cat.get('skills', {}):
-    print(cat['skills']['$skill']['description'])
-else:
-    print(descs.get('$skill', ''))
-")
-    printf "    ${GREEN}✓${NC} %-26s ${DIM}— %s${NC}\n" "$skill" "$desc"
+    case "$skill" in
+        meta-skill-creator) desc="Build and iterate on new skills" ;;
+        meta-wrap-up)       desc="End-of-session wrap-up" ;;
+        mkt-brand-voice)    desc="Extract or build your brand voice" ;;
+        mkt-positioning)    desc="Develop positioning angles" ;;
+        mkt-icp)            desc="Define ideal customer profiles" ;;
+        *)                  desc="" ;;
+    esac
+    printf "    ${GREEN}✓${NC} %-26s ${DIM}-- %s${NC}\n" "$skill" "$desc"
 done <<< "$CORE_SKILLS"
 echo ""
 
@@ -271,8 +260,9 @@ for i in "${!SKILL_NAMES[@]}"; do
 
     # Print category header when it changes
     if [[ "$cat" != "$CURRENT_CATEGORY" ]]; then
-        # Capitalize first letter of category
-        cat_display="$(echo "$cat" | $PYTHON_CMD -c "import sys; print(sys.stdin.read().strip().title())")"
+        # Capitalize first letter of category (pure bash, no Python)
+        first="$(echo "${cat:0:1}" | tr '[:lower:]' '[:upper:]')"
+        cat_display="${first}${cat:1}"
         printf "    ${BOLD}%s:${NC}\n" "$cat_display"
         CURRENT_CATEGORY="$cat"
     fi
