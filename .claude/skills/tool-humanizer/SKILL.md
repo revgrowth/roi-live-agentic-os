@@ -155,3 +155,12 @@ The calling skill is responsible for saving the final output.
 ## Self-Update
 
 If the user flags an issue — too aggressive, missed a pattern, false positive — update the `## Rules` section immediately with the correction and today's date. Also log to `context/learnings.md` under `## tool-humanizer`.
+
+## Scoring Thresholds
+
+| Score | Label | Action |
+|-------|-------|--------|
+| 90-100 | Clean | No changes needed |
+| 70-89 | Light | Fix flagged patterns only |
+| 50-69 | Moderate | Rewrite flagged sentences |
+| 0-49 | Heavy | Full rewrite recommended |
