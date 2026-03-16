@@ -78,13 +78,6 @@
       "requires_services": [],
       "dependencies": [],
       "mcp_servers": []
-    },
-    "test-example-skill": {
-      "category": "utility",
-      "description": "Test skill for update script demo — will be deleted",
-      "requires_services": [],
-      "dependencies": [],
-      "mcp_servers": []
     }
   }
 }

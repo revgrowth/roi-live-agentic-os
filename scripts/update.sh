@@ -426,7 +426,9 @@ if [[ ${#MODIFIED_SKILLS[@]} -gt 0 ]]; then
         accepted_count=0
         kept_count=0
 
-        # --- Per-file review for changed files ---
+        # --- Per-file review with 3-way analysis ---
+        # Compare each changed file against the common ancestor (OLD_HEAD)
+        # to show exactly who changed what and offer merge when possible.
         if [[ -n "$changed_files" ]]; then
             while IFS= read -r pair; do
                 backup_file=$(echo "$pair" | sed 's/ → .*//')
@@ -434,38 +436,127 @@ if [[ ${#MODIFIED_SKILLS[@]} -gt 0 ]]; then
                 rel_name=$(echo "$upstream_file" | sed "s|$skill_dir/||;s|$skill_dir||")
                 [[ -z "$rel_name" ]] && rel_name=$(basename "$upstream_file")
 
+                # Get common ancestor from pre-pull commit
+                ANCESTOR_TMP=$(mktemp)
+                rel_git_path=".claude/skills/$skill_name/$rel_name"
+                git show "${OLD_HEAD}:${rel_git_path}" > "$ANCESTOR_TMP" 2>/dev/null || echo "" > "$ANCESTOR_TMP"
+
+                # Compute who changed what relative to ancestor
+                upstream_diff=$(diff -u "$ANCESTOR_TMP" "$upstream_file" 2>/dev/null | tail -n +3 || true)
+                your_diff=$(diff -u "$ANCESTOR_TMP" "$backup_file" 2>/dev/null | tail -n +3 || true)
+
+                has_upstream=false; [[ -n "$upstream_diff" ]] && has_upstream=true
+                has_yours=false; [[ -n "$your_diff" ]] && has_yours=true
+
+                # Handle bulk decisions from a previous iteration
+                if [[ "${ACCEPT_ALL_REMAINING:-false}" == "true" ]]; then
+                    ok "Accepted upstream: $rel_name"
+                    file_decisions="${file_decisions}\n    ${GREEN}✓${NC} $rel_name (accepted upstream)"
+                    accepted_count=$((accepted_count + 1))
+                    rm -f "$ANCESTOR_TMP"
+                    continue
+                fi
+                if [[ "${KEEP_ALL_REMAINING:-false}" == "true" ]]; then
+                    cp "$backup_file" "$upstream_file" 2>/dev/null || true
+                    ok "Kept yours: $rel_name"
+                    file_decisions="${file_decisions}\n    ${YELLOW}○${NC} $rel_name (kept yours)"
+                    kept_count=$((kept_count + 1))
+                    rm -f "$ANCESTOR_TMP"
+                    continue
+                fi
+
+                # If only you changed (upstream didn't touch it), auto-keep yours
+                if ! $has_upstream && $has_yours; then
+                    cp "$backup_file" "$upstream_file" 2>/dev/null || true
+                    ok "Kept yours: $rel_name ${DIM}(upstream didn't change this file)${NC}"
+                    file_decisions="${file_decisions}\n    ${YELLOW}○${NC} $rel_name (kept yours — upstream unchanged)"
+                    kept_count=$((kept_count + 1))
+                    rm -f "$ANCESTOR_TMP"
+                    continue
+                fi
+
                 echo ""
                 printf "  ${BOLD}File: %s${NC}\n" "$rel_name"
                 echo "  ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"
-                echo ""
 
-                file_diff=$(diff -u "$backup_file" "$upstream_file" 2>/dev/null || true)
-                if [[ -n "$file_diff" ]]; then
-                    echo "$file_diff" | while IFS= read -r line; do
+                # Show upstream changes (labeled)
+                if $has_upstream; then
+                    printf "\n  ${GREEN}${BOLD}  Upstream changes:${NC}\n"
+                    echo "$upstream_diff" | while IFS= read -r line; do
                         case "$line" in
-                            ---*) printf "  ${YELLOW}%s${NC}\n" "$line" ;;
-                            +++*) printf "  ${GREEN}%s${NC}\n" "$line" ;;
-                            +*)   printf "  ${GREEN}%s${NC}\n" "$line" ;;
-                            -*)   printf "  ${YELLOW}%s${NC}\n" "$line" ;;
-                            @*)   printf "  ${CYAN}%s${NC}\n" "$line" ;;
-                            *)    printf "  %s\n" "$line" ;;
+                            @@*)  printf "    ${CYAN}%s${NC}\n" "$line" ;;
+                            +*)   printf "    ${GREEN}%s${NC}\n" "$line" ;;
+                            -*)   printf "    ${RED}%s${NC}\n" "$line" ;;
+                            *)    ;;
                         esac
                     done
                 fi
-                echo ""
 
-                printf "  ${BOLD}Accept this change?${NC} [y/n/a/k]\n"
-                printf "  ${DIM}y = accept upstream  n = keep yours  a = accept ALL remaining  k = keep ALL remaining${NC}\n"
+                # Show your changes (labeled)
+                if $has_yours; then
+                    printf "\n  ${YELLOW}${BOLD}  Your changes:${NC}\n"
+                    echo "$your_diff" | while IFS= read -r line; do
+                        case "$line" in
+                            @@*)  printf "    ${CYAN}%s${NC}\n" "$line" ;;
+                            +*)   printf "    ${YELLOW}%s${NC}\n" "$line" ;;
+                            -*)   printf "    ${RED}%s${NC}\n" "$line" ;;
+                            *)    ;;
+                        esac
+                    done
+                fi
+
+                # Try 3-way merge to see if changes are compatible
+                can_merge=false
+                MERGED_TMP=$(mktemp)
+                if $has_upstream && $has_yours; then
+                    cp "$backup_file" "$MERGED_TMP"
+                    if git merge-file -q "$MERGED_TMP" "$ANCESTOR_TMP" "$upstream_file" 2>/dev/null; then
+                        can_merge=true
+                    fi
+                fi
+                rm -f "$ANCESTOR_TMP"
+
+                # Present options based on what changed and whether merge is possible
+                echo ""
+                if $has_upstream && $has_yours && $can_merge; then
+                    printf "  ${GREEN}✓ No conflict${NC} — both sets of changes can be merged.\n"
+                    echo ""
+                    printf "  ${BOLD}What to do?${NC}\n"
+                    printf "  ${DIM}m = merge both  u = upstream only  y = yours only  a = all upstream  k = keep all yours${NC}\n"
+                elif $has_upstream && $has_yours; then
+                    printf "  ${YELLOW}⚠ Conflict${NC} — both sides changed the same lines.\n"
+                    echo ""
+                    printf "  ${BOLD}What to do?${NC}\n"
+                    printf "  ${DIM}u = upstream only  y = yours only  a = all upstream  k = keep all yours${NC}\n"
+                else
+                    # Only upstream changed (user didn't modify this file)
+                    printf "  ${DIM}Only upstream changed this file.${NC}\n"
+                    echo ""
+                    printf "  ${BOLD}Accept upstream change?${NC}\n"
+                    printf "  ${DIM}u = accept upstream  y = revert to yours  a = all upstream  k = keep all yours${NC}\n"
+                fi
+
                 printf "  > "
                 while true; do
                     read -r choice < /dev/tty
                     case "$choice" in
-                        [yY])
+                        [mM])
+                            if $can_merge; then
+                                cp "$MERGED_TMP" "$upstream_file"
+                                ok "Merged both: $rel_name"
+                                file_decisions="${file_decisions}\n    ${GREEN}⊕${NC} $rel_name (merged both)"
+                                accepted_count=$((accepted_count + 1))
+                            else
+                                printf "  Can't merge — changes conflict. Pick u or y: "
+                                continue
+                            fi
+                            break ;;
+                        [uU])
                             ok "Accepted upstream: $rel_name"
                             file_decisions="${file_decisions}\n    ${GREEN}✓${NC} $rel_name (accepted upstream)"
                             accepted_count=$((accepted_count + 1))
                             break ;;
-                        [nN])
+                        [yY])
                             cp "$backup_file" "$upstream_file" 2>/dev/null || true
                             ok "Kept yours: $rel_name"
                             file_decisions="${file_decisions}\n    ${YELLOW}○${NC} $rel_name (kept yours)"
@@ -485,44 +576,15 @@ if [[ ${#MODIFIED_SKILLS[@]} -gt 0 ]]; then
                             KEEP_ALL_REMAINING=true
                             break ;;
                         *)
-                            printf "  Please enter y, n, a, or k: " ;;
+                            if $can_merge; then
+                                printf "  Please enter m, u, y, a, or k: "
+                            else
+                                printf "  Please enter u, y, a, or k: "
+                            fi ;;
                     esac
                 done
-
-                if [[ "${ACCEPT_ALL_REMAINING:-false}" == "true" ]] || [[ "${KEEP_ALL_REMAINING:-false}" == "true" ]]; then
-                    break
-                fi
+                rm -f "$MERGED_TMP"
             done <<< "$changed_files"
-
-            # Process remaining files after bulk decision
-            if [[ "${ACCEPT_ALL_REMAINING:-false}" == "true" ]]; then
-                remaining=$(echo "$changed_files" | tail -n +$((accepted_count + kept_count + 1)))
-                if [[ -n "$remaining" ]]; then
-                    while IFS= read -r pair; do
-                        upstream_file=$(echo "$pair" | sed 's/.* → //')
-                        rel_name=$(echo "$upstream_file" | sed "s|$skill_dir/||;s|$skill_dir||")
-                        [[ -z "$rel_name" ]] && rel_name=$(basename "$upstream_file")
-                        ok "Accepted upstream: $rel_name"
-                        file_decisions="${file_decisions}\n    ${GREEN}✓${NC} $rel_name (accepted upstream)"
-                        accepted_count=$((accepted_count + 1))
-                    done <<< "$remaining"
-                fi
-            fi
-            if [[ "${KEEP_ALL_REMAINING:-false}" == "true" ]]; then
-                remaining=$(echo "$changed_files" | tail -n +$((accepted_count + kept_count + 1)))
-                if [[ -n "$remaining" ]]; then
-                    while IFS= read -r pair; do
-                        backup_file=$(echo "$pair" | sed 's/ → .*//')
-                        upstream_file=$(echo "$pair" | sed 's/.* → //')
-                        rel_name=$(echo "$upstream_file" | sed "s|$skill_dir/||;s|$skill_dir||")
-                        [[ -z "$rel_name" ]] && rel_name=$(basename "$upstream_file")
-                        cp "$backup_file" "$upstream_file" 2>/dev/null || true
-                        ok "Kept yours: $rel_name"
-                        file_decisions="${file_decisions}\n    ${YELLOW}○${NC} $rel_name (kept yours)"
-                        kept_count=$((kept_count + 1))
-                    done <<< "$remaining"
-                fi
-            fi
             ACCEPT_ALL_REMAINING=false
             KEEP_ALL_REMAINING=false
         fi

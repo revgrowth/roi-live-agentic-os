@@ -7,7 +7,7 @@ description: >
   three, vague attributions, negative parallelisms, conjunctive phrase abuse.
   Three modes: quick (obvious patterns), standard (full scan + score),
   deep (voice-matched using brand_context/voice-profile.md).
-  Called automatically by execution skills as a post-processing step. Ensures all output reads naturally.
+  Called automatically by execution skills as a post-processing step.
   Also invoked standalone: "humanize this", "de-AI this", "make this sound
   human", "remove AI patterns", "clean up this copy".
   Does NOT trigger for brand voice extraction, positioning, or ICP work.
