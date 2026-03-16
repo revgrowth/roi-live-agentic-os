@@ -1,6 +1,6 @@
 # Agentic OS
 
-Turn Claude Code into your AGENTIC BIZ ASSISTANT!
+Turn Claude Code into your Agentic Operating System.
 
 Agentic OS gives Claude Code personality, memory, and skills so it works like a team member, not a chatbot. It remembers your brand voice, learns your preferences over time, and runs proven methodologies instead of winging it every session.
 
