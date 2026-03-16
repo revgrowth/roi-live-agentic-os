@@ -17,10 +17,10 @@ BOLD='\033[1m'
 DIM='\033[2m'
 NC='\033[0m'
 
-info()  { printf "  ${CYAN}%s${NC}\n" "$1"; }
-ok()    { printf "  ${GREEN}✓ %s${NC}\n" "$1"; }
-warn()  { printf "  ${YELLOW}→ %s${NC}\n" "$1"; }
-bullet(){ printf "    ${DIM}•${NC} %s\n" "$1"; }
+info()  { printf "  ${CYAN}%b${NC}\n" "$1"; }
+ok()    { printf "  ${GREEN}✓ %b${NC}\n" "$1"; }
+warn()  { printf "  ${YELLOW}→ %b${NC}\n" "$1"; }
+bullet(){ printf "    ${DIM}•${NC} %b\n" "$1"; }
 
 # ---------- Repo root from script location ----------
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -88,6 +88,7 @@ fi
 # =========================================================
 OLD_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 OLD_HEAD=$(git rev-parse HEAD)
+LAST_UPDATED=$(git log -1 --format="%cd" --date=format:"%d %b %Y at %H:%M" 2>/dev/null || echo "unknown")
 
 # =========================================================
 # Step 4: Stash local changes to protected paths
@@ -211,6 +212,7 @@ echo ""
 
 if ! $HAS_UPSTREAM_CHANGES; then
     ok "No new updates — you're on the latest version."
+    info "Last updated: ${BOLD}${LAST_UPDATED}${NC}"
     echo ""
     info "Scripts:              ${GREEN}no changes${NC}"
     info "System files:         ${GREEN}no changes${NC}  ${DIM}(CLAUDE.md, README.md, etc.)${NC}"
@@ -592,20 +594,21 @@ except Exception:
 fi
 
 # =========================================================
-# STEP 3 OF 4: New Skills
+# STEP 3 OF 4: Skill Catalog
 # =========================================================
 echo ""
 printf "${CYAN}${BOLD}═══════════════════════════════════════════════${NC}\n"
-printf "${CYAN}${BOLD}  Step 3: New Skills${NC}\n"
+printf "${CYAN}${BOLD}  Step 3: Skill Catalog${NC}\n"
 printf "${CYAN}${BOLD}═══════════════════════════════════════════════${NC}\n"
 echo ""
 
-NEW_SKILLS_MSG=""
 INSTALLED_NEW_SKILLS_MSG=""
-HAS_NEW_SKILLS=false
 
 if [[ -f "$CATALOG" ]]; then
-    NEW_SKILLS=$($PYTHON_CMD -c "
+    # Python outputs two sections separated by "---":
+    #   Section 1: NEW skills (never seen before) — name|category|desc|services|deps
+    #   Section 2: AVAILABLE skills (previously removed, not installed) — same format
+    CATALOG_OUTPUT=$($PYTHON_CMD -c "
 import json, sys, os
 
 catalog_path = '$CATALOG'
@@ -622,22 +625,39 @@ if os.path.exists(installed_path):
         inst = json.load(f)
     installed = set(inst.get('installed_skills', []))
     removed = set(inst.get('removed_skills', []))
-    known = installed | removed | core_skills
 else:
-    known = set(catalog_skills.keys()) | core_skills
+    installed = set()
+    removed = set()
 
+known = installed | removed | core_skills
 new_skills = set(catalog_skills.keys()) - known
+available_skills = removed  # previously removed = available but not installed
+
 order = {'utility': 1, 'strategy': 2, 'execution': 3, 'visual': 4, 'operations': 5}
-for s in sorted(new_skills, key=lambda n: (order.get(catalog_skills[n]['category'], 99), n)):
-    info = catalog_skills[s]
+
+def format_skill(name):
+    info = catalog_skills[name]
     services = ','.join(info.get('requires_services', []))
     deps = ','.join(info.get('dependencies', []))
-    print(f'{s}|{info[\"category\"]}|{info[\"description\"]}|{services}|{deps}')
+    return f'{name}|{info[\"category\"]}|{info[\"description\"]}|{services}|{deps}'
+
+# New skills
+for s in sorted(new_skills, key=lambda n: (order.get(catalog_skills[n].get('category',''), 99), n)):
+    print(format_skill(s))
+print('---')
+# Available (previously removed)
+for s in sorted(available_skills, key=lambda n: (order.get(catalog_skills.get(n,{}).get('category',''), 99), n)):
+    if s in catalog_skills:
+        print(format_skill(s))
 " 2>/dev/null || true)
 
-    if [[ -n "$NEW_SKILLS" ]]; then
-        HAS_NEW_SKILLS=true
-        info "New skills have been added since your last update:"
+    # Split into new and available
+    NEW_SKILLS=$(echo "$CATALOG_OUTPUT" | sed '/^---$/,$d')
+    AVAILABLE_SKILLS=$(echo "$CATALOG_OUTPUT" | sed '1,/^---$/d')
+
+    # --- New skills section ---
+    if [[ -n "$NEW_SKILLS" ]] && [[ "$NEW_SKILLS" != "" ]]; then
+        ok "New skills added since your last update:"
         echo ""
 
         declare -a NS_NAMES=()
@@ -702,27 +722,41 @@ for s in sorted(new_skills, key=lambda n: (order.get(catalog_skills[n]['category
                 echo ""
             fi
         else
-            info "Skipped — install anytime with: ${BOLD}bash scripts/add-skill.sh <name>${NC}"
             echo ""
         fi
-
-        # Note uninstalled new skills for summary
-        for i in "${!NS_NAMES[@]}"; do
-            name="${NS_NAMES[$i]}"
-            was_installed=false
-            for ns in "${SELECTED_NS[@]:-}"; do
-                [[ "$ns" == "$name" ]] && was_installed=true && break
-            done
-            if ! $was_installed; then
-                NEW_SKILLS_MSG="${NEW_SKILLS_MSG}\n    ${DIM}${name} — ${NS_DESCRIPTIONS[$i]}${NC}"
-            fi
-        done
+    else
+        ok "No new skills since your last update."
+        echo ""
     fi
-fi
 
-if ! $HAS_NEW_SKILLS; then
-    ok "No new skills since your last update."
-    info "You can browse available skills anytime with: ${BOLD}bash scripts/list-skills.sh${NC}"
+    # --- Available (not installed) skills section ---
+    if [[ -n "$AVAILABLE_SKILLS" ]] && [[ "$AVAILABLE_SKILLS" != "" ]]; then
+        AVAIL_COUNT=$(echo "$AVAILABLE_SKILLS" | grep -c '|' || true)
+        info "You also have ${BOLD}${AVAIL_COUNT} skill(s)${NC} ${CYAN}available that you haven't installed:${NC}"
+        echo ""
+
+        CURRENT_CATEGORY=""
+        while IFS='|' read -r name category description services deps; do
+            [[ -z "$name" ]] && continue
+            cat="$category"
+
+            if [[ "$cat" != "$CURRENT_CATEGORY" ]]; then
+                first="$(echo "${cat:0:1}" | tr '[:lower:]' '[:upper:]')"
+                printf "    ${BOLD}%s${NC}\n" "${first}${cat:1}"
+                CURRENT_CATEGORY="$cat"
+            fi
+
+            svc_note=""
+            [[ -n "$services" ]] && svc_note=" ${DIM}(needs ${services})${NC}"
+
+            printf "      ${DIM}•${NC} %-26s ${DIM}— %s${NC}%b\n" "$name" "$description" "$svc_note"
+        done <<< "$AVAILABLE_SKILLS"
+        echo ""
+        info "Install with: ${BOLD}bash scripts/add-skill.sh <name>${NC}"
+        echo ""
+    fi
+else
+    warn "Skill catalog not found — skipping skill check."
     echo ""
 fi
 
