@@ -32,6 +32,37 @@ cd "$REPO_ROOT"
 CATALOG="$REPO_ROOT/.claude/skills/_catalog/catalog.json"
 INSTALLED="$REPO_ROOT/.claude/skills/_catalog/installed.json"
 BACKUP_DIR="$REPO_ROOT/.backup"
+REVIEWED_STATE="$BACKUP_DIR/.update-reviewed"
+
+# ---------- Reviewed-state helpers ----------
+# Stores md5 checksums of files the user already reviewed.
+# If the file hasn't changed since last review, skip it.
+file_md5() {
+    md5 -q "$1" 2>/dev/null || md5sum "$1" 2>/dev/null | awk '{print $1}' || echo ""
+}
+
+was_already_reviewed() {
+    local file="$1"
+    [[ ! -f "$REVIEWED_STATE" ]] && return 1
+    local current_md5
+    current_md5=$(file_md5 "$REPO_ROOT/$file")
+    [[ -z "$current_md5" ]] && return 1
+    grep -qx "${file}:${current_md5}" "$REVIEWED_STATE" 2>/dev/null
+}
+
+mark_reviewed() {
+    local file="$1"
+    local current_md5
+    current_md5=$(file_md5 "$REPO_ROOT/$file")
+    [[ -z "$current_md5" ]] && return
+    mkdir -p "$BACKUP_DIR"
+    # Remove old entry for this file, add new one
+    if [[ -f "$REVIEWED_STATE" ]]; then
+        grep -v "^${file}:" "$REVIEWED_STATE" > "${REVIEWED_STATE}.tmp" 2>/dev/null || true
+        mv "${REVIEWED_STATE}.tmp" "$REVIEWED_STATE"
+    fi
+    echo "${file}:${current_md5}" >> "$REVIEWED_STATE"
+}
 
 # ---------- Protected paths (never overwritten) ----------
 PROTECTED_PATHS=(
@@ -132,15 +163,26 @@ if [[ -d "$REPO_ROOT/.claude/skills" ]]; then
             continue
         fi
 
-        # Check for local modifications
+        # Check for local modifications (skip files already reviewed)
         modified_files=$(git diff --name-only -- ".claude/skills/$skill_name/" 2>/dev/null || true)
         if [[ -n "$modified_files" ]]; then
-            mkdir -p "$SKILL_BACKUP_DIR/$skill_name"
-            cp -r "$skill_dir"* "$SKILL_BACKUP_DIR/$skill_name/" 2>/dev/null || true
-            MODIFIED_SKILLS+=("$skill_name")
-            # Store as pipe-separated list of basenames
-            file_list=$(echo "$modified_files" | while IFS= read -r f; do basename "$f"; done | tr '\n' '|' | sed 's/|$//')
-            MODIFIED_SKILL_FILES+=("$file_list")
+            # Filter out files whose content hasn't changed since last review
+            new_modified=""
+            while IFS= read -r mf; do
+                [[ -z "$mf" ]] && continue
+                if ! was_already_reviewed "$mf"; then
+                    new_modified="${new_modified}${mf}\n"
+                fi
+            done <<< "$modified_files"
+            new_modified=$(printf '%b' "$new_modified" | sed '/^$/d')
+
+            if [[ -n "$new_modified" ]]; then
+                mkdir -p "$SKILL_BACKUP_DIR/$skill_name"
+                cp -r "$skill_dir"* "$SKILL_BACKUP_DIR/$skill_name/" 2>/dev/null || true
+                MODIFIED_SKILLS+=("$skill_name")
+                file_list=$(echo "$new_modified" | while IFS= read -r f; do basename "$f"; done | tr '\n' '|' | sed 's/|$//')
+                MODIFIED_SKILL_FILES+=("$file_list")
+            fi
         fi
     done
 fi
@@ -182,6 +224,11 @@ if [[ -n "$ALL_DIRTY" ]]; then
         case "$file" in
             .claude/skills/*) continue ;;
         esac
+
+        # Skip files already reviewed with unchanged content
+        if was_already_reviewed "$file"; then
+            continue
+        fi
 
         # This is an "other" modified file — back it up and reset
         mkdir -p "$OTHER_BACKUP_DIR/$(dirname "$file")"
@@ -403,20 +450,22 @@ echo ""
 
 SKILL_REVIEW_MSG=""
 
+# --- User-created skills (always shown first and prominently) ---
+if [[ ${#USER_CREATED_SKILLS[@]} -gt 0 ]]; then
+    printf "  ${GREEN}${BOLD}★ ${#USER_CREATED_SKILLS[@]} custom skill(s) detected${NC} ${DIM}(yours — never touched by updates):${NC}\n"
+    for uc_skill in "${USER_CREATED_SKILLS[@]}"; do
+        printf "    ${GREEN}✓${NC} ${BOLD}%s${NC}\n" "$uc_skill"
+    done
+    echo ""
+fi
+
+# --- Modified upstream skills ---
 if [[ ${#MODIFIED_SKILLS[@]} -eq 0 ]] && [[ ${#USER_CREATED_SKILLS[@]} -eq 0 ]]; then
     ok "No local skill modifications detected."
     info "All your installed skills match the upstream versions."
     echo ""
 elif [[ ${#MODIFIED_SKILLS[@]} -eq 0 ]]; then
     ok "No modifications to upstream skills."
-    echo ""
-fi
-
-if [[ ${#USER_CREATED_SKILLS[@]} -gt 0 ]]; then
-    ok "${#USER_CREATED_SKILLS[@]} custom skill(s) you've created ${DIM}(untouched by updates):${NC}"
-    for uc_skill in "${USER_CREATED_SKILLS[@]}"; do
-        printf "    ${GREEN}✓${NC} %s\n" "$uc_skill"
-    done
     echo ""
 fi
 
@@ -464,6 +513,10 @@ if [[ ${#MODIFIED_SKILLS[@]} -gt 0 ]]; then
             echo ""
             info "No upstream changes to this skill — keeping your version."
             cp -r "$backup_skill_dir"/* "$skill_dir/" 2>/dev/null || true
+            # Mark all modified files in this skill as reviewed
+            for rf in $(git diff --name-only -- ".claude/skills/$skill_name/" 2>/dev/null || true); do
+                mark_reviewed "$rf"
+            done
             SKILL_REVIEW_MSG="${SKILL_REVIEW_MSG}\n    ${GREEN}✓${NC} $skill_name: kept yours (no upstream changes)"
             echo ""
             continue
@@ -501,6 +554,7 @@ if [[ ${#MODIFIED_SKILLS[@]} -gt 0 ]]; then
                     ok "Accepted upstream: $rel_name"
                     file_decisions="${file_decisions}\n    ${GREEN}✓${NC} $rel_name (accepted upstream)"
                     accepted_count=$((accepted_count + 1))
+                    mark_reviewed "$rel_git_path"
                     rm -f "$ANCESTOR_TMP"
                     continue
                 fi
@@ -509,6 +563,7 @@ if [[ ${#MODIFIED_SKILLS[@]} -gt 0 ]]; then
                     ok "Kept yours: $rel_name"
                     file_decisions="${file_decisions}\n    ${YELLOW}○${NC} $rel_name (kept yours)"
                     kept_count=$((kept_count + 1))
+                    mark_reviewed "$rel_git_path"
                     rm -f "$ANCESTOR_TMP"
                     continue
                 fi
@@ -519,6 +574,7 @@ if [[ ${#MODIFIED_SKILLS[@]} -gt 0 ]]; then
                     ok "Kept yours: $rel_name ${DIM}(upstream didn't change this file)${NC}"
                     file_decisions="${file_decisions}\n    ${YELLOW}○${NC} $rel_name (kept yours — upstream unchanged)"
                     kept_count=$((kept_count + 1))
+                    mark_reviewed "$rel_git_path"
                     rm -f "$ANCESTOR_TMP"
                     continue
                 fi
@@ -631,6 +687,7 @@ if [[ ${#MODIFIED_SKILLS[@]} -gt 0 ]]; then
                             fi ;;
                     esac
                 done
+                mark_reviewed "$rel_git_path"
                 rm -f "$MERGED_TMP"
             done <<< "$changed_files"
             ACCEPT_ALL_REMAINING=false
@@ -682,9 +739,10 @@ if [[ ${#OTHER_MODIFIED_FILES[@]} -gt 0 ]] && $HAS_UPSTREAM_CHANGES; then
         fi
     done
 
-    # Auto-restore files that didn't change upstream
+    # Auto-restore files that didn't change upstream and mark reviewed
     for file in "${OTHER_NOCONFLICT_FILES[@]}"; do
         cp "$OTHER_BACKUP_DIR/$file" "$REPO_ROOT/$file" 2>/dev/null || true
+        mark_reviewed "$file"
     done
 
     # Review files that changed both locally and upstream
@@ -708,12 +766,14 @@ if [[ ${#OTHER_MODIFIED_FILES[@]} -gt 0 ]] && $HAS_UPSTREAM_CHANGES; then
             if [[ "$ACCEPT_ALL_OTHER" == "true" ]]; then
                 ok "Accepted upstream: $file"
                 OTHER_REVIEW_MSG="${OTHER_REVIEW_MSG}\n    ${GREEN}✓${NC} $file (accepted upstream)"
+                mark_reviewed "$file"
                 continue
             fi
             if [[ "$KEEP_ALL_OTHER" == "true" ]]; then
                 cp "$backup_file" "$upstream_file" 2>/dev/null || true
                 ok "Kept yours: $file"
                 OTHER_REVIEW_MSG="${OTHER_REVIEW_MSG}\n    ${YELLOW}○${NC} $file (kept yours)"
+                mark_reviewed "$file"
                 continue
             fi
 
@@ -826,14 +886,16 @@ if [[ ${#OTHER_MODIFIED_FILES[@]} -gt 0 ]] && $HAS_UPSTREAM_CHANGES; then
                         fi ;;
                 esac
             done
+            mark_reviewed "$file"
             rm -f "$MERGED_TMP"
         done
         echo ""
     fi
 elif [[ ${#OTHER_MODIFIED_FILES[@]} -gt 0 ]]; then
-    # No upstream changes — just restore all local modifications
+    # No upstream changes — just restore all local modifications and mark reviewed
     for file in "${OTHER_MODIFIED_FILES[@]}"; do
         cp "$OTHER_BACKUP_DIR/$file" "$REPO_ROOT/$file" 2>/dev/null || true
+        mark_reviewed "$file"
     done
 fi
 
@@ -1082,6 +1144,11 @@ if $HAS_UPSTREAM_CHANGES; then
     fi
 else
     ok "Main repo: already up to date"
+fi
+
+# User-created skills in summary
+if [[ ${#USER_CREATED_SKILLS[@]} -gt 0 ]]; then
+    printf "\n  ${BOLD}Your custom skills:${NC} %s\n" "${USER_CREATED_SKILLS[*]}"
 fi
 
 # Skill review results
