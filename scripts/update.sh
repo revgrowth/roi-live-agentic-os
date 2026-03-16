@@ -322,7 +322,7 @@ else
 
     if [[ -n "$SYS_FILES_FOR_DIFF" ]]; then
         printf "  ${BOLD}Want to see the full diff?${NC} [y/n] "
-        read -r show_diff
+        read -r show_diff < /dev/tty
         if [[ "$show_diff" =~ ^[yY]$ ]]; then
             echo ""
             printf "$SYS_FILES_FOR_DIFF" | while IFS= read -r file; do
@@ -458,7 +458,7 @@ if [[ ${#MODIFIED_SKILLS[@]} -gt 0 ]]; then
                 printf "  ${DIM}y = accept upstream  n = keep yours  a = accept ALL remaining  k = keep ALL remaining${NC}\n"
                 printf "  > "
                 while true; do
-                    read -r choice
+                    read -r choice < /dev/tty
                     case "$choice" in
                         [yY])
                             ok "Accepted upstream: $rel_name"
@@ -712,7 +712,7 @@ for s in sorted(available_skills, key=lambda n: (order.get(catalog_skills.get(n,
         echo ""
 
         printf "  Enter numbers to install (e.g. ${BOLD}1 3${NC}), ${BOLD}all${NC}, or press Enter to skip: "
-        read -r NS_INPUT
+        read -r NS_INPUT < /dev/tty
 
         if [[ -n "$NS_INPUT" ]]; then
             SELECTED_NS=()
