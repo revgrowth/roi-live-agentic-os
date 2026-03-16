@@ -1138,28 +1138,74 @@ for s in sorted(available_skills, key=lambda n: (order.get(catalog_skills.get(n,
     # --- Available (not installed) skills section ---
     if [[ -n "$AVAILABLE_SKILLS" ]] && [[ "$AVAILABLE_SKILLS" != "" ]]; then
         AVAIL_COUNT=$(echo "$AVAILABLE_SKILLS" | grep -c '|' || true)
+        echo ""
         info "You also have ${BOLD}${AVAIL_COUNT} skill(s)${NC} ${CYAN}available that you haven't installed:${NC}"
         echo ""
 
+        declare -a AV_NAMES=()
+        declare -a AV_CATEGORIES=()
+        declare -a AV_DESCRIPTIONS=()
+        declare -a AV_SERVICES=()
+        declare -a AV_DEPS=()
         CURRENT_CATEGORY=""
+
         while IFS='|' read -r name category description services deps; do
             [[ -z "$name" ]] && continue
-            cat="$category"
+            AV_NAMES+=("$name")
+            AV_CATEGORIES+=("$category")
+            AV_DESCRIPTIONS+=("$description")
+            AV_SERVICES+=("$services")
+            AV_DEPS+=("$deps")
+        done <<< "$AVAILABLE_SKILLS"
+
+        for i in "${!AV_NAMES[@]}"; do
+            NUM=$((i + 1))
+            cat="${AV_CATEGORIES[$i]}"
 
             if [[ "$cat" != "$CURRENT_CATEGORY" ]]; then
                 first="$(echo "${cat:0:1}" | tr '[:lower:]' '[:upper:]')"
-                printf "    ${BOLD}%s${NC}\n" "${first}${cat:1}"
+                printf "\n    ${BOLD}%s${NC}\n" "${first}${cat:1}"
                 CURRENT_CATEGORY="$cat"
             fi
 
             svc_note=""
-            [[ -n "$services" ]] && svc_note=" ${DIM}(needs ${services})${NC}"
+            [[ -n "${AV_SERVICES[$i]}" ]] && svc_note=" ${DIM}(needs ${AV_SERVICES[$i]})${NC}"
+            dep_note=""
+            [[ -n "${AV_DEPS[$i]}" ]] && dep_note=" ${DIM}(auto-adds: ${AV_DEPS[$i]})${NC}"
 
-            printf "      ${DIM}•${NC} %-26s ${DIM}— %s${NC}%b\n" "$name" "$description" "$svc_note"
-        done <<< "$AVAILABLE_SKILLS"
+            printf "     ${DIM}[%2d]${NC} %-26s ${DIM}— %s${NC}%b%b\n" \
+                "$NUM" "${AV_NAMES[$i]}" "${AV_DESCRIPTIONS[$i]}" "$svc_note" "$dep_note"
+        done
         echo ""
-        info "Install with: ${BOLD}bash scripts/add-skill.sh <name>${NC}"
-        echo ""
+
+        printf "  Enter numbers to install (e.g. ${BOLD}1 3${NC}), ${BOLD}all${NC}, or press Enter to skip: "
+        read -r AV_INPUT < /dev/tty
+
+        if [[ -n "$AV_INPUT" ]]; then
+            SELECTED_AV=()
+            if echo "$AV_INPUT" | grep -qi "^all$"; then
+                SELECTED_AV=("${AV_NAMES[@]}")
+            else
+                for token in $AV_INPUT; do
+                    if [[ "$token" =~ ^[0-9]+$ ]] && [[ "$token" -ge 1 ]] && [[ "$token" -le "${#AV_NAMES[@]}" ]]; then
+                        SELECTED_AV+=("${AV_NAMES[$((token - 1))]}")
+                    else
+                        warn "Ignoring invalid selection: $token"
+                    fi
+                done
+            fi
+
+            if [[ ${#SELECTED_AV[@]} -gt 0 ]]; then
+                echo ""
+                for av in "${SELECTED_AV[@]}"; do
+                    bash "$REPO_ROOT/scripts/add-skill.sh" "$av" 2>&1 | sed 's/^/    /'
+                    INSTALLED_NEW_SKILLS_MSG="${INSTALLED_NEW_SKILLS_MSG}\n    ${GREEN}✓${NC} $av"
+                done
+                echo ""
+            fi
+        else
+            echo ""
+        fi
     fi
 else
     warn "Skill catalog not found — skipping skill check."

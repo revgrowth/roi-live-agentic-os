@@ -85,6 +85,13 @@
       "requires_services": [],
       "dependencies": [],
       "mcp_servers": []
+    },
+    "test-second-skill": {
+      "category": "utility",
+      "description": "Second test skill for multi-skill update detection",
+      "requires_services": [],
+      "dependencies": [],
+      "mcp_servers": []
     }
   }
 }
