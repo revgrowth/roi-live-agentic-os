@@ -14,7 +14,7 @@ Before doing anything else in any session:
 5. Scan `brand_context/` — what exists? Flag anything older than 30 days: "Your [file] is from [date]. Want to refresh, or keep going?"
 6. Scan `.claude/skills/` — know what skills are installed and available
 7. **Sync check** — run the skill & MCP reconciliation (see below)
-8. **Scheduled jobs** — check if the watchdog is installed (look for `~/Library/LaunchAgents/com.agentic-os.watchdog.plist` on Mac). If installed, report: *"Watchdog is active — your N enabled jobs run automatically in the background."* If not installed, scan `cron/jobs/` for enabled jobs and mention: *"You have N scheduled jobs. Install the watchdog to run them automatically: `bash scripts/install-watchdog.sh`"*
+8. **Scheduled jobs** — check if the cron dispatcher is installed (look for `~/Library/LaunchAgents/com.agentic-os.cron-dispatcher.plist` on Mac). If installed, read `cron/status/` files and report: *"Cron dispatcher is active — N enabled jobs. Last run: {job} at {time} ({result})."* If any jobs failed on their last run, flag them: *"{job} failed on last run — check logs?"* If not installed, scan `cron/jobs/` for active jobs and mention: *"You have N scheduled jobs. Install the dispatcher to run them automatically: `bash scripts/install-crons.sh`"*
 9. **Session gate** — after completing the heartbeat, check whether the user should run `/start-here` before doing other work:
    - **No `brand_context/` files?** → First-time user. Prompt: *"Looks like you haven't set up yet. Run `/start-here` to get your brand foundation built — it takes a few minutes and makes everything better."*
    - **Brand context exists but no previous `/wrap-up`?** Check the most recent `context/memory/` file — if the last session has no `### Open threads` content or the session block looks incomplete (placeholder text still present), nudge: *"Your last session wasn't wrapped up. Running `/wrap-up` now will save your context, then `/start-here` will pick it up. Or just run `/start-here` to jump into today."*
@@ -175,6 +175,12 @@ Every skill and its output folder uses a category prefix. This keeps skills, out
 | `mkt-positioning` | "differentiation", "angle", "hooks", "USP" | `positioning.md` |
 | `mkt-icp` | "target audience", "buyer persona", "ideal customer" | `icp.md` |
 
+### Strategy Skills
+
+| Skill | Triggers on |
+|-------|------------|
+| `str-ai-seo` | "AI SEO", "AEO", "GEO", "LLMO", "answer engine optimization", "AI citations", "AI visibility", "optimize for ChatGPT/Perplexity/Claude", "show up in AI answers" |
+
 *Optional skills are auto-registered by the Heartbeat reconciliation when their folders appear on disk. Install optional skills with `bash scripts/add-skill.sh <name>`. See `.claude/skills/_catalog/catalog.json` for the full list.*
 
 *Add new skills to this table when built and registered.*
@@ -191,6 +197,7 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 | `mkt-positioning` | — | **writes** | full | — | — | `## mkt-positioning` |
 | `mkt-icp` | — | summary | **writes** | — | — | `## mkt-icp` |
 | `meta-wrap-up` | — | — | — | — | — | `## meta-wrap-up` |
+| `str-ai-seo` | tone only | summary | full | — | — | `## str-ai-seo` |
 
 *Optional skills auto-add their row here via Heartbeat reconciliation when installed. New skills declare their own row when added.*
 

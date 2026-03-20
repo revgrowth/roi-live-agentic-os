@@ -21,5 +21,6 @@ brand_context/*.md
 .DS_Store
 .backup/
 
-# Cron logs
+# Cron logs and status
 cron/logs/
+cron/status/

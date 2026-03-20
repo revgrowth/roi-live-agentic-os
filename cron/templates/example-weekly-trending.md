@@ -1,20 +1,25 @@
 ---
-name: example-weekly-trending
-schedule: every_2h
-description: AI automation trending research every 2 hours
-model: sonnet
-max_budget_usd: 0.75
-enabled: false
+name: "Weekly AI Trending"
+time: "every_2h"
+days: "weekdays"
+active: "false"
+model: "sonnet"
+# notify: "on_finish"
+# description: ""
+# timeout: "30m"
+# retry: "0"
 ---
 
 You are running as a scheduled job for Agentic OS.
 
 Read CLAUDE.md for system context. Read context/SOUL.md for voice.
 
+Use the str-trending-research skill methodology (read .claude/skills/str-trending-research/SKILL.md for the full approach).
+
 Task: Research what's trending in AI automation over the last 7 days.
 Focus on: Claude Code, n8n workflows, agentic systems, MCP servers.
 
-Use the str-trending-research skill methodology:
+Steps:
 1. Search Reddit for top threads in r/ClaudeAI, r/n8n, r/LocalLLaMA
 2. Search X/Twitter for posts about Claude Code and n8n
 3. Search web for recent blog posts and announcements

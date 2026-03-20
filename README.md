@@ -60,6 +60,7 @@ Agentic OS is built on three layers:
 | `viz-excalidraw-diagram` | Architecture and workflow diagrams | -- |
 | `viz-nano-banana` | AI image generation in 5 visual styles | `GEMINI_API_KEY` |
 | `viz-ugc-heygen` | AI avatar videos via HeyGen | `HEYGEN_API_KEY` |
+| `str-ai-seo` | Optimize content for AI search engines and LLM citations | -- |
 | `ops-cron` | Schedule recurring Claude Code tasks | -- |
 
 ---
@@ -141,27 +142,98 @@ Skills will tell you when they could use a key you haven't added yet, and they a
 
 ---
 
-## Always-On Scheduled Jobs
+## Scheduled Jobs (Cron)
 
-Want your jobs to run even when Claude Code is closed? Install the watchdog:
+Run tasks automatically in the background -- even when Claude Code is closed. Drop a markdown file into `cron/jobs/`, install the dispatcher once, and your prompts run on schedule via headless `claude -p`.
+
+### How it works
+
+1. A lightweight dispatcher (`scripts/run-crons.sh`) runs every 60 seconds via your OS scheduler
+2. It scans `cron/jobs/*.md` and checks each file's `time` and `days` against the current time
+3. Any matching job fires `claude -p` with the prompt body from the file
+4. Each job logs to `cron/logs/{job-name}.log`
+
+### Install the dispatcher
 
 **Mac:**
 ```bash
-bash scripts/install-watchdog.sh
+bash scripts/install-crons.sh
 ```
 
 **Windows (PowerShell as admin):**
 ```powershell
-powershell scripts/install-watchdog.ps1
+powershell scripts/install-crons.ps1
 ```
 
-That's it. The watchdog checks your jobs every hour in the background. It runs them using your Claude plan credits -- each job has a built-in spending cap (`max_budget_usd` in the job file).
+The dispatcher uses your Claude plan credits. Each run costs roughly $0.01-0.05 (haiku), $0.05-0.25 (sonnet), or $0.25-2.00 (opus) depending on the model and task complexity.
 
-To stop it:
-- **Mac:** `bash scripts/uninstall-watchdog.sh`
-- **Windows:** `powershell scripts/uninstall-watchdog.ps1`
+### Create a job
 
-Your job files in `cron/jobs/` are never deleted -- only the background scheduler is removed.
+Each job is a markdown file in `cron/jobs/` with YAML frontmatter and a prompt body:
+
+```markdown
+---
+name: "My Daily Research"
+time: "09:00"
+days: "weekdays"
+active: "true"
+model: "sonnet"
+# Optional
+# notify: "on_finish"
+# description: "Researches trending topics and saves a daily briefing"
+# timeout: "30m"
+# retry: "0"
+---
+
+You are running as a scheduled job for Agentic OS.
+
+Read CLAUDE.md for system context.
+
+Task: [Your task here]
+
+Save output to: projects/[folder]/[name]_{today's date}.md
+```
+
+Or just ask Claude: "schedule a job to [do something] every morning" -- the `ops-cron` skill handles the rest.
+
+### Schedule options
+
+| Setting | Examples |
+|---------|----------|
+| **Exact time** | `time: "09:00"` or `time: "09:00,13:00,17:00"` |
+| **Every N minutes** | `time: "every_5m"`, `"every_10m"`, `"every_30m"` |
+| **Every N hours** | `time: "every_1h"`, `"every_2h"`, `"every_4h"` |
+| **Days** | `days: "daily"`, `"weekdays"`, `"weekends"`, `"mon,wed,fri"` |
+| **Model** | `model: "haiku"` (cheap), `"sonnet"` (default), `"opus"` (powerful) |
+
+Full reference: `cron/templates/schedule-reference.md`
+
+### Notifications & status
+
+- **OS notifications** -- jobs send a native notification when they finish. Control this with the `notify` field: `"on_finish"` (default, notifies on success and failure), `"on_failure"` (errors and timeouts only), or `"silent"` (never notify).
+- **Status tracking** -- each job writes its result to `cron/status/`. Ask Claude "list my jobs" to see a table with last run time, result, duration, and run/fail counts.
+- **Catch-up on wake** -- if your laptop was closed during a scheduled fixed-time job, it runs automatically when the machine wakes up. Interval jobs (`every_Nh`) resume on the next matching interval without catching up.
+- **Timeout** -- prevents runaway jobs. Default is 30 minutes. Configure per job with the `timeout` field (e.g., `"5m"`, `"1h"`, `"90s"`). If a job exceeds its timeout, the process is killed and the result is recorded as `timeout`.
+- **Retry** -- set `retry: "1"` (or higher) to automatically re-run a job on failure. Each retry gets the full timeout. Default is 0 (no retries).
+
+### Manage jobs
+
+| Action | How |
+|--------|-----|
+| **Pause a job** | Set `active: "false"` in the job file |
+| **Resume a job** | Set `active: "true"` in the job file |
+| **Run a job now** | `bash scripts/run-job.sh {job-name}` |
+| **Check logs** | `cat cron/logs/{job-name}.log` |
+| **List all jobs** | `ls cron/jobs/` or ask Claude "what's scheduled?" |
+| **Remove the dispatcher** | `bash scripts/uninstall-crons.sh` (Mac) or `powershell scripts/uninstall-crons.ps1` (Windows) |
+
+Removing the dispatcher only stops the scheduler. Your job files in `cron/jobs/` are never deleted.
+
+### Important notes
+
+- **macOS protected folders:** The dispatcher can't run from Desktop, Documents, or Downloads due to macOS sandboxing. The install script detects this and tells you to move the project.
+- **PATH:** The dispatcher adds `~/.local/bin`, `/usr/local/bin`, and `/opt/homebrew/bin` to PATH so it can find the `claude` CLI in background mode.
+- **Existing sessions:** Jobs run as separate headless processes -- they don't interfere with any open Claude Code session.
 
 ---
 
