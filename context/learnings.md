@@ -9,6 +9,7 @@
 ## What works well
 
 ## What doesn't work well
+- 2026-03-24: Project folders (Level 2/3) were being created directly under projects/ alongside single-task category folders — confusing for users. Moved to projects/briefs/{name}/ for clear separation. Always use projects/briefs/ for multi-deliverable projects.
 
 
 # Individual Skills

@@ -90,7 +90,7 @@ Run the bundled script:
 ```bash
 uv run .claude/skills/viz-nano-banana/scripts/generate_image.py \
   --prompt "FULL CONSTRUCTED PROMPT" \
-  --filename "projects/viz-nano-banana/{descriptive-name}_{YYYY-MM-DD}.png" \
+  --filename "projects/viz-nano-banana/{YYYY-MM-DD}_{descriptive-name}.png" \
   --resolution 1K \
   --aspect-ratio 16:9
 ```
@@ -106,7 +106,7 @@ uv run .claude/skills/viz-nano-banana/scripts/generate_image.py \
 
 **Always save output to disk.** Create the folder if it doesn't exist.
 
-Save to: `projects/viz-nano-banana/{descriptive-name}_{YYYY-MM-DD}.png`
+Save to: `projects/viz-nano-banana/{YYYY-MM-DD}_{descriptive-name}.png`
 
 Tell the user the file path so they can view it.
 

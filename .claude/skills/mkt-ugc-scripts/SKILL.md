@@ -19,7 +19,7 @@ Write scripts people actually want to watch. Every script is built for someone t
 
 ## Outcome
 
-Platform-ready scripts saved to `projects/mkt-ugc-scripts/{batch-name}_{YYYY-MM-DD}/`. Each script includes timing cues, delivery notes, on-screen text suggestions, and a hook designed for talking-head delivery.
+Platform-ready scripts saved to `projects/mkt-ugc-scripts/{YYYY-MM-DD}_{batch-name}/`. Each script includes timing cues, delivery notes, on-screen text suggestions, and a hook designed for talking-head delivery.
 
 ## Context Needs
 
@@ -169,7 +169,7 @@ Spoken scripts should score high naturally since they're already conversational 
 
 **Always save scripts to disk.** This is not optional — every script produced by this skill gets saved as a file, every time.
 
-Create folder: `projects/mkt-ugc-scripts/{batch-name}_{YYYY-MM-DD}/`
+Create folder: `projects/mkt-ugc-scripts/{YYYY-MM-DD}_{batch-name}/`
 
 One file per script: `{topic-slug}_{platform}.md`
 

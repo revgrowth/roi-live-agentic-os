@@ -1275,6 +1275,21 @@ fi
 echo ""
 ok "Your data is safe:"
 printf "    brand_context/  ${GREEN}✓${NC}   .env  ${GREEN}✓${NC}   context/  ${GREEN}✓${NC}   projects/  ${GREEN}✓${NC}\n"
+
+# ---------- Auto-sync to client folders ----------
+if [[ -d "${REPO_ROOT}/clients" ]]; then
+    CLIENT_COUNT=0
+    for CLIENT_DIR in "${REPO_ROOT}/clients"/*/; do
+        [[ -d "$CLIENT_DIR" ]] || continue
+        CLIENT_COUNT=$((CLIENT_COUNT + 1))
+    done
+    if [[ $CLIENT_COUNT -gt 0 ]]; then
+        echo ""
+        info "Syncing updates to ${CLIENT_COUNT} client folder(s)..."
+        bash "${REPO_ROOT}/scripts/update-clients.sh"
+    fi
+fi
+
 echo ""
 printf "${CYAN}${BOLD}═══════════════════════════════════════════════${NC}\n"
 echo ""

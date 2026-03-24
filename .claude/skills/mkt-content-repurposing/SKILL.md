@@ -18,7 +18,7 @@ description: >
 
 ## Outcome
 
-One piece of source content turned into 10-16 platform-native assets, saved to `projects/mkt-content-repurposing/{campaign-name}_{YYYY-MM-DD}/`. Each file is ready to copy-paste and publish — not a reworded version of the same post, but content that feels like it belongs on each platform.
+One piece of source content turned into 10-16 platform-native assets, saved to `projects/mkt-content-repurposing/{YYYY-MM-DD}_{campaign-name}/`. Each file is ready to copy-paste and publish — not a reworded version of the same post, but content that feels like it belongs on each platform.
 
 ## Context Needs
 
@@ -129,7 +129,7 @@ Before saving, run all generated content through `tool-humanizer` in pipeline mo
 
 ## Step 10: Save Everything
 
-Create: `projects/mkt-content-repurposing/{campaign-name}_{YYYY-MM-DD}/`
+Create: `projects/mkt-content-repurposing/{YYYY-MM-DD}_{campaign-name}/`
 
 One file per platform: `linkedin.md`, `twitter-x.md`, `instagram.md`, `tiktok.md`, `youtube.md`, `threads.md`, `bluesky.md`, `reddit.md`. Add `calendar.md` if they asked for scheduling.
 

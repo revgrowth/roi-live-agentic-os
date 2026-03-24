@@ -26,14 +26,24 @@ Check what exists:
 - `context/USER.md` (populated or template?)
 - `.claude/skills/` (which skills are installed)
 
+**Detect if this is a client workspace:** Check if the current working directory is inside a `clients/` folder (path contains `/clients/`). If so, this is a client workspace — read the client CLAUDE.md to get the client name from the `# Client: {name}` header.
+
+**Client workspace intro (if inside clients/):**
+Explain the multi-client setup and frame this as building brand context for this specific client:
+- You're inside **{client name}**'s workspace — one of several client folders managed by the parent Agentic OS
+- The parent Agentic OS at the root holds all the shared skills, methodology, and scripts — edits there benefit every client
+- Each client folder (list any sibling folders under `clients/` if they exist) gets its own brand context, memory, and outputs — completely separate from each other
+- Right now we're setting up **{client name}**'s brand foundation so everything produced here matches their voice, positioning, and audience
+- We'll answer a few questions, then pick which skills to keep active for this client
+
+**Standard intro (if NOT inside clients/):**
 Read README.md and give the user a brief, genuine explanation of what they've set up:
 - What Agentic OS does (business OS that learns their brand, gets sharper each session)
-- How it works in practice (answer a few questions → brand foundation → every skill uses it)
+- How it works in practice (answer a few questions → brand foundation → then you'll pick which skills to keep)
 - The learnings loop (feedback improves future output)
 - That skills can be built for any domain as needs grow
-- What skills are currently installed (scan `.claude/skills/` dynamically)
 
-Keep it conversational — 4-6 sentences max, not a feature dump. End with the first question.
+Keep it conversational — 4-6 sentences max, not a feature dump. Don't list installed skills here — that happens in Step 8 after brand context is built, so skills can be framed for their specific business. End with the first question.
 
 ### Step 2: Core Questions (ONE AT A TIME, SKIP IF ALREADY ANSWERED)
 
@@ -42,7 +52,9 @@ Do NOT present all four at once.
 
 **Before each question, check if the user already provided the answer in a previous response.** People often cover multiple topics in one answer (e.g., describing their business AND their ideal customer together). If you already have enough information for a question, skip it and move to the next one. Acknowledge what you picked up so the user knows you were listening.
 
-**Question 1:** "What does your business do? Give me the one-sentence version."
+**Question 1:**
+- Client workspace: "What does **{client name}**'s business do? Give me the one-sentence version."
+- Standard: "What does your business do? Give me the one-sentence version."
 → Wait for answer.
 
 **Question 2:** "Who's your ideal customer — who do you help?"
@@ -135,26 +147,96 @@ Here's what I built:
 Everything's saved in brand_context/. I'll use this in every skill going forward.
 ```
 
-### Step 8: Dynamic Skill Showcase
+### Step 8: Skill Selection
 
-Scan `.claude/skills/` for all installed skills.
-Read each skill's frontmatter to get name and description.
-Group by category (foundation / execution / other).
+Now that brand context is built, give the user a brief intro framing the skills for their business, then launch the interactive selector.
 
-Present what's available, framed around this specific business:
+**Before launching the selector**, briefly explain what each category does for THIS business (using the brand context just built). Keep it to 3-4 lines max — the selector itself shows descriptions:
 
 ```
-Here's what I can do for [business name]:
+Now let's pick which skills to keep. Everything's pre-selected — just untick what you don't need.
 
-**Foundation** (done)
-✓ mkt-brand-voice, mkt-positioning, mkt-icp — complete
-
-**Growth Marketing**
-- [skill]: [what it does for their specific business]
-- [skill]: [what it does for their specific business]
+Quick overview for [business]:
+- **Content & Copy** — write landing pages, repurpose content, create video scripts in your voice
+- **Research & Strategy** — find trending topics your audience cares about
+- **Visual & Video** — generate images, diagrams, and AI avatar videos
+- **Utility** — humanizer (de-AI your text), web scraping, YouTube transcripts
 ```
 
-End with ONE recommendation based on business context:
+**Then present the optional skills as a numbered checklist** so the user can see what's available. Read `.claude/skills/_catalog/catalog.json` and list each optional skill with its number, name, and a one-line description framed for the user's business. Group by category. Example:
+
+```
+Everything's pre-selected. Tell me which to remove — or say "keep all" to move on.
+
+**Content & Copy**
+ 1. mkt-copywriting — write landing pages and sales copy in your voice
+ 2. mkt-content-repurposing — turn one piece into posts across 8 platforms
+ 3. mkt-ugc-scripts — short-form video scripts for TikTok/Reels/Shorts
+
+**Research & Strategy**
+ 4. str-trending-research — find what your audience is talking about right now
+
+**Visual & Video**
+ 5. viz-excalidraw-diagram — architecture and workflow diagrams
+ 6. viz-nano-banana — AI image generation (needs GEMINI_API_KEY)
+ 7. viz-ugc-heygen — AI avatar videos (needs HEYGEN_API_KEY)
+
+**Utility**
+ 8. tool-humanizer — de-AI all written output
+ 9. tool-firecrawl-scraper — advanced web scraping (needs FIRECRAWL_API_KEY)
+10. tool-youtube — YouTube transcript extraction (needs YOUTUBE_API_KEY)
+
+**Operations**
+11. ops-cron — schedule recurring tasks
+
+Which would you like to remove? (e.g. "remove 5, 6, 7" or "keep all")
+```
+
+Wait for the user's response. Then run the script in CLI mode with their selections:
+```bash
+python3 scripts/select-skills.py --remove "viz-excalidraw-diagram,viz-nano-banana,viz-ugc-heygen"
+```
+
+The script handles dependency resolution, folder removal, `installed.json` update, and prints a summary.
+
+**Note:** If the user runs `python3 scripts/select-skills.py` directly in their own terminal (not through Claude), the script auto-detects the TTY and shows a full interactive checkbox UI with arrow keys + space to toggle.
+
+**After the script completes**, read `.claude/skills/_catalog/selection-result.json` and acknowledge briefly: "All set — [N] skills ready to go."
+
+### Step 9: How It Works Primer (MANDATORY — do NOT skip)
+
+**This step is required.** After showing skills, ALWAYS give the user a quick orientation before recommending a task. This is their only onboarding — they won't read docs unless you tell them what exists.
+
+Present this as a natural continuation, not a separate section. Three things to cover:
+
+**1. How work is structured:**
+> "Quick heads up on how we work together. There are three modes:
+> - **Single task** — just ask me. Blog post, email, research — I get it done.
+> - **Planned project** — for bigger work with multiple deliverables. I scope it first, write a brief, and we work from that across sessions.
+> - **GSD project** — for complex builds with phases and milestones. Full structured planning and execution.
+>
+> You don't need to pick upfront — tell me what you're working on and I'll suggest the right level. Full details in [docs/projects-guide.md](docs/projects-guide.md)."
+
+**2. Multi-client support — ALWAYS mention if ANY of these signals are present:**
+- User said "agency", "clients", "brands", "accounts", "freelance", "consulting"
+- Business involves serving multiple companies or audiences
+- User described work that implies client-based revenue (e.g., "we build automations for businesses")
+
+If any signal is present:
+> "Since you work with [clients/multiple brands], you can set up separate workspaces for each — just say 'add a client' and I'll create one. Each gets its own brand context, memory, and outputs while sharing the same skills and methodology. So you only build skills once and every client benefits.
+>
+> See [docs/multi-client-guide.md](docs/multi-client-guide.md) for the full setup."
+
+Only skip this if the user is clearly a solo founder with a single product/brand and no mention of clients.
+
+**3. Sessions and continuity:**
+> "When you're done for the day, just say so — 'that's it', 'done for today', 'thanks' — and I'll automatically save everything: what we did, decisions made, open threads. Next time you come back, I pick up where we left off.
+>
+> For a quick reference of commands and paths, see [docs/cheat-sheet.md](docs/cheat-sheet.md)."
+
+### Step 10: First Recommendation
+
+End with ONE recommendation based on their business context:
 "Given you're [situation], I'd start with [skill] — [reason]."
 
 Do NOT present a menu and ask them to pick. Recommend.
@@ -196,13 +278,38 @@ Only show categories where at least one skill is installed. Use plain language, 
 **3. Goal question**
 End with: "What are you working on today?" or a contextual variant based on the recap (e.g. "Want to keep going on the launch sequence, or something different?").
 
-### Step 3: Route or Recommend
+### Step 3: Scope the Work
 
-If user states a clear task → execute it using the relevant skill.
+Once the user states their goal, **always** offer the three levels so they can pick the right approach. Present it naturally after acknowledging their goal:
 
-If user says they're unsure → recommend the highest-leverage next action based on what's missing, what learnings suggest, or what naturally follows from the last session.
+> "Great — before we dive in, how structured do you want this?"
+>
+> 1. **Single task** — I'll just get it done. Best for one-off deliverables or quick asks.
+> 2. **Planned project** — I'll scope it out first (goal, deliverables, what 'done' looks like), write a brief, and we work from that. Best when there are multiple deliverables or it'll span a few sessions.
+> 3. **GSD project** — Full structured planning with phases, milestones, and verification. Best for complex builds with dependencies.
+>
+> "If you're not sure, just say go and I'll treat it as a single task."
 
-Mention stale files or gaps only if directly relevant to their stated goal (once, with opportunity framing).
+**If the user picks 1 (or just says "go" / doesn't specify)** → proceed directly. This is Level 1 — output goes to `projects/{category}/`.
+
+**If the user picks 2 (planned project)**, run a brief scoping conversation:
+- What's the goal? (one sentence)
+- What are the deliverables? (checklist)
+- How will you know it's done? (acceptance criteria)
+- Any timeline or constraints?
+
+Save as `projects/briefs/{project-name}/brief.md` with frontmatter (`project`, `status: active`, `level: 2`, `created`). Then start working on the first deliverable.
+
+**If the user picks 3 (GSD project):**
+- First check if `.planning/` already exists in the current workspace
+- **If it does** → tell the user: "You've got an existing GSD project in `.planning/`. You'll need to archive it before starting a new one. Want me to run `/archive-gsd` now?" If yes, run the archive command, then proceed to `/gsd:new-project`.
+- **If it doesn't** → proceed directly to `/gsd:new-project`.
+
+**If the user is unsure about their goal entirely** → recommend the highest-leverage next action based on what's missing, what learnings suggest, or what naturally follows from the last session. Then offer the levels once they've picked a direction.
+
+### Step 4: Execute
+
+Route to the relevant skill and begin work. Mention stale files or gaps only if directly relevant to their stated goal (once, with opportunity framing).
 
 Do NOT:
 - Summarise their brand back to them unprompted

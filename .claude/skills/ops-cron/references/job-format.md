@@ -1,6 +1,8 @@
 # Job File Format
 
-Every scheduled job is a markdown file in `cron/jobs/` with YAML frontmatter and a prompt body.
+Every scheduled job is a markdown file in `cron/jobs/` with YAML frontmatter and a freeform prompt body.
+
+Starter templates are in `cron/templates/` — copy one to `cron/jobs/` and edit it.
 
 ---
 
@@ -8,85 +10,124 @@ Every scheduled job is a markdown file in `cron/jobs/` with YAML frontmatter and
 
 ```yaml
 ---
-name: job-name                    # Kebab-case, unique, matches filename
-schedule: every_2h                # See schedule values below
-description: What this job does   # One-liner for the jobs table
-model: sonnet                     # sonnet (default) | haiku | opus
-max_budget_usd: 0.50              # Hard cap per execution
-enabled: true                     # Set to false to skip without deleting
+name: "Morning Kickoff"
+time: "09:00"
+days: "weekdays"
+active: "true"
+model: "sonnet"
+# Optional
+notify: "on_finish"
+description: "Researches trending topics and saves a daily briefing"
+timeout: "10m"
+retry: "0"
 ---
 ```
 
 ### Required fields
-- `name` -- must match the filename (without .md)
-- `schedule` -- one of the schedule values below
-- `description` -- what humans see in the jobs list
+- `name` — human-readable name, shown in logs
+- `time` — when to run (see time formats below)
+- `days` — which days to run (see days values below)
+- `active` — `"true"` or `"false"`. Set false to pause without deleting.
 
-### Optional fields (with defaults)
-- `model` -- defaults to `sonnet`
-- `max_budget_usd` -- defaults to `0.50`
-- `enabled` -- defaults to `true`
+### Optional fields
+- `model` — defaults to `sonnet`. Options: `haiku`, `sonnet`, `opus`
+- `notify` — when to send OS notifications. Default: `"on_finish"`
+  - `"on_finish"` — notify on success AND failure
+  - `"on_success"` — notify only when the job completes successfully
+  - `"on_failure"` — notify only on errors or timeouts
+  - `"silent"` — never notify
+- `description` — one-line description shown in job listings. Default: empty
+- `timeout` — max runtime before the job is killed. Default: `"30m"`. Format: `"5m"`, `"1h"`, `"90s"`
+- `retry` — number of retries on failure. Default: `"0"`. Each retry gets the full timeout.
 
-### Schedule values
+### Time formats
 
-| Value | Meaning | Runs per day (approx) |
-|-------|---------|----------------------|
-| `every_10m` | Every 10 minutes | 144 |
-| `every_30m` | Every 30 minutes | 48 |
-| `every_1h` | Every hour | 24 |
-| `every_2h` | Every 2 hours | 12 |
-| `every_4h` | Every 4 hours | 6 |
-| `session_start` | Run once when session opens | Watchdog skips these |
+| Format | Example | Meaning |
+|--------|---------|---------|
+| Exact time | `"09:00"` | Runs once at 9:00 AM |
+| Multiple times | `"09:00,13:00,17:00"` | Runs at each listed time |
+| Every N minutes | `"every_1m"` | Every minute (testing only!) |
+| Every N minutes | `"every_5m"` | Every 5 minutes |
+| Every N minutes | `"every_10m"` | Every 10 minutes |
+| Every N minutes | `"every_30m"` | Every 30 minutes |
+| Every N hours | `"every_1h"` | Runs on the hour, every hour |
+| Every N hours | `"every_2h"` | Runs at 00:00, 02:00, 04:00, ... |
+| Every N hours | `"every_4h"` | Runs at 00:00, 04:00, 08:00, ... |
+
+Full reference with all options: see `cron/templates/schedule-reference.md`
+
+Interval format (`every_Nh`) runs when the hour is divisible by N and the minute is :00.
+
+### Days values
+
+| Value | Meaning |
+|-------|---------|
+| `daily` | Every day |
+| `weekdays` | Monday–Friday |
+| `weekends` | Saturday–Sunday |
+| `mon` | Specific day (use lowercase 3-letter abbreviation) |
+| `mon,wed,fri` | Multiple specific days (comma-separated) |
 
 ---
 
 ## Prompt Body
 
-Everything after the frontmatter `---` is the prompt executed by `claude -p` each time the job runs.
+Everything after the second `---` is the prompt sent to `claude -p`. Write whatever you want — multi-step, multi-skill, direct instructions.
 
 ### Rules for good job prompts
 
 1. **Self-contained.** Each execution has no memory of the last. State everything needed.
 2. **Specific file paths.** "Read brand_context/voice-profile.md" not "check voice context".
-3. **Explicit output location.** "Save results to projects/str-trending-research/daily_{date}.md"
-4. **Date-aware.** Use "today's date" -- Claude resolves it at runtime.
-5. **Bounded scope.** One clear task. Don't chain 5 skills in one job.
-6. **Error handling.** Say what to do if something fails (e.g., "If web search fails, exit without creating output").
+3. **Explicit output location.** "Save to projects/str-trending-research/{today's date in YYYY-MM-DD format}_daily.md"
+4. **Date-aware.** Use "today's date" — Claude resolves it at runtime.
+5. **Error handling.** Say what to do if something fails.
+6. **Reference skills by methodology.** If using a skill, tell Claude to follow that skill's methodology and reference the skill file path so it loads the right approach.
 
-### Example prompt body
+### Example: Single task
 
 ```markdown
 You are running as a scheduled job for Agentic OS.
+Read CLAUDE.md for system context.
 
+Task: Research trending AI automation topics on Reddit and X.
+Save to: projects/str-trending-research/{today's date in YYYY-MM-DD format}_daily.md
+
+If web search fails, exit without creating the output file.
+```
+
+### Example: Multi-step with skills
+
+```markdown
+You are running as a scheduled job for Agentic OS.
 Read CLAUDE.md for system context. Read context/SOUL.md for voice.
 
-Task: Research what's trending in AI automation on Reddit and X over the
-last 7 days. Focus on Claude Code, n8n, and agentic workflows.
+Do the following in order:
 
-Save the brief to: projects/str-trending-research/weekly-ai-automation_{today's date in YYYY-MM-DD format}.md
+1. Read yesterday's memory file and note open threads.
+2. Use the str-trending-research methodology (read .claude/skills/str-trending-research/SKILL.md
+   for the full approach). Research trending AI topics from the last 24 hours.
+3. Draft 2 content ideas connecting trends to our positioning.
+   Read brand_context/positioning.md for our angles.
+4. Save everything to: projects/ops-cron/{today's date}_morning-kickoff.md
 
-Format: Use the str-trending-research skill methodology. Include:
-- Top 5 Reddit threads with engagement counts
-- Top 5 X posts with engagement counts
-- Key themes and patterns
-- Actionable content angles
-
-If web search fails, note the failure and exit without creating the output file.
+If web search fails, skip trending and use existing context only.
 ```
 
 ---
 
 ## How Jobs Get Executed
 
-The watchdog (`scripts/watchdog.sh`) runs every hour via your OS scheduler. For each enabled job:
+The dispatcher (`scripts/run-crons.sh`) runs every minute via OS crontab. For each job file:
 
 1. Parse the YAML frontmatter
-2. Check if the job is due (based on schedule interval and last run time)
-3. Run: `claude -p "{prompt}" --model {model} --max-turns 25 --allowedTools "Read,Write,Edit,Bash,Glob,Grep,WebSearch,WebFetch"`
-4. Log output to `cron/logs/{name}_{date}.log`
-5. Record the run time in `cron/watchdog.state.json`
-
-Jobs with `schedule: session_start` are skipped by the watchdog -- they only run inside interactive Claude Code sessions.
+2. Skip if `active: "false"`
+3. Check if `time` matches the current time (exact, comma-list, or interval)
+4. Check if `days` matches the current day
+5. Run: `claude -p "{prompt}" --model {model} --dangerously-skip-permissions` with the configured `timeout` (default 30m). If the process exceeds the timeout, it is killed.
+6. If the job fails and `retry` > 0, re-run up to N times. Each retry gets the full timeout.
+7. Write a status file to `cron/status/{filename}.json` with result (`success`/`failure`/`timeout`), duration, timestamp, and run/fail counters
+8. Send an OS notification based on the `notify` setting (`on_finish`, `on_failure`, or `silent`)
+9. Log output to `cron/logs/{filename}.log` with START/END timestamps
 
 ---
 
@@ -94,10 +135,9 @@ Jobs with `schedule: session_start` are skipped by the watchdog -- they only run
 
 | Model | Typical cost per execution |
 |-------|-----------------------------|
-| haiku | $0.01-0.05 |
-| sonnet | $0.05-0.25 |
-| opus | $0.25-2.00 |
+| haiku | $0.01–0.05 |
+| sonnet | $0.05–0.25 |
+| opus | $0.25–2.00 |
 
-A sonnet job running every 2 hours for an 8-hour day = 4 executions = ~$0.40-1.00/day.
-
-**Budget guard:** Always set `max_budget_usd`. Start low ($0.50) and increase only if the job needs it.
+A sonnet job running once daily for a month = $1.50–7.50/month.
+A sonnet job running every 2 hours (12x/day) for a month = $18–90/month.

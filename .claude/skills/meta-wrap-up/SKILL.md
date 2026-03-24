@@ -2,12 +2,15 @@
 name: meta-wrap-up
 description: >
   End-of-session checklist that reviews deliverables, collects feedback,
-  fixes skills, updates learnings, and commits work. Use when the user
-  says "wrap up", "close session", "end session", "wrap things up",
-  "we're done", "that's it for today", "session done", or invokes
-  /wrap-up. Run at the end of any working session or after completing
-  a major deliverable. Does NOT trigger for content writing, voice
-  extraction, positioning, or audience research.
+  fixes skills, updates learnings, and commits work. Triggers
+  AUTOMATICALLY when the user signals session end: "thanks", "that's it",
+  "done for today", "bye", "I'm done", "all good", "that's all",
+  "cheers", "signing off", "wrap up", "close session", "end session",
+  "we're done", "session done", or invokes /wrap-up. Also runs at the
+  end of any working session or after completing a major deliverable.
+  Does NOT trigger for content writing, voice extraction, positioning,
+  or audience research. Does NOT trigger for mid-conversation "thanks"
+  that clearly mean "thanks, now do X" rather than session end.
 ---
 
 # Wrap-Up
@@ -50,7 +53,7 @@ Scan what happened this session:
    - Other locations — flag for file placement check
 3. **File placement check:** Verify outputs follow naming conventions:
    - Projects in `projects/{category}-{output-type}/` with correct prefix
-   - Filenames use `{descriptive-name}_{YYYY-MM-DD}.md` format
+   - Filenames use `{YYYY-MM-DD}_{descriptive-name}.md` format
    - If anything is misplaced or misnamed, fix it now
 
 ---

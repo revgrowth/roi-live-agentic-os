@@ -1,27 +1,26 @@
 ---
 name: ops-cron
 description: >
-  Schedule recurring tasks that run automatically via a system-level watchdog,
-  even when Claude Code is closed. Job definitions persist in cron/jobs/ as the
-  registry. The watchdog (launchd on Mac, Task Scheduler on Windows) checks
-  every hour and runs due jobs headlessly via claude -p. Triggers on:
+  Schedule recurring tasks that run automatically via OS crontab (Mac/Linux)
+  or Task Scheduler (Windows). Job files in cron/jobs/ define what runs, when,
+  and with which model. Headless claude -p executes each job. Triggers on:
   "schedule a job", "cron job", "run this every morning", "automate daily",
-  "recurring task", "set up a scheduled job", "check scheduled jobs",
-  "list scheduled jobs", "install watchdog", "uninstall watchdog".
+  "recurring task", "scheduled job", "check scheduled jobs", "list jobs",
+  "install cron", "run job manually".
   Does NOT trigger for one-off tasks or in-session reminders.
 ---
 
 # Scheduled Jobs
 
-Recurring tasks that persist across sessions and run automatically. Job definitions live in `cron/jobs/`. Execution uses a system-level watchdog that runs `claude -p` headlessly -- jobs keep running even when Claude Code is closed.
+Drop a markdown file into `cron/jobs/`, install the dispatcher once, and your prompts run automatically at the times you set. Each job fires headless `claude -p` — no open session required.
 
 ## How It Works
 
-The watchdog is a background process registered with your OS scheduler (launchd on Mac, Task Scheduler on Windows). Every hour it scans `cron/jobs/`, checks what's due, and runs each due job via `claude -p` with the model and budget from the job file. Each execution is stateless and self-contained. Install once, forget about it.
+A lightweight dispatcher script (`scripts/run-crons.sh`) runs every minute via your OS crontab. It scans `cron/jobs/*.md`, checks each file's `time` and `days` against the current time, and fires any matching jobs via `claude -p`. Each execution is stateless and self-contained.
 
 ## Outcome
 
-Job definition files in `cron/jobs/`. Automatic execution in the background. Logs for completed runs in `cron/logs/`.
+Job file in `cron/jobs/`. Automatic execution in the background. Per-job logs in `cron/logs/`.
 
 ## Context Needs
 
@@ -29,7 +28,7 @@ Job definition files in `cron/jobs/`. Automatic execution in the background. Log
 |------|-----------|--------------------------|
 | `context/learnings.md` | `## ops-cron` section | Known issues with specific jobs |
 
-No brand context needed -- this is infrastructure.
+No brand context needed — this is infrastructure.
 
 ---
 
@@ -37,88 +36,159 @@ No brand context needed -- this is infrastructure.
 
 | Action | User says | What to do |
 |--------|----------|------------|
-| **Create** | "schedule a job", "run X every morning" | Build a job file (Step 2) then offer to install watchdog (Step 3) |
-| **List** | "list jobs", "what's scheduled" | Read all files in `cron/jobs/`, show status table |
-| **Install** | "install watchdog", "start scheduled jobs" | Run `bash scripts/install-watchdog.sh` |
-| **Uninstall** | "uninstall watchdog", "stop all jobs" | Run `bash scripts/uninstall-watchdog.sh` |
-| **Stop job** | "stop the X job", "disable X" | Set `enabled: false` in the job file |
-| **Remove** | "remove the morning briefing job" | Delete the job file |
-| **Logs** | "check job logs", "did the job run" | Read latest from `cron/logs/` |
-| **Status** | "is the watchdog running" | Check for launchd plist (Mac) or scheduled task (Windows) |
+| **Create** | "schedule a job", "run X every morning" | Build a job file (Step 2–4), offer to install dispatcher (Step 5) |
+| **List** | "list jobs", "what's scheduled" | Read all files in `cron/jobs/` and status files from `cron/status/`, show a table with name, schedule, active, last run time, result, duration, and run/fail counts |
+| **Install** | "install cron", "start scheduled jobs" | Run `bash scripts/install-crons.sh` |
+| **Uninstall** | "uninstall cron", "stop all jobs" | Run `bash scripts/uninstall-crons.sh` |
+| **Pause job** | "stop the X job", "disable X" | Set `active: "false"` in the job file |
+| **Resume job** | "re-enable X", "turn X back on" | Set `active: "true"` in the job file |
+| **Remove** | "remove the morning job" | Delete the job file |
+| **Run now** | "run X now", "trigger X manually" | Run `bash scripts/run-job.sh {name}` |
+| **Logs** | "check job logs", "did the job run" | Read from `cron/logs/{job-name}.log` |
+| **Status** | "is the dispatcher running" | Check `crontab -l` (Mac) or scheduled tasks (Windows) |
 
-## Step 2: Create a Job File
+## Step 2: Understand What the User Wants
 
-Ask the user (max 3 questions):
-1. **What should it do?** -- The task in plain language
-2. **How often?** -- "every 30 minutes", "every 2 hours", etc.
-3. **Any constraints?** -- Budget cap, specific model
+Ask up to 4 focused questions:
 
-Create the job file at `cron/jobs/{job-name}.md`. See `references/job-format.md` for the format.
+1. **What should it do?** — Get the task in plain language. Probe for specifics:
+   - "Which topics or keywords should it focus on?"
+   - "Where should the output go?"
+   - "What format do you want the output in?"
 
-**Key rules for job prompts:**
-- Self-contained -- each execution has no memory of the last
-- Reference specific file paths
-- Say where to save output
-- Keep prompts focused -- one clear task per job
+2. **Which skills should it use?** — Check `.claude/skills/` for installed skills that match the task. Ask the user:
+   - "I can see you have `str-trending-research` installed — should this job use that methodology?"
+   - "You also have `mkt-content-repurposing` — want it to repurpose findings into posts?"
+   - List relevant installed skills and let them pick which to chain together.
 
-## Step 3: Install the Watchdog
+3. **When and how often?** — Map to the time format:
+   - "Every morning at 9" → `time: "09:00"`, `days: "daily"`
+   - "Every 2 hours on weekdays" → `time: "every_2h"`, `days: "weekdays"`
+   - "Three times a day" → ask which times, then `time: "09:00,13:00,17:00"`
+   - "Mondays and Wednesdays" → `days: "mon,wed"`
 
-If the watchdog isn't already installed, offer to install it:
+5. **Notifications and timeout?** — Ask if they want to be notified when the job finishes:
+   - `on_finish` (default) — notifies on success and failure
+   - `on_failure` — only notifies on errors or timeouts
+   - `silent` — no notifications
+   - If the job is long-running, suggest adjusting `timeout` (default 30m)
 
-**Mac:**
+4. **Which model?** — Explain the trade-off:
+   - `haiku` — fast and cheap ($0.01–0.05/run), good for simple lookups
+   - `sonnet` — balanced (default, $0.05–0.25/run), good for research and writing
+   - `opus` — most capable ($0.25–2.00/run), good for complex multi-step tasks
+
+## Step 3: Build the Prompt
+
+Write a self-contained prompt body that:
+
+- Starts with "You are running as a scheduled job for Agentic OS."
+- Tells Claude to read CLAUDE.md for system context
+- **References specific skill files** if using skills: "Read .claude/skills/{skill-name}/SKILL.md for the methodology"
+- **References specific brand context files** if the task needs voice/positioning/ICP
+- Gives clear, numbered steps for multi-step tasks
+- Specifies exact output path with date placeholder
+- Includes error handling ("If X fails, do Y")
+
+## Step 4: Create the File and Confirm
+
+1. Create the job file at `cron/jobs/{job-name}.md`
+2. **Show the user what was created.** Display:
+   - The full file path so they can click to review it
+   - A summary table of the schedule
+   - Estimated cost per run and per month
+3. Ask: "Want to review or adjust anything before we activate it?"
+
+Example confirmation:
+
+```
+Created: cron/jobs/daily-trending-research.md
+
+Schedule:
+  Time:    every 2 hours
+  Days:    weekdays
+  Model:   sonnet
+  Active:  true
+  Notify:  on_finish
+  Timeout: 30m
+  Retry:   0
+
+Estimated cost: ~$0.15/run × 12 runs/day × 22 weekdays = ~$40/month
+
+The job uses the str-trending-research methodology and saves output to
+projects/str-trending-research/. Review the file to check the prompt:
+/path/to/cron/jobs/daily-trending-research.md
+```
+
+## Step 5: Install the Dispatcher
+
+If the dispatcher isn't already installed, offer to install it:
+
+**Mac/Linux:**
 ```bash
-bash scripts/install-watchdog.sh
+bash scripts/install-crons.sh
 ```
 
 **Windows (PowerShell as admin):**
 ```powershell
-powershell scripts/install-watchdog.ps1
-```
-
-The installer:
-1. Checks `claude` CLI is available
-2. Calculates estimated daily cost from enabled jobs
-3. Registers with the OS scheduler
-4. Starts running immediately
-
-## Step 4: Verify
-
-Show the user:
-```
-Watchdog: installed (checking every 60 minutes)
-
-Scheduled jobs:
-  trending-research    every 2h    enabled    sonnet    $0.50 cap
-  inbox-check          every 30m   enabled    haiku     $0.25 cap
-
-Estimated daily cost: $0.40 - $1.50
-Logs: cron/logs/
+powershell scripts/install-crons.ps1
 ```
 
 ---
 
-## Schedule Reference
+## Time Reference
 
-| User says | `schedule` value | How often it runs |
-|-----------|-----------------|-------------------|
-| Every 10 minutes | `every_10m` | 6x/hour |
-| Every 30 minutes | `every_30m` | 2x/hour |
-| Every hour | `every_1h` | 1x/hour |
-| Every 2 hours | `every_2h` | Every 2 hours |
-| Every 4 hours | `every_4h` | Every 4 hours |
-| When I open Claude | `session_start` | Once per session (watchdog skips these) |
+| User says | `time` value | Runs |
+|-----------|-------------|------|
+| "at 9am" | `"09:00"` | Once daily at 9:00 |
+| "at 9am and 5pm" | `"09:00,17:00"` | Twice daily |
+| "every 5 minutes" | `"every_5m"` | 288x/day |
+| "every 10 minutes" | `"every_10m"` | 144x/day |
+| "every 30 minutes" | `"every_30m"` | 48x/day |
+| "every hour" | `"every_1h"` | 24x/day on the hour |
+| "every 2 hours" | `"every_2h"` | 12x/day (00:00, 02:00, ...) |
+| "every 4 hours" | `"every_4h"` | 6x/day (00:00, 04:00, ...) |
+| "three times a day" | `"09:00,13:00,17:00"` | Ask which times |
 
-No cron expressions. Human-readable intervals only.
+Full reference with all options: see `cron/templates/schedule-reference.md`
+
+---
+
+## Manual Trigger
+
+Run any job immediately, ignoring its schedule:
+
+```bash
+bash scripts/run-job.sh morning-kickoff
+```
+
+This is the same entrypoint a future Telegram bot would use.
+
+---
+
+## Status & Notifications
+
+**Per-job status files** are written to `cron/status/{job-name}.json` after each execution. Each file tracks: result (`success`/`failure`/`timeout`), duration, last run timestamp, total run count, and fail count. These are read by the **List** action to show a status table.
+
+**OS notifications** are sent when a job completes, controlled by the `notify` field:
+- `on_finish` (default) — notifies on both success and failure
+- `on_failure` — only notifies on errors or timeouts
+- `silent` — never notifies
+
+**Catch-up behavior:** If the laptop was closed (sleep/lid shut) during a scheduled fixed-time job, the dispatcher detects the missed window on wake and runs the job automatically. Interval-based jobs (`every_Nh`) do not catch up — they simply resume on the next matching interval.
+
+**Timeout** prevents runaway jobs. Default is 30 minutes. If a job exceeds its timeout, the process is killed and the result is recorded as `timeout`. If `retry` > 0, the job is re-attempted up to N times, each with the full timeout.
 
 ---
 
 ## Heartbeat Integration
 
-At session start (CLAUDE.md heartbeat step 9):
+At session start (CLAUDE.md heartbeat step 8):
 
-1. Check if watchdog is installed (launchd plist exists on Mac)
-2. If installed: report status: "Watchdog is active -- your N jobs run automatically"
-3. If not installed but enabled jobs exist: suggest installing the watchdog
+1. Check if dispatcher is installed (`crontab -l | grep run-crons` on Mac)
+2. If installed: read `cron/status/` files and report: "Cron dispatcher is active — N enabled jobs. Last run: {job} at {time} ({result})."
+3. If any jobs failed on last run, flag them: "{job} failed on last run — check logs?"
+4. If not installed but jobs exist: suggest `bash scripts/install-crons.sh`
 
 ---
 
@@ -130,4 +200,4 @@ At session start (CLAUDE.md heartbeat step 9):
 
 ## Self-Update
 
-If the user reports a job failing or a scheduling issue -- update the `## Rules` section immediately with the fix and today's date. Also log to `context/learnings.md` under `## ops-cron`.
+If the user reports a job failing or a scheduling issue — update the `## Rules` section immediately with the fix and today's date. Also log to `context/learnings.md` under `## ops-cron`.

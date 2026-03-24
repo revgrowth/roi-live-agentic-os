@@ -7,19 +7,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Heartbeat
 
 Before doing anything else in any session:
-1. Read `context/SOUL.md` — who you are, how you behave
-2. Read `context/USER.md` — who you're helping and their preferences
-3. Read `context/memory/{today}.md` + `context/memory/{yesterday}.md` — recent session context. Pay special attention to `### Open threads` from the last session — these are your starting point.
-4. **Create or open today's memory file** — if `context/memory/{YYYY-MM-DD}.md` doesn't exist, create it with a session start timestamp. If it already exists (second session today), append a new session header. See **Daily Memory** below.
-5. Scan `brand_context/` — what exists? Flag anything older than 30 days: "Your [file] is from [date]. Want to refresh, or keep going?"
-6. Scan `.claude/skills/` — know what skills are installed and available
-7. **Sync check** — run the skill & MCP reconciliation (see below)
-8. **Scheduled jobs** — check if the watchdog is installed (look for `~/Library/LaunchAgents/com.agentic-os.watchdog.plist` on Mac). If installed, report: *"Watchdog is active — your N enabled jobs run automatically in the background."* If not installed, scan `cron/jobs/` for enabled jobs and mention: *"You have N scheduled jobs. Install the watchdog to run them automatically: `bash scripts/install-watchdog.sh`"*
-9. **Session gate** — after completing the heartbeat, check whether the user should run `/start-here` before doing other work:
-   - **No `brand_context/` files?** → First-time user. Prompt: *"Looks like you haven't set up yet. Run `/start-here` to get your brand foundation built — it takes a few minutes and makes everything better."*
-   - **Brand context exists but no previous `/wrap-up`?** Check the most recent `context/memory/` file — if the last session has no `### Open threads` content or the session block looks incomplete (placeholder text still present), nudge: *"Your last session wasn't wrapped up. Running `/wrap-up` now will save your context, then `/start-here` will pick it up. Or just run `/start-here` to jump into today."*
-   - **Brand context exists and previous sessions are clean?** → Prompt: *"Run `/start-here` to kick off today's session — I'll recap where we left off and we'll go from there."*
-   - **User skips and jumps straight into a task?** → Don't block them, but mention once: *"Tip: starting with `/start-here` gives me your full context so I can do better work. Happy to keep going either way."*
+1. **Brand context gate** — scan `brand_context/` for populated `.md` files. If none exist, this is a first-time user. Skip steps 2-9 and go straight to step 10 (which runs `/start-here` in first-run mode to build brand context). No point loading memory, scanning projects, or checking crons if the foundation isn't set up yet.
+2. Read `context/SOUL.md` — who you are, how you behave. If not found (multi-client mode), read `../../context/SOUL.md` from the root.
+3. Read `context/USER.md` — who you're helping and their preferences. If not found, read `../../context/USER.md` from the root.
+4. Read `context/memory/{today}.md` + `context/memory/{yesterday}.md` — recent session context. Pay special attention to `### Open threads` from the last session — these are your starting point.
+5. **Create or open today's memory file** — if `context/memory/{YYYY-MM-DD}.md` doesn't exist, create it with a session start timestamp. If it already exists (second session today), append a new session header. See **Daily Memory** below.
+6. Flag stale brand context — anything in `brand_context/` older than 30 days: "Your [file] is from [date]. Want to refresh, or keep going?"
+7. **Active projects** — scan `projects/briefs/*/brief.md` for briefs with `status: active` in frontmatter. If any found, report: *"You have N active projects: {names}."* Skip silently if none.
+8. Scan `.claude/skills/` — know what skills are installed and available
+9. **Sync check** — run the skill & MCP reconciliation (see below)
+10. **Scheduled jobs** — check if the cron dispatcher is installed. On Mac, derive the project slug (`basename` of project dir, lowercased, non-alphanumeric replaced with `-`) and look for `~/Library/LaunchAgents/com.agentic-os.{slug}.plist`. If installed, read `cron/status/` files and report: *"Cron dispatcher is active — N enabled jobs. Last run: {job} at {time} ({result})."* If any jobs failed on their last run, flag them: *"{job} failed on last run — check logs?"* If not installed, silently note it — the dispatcher is installed automatically during `bash scripts/install.sh`. Only mention it if the user asks about cron or scheduling: *"The cron dispatcher isn't set up yet. Run `bash scripts/install-crons.sh` to enable it."*
+11. **Auto start-here** — after completing the heartbeat checks above, automatically run the `/start-here` flow. Do NOT prompt the user to type it — just do it. The `/start-here` command detects state (first-run vs returning) and handles everything: first-time onboarding, session recaps, goal-setting, and work scoping. The user should never need to type `/start-here` manually — the heartbeat runs it for them. (The command still exists for manual re-invocation if needed.)
 
 ### Daily Memory
 
@@ -30,6 +28,9 @@ Every session writes to `context/memory/{YYYY-MM-DD}.md`. This is how continuity
 **At session start:** Create the file if it doesn't exist, or append a new session block if it does:
 ```
 ## Session N
+
+### Project
+[Project folder name if working on a Level 2 or 3 project — e.g., q2-product-launch. Omit for single tasks.]
 
 ### Goal
 [One line — filled once the user states their goal]
@@ -44,9 +45,13 @@ Every session writes to `context/memory/{YYYY-MM-DD}.md`. This is how continuity
 - [Anything unfinished for the next session]
 ```
 
+When Claude reads yesterday's memory and sees a `### Project` reference, it loads `projects/briefs/{project-name}/brief.md` for full context. For Level 1 sessions (single tasks), omit the `### Project` field.
+
 **During the session:** Update the current session block incrementally as events happen. Don't wait for wrap-up — if a deliverable is produced or a decision is made, log it immediately.
 
-**At session end (via /wrap-up):** The wrap-up skill finalises the **existing** session block — replacing any placeholder text with real content. It does NOT create a new session block. Wrap-up completes the block that was started, not a separate one. Even without `/wrap-up`, the file should have useful context because it was written incrementally.
+**At session end (automatic):** Wrap-up runs automatically when the user signals they're done — no need to type `/wrap-up`. Detect session-ending signals like: "thanks", "that's it", "done for today", "bye", "I'm done", "all good", "that's all", "cheers", "signing off", or any message that clearly indicates the conversation is ending. When detected, run the full `meta-wrap-up` skill (review deliverables, collect feedback, update learnings, finalise memory, commit). The `/wrap-up` command still exists for manual invocation mid-session or if the auto-detection doesn't trigger.
+
+The wrap-up skill finalises the **existing** session block — replacing any placeholder text with real content. It does NOT create a new session block. Wrap-up completes the block that was started, not a separate one. Even without wrap-up, the file should have useful context because it was written incrementally.
 
 Keep entries concise — bullet points, not paragraphs. This file is read at the start of every future session.
 
@@ -91,18 +96,77 @@ Compare what's on disk against what's registered in this file. Fix any drift sil
 ### Task Routing
 
 When the user asks a question or requests a task:
-1. **Search installed skills first.** Check `.claude/skills/` frontmatter for a matching skill.
-2. **Skill found** → invoke it. Always prefer the dedicated skill over base knowledge.
-3. **No matching skill** → inform the user explicitly and offer the choice:
+1. **Check system operations first.** If the request matches a built-in operation (see table below), execute it directly. These are NOT skills — they're core system functions that always work.
+2. **Search installed skills.** Check `.claude/skills/` frontmatter for a matching skill.
+3. **Skill found** → invoke it. Always prefer the dedicated skill over base knowledge.
+4. **No matching skill** → inform the user explicitly and offer the choice:
    - **(a) Find or build a skill** — search for an existing skill to install, or build one with `meta-skill-creator`, so the system handles this task well every time
    - **(b) Handle it now with base knowledge** — complete the task without a skill, understanding output won't benefit from a tested methodology or the learnings loop
 
 Never silently fall back to base knowledge when a skill exists. Never silently handle a task without telling the user a skill gap was found.
 
+### Built-in Operations
+
+These are system-level commands handled by scripts — not skills. **Check these BEFORE searching skills.** Execute them directly without offering alternatives.
+
+| User says | Action |
+|-----------|--------|
+| "add a client", "new client", "set up a client" | See **Add Client Flow** below. |
+| "remove a skill", "uninstall {skill}" | Run `bash scripts/remove-skill.sh {skill-name}` |
+| "add a skill", "install {skill}" | Run `bash scripts/add-skill.sh {skill-name}` |
+| "list skills", "what skills are installed" | Run `bash scripts/list-skills.sh` |
+
+### Add Client Flow
+
+When the user asks to add a client:
+
+1. **Ask for the client name** (if not already provided).
+2. **Run the script:** `bash scripts/add-client.sh "{name}"`
+3. **Show the user what was created and how it fits:**
+
+```
+Here's what I set up for {name}:
+
+agentic-os/
+├── clients/
+│   └── {slug}/                      ← {name}'s workspace
+│       ├── brand_context/           ← their voice, positioning, ICP (built on first /start-here)
+│       ├── context/
+│       │   ├── SOUL.md → ../../context/SOUL.md    ← inherited from root
+│       │   ├── USER.md                             ← unique to this client
+│       │   ├── learnings.md                        ← builds up over time for this client
+│       │   └── memory/                             ← session history for this client
+│       ├── projects/                               ← all outputs for this client
+│       ├── cron/                                   ← scheduled jobs for this client
+│       └── .claude/skills/                  ← copied from root + any client-only skills
+├── CLAUDE.md                        ← shared methodology (all clients use this)
+├── context/SOUL.md                  ← shared personality
+└── .claude/skills/                  ← shared skills (edit once, all clients benefit)
+
+**What's shared:** Skills, CLAUDE.md, and SOUL.md come from the root — so improvements
+apply to every client automatically.
+
+**What's unique:** Brand context, memory, learnings, USER.md, and projects are all
+separate — each client gets their own voice, history, and outputs.
+
+**Editing skills:** Always edit at the root — client copies are overwritten on
+`update.sh`. Need a client-specific skill? Create it in the client's `.claude/skills/`
+folder — client-only skills are preserved during updates.
+```
+
+4. **Tell them how to switch — use the full absolute path:**
+> "To work with {name}, open a new terminal and run:
+> `cd {absolute path to current working directory}/clients/{slug} && claude`
+> On your first session there, I'll run through the brand setup automatically."
+>
+> Use `pwd` to get the absolute path. Never give just `cd clients/{slug}` — the user may not be in the project directory.
+
+5. **Link to the full guide:** "For more on how multi-client works, see [docs/multi-client-guide.md](docs/multi-client-guide.md)."
+
 ### Before Major Deliverables
 - Is the relevant brand_context file loaded per the context matrix below?
 - Are there learnings in `context/learnings.md` for this skill's section?
-- If brand_context is missing, offer to run `/start-here` — never block work because context is missing
+- If brand_context is missing, offer to build it (the heartbeat already runs start-here automatically) — never block work because context is missing
 
 ### After Major Deliverables
 - Ask: "How did this land? Any adjustments?"
@@ -113,11 +177,47 @@ Never silently fall back to base knowledge when a skill exists. Never silently h
 
 ## What This Project Is
 
-Agentic OS is a Claude Code project template that turns any client folder into an intelligent business assistant. It is **agent-first**: personality lives in `context/SOUL.md`, user preferences in `context/USER.md`, session continuity in `context/memory/`, accumulated learnings in `context/learnings.md`, brand memory in `brand_context/`, and functionality in `.claude/skills/`.
+Agentic OS is a Claude Code project template that turns Claude into an intelligent business assistant. It is **agent-first**: personality lives in `context/SOUL.md`, user preferences in `context/USER.md`, session continuity in `context/memory/`, accumulated learnings in `context/learnings.md`, brand memory in `brand_context/`, and functionality in `.claude/skills/`.
 
-**One command to start: `/start-here`**. Everything else is a skill that triggers automatically or gets invoked by the orchestrator.
+**Every session starts automatically** — the heartbeat runs `/start-here` without the user needing to type it. Everything else is a skill that triggers automatically or gets invoked by the orchestrator.
 
 The full specification lives in `PRD.md`. Read it when building any new component.
+
+---
+
+## Multi-Client Architecture
+
+Agentic OS supports multiple clients from a single install. The root folder holds shared methodology (CLAUDE.md, SOUL.md, skills, scripts). Each client gets a subfolder under `clients/` with its own brand context, memory, projects, and learnings.
+
+```
+agentic-os/                          ← shared methodology (skills, scripts, CLAUDE.md)
+├── clients/
+│   ├── abc-client/                  ← ABC Client's workspace
+│   │   ├── brand_context/           ← their voice, positioning, ICP
+│   │   ├── context/                 ← their memory, learnings, USER.md
+│   │   ├── projects/                ← their outputs
+│   │   └── .claude/skills/ ← copied from root, plus any client-only skills
+│   └── xyz-agency/                  ← another client
+│       ├── brand_context/
+│       ├── context/
+│       └── projects/
+├── brand_context/                   ← solo/default brand context (if not using clients/)
+├── context/                         ← solo/default context
+└── .claude/skills/                  ← shared skills (all clients use these)
+```
+
+**How it works:**
+- `bash scripts/add-client.sh "Client Name"` creates the client workspace with the correct structure
+- Each client inherits CLAUDE.md, SOUL.md, and skills from the root — edit once, all clients benefit
+- Each client has its own brand_context/, context/memory/, context/learnings.md, USER.md, and projects/
+- To work with a client: `cd clients/{slug} && claude` — onboarding runs automatically on first session
+- Solo users don't need clients/ at all — just work from the root folder
+
+**Skill editing rule:** Always edit shared skills at the root level — client copies are overwritten by `update.sh`. If you need a client-specific skill, create it directly in that client's `.claude/skills/` folder. Client-only skills are preserved during updates.
+
+**When the user says "add a client":** Run the script directly (see Built-in Operations). Don't suggest cloning a new repo, creating a separate workspace, or any other approach. Multi-client is built in.
+
+Full guide: [docs/multi-client-guide.md](docs/multi-client-guide.md)
 
 ---
 
@@ -175,6 +275,12 @@ Every skill and its output folder uses a category prefix. This keeps skills, out
 | `mkt-positioning` | "differentiation", "angle", "hooks", "USP" | `positioning.md` |
 | `mkt-icp` | "target audience", "buyer persona", "ideal customer" | `icp.md` |
 
+### Strategy Skills
+
+| Skill | Triggers on |
+|-------|------------|
+| `str-ai-seo` | "AI SEO", "AEO", "GEO", "LLMO", "answer engine optimization", "AI citations", "AI visibility", "optimize for ChatGPT/Perplexity/Claude", "show up in AI answers" |
+
 *Optional skills are auto-registered by the Heartbeat reconciliation when their folders appear on disk. Install optional skills with `bash scripts/add-skill.sh <name>`. See `.claude/skills/_catalog/catalog.json` for the full list.*
 
 *Add new skills to this table when built and registered.*
@@ -191,6 +297,7 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 | `mkt-positioning` | — | **writes** | full | — | — | `## mkt-positioning` |
 | `mkt-icp` | — | summary | **writes** | — | — | `## mkt-icp` |
 | `meta-wrap-up` | — | — | — | — | — | `## meta-wrap-up` |
+| `str-ai-seo` | tone only | summary | full | — | — | `## str-ai-seo` |
 
 *Optional skills auto-add their row here via Heartbeat reconciliation when installed. New skills declare their own row when added.*
 
@@ -202,15 +309,66 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 
 ## Output Standards
 
-- Save all generated content to `projects/{category}-{output-type}/`
-- The category prefix in the output folder matches the skill's category (e.g., `mkt-brand-voice` skill → `projects/mkt-*/` outputs)
-- Folder naming: `{category}-{output-type}` in kebab-case (e.g., `mkt-linkedin-carousel`, `str-keyword-plan`)
-- Filename format: `{descriptive-name}_{YYYY-MM-DD}.md` (folder provides context, no skill-name prefix needed)
+- **Single tasks (Level 1):** Save to `projects/{category}-{output-type}/`. The category prefix matches the skill's category (e.g., `mkt-brand-voice` skill → `projects/mkt-*/` outputs). Folder naming: `{category}-{output-type}` in kebab-case (e.g., `mkt-linkedin-carousel`, `str-keyword-plan`).
+- **Planned/GSD projects (Level 2/3):** Save ALL outputs inside the project folder — `projects/briefs/{project-name}/`. Never scatter project outputs across category folders.
+- Filename format: `{YYYY-MM-DD}_{descriptive-name}.md` (date-first so files sort newest-first with descending sort)
 - Folders are created on first use by the skill. No empty pre-scaffolding.
 - Default format: markdown unless user specifies otherwise
 - After major deliverables: ask for feedback, log to `context/learnings.md`
 - **Auto-download binary outputs.** After saving any non-markdown file (PNG, PDF, SVG, video, JSON diagrams, etc.), copy it to `~/Downloads/` using `cp <filepath> ~/Downloads/`. This applies to all skills — the user should never have to manually navigate to a generated file.
-- **Show clickable file path.** After saving any output, show the user the full absolute file path so they can click it directly to open the file. Example: "Saved to `/Users/simoncoton/Desktop/agentic-os/projects/mkt-copywriting/landing-page_2026-03-14.md`". This applies to all skills — the user should never have to navigate to find what was just created.
+- **Show clickable file path.** After saving any output, show the user the full absolute file path so they can click it directly to open the file. Example: "Saved to `/Users/simoncoton/Desktop/agentic-os/projects/mkt-copywriting/2026-03-14_landing-page.md`". This applies to all skills — the user should never have to navigate to find what was just created.
+
+### Projects
+
+Work scopes into three levels. The level determines where output goes and how much planning happens upfront.
+
+| Level | Name | When | Where |
+|-------|------|------|-------|
+| **1** | Single task | One or a few small deliverables, no project scoping needed | `projects/{category}/` |
+| **2** | Planned project | Multi-deliverable work that benefits from a brief — campaigns, launches, client deliverables | `projects/briefs/{project-name}/` |
+| **3** | GSD project | Complex multi-phase work with dependencies and milestones | `projects/briefs/{project-name}/` + `.planning/` |
+
+**Level 1 (single tasks):** Just ask Claude. Output goes to category folders — `projects/{category}-{type}/{name}_{date}.md`. Use Shift+Tab twice for plan mode if upfront thinking helps, but output still goes to category folders.
+
+**Level 2 (planned projects):** The project gets its own folder under `projects/briefs/` with a `brief.md`. Run an interactive scoping conversation to define the project: goal, deliverables, acceptance criteria, timeline, constraints. Save as `brief.md` inside the project folder. ALL outputs for that project go inside the project folder, not in category folders. Projects are listed most-recent-first (by `created` date in frontmatter) when reporting to the user.
+
+```
+projects/briefs/kanban-dashboard/
+├── brief.md                         ← project scope, deliverables, acceptance criteria
+├── landing-page_2026-03-24.md
+├── email-sequence_2026-03-25.md
+└── competitor-scan_2026-03-22.md
+```
+
+When creating a Level 2 brief, cover: project goal (one sentence), deliverables (checklist), acceptance criteria (how you'll know it's done), timeline/constraints, and any dependencies. Keep it to one page — this is a working document, not a formal PRD.
+
+**Level 3 (GSD projects):** Same as Level 2 (project folder under `projects/briefs/` with `brief.md` + outputs), but GSD's `.planning/` directory lives at the project root (hardcoded across 50+ references). The brief links to `.planning/`.
+
+```
+projects/briefs/website-rebuild/
+├── brief.md                         ← links to .planning/
+├── homepage-copy_2026-03-24.md
+└── sitemap_2026-03-25.excalidraw
+
+.planning/                           ← GSD artifacts (at project root, not inside projects/)
+├── PROJECT.md
+├── ROADMAP.md
+└── phases/
+```
+
+**One GSD project at a time per workspace.** `.planning/` is shared — finish or archive one before starting another. When complete, run `/archive-gsd` to move `.planning/` into the project folder and mark the brief as complete. If a user tries to start a new GSD project while `.planning/` exists, offer to run `/archive-gsd` first.
+
+**How to tell folders apart:** Category folders live directly under `projects/` using `{category}-{type}` naming (e.g., `projects/mkt-copywriting/`) — no `brief.md` inside. Project folders live under `projects/briefs/` using descriptive names (e.g., `projects/briefs/kanban-dashboard/`) — always have a `brief.md`. When listing projects for the user, sort by `created` date in frontmatter, most recent first.
+
+**Brief frontmatter format:**
+```yaml
+---
+project: q2-product-launch
+status: active
+level: 2
+created: 2026-03-24
+---
+```
 
 ### Humanizer Gate
 
@@ -222,16 +380,6 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 - Skills that produce non-publishable output (research briefs, ICP profiles, positioning docs) skip this step
 
 When building new skills, include a humanizer step in the methodology if the skill writes content meant for an audience. Reference `tool-humanizer` in pipeline mode.
-
-### Schemas
-
-Schemas live inside the skill that owns them, under `references/`. This keeps them version-controlled with the skill and out of user data directories.
-
-| Schema | Location | Used by |
-|--------|----------|---------|
-| `voice-profile.schema.json` | `.claude/skills/mkt-brand-voice/references/` | `mkt-brand-voice` |
-
-When a skill produces structured output, it should read the relevant schema before generating data to ensure all required fields are present.
 
 ---
 
@@ -291,7 +439,6 @@ Skills can depend on other skills. Declare dependencies in a `## Dependencies` s
 - [ ] SKILL.md < 200 lines
 - [ ] References are self-contained
 - [ ] If the skill depends on other skills: add a `## Dependencies` section to SKILL.md
-- [ ] If the skill produces structured/repeatable output: add a schema to the skill's `references/` folder and reference it from SKILL.md
 - [ ] Declare which `projects/` subfolder(s) the skill writes to (must use same category prefix)
 - [ ] **External services**: If the skill uses any external API, ensure the key is in the Service Registry (CLAUDE.md), `.env.example`, and README.md External Services table. The reconciliation does this automatically, but verify it ran.
 - [ ] **Humanizer gate**: If the skill produces publishable text (blog posts, social content, copy, emails), include a step that runs output through `tool-humanizer` in pipeline mode before saving
@@ -299,16 +446,6 @@ Skills can depend on other skills. Declare dependencies in a `## Dependencies` s
 ### Folder naming
 - Format: `{category}-{skill-name}` in kebab-case (e.g., `mkt-brand-voice`, `ops-client-onboarding`)
 - Cannot contain "claude" or "anthropic"
-
----
-
-## Build Order (from PRD)
-
-1. **Phase 1 — Agent Identity:** context/SOUL.md → context/USER.md ✓
-2. **Phase 2 — Command + Foundation Skills:** `start-here.md` ✓ → `mkt-brand-voice/` ✓ → `mkt-positioning/` ✓ → `mkt-icp/` ✓
-3. **Phase 3 — Validate:** End-to-end test with a real business
-4. **Phase 4 — Execution Skills:** Build incrementally, each with reference skills
-5. **Phase 5 — Expand:** First non-marketing skill proves architecture is domain-agnostic
 
 ---
 

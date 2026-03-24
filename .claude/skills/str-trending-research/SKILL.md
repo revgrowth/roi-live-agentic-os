@@ -20,7 +20,7 @@ description: >
 
 ## Outcome
 
-A research brief saved to `projects/str-trending-research/{topic}_{YYYY-MM-DD}.md` containing:
+A research brief saved to `projects/str-trending-research/{YYYY-MM-DD}_{topic}.md` containing:
 - What people are actually discussing, recommending, and debating right now
 - Engagement-weighted insights (upvotes, likes, comments signal what resonates)
 - Patterns across platforms (strongest signals appear everywhere)
@@ -157,7 +157,7 @@ Display the synthesis in this format:
 
 ## Step 5: Save the Brief
 
-Save to `projects/str-trending-research/{topic-slug}_{YYYY-MM-DD}.md`.
+Save to `projects/str-trending-research/{YYYY-MM-DD}_{topic-slug}.md`.
 
 The brief format is defined in `references/brief-template.md`. Include:
 - Research metadata (topic, date, query type, sources scanned)
