@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
+# Note: intentionally NOT using set -e here.
+# We want to continue past individual install failures
+# and report them all at the end, not bail on the first one.
 
 # Agentic OS — System Setup
 # Installs CLI dependencies needed by skills in this repo.
@@ -155,7 +158,13 @@ echo "========================================="
 if [[ $ERRORS -eq 0 ]]; then
     printf "${GREEN}  All dependencies installed!${NC}\n"
 else
-    printf "${YELLOW}  Done with %d issue(s) — see above.${NC}\n" "$ERRORS"
+    printf "${YELLOW}  %d optional dependency issue(s) — see above.${NC}\n" "$ERRORS"
+    printf "${YELLOW}  Skills that need these tools will tell you when they're missing.${NC}\n"
+    printf "${YELLOW}  Everything else works fine without them.${NC}\n"
 fi
 echo "========================================="
 echo ""
+
+# Always exit 0 — dependency failures are non-blocking.
+# Skills gracefully degrade when their tools are missing.
+exit 0
