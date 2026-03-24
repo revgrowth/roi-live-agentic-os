@@ -154,7 +154,7 @@ info "Installing system dependencies..."
 echo ""
 
 if [[ -f "$REPO_ROOT/scripts/setup.sh" ]]; then
-    PYTHON_CMD="$PYTHON_CMD" bash "$REPO_ROOT/scripts/setup.sh"
+    PYTHON_CMD="$PYTHON_CMD" bash "$REPO_ROOT/scripts/setup.sh" || true
 else
     warn "scripts/setup.sh not found — skipping dependency install"
 fi
