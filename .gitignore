@@ -22,7 +22,9 @@ brand_context/*.md
 .DS_Store
 .backup/
 
-# Cron logs and status
+# Cron (jobs are user-created, logs/status are runtime)
+cron/jobs/*
+!cron/jobs/.gitkeep
 cron/logs/
 cron/status/
 
