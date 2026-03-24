@@ -154,7 +154,32 @@ Here's what I can do for [business name]:
 - [skill]: [what it does for their specific business]
 ```
 
-End with ONE recommendation based on business context:
+### Step 9: How It Works Primer
+
+Before recommending a first task, give the user a quick orientation on how they'll actually use the system day-to-day. Keep it conversational — not a feature dump.
+
+Cover three things:
+
+**1. Projects come in three sizes:**
+> "When you want to get something done, there are three ways to work:
+> - **Single task** — just ask me and I'll do it. Blog post, email, research — done.
+> - **Planned project** — for bigger work with multiple deliverables. I'll scope it out first, write a brief, and we work from that.
+> - **GSD project** — for complex builds with phases and milestones. Full structured planning and verification.
+>
+> You don't need to pick upfront — just tell me what you're working on and I'll suggest the right level."
+
+**2. Multi-client support (mention only if they might need it):**
+If the user's business involves working with multiple brands, clients, or distinct audiences, mention:
+> "If you work with multiple clients or brands, I can run separate workspaces for each — just say 'add a client' and I'll set it up. Each gets its own brand context, memory, and outputs while sharing the same skills."
+
+If they're clearly a solo founder/single brand, skip this.
+
+**3. Sessions and continuity:**
+> "At the end of each session, run `/wrap-up` and I'll save everything — what we did, decisions made, open threads. Next time you come back, I pick up where we left off."
+
+### Step 10: First Recommendation
+
+End with ONE recommendation based on their business context:
 "Given you're [situation], I'd start with [skill] — [reason]."
 
 Do NOT present a menu and ask them to pick. Recommend.
