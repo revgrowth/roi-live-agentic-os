@@ -110,10 +110,50 @@ These are system-level commands handled by scripts — not skills. **Check these
 
 | User says | Action |
 |-----------|--------|
-| "add a client", "new client", "set up a client" | Ask for the client name (if not provided), then run `bash scripts/add-client.sh "{name}"`. When done, ask: *"Want to switch into that client folder now?"* If yes, tell them to run `cd clients/{slug} && claude` in a new terminal (Claude Code can't change its own working directory). |
+| "add a client", "new client", "set up a client" | See **Add Client Flow** below. |
 | "remove a skill", "uninstall {skill}" | Run `bash scripts/remove-skill.sh {skill-name}` |
 | "add a skill", "install {skill}" | Run `bash scripts/add-skill.sh {skill-name}` |
 | "list skills", "what skills are installed" | Run `bash scripts/list-skills.sh` |
+
+### Add Client Flow
+
+When the user asks to add a client:
+
+1. **Ask for the client name** (if not already provided).
+2. **Run the script:** `bash scripts/add-client.sh "{name}"`
+3. **Show the user what was created and how it fits:**
+
+```
+Here's what I set up for {name}:
+
+agentic-os/
+├── clients/
+│   └── {slug}/                      ← {name}'s workspace
+│       ├── brand_context/           ← their voice, positioning, ICP (built on first /start-here)
+│       ├── context/
+│       │   ├── SOUL.md → ../../context/SOUL.md    ← inherited from root
+│       │   ├── USER.md                             ← unique to this client
+│       │   ├── learnings.md                        ← builds up over time for this client
+│       │   └── memory/                             ← session history for this client
+│       ├── projects/                               ← all outputs for this client
+│       ├── cron/                                   ← scheduled jobs for this client
+│       └── .claude/skills/ → ../../.claude/skills/ ← shared skills from root
+├── CLAUDE.md                        ← shared methodology (all clients use this)
+├── context/SOUL.md                  ← shared personality
+└── .claude/skills/                  ← shared skills (edit once, all clients benefit)
+
+**What's shared:** Skills, CLAUDE.md, and SOUL.md come from the root — so improvements
+apply to every client automatically.
+
+**What's unique:** Brand context, memory, learnings, USER.md, and projects are all
+separate — each client gets their own voice, history, and outputs.
+```
+
+4. **Tell them how to switch:**
+> "To work with {name}, open a new terminal and run: `cd clients/{slug} && claude`
+> On your first session there, I'll run through the brand setup automatically."
+
+5. **Link to the full guide:** "For more on how multi-client works, see [docs/multi-client-guide.md](docs/multi-client-guide.md)."
 
 ### Before Major Deliverables
 - Is the relevant brand_context file loaded per the context matrix below?
@@ -162,7 +202,7 @@ agentic-os/                          ← shared methodology (skills, scripts, CL
 - `bash scripts/add-client.sh "Client Name"` creates the client workspace with the correct structure
 - Each client inherits CLAUDE.md, SOUL.md, and skills from the root — edit once, all clients benefit
 - Each client has its own brand_context/, context/memory/, context/learnings.md, USER.md, and projects/
-- To work with a client: `cd clients/{slug} && claude`, then run `/start-here` on first use
+- To work with a client: `cd clients/{slug} && claude` — onboarding runs automatically on first session
 - Solo users don't need clients/ at all — just work from the root folder
 
 **When the user says "add a client":** Run the script directly (see Built-in Operations). Don't suggest cloning a new repo, creating a separate workspace, or any other approach. Multi-client is built in.
