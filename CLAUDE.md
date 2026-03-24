@@ -150,9 +150,12 @@ apply to every client automatically.
 separate — each client gets their own voice, history, and outputs.
 ```
 
-4. **Tell them how to switch:**
-> "To work with {name}, open a new terminal and run: `cd clients/{slug} && claude`
+4. **Tell them how to switch — use the full absolute path:**
+> "To work with {name}, open a new terminal and run:
+> `cd {absolute path to current working directory}/clients/{slug} && claude`
 > On your first session there, I'll run through the brand setup automatically."
+>
+> Use `pwd` to get the absolute path. Never give just `cd clients/{slug}` — the user may not be in the project directory.
 
 5. **Link to the full guide:** "For more on how multi-client works, see [docs/multi-client-guide.md](docs/multi-client-guide.md)."
 
