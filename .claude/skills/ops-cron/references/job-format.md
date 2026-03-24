@@ -78,7 +78,7 @@ Everything after the second `---` is the prompt sent to `claude -p`. Write whate
 
 1. **Self-contained.** Each execution has no memory of the last. State everything needed.
 2. **Specific file paths.** "Read brand_context/voice-profile.md" not "check voice context".
-3. **Explicit output location.** "Save to projects/str-trending-research/daily_{today's date in YYYY-MM-DD format}.md"
+3. **Explicit output location.** "Save to projects/str-trending-research/{today's date in YYYY-MM-DD format}_daily.md"
 4. **Date-aware.** Use "today's date" — Claude resolves it at runtime.
 5. **Error handling.** Say what to do if something fails.
 6. **Reference skills by methodology.** If using a skill, tell Claude to follow that skill's methodology and reference the skill file path so it loads the right approach.
@@ -90,7 +90,7 @@ You are running as a scheduled job for Agentic OS.
 Read CLAUDE.md for system context.
 
 Task: Research trending AI automation topics on Reddit and X.
-Save to: projects/str-trending-research/daily_{today's date in YYYY-MM-DD format}.md
+Save to: projects/str-trending-research/{today's date in YYYY-MM-DD format}_daily.md
 
 If web search fails, exit without creating the output file.
 ```
@@ -108,7 +108,7 @@ Do the following in order:
    for the full approach). Research trending AI topics from the last 24 hours.
 3. Draft 2 content ideas connecting trends to our positioning.
    Read brand_context/positioning.md for our angles.
-4. Save everything to: projects/ops-cron/morning-kickoff_{today's date}.md
+4. Save everything to: projects/ops-cron/{today's date}_morning-kickoff.md
 
 If web search fails, skip trending and use existing context only.
 ```

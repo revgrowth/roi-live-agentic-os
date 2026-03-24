@@ -22,6 +22,6 @@ Task: Review this week's activity and produce a summary.
 2. Read context/memory/ files from the last 7 days. Summarise key decisions and deliverables.
 3. Note any open threads that need attention next week.
 
-Save the review to: projects/ops-cron/weekly-review_{today's date in YYYY-MM-DD format}.md
+Save the review to: projects/ops-cron/{today's date in YYYY-MM-DD format}_weekly-review.md
 
 If anything fails, note the error and continue with what you can access.

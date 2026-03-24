@@ -53,7 +53,7 @@ Scan what happened this session:
    - Other locations — flag for file placement check
 3. **File placement check:** Verify outputs follow naming conventions:
    - Projects in `projects/{category}-{output-type}/` with correct prefix
-   - Filenames use `{descriptive-name}_{YYYY-MM-DD}.md` format
+   - Filenames use `{YYYY-MM-DD}_{descriptive-name}.md` format
    - If anything is misplaced or misnamed, fix it now
 
 ---

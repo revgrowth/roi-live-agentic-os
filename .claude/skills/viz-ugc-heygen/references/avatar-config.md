@@ -48,7 +48,7 @@ Include in API request as:
 - **Download:** Always download the **non-captioned** MP4 (`video_url`) + the `.ass` subtitle file (`caption_url`)
 - **Brand captions:** Restyle the `.ass` file with brand fonts/colors, then burn onto video with ffmpeg
 - **Save video file:** Final branded MP4 to `projects/viz-ugc-heygen/` alongside the metadata .md file
-- **File naming:** `{topic-slug}_{YYYY-MM-DD}.mp4` (matches the .md file)
+- **File naming:** `{YYYY-MM-DD}_{topic-slug}.mp4` (matches the .md file)
 - **Signed URLs expire** — always download immediately after generation completes
 
 ## Branded Caption Template

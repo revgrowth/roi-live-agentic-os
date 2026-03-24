@@ -23,7 +23,7 @@ There are three levels. When you tell Claude your goal, it helps you pick the ri
 Just ask Claude. Output goes to `projects/{category}-{type}/`. No brief, no project folder. Use Shift+Tab twice for plan mode if upfront thinking helps.
 
 ```
-projects/mkt-copywriting/blog-post_2026-03-24.md
+projects/mkt-copywriting/2026-03-24_blog-post.md
 ```
 
 ---
@@ -37,9 +37,9 @@ The project gets its own folder under `projects/briefs/`. ALL outputs for that p
 ```
 projects/briefs/q2-product-launch/   <- project folder
 ├── brief.md                         <- scope, deliverables, acceptance criteria
-├── landing-page_2026-03-24.md       <- outputs live WITH the brief
-├── email-sequence_2026-03-25.md
-└── competitor-scan_2026-03-22.md
+├── 2026-03-24_landing-page.md       <- outputs live WITH the brief
+├── 2026-03-25_email-sequence.md
+└── 2026-03-22_competitor-scan.md
 ```
 
 ### What goes in the brief
@@ -74,8 +74,8 @@ Your project's outputs and brief still live in `projects/briefs/{project-name}/`
 ```
 projects/briefs/website-rebuild/     <- project folder (your stuff)
 ├── brief.md                         <- project brief (links to .planning/)
-├── homepage-copy_2026-03-24.md      <- outputs still go in the project folder
-└── sitemap_2026-03-25.excalidraw
+├── 2026-03-24_homepage-copy.md      <- outputs still go in the project folder
+└── 2026-03-25_sitemap.excalidraw
 
 .planning/                           <- GSD working space (at workspace root)
 ├── PROJECT.md
@@ -115,8 +115,8 @@ The archive preserves the full roadmap, phase plans, and verification reports al
 ```
 projects/briefs/website-rebuild/     <- after archiving
 ├── brief.md                         <- status: complete
-├── homepage-copy_2026-03-24.md
-├── sitemap_2026-03-25.excalidraw
+├── 2026-03-24_homepage-copy.md
+├── 2026-03-25_sitemap.excalidraw
 └── planning-archive/                <- moved from .planning/
     ├── PROJECT.md
     ├── ROADMAP.md
@@ -130,22 +130,22 @@ projects/briefs/website-rebuild/     <- after archiving
 ```
 projects/
 ├── mkt-copywriting/                <- single task category folder (Level 1)
-│   └── blog-post_2026-03-20.md
+│   └── 2026-03-20_blog-post.md
 ├── str-trending-research/          <- single task category folder
-│   └── ai-trends_2026-03-18.md
+│   └── 2026-03-18_ai-trends.md
 └── briefs/                         <- all Level 2/3 projects (most recent first)
     ├── kanban-dashboard/           <- Level 2 planned project (has brief.md)
     │   ├── brief.md
-    │   └── architecture_2026-03-24.md
+    │   └── 2026-03-24_architecture.md
     ├── q2-product-launch/          <- Level 2 planned project
     │   ├── brief.md
-    │   ├── landing-page_2026-03-24.md
-    │   ├── email-sequence_2026-03-25.md
-    │   └── competitor-scan_2026-03-22.md
+    │   ├── 2026-03-24_landing-page.md
+    │   ├── 2026-03-25_email-sequence.md
+    │   └── 2026-03-22_competitor-scan.md
     └── website-rebuild/            <- Level 3 GSD project (has brief.md, links to .planning/)
         ├── brief.md
-        ├── homepage-copy_2026-03-24.md
-        └── sitemap_2026-03-25.excalidraw
+        ├── 2026-03-24_homepage-copy.md
+        └── 2026-03-25_sitemap.excalidraw
 
 .planning/                          <- GSD only (Level 3), at project root — one at a time
 ├── PROJECT.md

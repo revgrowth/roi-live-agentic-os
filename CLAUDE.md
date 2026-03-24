@@ -311,12 +311,12 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 
 - **Single tasks (Level 1):** Save to `projects/{category}-{output-type}/`. The category prefix matches the skill's category (e.g., `mkt-brand-voice` skill → `projects/mkt-*/` outputs). Folder naming: `{category}-{output-type}` in kebab-case (e.g., `mkt-linkedin-carousel`, `str-keyword-plan`).
 - **Planned/GSD projects (Level 2/3):** Save ALL outputs inside the project folder — `projects/briefs/{project-name}/`. Never scatter project outputs across category folders.
-- Filename format: `{descriptive-name}_{YYYY-MM-DD}.md` (folder provides context, no skill-name prefix needed)
+- Filename format: `{YYYY-MM-DD}_{descriptive-name}.md` (date-first so files sort newest-first with descending sort)
 - Folders are created on first use by the skill. No empty pre-scaffolding.
 - Default format: markdown unless user specifies otherwise
 - After major deliverables: ask for feedback, log to `context/learnings.md`
 - **Auto-download binary outputs.** After saving any non-markdown file (PNG, PDF, SVG, video, JSON diagrams, etc.), copy it to `~/Downloads/` using `cp <filepath> ~/Downloads/`. This applies to all skills — the user should never have to manually navigate to a generated file.
-- **Show clickable file path.** After saving any output, show the user the full absolute file path so they can click it directly to open the file. Example: "Saved to `/Users/simoncoton/Desktop/agentic-os/projects/mkt-copywriting/landing-page_2026-03-14.md`". This applies to all skills — the user should never have to navigate to find what was just created.
+- **Show clickable file path.** After saving any output, show the user the full absolute file path so they can click it directly to open the file. Example: "Saved to `/Users/simoncoton/Desktop/agentic-os/projects/mkt-copywriting/2026-03-14_landing-page.md`". This applies to all skills — the user should never have to navigate to find what was just created.
 
 ### Projects
 

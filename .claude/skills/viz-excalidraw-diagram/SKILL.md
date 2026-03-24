@@ -115,8 +115,8 @@ Typically takes 2-4 iterations. Don't stop after one pass if the composition cou
 ## Step 6: Save
 
 Save to `projects/viz-excalidraw-diagram/{diagram-name}/`:
-- `{descriptive-name}_{YYYY-MM-DD}.excalidraw` — the source JSON
-- `{descriptive-name}_{YYYY-MM-DD}.png` — the rendered output
+- `{YYYY-MM-DD}_{descriptive-name}.excalidraw` — the source JSON
+- `{YYYY-MM-DD}_{descriptive-name}.png` — the rendered output
 
 Show the user the rendered PNG after saving.
 

@@ -22,7 +22,7 @@ Chain them together: find the latest video from a channel, then pull its transcr
 
 ## Outcome
 
-YouTube video metadata and/or full transcripts saved to `projects/tool-youtube/{video-title-slug}_{YYYY-MM-DD}.md`. Always save output to disk. This is not optional.
+YouTube video metadata and/or full transcripts saved to `projects/tool-youtube/{YYYY-MM-DD}_{video-title-slug}.md`. Always save output to disk. This is not optional.
 
 ## Context Needs
 
@@ -109,7 +109,7 @@ Then read the output file. No API key needed — yt-dlp handles it.
 
 ## Step 4: Save Output
 
-**Always save the transcript to the projects folder.** After extracting, create a clean version at `projects/tool-youtube/{video-title-slug}_{YYYY-MM-DD}.md`. The saved file format:
+**Always save the transcript to the projects folder.** After extracting, create a clean version at `projects/tool-youtube/{YYYY-MM-DD}_{video-title-slug}.md`. The saved file format:
 
 ```
 # {Video Title}

@@ -117,11 +117,11 @@ Save to `projects/mkt-copywriting/{campaign-name}/`:
 
 | Format | Filename |
 |--------|----------|
-| Landing page | `landing-page_{YYYY-MM-DD}.md` |
-| Sales page | `sales-page_{YYYY-MM-DD}.md` |
-| Email | `email_{subject-slug}_{YYYY-MM-DD}.md` |
-| Ad copy | `ad_{platform}_{variant}_{YYYY-MM-DD}.md` |
-| Social post | `social_{platform}_{YYYY-MM-DD}.md` |
+| Landing page | `{YYYY-MM-DD}_landing-page.md` |
+| Sales page | `{YYYY-MM-DD}_sales-page.md` |
+| Email | `{YYYY-MM-DD}_email_{subject-slug}.md` |
+| Ad copy | `{YYYY-MM-DD}_ad_{platform}_{variant}.md` |
+| Social post | `{YYYY-MM-DD}_social_{platform}.md` |
 
 Include YAML frontmatter: type, campaign, awareness_level, variant, platform, word_count, date, score.
 

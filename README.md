@@ -191,7 +191,7 @@ Read CLAUDE.md for system context.
 
 Task: [Your task here]
 
-Save output to: projects/[folder]/[name]_{today's date}.md
+Save output to: projects/[folder]/{today's date}_[name].md
 ```
 
 Or just ask Claude: "schedule a job to [do something] every morning" -- the `ops-cron` skill handles the rest.

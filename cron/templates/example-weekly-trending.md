@@ -25,7 +25,7 @@ Steps:
 3. Search web for recent blog posts and announcements
 
 Save the research brief to:
-projects/str-trending-research/weekly-ai-automation_{today's date in YYYY-MM-DD format}.md
+projects/str-trending-research/{today's date in YYYY-MM-DD format}_weekly-ai-automation.md
 
 Include in the brief:
 - Top 5 Reddit discussions with upvote counts and key takeaways

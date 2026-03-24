@@ -25,7 +25,7 @@ Create talking-head UGC videos using HeyGen's cloned avatars and custom voices.
 
 ## Outcome
 
-A generated MP4 video with branded captions, saved to `projects/viz-ugc-heygen/{topic-slug}_{YYYY-MM-DD}.mp4`, alongside a metadata file with the script, settings, and video URL. Always save output to disk. This is not optional.
+A generated MP4 video with branded captions, saved to `projects/viz-ugc-heygen/{YYYY-MM-DD}_{topic-slug}.mp4`, alongside a metadata file with the script, settings, and video URL. Always save output to disk. This is not optional.
 
 ## Context Needs
 
@@ -136,16 +136,16 @@ Optional enhancements:
      python3 .claude/skills/viz-ugc-heygen/scripts/burn-captions.py raw.mp4 captions.ass output.mp4 --restyle
      ```
      The `--restyle` flag auto-applies branded styles (Roboto-Bold, white text, brand blue outline) from `references/avatar-config.md`.
-   - Save final MP4 to `projects/viz-ugc-heygen/{topic-slug}_{YYYY-MM-DD}.mp4`
+   - Save final MP4 to `projects/viz-ugc-heygen/{YYYY-MM-DD}_{topic-slug}.mp4`
    - Clean up intermediate files (raw.mp4, captions.ass)
-   - Auto-open the final MP4: `open projects/viz-ugc-heygen/{topic-slug}_{YYYY-MM-DD}.mp4`
+   - Auto-open the final MP4: `open projects/viz-ugc-heygen/{YYYY-MM-DD}_{topic-slug}.mp4`
    - Show file path and duration to user
 4. On failure: show error, suggest fixes
 
 ## Step 7: Save & Collect Feedback
 
 1. Save video metadata to `projects/viz-ugc-heygen/`:
-   - `{topic-slug}_{YYYY-MM-DD}.md` with: script, video URL, thumbnail, settings used, platform
+   - `{YYYY-MM-DD}_{topic-slug}.md` with: script, video URL, thumbnail, settings used, platform
 2. Ask: "How did this land? Any adjustments for next time?"
 3. Log feedback to `context/learnings.md` → `## viz-ugc-heygen`
    - Preferred avatar look, voice settings, script style notes
