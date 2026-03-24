@@ -28,12 +28,11 @@ Check what exists:
 
 Read README.md and give the user a brief, genuine explanation of what they've set up:
 - What Agentic OS does (business OS that learns their brand, gets sharper each session)
-- How it works in practice (answer a few questions → brand foundation → every skill uses it)
+- How it works in practice (answer a few questions → brand foundation → then you'll pick which skills to keep)
 - The learnings loop (feedback improves future output)
 - That skills can be built for any domain as needs grow
-- What skills are currently installed (scan `.claude/skills/` dynamically)
 
-Keep it conversational — 4-6 sentences max, not a feature dump. End with the first question.
+Keep it conversational — 4-6 sentences max, not a feature dump. Don't list installed skills here — that happens in Step 8 after brand context is built, so skills can be framed for their specific business. End with the first question.
 
 ### Step 2: Core Questions (ONE AT A TIME, SKIP IF ALREADY ANSWERED)
 
@@ -135,24 +134,32 @@ Here's what I built:
 Everything's saved in brand_context/. I'll use this in every skill going forward.
 ```
 
-### Step 8: Dynamic Skill Showcase
+### Step 8: Skill Selection
 
-Scan `.claude/skills/` for all installed skills.
-Read each skill's frontmatter to get name and description.
-Group by category (foundation / execution / other).
+Now that brand context is built, give the user a brief intro framing the skills for their business, then launch the interactive selector.
 
-Present what's available, framed around this specific business:
+**Before launching the selector**, briefly explain what each category does for THIS business (using the brand context just built). Keep it to 3-4 lines max — the selector itself shows descriptions:
 
 ```
-Here's what I can do for [business name]:
+Now let's pick which skills to keep. Everything's pre-selected — just untick what you don't need.
 
-**Foundation** (done)
-✓ mkt-brand-voice, mkt-positioning, mkt-icp — complete
-
-**Growth Marketing**
-- [skill]: [what it does for their specific business]
-- [skill]: [what it does for their specific business]
+Quick overview for [business]:
+- **Content & Copy** — write landing pages, repurpose content, create video scripts in your voice
+- **Research & Strategy** — find trending topics your audience cares about
+- **Visual & Video** — generate images, diagrams, and AI avatar videos
+- **Utility** — humanizer (de-AI your text), web scraping, YouTube transcripts
 ```
+
+**Then launch the interactive checkbox selector:**
+```bash
+python3 scripts/select-skills.py
+```
+
+This shows a terminal UI where the user navigates with arrow keys, toggles skills with Space, and confirms with Enter. All optional skills start selected — the user unticks what they don't want. Core skills are shown as always-installed and can't be removed.
+
+The script handles everything: dependency resolution, folder removal, `installed.json` update, and prints a summary with any needed API keys.
+
+**After the script completes**, read the results from `.claude/skills/_catalog/selection-result.json` and acknowledge briefly: "All set — [N] skills ready to go." If any API keys are needed, the script already mentioned them — don't repeat.
 
 ### Step 9: How It Works Primer (MANDATORY — do NOT skip)
 
