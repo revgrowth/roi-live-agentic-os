@@ -166,16 +166,18 @@ Cover three things:
 > - **Planned project** — for bigger work with multiple deliverables. I'll scope it out first, write a brief, and we work from that.
 > - **GSD project** — for complex builds with phases and milestones. Full structured planning and verification.
 >
-> You don't need to pick upfront — just tell me what you're working on and I'll suggest the right level."
+> You don't need to pick upfront — just tell me what you're working on and I'll suggest the right level. Full details in [docs/projects-guide.md](docs/projects-guide.md)."
 
 **2. Multi-client support (mention only if they might need it):**
 If the user's business involves working with multiple brands, clients, or distinct audiences, mention:
-> "If you work with multiple clients or brands, I can run separate workspaces for each — just say 'add a client' and I'll set it up. Each gets its own brand context, memory, and outputs while sharing the same skills."
+> "If you work with multiple clients or brands, I can run separate workspaces for each — just say 'add a client' and I'll set it up. Each gets its own brand context, memory, and outputs while sharing the same skills. See [docs/multi-client-guide.md](docs/multi-client-guide.md) for the full setup."
 
 If they're clearly a solo founder/single brand, skip this.
 
 **3. Sessions and continuity:**
-> "At the end of each session, run `/wrap-up` and I'll save everything — what we did, decisions made, open threads. Next time you come back, I pick up where we left off."
+> "At the end of each session, run `/wrap-up` and I'll save everything — what we did, decisions made, open threads. Next time you come back, I pick up where we left off.
+>
+> For a quick reference of commands and paths, see [docs/cheat-sheet.md](docs/cheat-sheet.md)."
 
 ### Step 10: First Recommendation
 
