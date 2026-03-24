@@ -67,7 +67,7 @@ When you `cd clients/client-one && claude`:
 
 ## How Skills Stay in Sync
 
-Skills live in the root folder as a master copy. Each client folder gets its own working copy. **You never need to think about keeping these in sync** — it happens automatically in two situations:
+Skills live in the root folder as the master copy. Each client folder gets its own working copy. **You never need to think about keeping these in sync** — it happens automatically in two situations:
 
 1. **When you create a new client** — `add-client.sh` copies the latest skills into the client folder
 2. **When you update Agentic OS** — `update.sh` pulls the latest from upstream and pushes skills, scripts, and settings to all client folders in one step
@@ -81,6 +81,27 @@ bash scripts/update.sh
 
 That's it. All clients are synced. Your client data (brand context, memory, learnings, projects) is never touched.
 
+### Important: Where to Edit Skills
+
+**Always edit skills at the root level**, not inside a client folder. Root is the source of truth — when `update.sh` runs, it overwrites client copies with whatever's at root. If you edit a skill inside a client folder, the next update will replace your changes.
+
+```
+Edit here:     agentic-os/.claude/skills/mkt-copywriting/SKILL.md     ← ✓ root
+Not here:      agentic-os/clients/client-one/.claude/skills/mkt-copywriting/SKILL.md  ← ✗ overwritten on update
+```
+
+### Client-Only Skills
+
+If you need a skill that's specific to one client, you can create it directly in that client's `.claude/skills/` folder. Client-only skills are preserved during updates — the sync only overwrites skills that exist at root, and leaves everything else alone.
+
+```
+agentic-os/.claude/skills/                          ← shared skills (synced to all clients)
+clients/client-one/.claude/skills/
+├── mkt-copywriting/                                ← from root (overwritten on update)
+├── mkt-brand-voice/                                ← from root (overwritten on update)
+└── custom-client-reporting/                        ← client-only (preserved on update)
+```
+
 ### Managing Skills
 
 You can ask Claude to list, add, or remove skills — or use these commands from the root folder:
@@ -91,7 +112,7 @@ bash scripts/add-skill.sh skill-name     # Add a skill
 bash scripts/remove-skill.sh skill-name  # Remove a skill
 ```
 
-When you add or remove a skill, it takes effect in all client folders the next time you run `update.sh`. If you want it to take effect immediately, run `bash scripts/update-clients.sh` — but most people just wait for the next update.
+When you add or remove a skill at root, it takes effect in all client folders the next time you run `update.sh`. If you want it to take effect immediately, run `bash scripts/update-clients.sh` — but most people just wait for the next update.
 
 ---
 
@@ -327,8 +348,11 @@ Not automatically. Each client's `context/learnings.md` accumulates feedback tun
 **Can I share skills across clients?**
 Already handled. Skills live in the root `.claude/skills/` as the master copy. `update.sh` syncs them to all client folders automatically.
 
-**What if I customize a skill for one client?**
-Edit it in that client's `.claude/skills/` folder — the change stays local. Next time you update, it will overwrite with the root version. If you want to keep a client-specific change, either skip that skill during sync or make the change in the root (so all clients benefit).
+**What if I want to customize a shared skill?**
+Edit it at the root level — the change propagates to all clients on the next `update.sh`. Don't edit shared skills inside a client folder; the next update will overwrite your changes.
+
+**What if I need a skill for just one client?**
+Create it directly in that client's `.claude/skills/` folder. Client-only skills (ones that don't exist at root) are preserved during updates — they won't be touched.
 
 **Do I need separate API keys per client?**
 Usually no — the same Firecrawl, OpenAI, or YouTube key works across all clients. Copy the same `.env` file. Only separate them if a client has their own API accounts.

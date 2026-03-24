@@ -72,7 +72,7 @@ Level 1 output goes to category folders. Level 2/3 output goes inside the projec
 | Skill reference material | `.claude/skills/{skill-name}/references/` |
 | Available skills catalog | `.claude/skills/_catalog/catalog.json` |
 
-Add/remove skills from the **root**. They sync to clients automatically on `update.sh`.
+Add/remove/edit skills from the **root**. They sync to clients automatically on `update.sh`. Client-only skills (created directly in a client folder) are preserved during sync.
 
 ## Rules of Thumb
 
@@ -80,6 +80,8 @@ Add/remove skills from the **root**. They sync to clients automatically on `upda
 - Multiple clients? One client folder each, inside `clients/`.
 - End session before switching clients — wrap-up runs automatically
 - Onboarding runs automatically on first session per client
+- Edit skills at the **root** level — client copies are overwritten on update
+- Client-only skills are fine — create them in the client's `.claude/skills/` folder
 - Edit root CLAUDE.md → all clients see it automatically
 - Edit root SOUL.md / USER.md → all clients see it automatically
 - `update.sh` auto-syncs skills + scripts to all clients

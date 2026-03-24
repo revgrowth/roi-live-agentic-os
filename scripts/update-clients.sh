@@ -25,12 +25,40 @@ for CLIENT_DIR in "${CLIENTS_DIR}"/*/; do
 
   echo "Syncing ${CLIENT_NAME}..."
 
-  # Sync skills
+  # Sync skills — copy root skills over, but preserve client-only skills
   if [[ -d "${PROJECT_DIR}/.claude/skills" ]]; then
-    mkdir -p "${CLIENT_DIR}/.claude"
-    rm -rf "${CLIENT_DIR}/.claude/skills"
-    cp -R "${PROJECT_DIR}/.claude/skills" "${CLIENT_DIR}/.claude/skills"
-    echo "  Skills synced"
+    mkdir -p "${CLIENT_DIR}/.claude/skills"
+
+    # Copy each root skill folder to the client (overwrite if exists)
+    for root_skill in "${PROJECT_DIR}/.claude/skills"/*/; do
+      [[ -d "$root_skill" ]] || continue
+      skill_name=$(basename "$root_skill")
+      rm -rf "${CLIENT_DIR}/.claude/skills/${skill_name}"
+      cp -R "$root_skill" "${CLIENT_DIR}/.claude/skills/${skill_name}"
+    done
+
+    # Copy catalog files
+    if [[ -d "${PROJECT_DIR}/.claude/skills/_catalog" ]]; then
+      rm -rf "${CLIENT_DIR}/.claude/skills/_catalog"
+      cp -R "${PROJECT_DIR}/.claude/skills/_catalog" "${CLIENT_DIR}/.claude/skills/_catalog"
+    fi
+
+    # Count client-only skills (exist in client but not in root)
+    CLIENT_ONLY=0
+    for client_skill in "${CLIENT_DIR}/.claude/skills"/*/; do
+      [[ -d "$client_skill" ]] || continue
+      skill_name=$(basename "$client_skill")
+      [[ "$skill_name" == "_catalog" ]] && continue
+      if [[ ! -d "${PROJECT_DIR}/.claude/skills/${skill_name}" ]]; then
+        CLIENT_ONLY=$((CLIENT_ONLY + 1))
+      fi
+    done
+
+    if [[ $CLIENT_ONLY -gt 0 ]]; then
+      echo "  Skills synced (${CLIENT_ONLY} client-only skill(s) preserved)"
+    else
+      echo "  Skills synced"
+    fi
   fi
 
   # Sync Claude Code settings

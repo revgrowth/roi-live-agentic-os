@@ -138,7 +138,7 @@ agentic-os/
 │       │   └── memory/                             ← session history for this client
 │       ├── projects/                               ← all outputs for this client
 │       ├── cron/                                   ← scheduled jobs for this client
-│       └── .claude/skills/ → ../../.claude/skills/ ← shared skills from root
+│       └── .claude/skills/                  ← copied from root + any client-only skills
 ├── CLAUDE.md                        ← shared methodology (all clients use this)
 ├── context/SOUL.md                  ← shared personality
 └── .claude/skills/                  ← shared skills (edit once, all clients benefit)
@@ -148,6 +148,10 @@ apply to every client automatically.
 
 **What's unique:** Brand context, memory, learnings, USER.md, and projects are all
 separate — each client gets their own voice, history, and outputs.
+
+**Editing skills:** Always edit at the root — client copies are overwritten on
+`update.sh`. Need a client-specific skill? Create it in the client's `.claude/skills/`
+folder — client-only skills are preserved during updates.
 ```
 
 4. **Tell them how to switch — use the full absolute path:**
@@ -192,7 +196,7 @@ agentic-os/                          ← shared methodology (skills, scripts, CL
 │   │   ├── brand_context/           ← their voice, positioning, ICP
 │   │   ├── context/                 ← their memory, learnings, USER.md
 │   │   ├── projects/                ← their outputs
-│   │   └── .claude/skills/ → symlink to root skills
+│   │   └── .claude/skills/ ← copied from root, plus any client-only skills
 │   └── xyz-agency/                  ← another client
 │       ├── brand_context/
 │       ├── context/
@@ -208,6 +212,8 @@ agentic-os/                          ← shared methodology (skills, scripts, CL
 - Each client has its own brand_context/, context/memory/, context/learnings.md, USER.md, and projects/
 - To work with a client: `cd clients/{slug} && claude` — onboarding runs automatically on first session
 - Solo users don't need clients/ at all — just work from the root folder
+
+**Skill editing rule:** Always edit shared skills at the root level — client copies are overwritten by `update.sh`. If you need a client-specific skill, create it directly in that client's `.claude/skills/` folder. Client-only skills are preserved during updates.
 
 **When the user says "add a client":** Run the script directly (see Built-in Operations). Don't suggest cloning a new repo, creating a separate workspace, or any other approach. Multi-client is built in.
 
