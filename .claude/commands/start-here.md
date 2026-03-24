@@ -150,16 +150,45 @@ Quick overview for [business]:
 - **Utility** — humanizer (de-AI your text), web scraping, YouTube transcripts
 ```
 
-**Then launch the interactive checkbox selector:**
-```bash
-python3 scripts/select-skills.py
+**Then present the optional skills as a numbered checklist** so the user can see what's available. Read `.claude/skills/_catalog/catalog.json` and list each optional skill with its number, name, and a one-line description framed for the user's business. Group by category. Example:
+
+```
+Everything's pre-selected. Tell me which to remove — or say "keep all" to move on.
+
+**Content & Copy**
+ 1. mkt-copywriting — write landing pages and sales copy in your voice
+ 2. mkt-content-repurposing — turn one piece into posts across 8 platforms
+ 3. mkt-ugc-scripts — short-form video scripts for TikTok/Reels/Shorts
+
+**Research & Strategy**
+ 4. str-trending-research — find what your audience is talking about right now
+
+**Visual & Video**
+ 5. viz-excalidraw-diagram — architecture and workflow diagrams
+ 6. viz-nano-banana — AI image generation (needs GEMINI_API_KEY)
+ 7. viz-ugc-heygen — AI avatar videos (needs HEYGEN_API_KEY)
+
+**Utility**
+ 8. tool-humanizer — de-AI all written output
+ 9. tool-firecrawl-scraper — advanced web scraping (needs FIRECRAWL_API_KEY)
+10. tool-youtube — YouTube transcript extraction (needs YOUTUBE_API_KEY)
+
+**Operations**
+11. ops-cron — schedule recurring tasks
+
+Which would you like to remove? (e.g. "remove 5, 6, 7" or "keep all")
 ```
 
-This shows a terminal UI where the user navigates with arrow keys, toggles skills with Space, and confirms with Enter. All optional skills start selected — the user unticks what they don't want. Core skills are shown as always-installed and can't be removed.
+Wait for the user's response. Then run the script in CLI mode with their selections:
+```bash
+python3 scripts/select-skills.py --remove "viz-excalidraw-diagram,viz-nano-banana,viz-ugc-heygen"
+```
 
-The script handles everything: dependency resolution, folder removal, `installed.json` update, and prints a summary with any needed API keys.
+The script handles dependency resolution, folder removal, `installed.json` update, and prints a summary.
 
-**After the script completes**, read the results from `.claude/skills/_catalog/selection-result.json` and acknowledge briefly: "All set — [N] skills ready to go." If any API keys are needed, the script already mentioned them — don't repeat.
+**Note:** If the user runs `python3 scripts/select-skills.py` directly in their own terminal (not through Claude), the script auto-detects the TTY and shows a full interactive checkbox UI with arrow keys + space to toggle.
+
+**After the script completes**, read `.claude/skills/_catalog/selection-result.json` and acknowledge briefly: "All set — [N] skills ready to go."
 
 ### Step 9: How It Works Primer (MANDATORY — do NOT skip)
 
