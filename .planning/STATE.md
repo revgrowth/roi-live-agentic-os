@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2025-03-25)
 
 **Core value:** A user can describe a task, watch it run, and get the output -- without ever opening a terminal.
-**Current focus:** Phase 1: Design
+**Current focus:** Phase 1: Design Prompts
 
 ## Current Position
 
-Phase: 1 of 5 (Design)
-Plan: 0 of TBD in current phase
+Phase: 1 of 5 (Design Prompts)
+Plan: 0 of 2 in current phase
 Status: Ready to plan
-Last activity: 2025-03-25 -- Roadmap revised (added Design phase)
+Last activity: 2025-03-25 -- Roadmap revised (Phase 1 updated to Stitch prompt output workflow)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -43,6 +43,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
 - Design-first approach -- all views designed in Google Stitch before any code is written
+- Phase 1 produces copy-paste-ready Stitch prompts, not design files directly -- user pastes prompts into Stitch to generate designs
+- Research Stitch prompting best practices and study design references (Vibe Kanban, OpenClaw, Claude Task Viewer) before crafting prompts
 - Claude CLI subprocess (not API) -- inherits full agentic-os context automatically
 - SQLite for persistence -- simple, local, no setup
 - SSE for live updates -- lightweight, no WebSocket complexity
@@ -61,5 +63,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2025-03-25
-Stopped at: Roadmap revised with Design phase, ready to plan Phase 1
+Stopped at: Roadmap revised -- Phase 1 updated to Stitch prompt workflow, ready to plan Phase 1
 Resume file: None

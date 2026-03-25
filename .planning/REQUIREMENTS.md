@@ -7,10 +7,10 @@
 
 ### Design
 
-- [ ] **DESIGN-01**: All dashboard views designed in Google Stitch before code is written
-- [ ] **DESIGN-02**: Design spec covers Board, Cron Jobs, Context, Brand, Skills views and client switcher
-- [ ] **DESIGN-03**: Design spec defines colours, typography, spacing, component styles, layout patterns
-- [ ] **DESIGN-04**: Design spec covers all states: empty, loading, running, completed, error
+- [ ] **DESIGN-01**: Copy-paste-ready Google Stitch prompts produced for all dashboard views before code is written
+- [ ] **DESIGN-02**: Stitch prompts cover Board, Cron Jobs, Context, Brand, Skills views and client switcher — one prompt per view/screen
+- [ ] **DESIGN-03**: A design language document defines shared tokens (colours, typography, spacing, component styles) referenced by all prompts
+- [ ] **DESIGN-04**: Each Stitch prompt specifies all relevant view states: empty, loading, running, completed, and error
 
 ### Infrastructure
 
@@ -156,4 +156,4 @@
 
 ---
 *Requirements defined: 2025-03-25*
-*Last updated: 2025-03-25 after roadmap revision — added Design phase requirements*
+*Last updated: 2025-03-25 — revised DESIGN requirements to reflect Stitch prompt output (not design files)*

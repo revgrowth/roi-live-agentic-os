@@ -2,7 +2,7 @@
 
 ## Overview
 
-This roadmap delivers a locally hosted dashboard that replaces the terminal for non-technical Agentic OS users. The build follows five phases: first designing all views in Google Stitch to establish a visual source of truth, then proving the end-to-end core loop (create task, spawn agent, see live updates), then surfacing outputs and monitoring, then adding cron scheduling and management tabs, and finally layering client switching over the working system. Each phase delivers a coherent, testable capability.
+This roadmap delivers a locally hosted dashboard that replaces the terminal for non-technical Agentic OS users. The build follows five phases: first producing copy-paste-ready Google Stitch prompts for every dashboard view to establish a visual source of truth, then proving the end-to-end core loop (create task, spawn agent, see live updates), then surfacing outputs and monitoring, then adding cron scheduling and management tabs, and finally layering client switching over the working system. Each phase delivers a coherent, testable capability.
 
 ## Phases
 
@@ -12,7 +12,7 @@ This roadmap delivers a locally hosted dashboard that replaces the terminal for 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Design** - All dashboard views designed in Google Stitch with full design spec before any code is written
+- [ ] **Phase 1: Design Prompts** - Copy-paste-ready Google Stitch prompts for every dashboard view, grounded in reference research and prompting best practices
 - [ ] **Phase 2: Core Loop** - Infrastructure, Kanban board, task execution, and live updates working end-to-end
 - [ ] **Phase 3: Outputs and Monitoring** - Output files surface on cards with preview/download, cost tracking, and detail panel
 - [ ] **Phase 4: Scheduling and Management** - Cron job scheduling plus Context, Brand, and Skills tabs
@@ -20,21 +20,24 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ## Phase Details
 
-### Phase 1: Design
-**Goal**: Every dashboard view is designed and documented before a single line of code is written, giving all build phases a pixel-level visual source of truth
+### Phase 1: Design Prompts
+**Goal**: Produce copy-paste-ready Google Stitch prompts for every dashboard view so the user can generate designs that match the spec
 **Depends on**: Nothing (first phase)
 **Requirements**: DESIGN-01, DESIGN-02, DESIGN-03, DESIGN-04
 **Success Criteria** (what must be TRUE):
-  1. All five views (Board, Cron Jobs, Context, Brand, Skills) plus the client switcher are designed as visual mockups in Google Stitch
-  2. The design spec defines colours, typography, spacing, component styles, and layout patterns that apply across all views
-  3. Every view has designs for all relevant states: empty, loading, running, completed, and error
-  4. Design references (Vibe Kanban for layout/aesthetic, OpenClaw dashboards, Claude Task Viewer) are visibly reflected in the output
-**Plans**: TBD
-**Tools**: Google Stitch, viz-stitch-design skill, tool-stitch MCP
+  1. User can paste each prompt into Google Stitch and get a design that matches the intended layout, component structure, and aesthetic for that view
+  2. Prompts cover all five views (Board, Cron Jobs, Context, Brand, Skills) plus the client switcher -- one prompt per view/screen
+  3. Each prompt includes design reference aesthetics (Vibe Kanban, OpenClaw, Claude Task Viewer), layout details, component descriptions, colour/typography guidance, and specific view states (empty, loading, running, completed, error)
+  4. A design language document defines shared tokens (colours, typography, spacing, component styles) that all prompts reference for consistency
+**Plans**: 2 plans
+
+Plans:
+- [ ] 01-01: Research Google Stitch prompting best practices, study design references (Vibe Kanban at vibekanban.com, OpenClaw dashboards, Claude Task Viewer), and establish design language/tokens
+- [ ] 01-02: Craft Stitch prompts for all views -- Board, Cron Jobs, Context, Brand, Skills, client switcher -- covering all states (empty, loading, running, completed, error)
 
 ### Phase 2: Core Loop
 **Goal**: A user can create a task, watch it execute via a live Kanban board, and see the card move through columns in real time
-**Depends on**: Phase 1 (design spec is the build reference)
+**Depends on**: Phase 1 (Stitch-generated designs are the build reference)
 **Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, BOARD-01, BOARD-02, BOARD-03, BOARD-04, BOARD-05, EXEC-01, EXEC-02, EXEC-03, EXEC-04, UI-01, UI-02
 **Success Criteria** (what must be TRUE):
   1. User can open the dashboard in a browser via a single terminal command and see a Kanban board with five columns
@@ -97,7 +100,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Design | 0/TBD | Not started | - |
+| 1. Design Prompts | 0/2 | Not started | - |
 | 2. Core Loop | 0/3 | Not started | - |
 | 3. Outputs and Monitoring | 0/2 | Not started | - |
 | 4. Scheduling and Management | 0/2 | Not started | - |
