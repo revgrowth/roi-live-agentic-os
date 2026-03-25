@@ -22,6 +22,14 @@ brand_context/*.md
 .DS_Store
 .backup/
 
+# Next.js / Node
+node_modules/
+.next/
+next-env.d.ts
+
+# Command Centre data
+.command-centre/
+
 # Cron (logs and status are runtime, specific personal jobs excluded)
 cron/jobs/claude-code-trending.md
 cron/jobs/nano-banana-trending.md
