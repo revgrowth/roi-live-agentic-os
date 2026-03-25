@@ -1213,6 +1213,38 @@ else
 fi
 
 # =========================================================
+# GSD Framework Sync
+# =========================================================
+GSD_COMMANDS="$REPO_ROOT/.claude/commands/gsd"
+GSD_STATUS=""
+
+if command -v node &>/dev/null; then
+    if [[ -d "$GSD_COMMANDS" ]] && [[ $(ls -1 "$GSD_COMMANDS"/*.md 2>/dev/null | wc -l) -gt 10 ]]; then
+        GSD_STATUS="installed"
+        # Check for GSD updates silently
+        CURRENT_GSD=$(npm view get-shit-done-cc version 2>/dev/null || echo "")
+        if [[ -n "$CURRENT_GSD" ]]; then
+            GSD_STATUS="installed (latest: v${CURRENT_GSD})"
+        fi
+    else
+        info "Installing GSD project framework..."
+        if npx get-shit-done-cc --local --claude 2>/dev/null; then
+            ok "GSD installed"
+            GSD_STATUS="freshly installed"
+        else
+            warn "GSD install failed — run manually: npx get-shit-done-cc --local --claude"
+            GSD_STATUS="failed"
+        fi
+    fi
+else
+    if [[ ! -d "$GSD_COMMANDS" ]]; then
+        GSD_STATUS="missing (install Node.js first)"
+    else
+        GSD_STATUS="installed (Node.js not found for updates)"
+    fi
+fi
+
+# =========================================================
 # STEP 4 OF 4: Summary
 # =========================================================
 echo ""
@@ -1269,6 +1301,12 @@ fi
 # Re-removed skills
 if [[ -n "$REMOVED_SKILLS_MSG" ]]; then
     printf "$REMOVED_SKILLS_MSG\n"
+fi
+
+# GSD status
+if [[ -n "$GSD_STATUS" ]]; then
+    echo ""
+    ok "GSD framework: ${GSD_STATUS}"
 fi
 
 # Protected files

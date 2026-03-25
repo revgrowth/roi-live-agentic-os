@@ -8,12 +8,14 @@ set -euo pipefail
 #   bash scripts/install.sh
 #
 # What it does:
-#   1. Checks prerequisites (git, bash, python3)
+#   1. Checks prerequisites (git, bash, python3, node)
 #   2. Creates .env from .env.example if missing
 #   3. Runs scripts/setup.sh for system dependencies
 #   4. Installs all skills (selection happens during first Claude session)
 #   5. Writes installed.json
-#   6. Prints next steps
+#   6. Installs GSD project framework (get-shit-done-cc)
+#   7. Installs cron dispatcher
+#   8. Prints next steps
 #
 # Idempotent — safe to run multiple times.
 # =============================================================================
@@ -94,6 +96,16 @@ else
     printf "${RED}not found${NC}\n"
     fail "bash is required"
     PREREQ_FAIL=1
+fi
+
+# Node.js (required for GSD project framework)
+printf "  node ......... "
+if command -v node &>/dev/null; then
+    printf "${GREEN}$(node --version 2>&1)${NC}\n"
+else
+    printf "${YELLOW}not found${NC}\n"
+    warn "Node.js is recommended for GSD project management."
+    warn "Install from: https://nodejs.org/"
 fi
 
 # Python 3 — check python3 first, fall back to python (Windows often uses 'python')
@@ -214,6 +226,29 @@ print("    1. Run \033[1mclaude\033[0m — it'll walk you through brand setup + 
 print("    2. Add API keys to .env later if any skills need them")
 print()
 PYEOF
+
+# =============================================================================
+# 7. Install GSD project framework
+# =============================================================================
+echo ""
+info "Installing GSD project framework..."
+echo ""
+
+if command -v node &>/dev/null; then
+    GSD_COMMANDS="$REPO_ROOT/.claude/commands/gsd"
+    if [[ -d "$GSD_COMMANDS" ]] && [[ $(ls -1 "$GSD_COMMANDS"/*.md 2>/dev/null | wc -l) -gt 10 ]]; then
+        success "GSD already installed ($(ls -1 "$GSD_COMMANDS"/*.md | wc -l | tr -d ' ') commands)"
+    else
+        if npx get-shit-done-cc --local --claude 2>/dev/null; then
+            success "GSD installed successfully"
+        else
+            warn "GSD installation failed — you can install it later with: npx get-shit-done-cc --local --claude"
+        fi
+    fi
+else
+    warn "Skipping GSD — Node.js not found. Install Node.js, then run: npx get-shit-done-cc --local --claude"
+fi
+echo ""
 
 # ---------- Install cron dispatcher ----------
 echo ""
