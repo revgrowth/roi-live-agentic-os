@@ -5,6 +5,13 @@
 
 ## v1 Requirements
 
+### Design
+
+- [ ] **DESIGN-01**: All dashboard views designed in Google Stitch before code is written
+- [ ] **DESIGN-02**: Design spec covers Board, Cron Jobs, Context, Brand, Skills views and client switcher
+- [ ] **DESIGN-03**: Design spec defines colours, typography, spacing, component styles, layout patterns
+- [ ] **DESIGN-04**: Design spec covers all states: empty, loading, running, completed, error
+
 ### Infrastructure
 
 - [ ] **INFRA-01**: App initializes SQLite database on first launch with full schema
@@ -60,7 +67,7 @@
 - [ ] **CLIENT-01**: Client switcher in nav bar scopes all views to a specific client folder or root
 - [ ] **CLIENT-02**: Board, cron jobs, context, brand, and skills all filter by selected client
 
-### Design
+### Design (UI Implementation)
 
 - [ ] **UI-01**: Clean light theme with minimal UI inspired by Vibe Kanban — no emojis, no dev jargon
 - [ ] **UI-02**: Nav structure: Board | Cron Jobs | Context | Brand | Skills with client switcher in top bar
@@ -101,49 +108,52 @@
 | OAuth / user authentication | Single-user local app — no accounts needed |
 | Mobile app | Desktop browser only — dashboard is a workstation tool |
 | Real-time collaborative editing | Single user per instance |
-| Google Stitch setup | Handled separately before build phases begin |
 | Agent SDK integration | Claude CLI subprocess is simpler and proven; revisit if SDK matures |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| INFRA-05 | — | Pending |
-| BOARD-01 | — | Pending |
-| BOARD-02 | — | Pending |
-| BOARD-03 | — | Pending |
-| BOARD-04 | — | Pending |
-| BOARD-05 | — | Pending |
-| EXEC-01 | — | Pending |
-| EXEC-02 | — | Pending |
-| EXEC-03 | — | Pending |
-| EXEC-04 | — | Pending |
-| TRACK-01 | — | Pending |
-| TRACK-02 | — | Pending |
-| OUT-01 | — | Pending |
-| OUT-02 | — | Pending |
-| OUT-03 | — | Pending |
-| PANEL-01 | — | Pending |
-| PANEL-02 | — | Pending |
-| CRON-01 | — | Pending |
-| CRON-02 | — | Pending |
-| CTX-01 | — | Pending |
-| BRAND-01 | — | Pending |
-| SKILL-01 | — | Pending |
-| CLIENT-01 | — | Pending |
-| CLIENT-02 | — | Pending |
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
+| DESIGN-01 | Phase 1 | Pending |
+| DESIGN-02 | Phase 1 | Pending |
+| DESIGN-03 | Phase 1 | Pending |
+| DESIGN-04 | Phase 1 | Pending |
+| INFRA-01 | Phase 2 | Pending |
+| INFRA-02 | Phase 2 | Pending |
+| INFRA-03 | Phase 2 | Pending |
+| INFRA-04 | Phase 2 | Pending |
+| INFRA-05 | Phase 2 | Pending |
+| BOARD-01 | Phase 2 | Pending |
+| BOARD-02 | Phase 2 | Pending |
+| BOARD-03 | Phase 2 | Pending |
+| BOARD-04 | Phase 2 | Pending |
+| BOARD-05 | Phase 2 | Pending |
+| EXEC-01 | Phase 2 | Pending |
+| EXEC-02 | Phase 2 | Pending |
+| EXEC-03 | Phase 2 | Pending |
+| EXEC-04 | Phase 2 | Pending |
+| TRACK-01 | Phase 3 | Pending |
+| TRACK-02 | Phase 3 | Pending |
+| OUT-01 | Phase 3 | Pending |
+| OUT-02 | Phase 3 | Pending |
+| OUT-03 | Phase 3 | Pending |
+| PANEL-01 | Phase 3 | Pending |
+| PANEL-02 | Phase 3 | Pending |
+| CRON-01 | Phase 4 | Pending |
+| CRON-02 | Phase 4 | Pending |
+| CTX-01 | Phase 4 | Pending |
+| BRAND-01 | Phase 4 | Pending |
+| SKILL-01 | Phase 4 | Pending |
+| CLIENT-01 | Phase 5 | Pending |
+| CLIENT-02 | Phase 5 | Pending |
+| UI-01 | Phase 2 | Pending |
+| UI-02 | Phase 2 | Pending |
 
 **Coverage:**
-- v1 requirements: 30 total
-- Mapped to phases: 0
-- Unmapped: 30 ⚠️
+- v1 requirements: 34 total
+- Mapped to phases: 34
+- Unmapped: 0
 
 ---
 *Requirements defined: 2025-03-25*
-*Last updated: 2025-03-25 after initial definition*
+*Last updated: 2025-03-25 after roadmap revision — added Design phase requirements*
