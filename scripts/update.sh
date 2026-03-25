@@ -1215,32 +1215,40 @@ fi
 # =========================================================
 # GSD Framework Sync
 # =========================================================
-GSD_COMMANDS="$REPO_ROOT/.claude/commands/gsd"
+GSD_GLOBAL="$HOME/.claude/commands/gsd"
+GSD_LOCAL="$REPO_ROOT/.claude/commands/gsd"
 GSD_STATUS=""
 
 if command -v node &>/dev/null; then
-    if [[ -d "$GSD_COMMANDS" ]] && [[ $(ls -1 "$GSD_COMMANDS"/*.md 2>/dev/null | wc -l) -gt 10 ]]; then
-        GSD_STATUS="installed"
+    # Migrate local → global if needed
+    if [[ -d "$GSD_LOCAL" ]]; then
+        rm -rf "$GSD_LOCAL"
+        find "$REPO_ROOT/.claude/agents" -name "gsd-*.md" -delete 2>/dev/null || true
+        ok "Cleaned up local GSD files (migrating to global)"
+    fi
+
+    if [[ -d "$GSD_GLOBAL" ]] && [[ $(ls -1 "$GSD_GLOBAL"/*.md 2>/dev/null | wc -l) -gt 10 ]]; then
+        GSD_STATUS="installed globally"
         # Check for GSD updates silently
         CURRENT_GSD=$(npm view get-shit-done-cc version 2>/dev/null || echo "")
         if [[ -n "$CURRENT_GSD" ]]; then
-            GSD_STATUS="installed (latest: v${CURRENT_GSD})"
+            GSD_STATUS="installed globally (latest: v${CURRENT_GSD})"
         fi
     else
-        info "Installing GSD project framework..."
-        if npx get-shit-done-cc --local --claude 2>/dev/null; then
-            ok "GSD installed"
-            GSD_STATUS="freshly installed"
+        info "Installing GSD project framework globally..."
+        if npx get-shit-done-cc --global --claude 2>/dev/null; then
+            ok "GSD installed globally"
+            GSD_STATUS="freshly installed (global)"
         else
-            warn "GSD install failed — run manually: npx get-shit-done-cc --local --claude"
+            warn "GSD install failed — run manually: npx get-shit-done-cc --global --claude"
             GSD_STATUS="failed"
         fi
     fi
 else
-    if [[ ! -d "$GSD_COMMANDS" ]]; then
+    if [[ ! -d "$GSD_GLOBAL" ]]; then
         GSD_STATUS="missing (install Node.js first)"
     else
-        GSD_STATUS="installed (Node.js not found for updates)"
+        GSD_STATUS="installed globally (Node.js not found for updates)"
     fi
 fi
 

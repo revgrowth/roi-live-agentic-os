@@ -235,18 +235,26 @@ info "Installing GSD project framework..."
 echo ""
 
 if command -v node &>/dev/null; then
-    GSD_COMMANDS="$REPO_ROOT/.claude/commands/gsd"
-    if [[ -d "$GSD_COMMANDS" ]] && [[ $(ls -1 "$GSD_COMMANDS"/*.md 2>/dev/null | wc -l) -gt 10 ]]; then
-        success "GSD already installed ($(ls -1 "$GSD_COMMANDS"/*.md | wc -l | tr -d ' ') commands)"
+    GSD_GLOBAL="$HOME/.claude/commands/gsd"
+    GSD_LOCAL="$REPO_ROOT/.claude/commands/gsd"
+    if [[ -d "$GSD_GLOBAL" ]] && [[ $(ls -1 "$GSD_GLOBAL"/*.md 2>/dev/null | wc -l) -gt 10 ]]; then
+        success "GSD already installed globally ($(ls -1 "$GSD_GLOBAL"/*.md | wc -l | tr -d ' ') commands)"
     else
-        if npx get-shit-done-cc --local --claude 2>/dev/null; then
-            success "GSD installed successfully"
+        if npx get-shit-done-cc --global --claude 2>/dev/null; then
+            success "GSD installed globally"
         else
-            warn "GSD installation failed — you can install it later with: npx get-shit-done-cc --local --claude"
+            warn "GSD installation failed — you can install it later with: npx get-shit-done-cc --global --claude"
         fi
     fi
+    # Clean up any local GSD install (migrating to global)
+    if [[ -d "$GSD_LOCAL" ]]; then
+        rm -rf "$GSD_LOCAL"
+        # Also clean local GSD agents
+        find "$REPO_ROOT/.claude/agents" -name "gsd-*.md" -delete 2>/dev/null || true
+        success "Cleaned up local GSD files (now global)"
+    fi
 else
-    warn "Skipping GSD — Node.js not found. Install Node.js, then run: npx get-shit-done-cc --local --claude"
+    warn "Skipping GSD — Node.js not found. Install Node.js, then run: npx get-shit-done-cc --global --claude"
 fi
 echo ""
 
