@@ -281,6 +281,18 @@ Every skill and its output folder uses a category prefix. This keeps skills, out
 |-------|------------|
 | `str-ai-seo` | "AI SEO", "AEO", "GEO", "LLMO", "answer engine optimization", "AI citations", "AI visibility", "optimize for ChatGPT/Perplexity/Claude", "show up in AI answers" |
 
+### Visual Skills
+
+| Skill | Triggers on |
+|-------|------------|
+| `viz-stitch-design` | "design a UI", "create a screen", "stitch design", "UI mockup", "app design", "landing page design", "mobile screen", "web layout", "wireframe to UI", "design this page" |
+
+### Utility Skills
+
+| Skill | Triggers on |
+|-------|------------|
+| `tool-stitch` | "fetch stitch design", "get stitch screens", "stitch project", "pull from stitch", "stitch code", "export stitch" |
+
 *Optional skills are auto-registered by the Heartbeat reconciliation when their folders appear on disk. Install optional skills with `bash scripts/add-skill.sh <name>`. See `.claude/skills/_catalog/catalog.json` for the full list.*
 
 *Add new skills to this table when built and registered.*
@@ -298,6 +310,8 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 | `mkt-icp` | — | summary | **writes** | — | — | `## mkt-icp` |
 | `meta-wrap-up` | — | — | — | — | — | `## meta-wrap-up` |
 | `str-ai-seo` | tone only | summary | full | — | — | `## str-ai-seo` |
+| `tool-stitch` | — | — | — | — | — | `## tool-stitch` |
+| `viz-stitch-design` | tone only | summary | language section | — | — | `## viz-stitch-design` |
 
 *Optional skills auto-add their row here via Heartbeat reconciliation when installed. New skills declare their own row when added.*
 
@@ -342,13 +356,16 @@ projects/briefs/kanban-dashboard/
 
 When creating a Level 2 brief, cover: project goal (one sentence), deliverables (checklist), acceptance criteria (how you'll know it's done), timeline/constraints, and any dependencies. Keep it to one page — this is a working document, not a formal PRD.
 
-**Level 3 (GSD projects):** Same as Level 2 (project folder under `projects/briefs/` with `brief.md` + outputs), but GSD's `.planning/` directory lives at the project root (hardcoded across 50+ references). The brief links to `.planning/`.
+**Level 3 (GSD projects):** Same as Level 2 (project folder under `projects/briefs/` with `brief.md` + outputs), but GSD's `.planning/` directory lives at the project root (hardcoded across 50+ references). The brief links to `.planning/`. **All source code, configs, dependencies, and build artifacts go inside the project folder** — never at the agentic-os root.
 
 ```
-projects/briefs/website-rebuild/
-├── brief.md                         ← links to .planning/
-├── homepage-copy_2026-03-24.md
-└── sitemap_2026-03-25.excalidraw
+projects/briefs/command-centre/
+├── brief.md                         ← project scope + link to .planning/
+├── package.json                     ← project deps live HERE, not at root
+├── src/                             ← all source code inside the project
+├── next.config.ts                   ← build configs inside the project
+├── node_modules/                    ← (gitignored) installed here
+└── .next/                           ← (gitignored) build output here
 
 .planning/                           ← GSD artifacts (at project root, not inside projects/)
 ├── PROJECT.md
@@ -357,6 +374,8 @@ projects/briefs/website-rebuild/
 ```
 
 **One GSD project at a time per workspace.** `.planning/` is shared — finish or archive one before starting another. When complete, run `/archive-gsd` to move `.planning/` into the project folder and mark the brief as complete. If a user tries to start a new GSD project while `.planning/` exists, offer to run `/archive-gsd` first.
+
+**Project containment rule:** The agentic-os root is the operating system — not a place for project outputs. Every file a project produces (source code, configs, package manifests, build artifacts, data files, scripts) MUST live inside its `projects/briefs/{project-name}/` folder. Run build tools (`npm`, `python`, etc.) from the project folder. Never scaffold, install, or build at the agentic-os root. This applies to all project levels — Level 1 outputs go in `projects/{category}/`, Level 2/3 outputs go in `projects/briefs/{project-name}/`.
 
 **How to tell folders apart:** Category folders live directly under `projects/` using `{category}-{type}` naming (e.g., `projects/mkt-copywriting/`) — no `brief.md` inside. Project folders live under `projects/briefs/` using descriptive names (e.g., `projects/briefs/kanban-dashboard/`) — always have a `brief.md`. When listing projects for the user, sort by `created` date in frontmatter, most recent first.
 
@@ -474,6 +493,7 @@ Some skills use external services for enhanced functionality. API keys are store
 | YouTube Data API v3 | `YOUTUBE_API_KEY` | `tool-youtube` | Channel video listing, @handle resolution, search | Transcript mode still works with direct URLs (free via yt-dlp). Channel listing unavailable |
 | Google Gemini | `GEMINI_API_KEY` | `viz-nano-banana` | Image generation via Gemini 3 Pro Image | No fallback — image generation requires the API key. Free tier available |
 | HeyGen | `HEYGEN_API_KEY` | `viz-ugc-heygen` | AI avatar video generation with cloned avatars and custom voices | No fallback — video generation requires the API key and HeyGen plan credits |
+| Google Stitch | gcloud auth | `tool-stitch`, `viz-stitch-design` | AI-powered UI design generation, screen export, design DNA extraction | No fallback — requires Google authentication via gcloud |
 
 *Add new services to this table and to `.env.example` when skills are built that use them.*
 

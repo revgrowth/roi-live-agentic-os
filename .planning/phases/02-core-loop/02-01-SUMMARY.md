@@ -26,22 +26,22 @@ tech-stack:
 
 key-files:
   created:
-    - package.json
-    - tsconfig.json
-    - next.config.ts
-    - postcss.config.mjs
-    - src/app/layout.tsx
-    - src/app/globals.css
-    - src/app/page.tsx
-    - src/types/task.ts
-    - src/lib/config.ts
-    - src/lib/db.ts
-    - src/lib/schema.sql
-    - src/lib/event-bus.ts
-    - src/app/api/tasks/route.ts
-    - src/app/api/tasks/[id]/route.ts
-    - src/app/api/tasks/[id]/status/route.ts
-    - src/app/api/events/route.ts
+    - projects/briefs/command-centre/package.json
+    - projects/briefs/command-centre/tsconfig.json
+    - projects/briefs/command-centre/next.config.ts
+    - projects/briefs/command-centre/postcss.config.mjs
+    - projects/briefs/command-centre/src/app/layout.tsx
+    - projects/briefs/command-centre/src/app/globals.css
+    - projects/briefs/command-centre/src/app/page.tsx
+    - projects/briefs/command-centre/src/types/task.ts
+    - projects/briefs/command-centre/src/lib/config.ts
+    - projects/briefs/command-centre/src/lib/db.ts
+    - projects/briefs/command-centre/src/lib/schema.sql
+    - projects/briefs/command-centre/src/lib/event-bus.ts
+    - projects/briefs/command-centre/src/app/api/tasks/route.ts
+    - projects/briefs/command-centre/src/app/api/tasks/[id]/route.ts
+    - projects/briefs/command-centre/src/app/api/tasks/[id]/status/route.ts
+    - projects/briefs/command-centre/src/app/api/events/route.ts
   modified:
     - .gitignore
     - .claude/settings.json
@@ -95,22 +95,22 @@ Each task was committed atomically:
 2. **Task 2: REST API endpoints and SSE streaming** - `25df682` (feat)
 
 ## Files Created/Modified
-- `package.json` - Project config with all phase dependencies
-- `tsconfig.json` - TypeScript strict config with path aliases
-- `next.config.ts` - Next.js config with better-sqlite3 external package
-- `postcss.config.mjs` - Tailwind v4 PostCSS plugin
-- `src/app/layout.tsx` - Root layout with Inter font
-- `src/app/globals.css` - Tailwind v4 import + #FAFBFC background
-- `src/app/page.tsx` - Placeholder page
-- `src/types/task.ts` - Task, TaskCreateInput, TaskUpdateInput types
-- `src/lib/config.ts` - AGENTIC_OS_DIR config with cwd fallback
-- `src/lib/db.ts` - SQLite singleton with auto-schema init
-- `src/lib/schema.sql` - Full task table DDL with indexes
-- `src/lib/event-bus.ts` - EventEmitter-based pub/sub for SSE
-- `src/app/api/tasks/route.ts` - Task list and creation (GET/POST)
-- `src/app/api/tasks/[id]/route.ts` - Task CRUD (GET/PATCH/DELETE)
-- `src/app/api/tasks/[id]/status/route.ts` - Agent self-reporting endpoint
-- `src/app/api/events/route.ts` - SSE streaming endpoint
+- `projects/briefs/command-centre/package.json` - Project config with all phase dependencies
+- `projects/briefs/command-centre/tsconfig.json` - TypeScript strict config with path aliases
+- `projects/briefs/command-centre/next.config.ts` - Next.js config with better-sqlite3 external package
+- `projects/briefs/command-centre/postcss.config.mjs` - Tailwind v4 PostCSS plugin
+- `projects/briefs/command-centre/src/app/layout.tsx` - Root layout with Inter font
+- `projects/briefs/command-centre/src/app/globals.css` - Tailwind v4 import + #FAFBFC background
+- `projects/briefs/command-centre/src/app/page.tsx` - Placeholder page
+- `projects/briefs/command-centre/src/types/task.ts` - Task, TaskCreateInput, TaskUpdateInput types
+- `projects/briefs/command-centre/src/lib/config.ts` - AGENTIC_OS_DIR config with cwd fallback
+- `projects/briefs/command-centre/src/lib/db.ts` - SQLite singleton with auto-schema init
+- `projects/briefs/command-centre/src/lib/schema.sql` - Full task table DDL with indexes
+- `projects/briefs/command-centre/src/lib/event-bus.ts` - EventEmitter-based pub/sub for SSE
+- `projects/briefs/command-centre/src/app/api/tasks/route.ts` - Task list and creation (GET/POST)
+- `projects/briefs/command-centre/src/app/api/tasks/[id]/route.ts` - Task CRUD (GET/PATCH/DELETE)
+- `projects/briefs/command-centre/src/app/api/tasks/[id]/status/route.ts` - Agent self-reporting endpoint
+- `projects/briefs/command-centre/src/app/api/events/route.ts` - SSE streaming endpoint
 - `.gitignore` - Added node_modules, .next, .command-centre
 - `.claude/settings.json` - Added npm install permission
 

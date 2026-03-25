@@ -24,13 +24,13 @@ tech-stack:
 
 key-files:
   created:
-    - src/lib/claude-parser.ts
-    - src/lib/process-manager.ts
-    - src/lib/queue-watcher.ts
-    - src/instrumentation.ts
-    - src/app/api/tasks/[id]/execute/route.ts
-    - src/app/api/tasks/[id]/cancel/route.ts
-    - scripts/test-parser.ts
+    - projects/briefs/command-centre/src/lib/claude-parser.ts
+    - projects/briefs/command-centre/src/lib/process-manager.ts
+    - projects/briefs/command-centre/src/lib/queue-watcher.ts
+    - projects/briefs/command-centre/src/instrumentation.ts
+    - projects/briefs/command-centre/src/app/api/tasks/[id]/execute/route.ts
+    - projects/briefs/command-centre/src/app/api/tasks/[id]/cancel/route.ts
+    - projects/briefs/command-centre/scripts/test-parser.ts
   modified: []
 
 key-decisions:
@@ -80,13 +80,13 @@ Each task was committed atomically:
 2. **Task 2: Queue watcher, instrumentation, execute/cancel routes** - `213bfec` (feat)
 
 ## Files Created/Modified
-- `src/lib/claude-parser.ts` - Stream-json parser with onProgress/onComplete/onError callbacks
-- `src/lib/process-manager.ts` - Singleton managing Claude CLI child processes per task
-- `src/lib/queue-watcher.ts` - Event listener triggering execution on queued status
-- `src/instrumentation.ts` - Next.js server startup hook for queue watcher init
-- `src/app/api/tasks/[id]/execute/route.ts` - Manual execution trigger endpoint (POST)
-- `src/app/api/tasks/[id]/cancel/route.ts` - Task cancellation endpoint (POST)
-- `scripts/test-parser.ts` - Parser fixture tests (14 assertions)
+- `projects/briefs/command-centre/src/lib/claude-parser.ts` - Stream-json parser with onProgress/onComplete/onError callbacks
+- `projects/briefs/command-centre/src/lib/process-manager.ts` - Singleton managing Claude CLI child processes per task
+- `projects/briefs/command-centre/src/lib/queue-watcher.ts` - Event listener triggering execution on queued status
+- `projects/briefs/command-centre/src/instrumentation.ts` - Next.js server startup hook for queue watcher init
+- `projects/briefs/command-centre/src/app/api/tasks/[id]/execute/route.ts` - Manual execution trigger endpoint (POST)
+- `projects/briefs/command-centre/src/app/api/tasks/[id]/cancel/route.ts` - Task cancellation endpoint (POST)
+- `projects/briefs/command-centre/scripts/test-parser.ts` - Parser fixture tests (14 assertions)
 
 ## Decisions Made
 - **Stateful parser class:** ClaudeOutputParser tracks completion state to prevent duplicate result/error handling

@@ -174,7 +174,7 @@ npm install -D prettier prettier-plugin-tailwindcss
 - Alternative: ship source + build on install (slower first run, but smaller package)
 
 **For multi-client scoping:**
-- SQLite file lives at agentic-os root: `.command-centre/data.db`
+- SQLite file lives at agentic-os root: `projects/briefs/command-centre/.command-centre/data.db`
 - Client scoping is a DB column (client_slug), not separate databases
 - Single DB simplifies cross-client views and global dashboards
 - File paths in tasks/outputs reference client subdirectories

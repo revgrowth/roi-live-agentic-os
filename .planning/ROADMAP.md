@@ -1,5 +1,7 @@
 # Roadmap: Agentic OS Command Centre
 
+**App root:** `projects/briefs/command-centre/` — all source code, configs, and build artifacts live here. Run `npm` commands from this directory.
+
 ## Overview
 
 This roadmap delivers a locally hosted dashboard that replaces the terminal for non-technical Agentic OS users. The build follows five phases: first producing copy-paste-ready Google Stitch prompts for every dashboard view to establish a visual source of truth, then proving the end-to-end core loop (create task, spawn agent, see live updates), then surfacing outputs and monitoring, then adding cron scheduling and management tabs, and finally layering client switching over the working system. Each phase delivers a coherent, testable capability.
