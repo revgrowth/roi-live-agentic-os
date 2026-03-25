@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2025-03-25)
 
 **Core value:** A user can describe a task, watch it run, and get the output -- without ever opening a terminal.
-**Current focus:** Phase 1: Design Prompts
+**Current focus:** Phase 1: Design Prompts -- COMPLETE. Ready for Phase 2: Build.
 
 ## Current Position
 
 Phase: 1 of 5 (Design Prompts)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-03-25 -- Completed 01-01-PLAN.md (Research and Design Language)
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-03-25 -- Completed 01-02-PLAN.md (Stitch Prompt Crafting)
 
-Progress: [█░░░░░░░░░] 10%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
+- Total plans completed: 2
 - Average duration: ~5 minutes
-- Total execution time: ~5 minutes
+- Total execution time: ~9 minutes
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Design Prompts | 1/2 | ~5 min | ~5 min |
+| 1. Design Prompts | 2/2 | ~9 min | ~5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (~5 min)
-- Trend: Starting
+- Last 5 plans: 01-01 (~5 min), 01-02 (~4 min)
+- Trend: Consistent
 
 *Updated after each plan completion*
 
@@ -54,6 +54,9 @@ Recent decisions affecting current work:
 - Skeleton loading over spinners for loading states (01-01)
 - 3px left-border colour for card status indication (01-01)
 - #FAFBFC near-white page background for eye strain reduction (01-01)
+- Inline design tokens in every Stitch prompt for self-contained copy-paste use (01-02)
+- Client switcher as component states grid rather than full page (01-02)
+- Slide-out panel pattern reused for Brand and Context editing (01-02)
 
 ### Pending Todos
 
@@ -68,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-25
-Stopped at: Completed 01-01-PLAN.md (Research and Design Language)
+Stopped at: Completed 01-02-PLAN.md (Stitch Prompt Crafting) -- Phase 1 complete
 Resume file: None
