@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2025-03-25)
 
 **Core value:** A user can describe a task, watch it run, and get the output -- without ever opening a terminal.
-**Current focus:** Phase 1: Design Prompts -- COMPLETE. Ready for Phase 2: Build.
+**Current focus:** Phase 2: Core Loop (Phase 1 complete, verified)
 
 ## Current Position
 
@@ -71,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-25
-Stopped at: Completed 01-02-PLAN.md (Stitch Prompt Crafting) -- Phase 1 complete
+Stopped at: Phase 1 executed and verified (4/4 must-haves passed). Ready for Phase 2.
 Resume file: None

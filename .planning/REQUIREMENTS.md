@@ -7,10 +7,10 @@
 
 ### Design
 
-- [ ] **DESIGN-01**: Copy-paste-ready Google Stitch prompts produced for all dashboard views before code is written
-- [ ] **DESIGN-02**: Stitch prompts cover Board, Cron Jobs, Context, Brand, Skills views and client switcher — one prompt per view/screen
-- [ ] **DESIGN-03**: A design language document defines shared tokens (colours, typography, spacing, component styles) referenced by all prompts
-- [ ] **DESIGN-04**: Each Stitch prompt specifies all relevant view states: empty, loading, running, completed, and error
+- [x] **DESIGN-01**: Copy-paste-ready Google Stitch prompts produced for all dashboard views before code is written
+- [x] **DESIGN-02**: Stitch prompts cover Board, Cron Jobs, Context, Brand, Skills views and client switcher — one prompt per view/screen
+- [x] **DESIGN-03**: A design language document defines shared tokens (colours, typography, spacing, component styles) referenced by all prompts
+- [x] **DESIGN-04**: Each Stitch prompt specifies all relevant view states: empty, loading, running, completed, and error
 
 ### Infrastructure
 
@@ -114,10 +114,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DESIGN-01 | Phase 1 | Pending |
-| DESIGN-02 | Phase 1 | Pending |
-| DESIGN-03 | Phase 1 | Pending |
-| DESIGN-04 | Phase 1 | Pending |
+| DESIGN-01 | Phase 1 | Complete |
+| DESIGN-02 | Phase 1 | Complete |
+| DESIGN-03 | Phase 1 | Complete |
+| DESIGN-04 | Phase 1 | Complete |
 | INFRA-01 | Phase 2 | Pending |
 | INFRA-02 | Phase 2 | Pending |
 | INFRA-03 | Phase 2 | Pending |
@@ -156,4 +156,4 @@
 
 ---
 *Requirements defined: 2025-03-25*
-*Last updated: 2025-03-25 — revised DESIGN requirements to reflect Stitch prompt output (not design files)*
+*Last updated: 2026-03-25 — DESIGN-01 through DESIGN-04 marked Complete (Phase 1 executed)*

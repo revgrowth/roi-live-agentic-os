@@ -12,7 +12,7 @@ This roadmap delivers a locally hosted dashboard that replaces the terminal for 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Design Prompts** - Copy-paste-ready Google Stitch prompts for every dashboard view, grounded in reference research and prompting best practices
+- [x] **Phase 1: Design Prompts** - Copy-paste-ready Google Stitch prompts for every dashboard view, grounded in reference research and prompting best practices
 - [ ] **Phase 2: Core Loop** - Infrastructure, Kanban board, task execution, and live updates working end-to-end
 - [ ] **Phase 3: Outputs and Monitoring** - Output files surface on cards with preview/download, cost tracking, and detail panel
 - [ ] **Phase 4: Scheduling and Management** - Cron job scheduling plus Context, Brand, and Skills tabs
@@ -32,8 +32,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Research Google Stitch prompting best practices, study design references (Vibe Kanban at vibekanban.com, OpenClaw dashboards, Claude Task Viewer), and establish design language/tokens
-- [ ] 01-02: Craft Stitch prompts for all views -- Board, Cron Jobs, Context, Brand, Skills, client switcher -- covering all states (empty, loading, running, completed, error)
+- [x] 01-01: Research Google Stitch prompting best practices, study design references (Vibe Kanban at vibekanban.com, OpenClaw dashboards, Claude Task Viewer), and establish design language/tokens
+- [x] 01-02: Craft Stitch prompts for all views -- Board, Cron Jobs, Context, Brand, Skills, client switcher -- covering all states (empty, loading, running, completed, error)
 
 ### Phase 2: Core Loop
 **Goal**: A user can create a task, watch it execute via a live Kanban board, and see the card move through columns in real time
@@ -100,7 +100,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Design Prompts | 0/2 | Not started | - |
+| 1. Design Prompts | 2/2 | Complete | 2026-03-25 |
 | 2. Core Loop | 0/3 | Not started | - |
 | 3. Outputs and Monitoring | 0/2 | Not started | - |
 | 4. Scheduling and Management | 0/2 | Not started | - |
