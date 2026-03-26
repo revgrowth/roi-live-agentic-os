@@ -5,7 +5,7 @@ import { Sidebar } from "./sidebar";
 import { StatsBar } from "./stats-bar";
 import { ScopeBar } from "./scope-bar";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children, title }: { children: React.ReactNode; title?: string }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
@@ -39,7 +39,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               margin: 0,
             }}
           >
-            Command Centre
+            {title || "Command Centre"}
           </h2>
         </header>
         <ScopeBar />
