@@ -30,5 +30,12 @@ export function getDb(): Database.Database {
 
   db.exec(schemaSql);
 
+  // Migration: add clientId column if it doesn't exist
+  const columns = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
+  if (!columns.some((c) => c.name === "clientId")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN clientId TEXT");
+    db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_clientId ON tasks(clientId)");
+  }
+
   return db;
 }

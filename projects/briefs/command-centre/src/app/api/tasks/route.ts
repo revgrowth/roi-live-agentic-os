@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
       errorMessage: null,
       startedAt: null,
       completedAt: null,
+      clientId: null,
     };
 
     db.prepare(

@@ -32,3 +32,5 @@ CREATE TABLE IF NOT EXISTS task_outputs (
   FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_task_outputs_taskId ON task_outputs(taskId);
+
+-- Migration: clientId column added dynamically in db.ts (ALTER TABLE is not idempotent in SQLite)

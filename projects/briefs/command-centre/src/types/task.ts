@@ -17,6 +17,7 @@ export interface Task {
   errorMessage: string | null;
   startedAt: string | null;
   completedAt: string | null;
+  clientId: string | null;
 }
 
 export interface OutputFile {
@@ -33,6 +34,7 @@ export interface OutputFile {
 export interface TaskCreateInput {
   title: string;
   level: TaskLevel;
+  clientId?: string | null;
 }
 
 export type TaskUpdateInput = Partial<
@@ -50,5 +52,6 @@ export type TaskUpdateInput = Partial<
     | "errorMessage"
     | "startedAt"
     | "completedAt"
+    | "clientId"
   >
 >;

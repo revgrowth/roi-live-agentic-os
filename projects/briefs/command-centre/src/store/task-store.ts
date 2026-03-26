@@ -73,6 +73,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       errorMessage: null,
       startedAt: null,
       completedAt: null,
+      clientId: null,
     };
 
     // Track pending create for SSE reconciliation
