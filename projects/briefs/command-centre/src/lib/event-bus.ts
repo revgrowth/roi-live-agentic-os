@@ -16,6 +16,7 @@ export interface TaskEvent {
   task: Task;
   timestamp: string;
   questionText?: string;
+  logEntry?: import("@/types/task").LogEntry;
 }
 
 const emitter = new EventEmitter();

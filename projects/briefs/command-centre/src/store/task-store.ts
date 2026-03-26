@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Task, TaskLevel, TaskUpdateInput, OutputFile } from "@/types/task";
+import type { Task, TaskLevel, TaskUpdateInput, OutputFile, LogEntry } from "@/types/task";
 import type { TaskEvent } from "@/lib/event-bus";
 import { useClientStore } from "./client-store";
 
@@ -13,6 +13,8 @@ interface TaskStore {
   isLoading: boolean;
   error: string | null;
   outputFiles: Record<string, OutputFile[]>;
+  logEntries: Record<string, LogEntry[]>;
+  questionText: string | null;
   selectedTaskId: string | null;
 
   // Actions
@@ -23,6 +25,9 @@ interface TaskStore {
   deleteTask: (id: string) => Promise<void>;
   applySSEEvent: (event: TaskEvent) => void;
   fetchOutputFiles: (taskId: string) => Promise<void>;
+  fetchLogEntries: (taskId: string) => Promise<void>;
+  appendLogEntry: (taskId: string, entry: LogEntry) => void;
+  setQuestionText: (text: string | null) => void;
   openPanel: (taskId: string) => void;
   closePanel: () => void;
 
@@ -38,6 +43,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   isLoading: false,
   error: null,
   outputFiles: {},
+  logEntries: {},
+  questionText: null,
   selectedTaskId: null,
 
   fetchTasks: async () => {
@@ -280,6 +287,20 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         // Re-fetch outputs for this task
         get().fetchOutputFiles(event.task.id);
         break;
+      case "task:question":
+        set((state) => ({
+          tasks: state.tasks.map((t) =>
+            t.id === event.task.id ? event.task : t
+          ),
+          questionText: event.questionText || null,
+        }));
+        break;
+      case "task:log":
+        // Append log entry if present
+        if (event.logEntry) {
+          get().appendLogEntry(event.task.id, event.logEntry);
+        }
+        break;
       case "task:deleted":
         set((state) => ({
           tasks: state.tasks.filter((t) => t.id !== event.task.id),
@@ -299,6 +320,32 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     } catch {
       // Silently fail -- outputs are non-critical
     }
+  },
+
+  fetchLogEntries: async (taskId: string) => {
+    try {
+      const res = await fetch(`/api/tasks/${taskId}/logs`);
+      if (!res.ok) return;
+      const entries = await res.json();
+      set((state) => ({
+        logEntries: { ...state.logEntries, [taskId]: entries },
+      }));
+    } catch {
+      // Silently fail
+    }
+  },
+
+  appendLogEntry: (taskId: string, entry: LogEntry) => {
+    set((state) => {
+      const existing = state.logEntries[taskId] || [];
+      return {
+        logEntries: { ...state.logEntries, [taskId]: [...existing, entry] },
+      };
+    });
+  },
+
+  setQuestionText: (text: string | null) => {
+    set({ questionText: text });
   },
 
   openPanel: (taskId: string) => {
