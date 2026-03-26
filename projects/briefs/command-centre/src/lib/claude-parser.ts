@@ -1,3 +1,5 @@
+import type { LogEntry } from "@/types/task";
+
 export interface ProgressData {
   costUsd?: number;
   tokensUsed?: number;
@@ -14,6 +16,8 @@ export interface ClaudeParserCallbacks {
   onProgress: (data: ProgressData) => void;
   onComplete: (data: CompleteData) => void;
   onError: (error: string) => void;
+  onLogEntry?: (entry: LogEntry) => void;
+  onQuestion?: (questionText: string) => void;
 }
 
 /**
@@ -52,6 +56,14 @@ export class ClaudeOutputParser {
         this.handleAssistant(parsed);
         break;
       }
+      case "tool_use": {
+        this.handleToolUse(parsed);
+        break;
+      }
+      case "tool_result": {
+        this.handleToolResult(parsed);
+        break;
+      }
       case "result": {
         this.handleResult(parsed);
         break;
@@ -60,7 +72,6 @@ export class ClaudeOutputParser {
         this.handleError(parsed);
         break;
       }
-      // Other message types (system, tool_use, tool_result) are ignored
     }
   }
 
@@ -83,6 +94,60 @@ export class ClaudeOutputParser {
     if (activityLabel) {
       this.callbacks.onProgress({ activityLabel });
     }
+
+    // Emit log entry for text content
+    const fullText = textBlocks.map((b) => b.text as string).join("");
+    if (fullText.trim()) {
+      this.callbacks.onLogEntry?.({
+        id: crypto.randomUUID(),
+        type: "text",
+        timestamp: new Date().toISOString(),
+        content: fullText,
+      });
+
+      // Question detection
+      const questionText = detectQuestion(fullText);
+      if (questionText) {
+        this.callbacks.onQuestion?.(questionText);
+      }
+    }
+  }
+
+  private handleToolUse(parsed: Record<string, unknown>): void {
+    const name = (parsed.name as string) || "unknown_tool";
+    const input = parsed.input ?? {};
+
+    this.callbacks.onLogEntry?.({
+      id: crypto.randomUUID(),
+      type: "tool_use",
+      timestamp: new Date().toISOString(),
+      content: name,
+      toolName: name,
+      toolArgs: JSON.stringify(input),
+      isCollapsed: true,
+    });
+  }
+
+  private handleToolResult(parsed: Record<string, unknown>): void {
+    const content = parsed.content as string | Array<Record<string, unknown>> | undefined;
+    let resultText = "";
+
+    if (typeof content === "string") {
+      resultText = content;
+    } else if (Array.isArray(content)) {
+      resultText = content
+        .filter((b) => b.type === "text" && typeof b.text === "string")
+        .map((b) => b.text as string)
+        .join("");
+    }
+
+    this.callbacks.onLogEntry?.({
+      id: crypto.randomUUID(),
+      type: "tool_result",
+      timestamp: new Date().toISOString(),
+      content: resultText || "(no output)",
+      toolResult: resultText || undefined,
+    });
   }
 
   private handleResult(parsed: Record<string, unknown>): void {
@@ -122,6 +187,31 @@ export class ClaudeOutputParser {
   get isCompleted(): boolean {
     return this.completed;
   }
+}
+
+/**
+ * Detect if Claude is asking the user a question.
+ * Returns the question text if detected, null otherwise.
+ */
+function detectQuestion(text: string): string | null {
+  const trimmed = text.trim();
+  const lines = trimmed.split("\n").filter((l) => l.trim());
+  const lastLine = lines[lines.length - 1]?.trim() || "";
+
+  if (lastLine.endsWith("?")) return lastLine;
+
+  // Check for common Claude question patterns
+  const questionPatterns = [
+    /would you like me to/i,
+    /shall I/i,
+    /do you want me to/i,
+    /please (confirm|choose|select|specify|provide)/i,
+    /which (one|option|approach)/i,
+  ];
+  for (const pattern of questionPatterns) {
+    if (pattern.test(lastLine)) return lastLine;
+  }
+  return null;
 }
 
 /**

@@ -5,15 +5,22 @@ import { getConfig, getClientAgenticOsDir } from "./config";
 import { emitTaskEvent } from "./event-bus";
 import { ClaudeOutputParser } from "./claude-parser";
 import { fileWatcher } from "./file-watcher";
-import type { Task } from "@/types/task";
+import type { Task, LogEntry } from "@/types/task";
+import type { Writable } from "stream";
 
 /**
  * Manages Claude CLI child processes for task execution.
  * Singleton -- one instance per server process.
  */
+interface SessionEntry {
+  proc: ChildProcess;
+  stdin: Writable | null;
+}
+
 class ProcessManager {
-  private sessions = new Map<string, ChildProcess>();
+  private sessions = new Map<string, SessionEntry>();
   private lastProgressEmit = new Map<string, number>();
+  private logEntries = new Map<string, LogEntry[]>();
 
   constructor() {
     // Clean up all sessions on server shutdown
@@ -75,12 +82,17 @@ class ProcessManager {
       }
     }
 
-    // Spawn Claude CLI
+    // Build prompt: include description if available
+    const prompt = task.description
+      ? `Task: ${task.title}\n\n${task.description}`
+      : task.title;
+
+    // Spawn Claude CLI with stdin pipe for two-way communication (D-08)
     let proc: ChildProcess;
     try {
-      proc = spawn("claude", ["--output-format", "stream-json", "--verbose", "-p", task.title], {
+      proc = spawn("claude", ["--output-format", "stream-json", "--verbose", "-p", prompt], {
         cwd,
-        stdio: ["ignore", "pipe", "pipe"],
+        stdio: ["pipe", "pipe", "pipe"],
         env: { ...process.env },
       });
     } catch (err) {
@@ -89,7 +101,8 @@ class ProcessManager {
       return;
     }
 
-    this.sessions.set(taskId, proc);
+    this.sessions.set(taskId, { proc, stdin: proc.stdin ?? null });
+    this.logEntries.set(taskId, []);
 
     // Set up parser with callbacks
     const parser = new ClaudeOutputParser({
@@ -101,6 +114,12 @@ class ProcessManager {
       },
       onError: (error) => {
         this.handleTaskError(taskId, error);
+      },
+      onLogEntry: (entry) => {
+        this.addLogEntry(taskId, entry);
+      },
+      onQuestion: (questionText) => {
+        this.handleQuestion(taskId, questionText);
       },
     });
 
@@ -157,11 +176,13 @@ class ProcessManager {
    * Cancel a running task. Sends SIGTERM, then SIGKILL after 5s.
    */
   async cancelTask(taskId: string): Promise<void> {
-    const proc = this.sessions.get(taskId);
-    if (!proc) {
+    const session = this.sessions.get(taskId);
+    if (!session) {
       console.warn(`[process-manager] No active session for task ${taskId}`);
       return;
     }
+
+    const { proc } = session;
 
     // Send SIGTERM
     proc.kill("SIGTERM");
@@ -205,17 +226,93 @@ class ProcessManager {
 
   /** Kill all active sessions. Called on server shutdown. */
   cleanup(): void {
-    for (const [taskId, proc] of this.sessions) {
+    for (const [taskId, session] of this.sessions) {
       console.log(`[process-manager] Cleaning up session for task ${taskId}`);
       try {
-        proc.kill("SIGTERM");
+        session.proc.kill("SIGTERM");
       } catch {
         // Process may already be gone
       }
     }
     this.sessions.clear();
     this.lastProgressEmit.clear();
+    this.logEntries.clear();
     fileWatcher.cleanupAll();
+  }
+
+  /**
+   * Send a reply to a running task's stdin.
+   * Returns true if the reply was written, false if task is not running or stdin unavailable.
+   */
+  async replyToTask(taskId: string, message: string): Promise<boolean> {
+    const session = this.sessions.get(taskId);
+    if (!session?.stdin || !session.stdin.writable) return false;
+
+    // Write user reply to stdin
+    session.stdin.write(message + "\n");
+
+    // Update task status back to running
+    const db = getDb();
+    const now = new Date().toISOString();
+    db.prepare("UPDATE tasks SET status = ?, updatedAt = ?, activityLabel = ? WHERE id = ?")
+      .run("running", now, "Processing reply...", taskId);
+
+    const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
+    emitTaskEvent({ type: "task:status", task: updated, timestamp: now });
+
+    // Add user reply as a log entry
+    const entry: LogEntry = {
+      id: crypto.randomUUID(),
+      type: "user_reply",
+      timestamp: now,
+      content: message,
+    };
+    this.addLogEntry(taskId, entry);
+
+    return true;
+  }
+
+  /** Get stored log entries for a task. */
+  getLogEntries(taskId: string): LogEntry[] {
+    return this.logEntries.get(taskId) || [];
+  }
+
+  /** Add a log entry and emit it via SSE. */
+  private addLogEntry(taskId: string, entry: LogEntry): void {
+    const entries = this.logEntries.get(taskId);
+    if (entries) {
+      entries.push(entry);
+    } else {
+      this.logEntries.set(taskId, [entry]);
+    }
+
+    // Emit log entry as SSE event
+    const db = getDb();
+    const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task | undefined;
+    if (task) {
+      emitTaskEvent({ type: "task:log", task, timestamp: entry.timestamp });
+    }
+  }
+
+  /** Handle question detection from parser. */
+  private handleQuestion(taskId: string, questionText: string): void {
+    const db = getDb();
+    const now = new Date().toISOString();
+
+    // Update task status to review with waiting label
+    db.prepare("UPDATE tasks SET status = ?, updatedAt = ?, activityLabel = ? WHERE id = ?")
+      .run("review", now, "Waiting for input...", taskId);
+
+    const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
+    emitTaskEvent({ type: "task:question", task: updated, timestamp: now, questionText });
+
+    // Also add a question log entry
+    this.addLogEntry(taskId, {
+      id: crypto.randomUUID(),
+      type: "question",
+      timestamp: now,
+      content: questionText,
+    });
   }
 
   // -- Internal handlers --
