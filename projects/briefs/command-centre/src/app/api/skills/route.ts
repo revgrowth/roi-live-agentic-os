@@ -1,36 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import matter from "gray-matter";
 import { getClientAgenticOsDir } from "@/lib/config";
-
-export interface SkillEntry {
-  name: string;
-  folder: string;
-  description: string;
-  triggers: string;
-  category: string;
-}
-
-function parseSkillFrontmatter(content: string): Record<string, string> {
-  const result: Record<string, string> = {};
-  const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
-  if (!match) return result;
-
-  const lines = match[1].split("\n");
-  for (const line of lines) {
-    const colonIdx = line.indexOf(":");
-    if (colonIdx === -1) continue;
-    const key = line.slice(0, colonIdx).trim();
-    const value = line.slice(colonIdx + 1).trim();
-    result[key] = value;
-  }
-  return result;
-}
-
-function extractCategory(folder: string): string {
-  const match = folder.match(/^([a-z]+)-/);
-  return match ? match[1] : "general";
-}
+import { parseDependencies } from "@/lib/file-service";
+import type { InstalledSkill } from "@/types/file";
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,34 +17,37 @@ export async function GET(request: NextRequest) {
     }
 
     const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
-    const skills: SkillEntry[] = [];
+    const skills: InstalledSkill[] = [];
 
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
-      if (entry.name.startsWith("_")) continue; // skip _catalog etc.
+      if (entry.name === "_catalog") continue;
 
       const skillMdPath = path.join(skillsDir, entry.name, "SKILL.md");
-      let description = "";
-      let triggers = "";
+      if (!fs.existsSync(skillMdPath)) continue;
 
-      if (fs.existsSync(skillMdPath)) {
-        try {
-          const content = fs.readFileSync(skillMdPath, "utf-8");
-          const frontmatter = parseSkillFrontmatter(content);
-          description = frontmatter.description || "";
-          triggers = frontmatter.triggers || "";
-        } catch {
-          // Skill file unreadable -- continue with empty metadata
-        }
+      try {
+        const raw = fs.readFileSync(skillMdPath, "utf-8");
+        const { data, content } = matter(raw);
+
+        skills.push({
+          name: (data.name as string) || entry.name,
+          category: entry.name.split("-")[0],
+          description: (data.description as string) || "",
+          triggers: (data.triggers as string[]) || [],
+          folderName: entry.name,
+          dependencies: parseDependencies(content),
+        });
+      } catch {
+        skills.push({
+          name: entry.name,
+          category: entry.name.split("-")[0],
+          description: "",
+          triggers: [],
+          folderName: entry.name,
+          dependencies: [],
+        });
       }
-
-      skills.push({
-        name: entry.name,
-        folder: entry.name,
-        description,
-        triggers,
-        category: extractCategory(entry.name),
-      });
     }
 
     return NextResponse.json(skills);
@@ -78,7 +55,7 @@ export async function GET(request: NextRequest) {
     console.error("GET /api/skills error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

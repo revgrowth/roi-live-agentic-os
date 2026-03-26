@@ -115,7 +115,7 @@ export function writeFile(relativePath: string, content: string, expectedLastMod
 /**
  * Parse ## Dependencies markdown table from SKILL.md body.
  */
-function parseDependencies(markdownBody: string): SkillDependency[] {
+export function parseDependencies(markdownBody: string): SkillDependency[] {
   const depsMatch = markdownBody.match(
     /## Dependencies\s*\n[\s\S]*?\|[\s\S]*?\n\|[-\s|]+\n([\s\S]*?)(?=\n##|\n*$)/
   );
