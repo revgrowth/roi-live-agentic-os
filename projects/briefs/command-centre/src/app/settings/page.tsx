@@ -4,15 +4,9 @@ import { useState } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
 import { EnvEditor } from "@/components/settings/env-editor";
+import { JsonEditor } from "@/components/settings/json-editor";
 
 type TabId = "scripts" | "env" | "mcp" | "claude";
-
-const tabLabels: Record<TabId, string> = {
-  scripts: "Scripts",
-  env: "Environment",
-  mcp: "MCP",
-  claude: "Claude Settings",
-};
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>("scripts");
@@ -21,9 +15,24 @@ export default function SettingsPage() {
     <AppShell title="Settings">
       <SettingsTabs activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as TabId)} />
       <div style={{ minHeight: 400 }}>
-        {activeTab === "env" ? (
-          <EnvEditor />
-        ) : (
+        {activeTab === "env" && <EnvEditor />}
+        {activeTab === "mcp" && (
+          <JsonEditor
+            apiEndpoint="/api/settings/mcp"
+            title="MCP Configuration"
+            description="Edit .mcp.json — MCP server connections and their environment variables"
+            emptyMessage="No .mcp.json file found. Create one to configure MCP servers."
+          />
+        )}
+        {activeTab === "claude" && (
+          <JsonEditor
+            apiEndpoint="/api/settings/claude-settings"
+            title="Claude Settings"
+            description="Edit .claude/settings.json — permissions, allowed tools, and deny patterns"
+            emptyMessage="No .claude/settings.json file found. Create one to configure Claude CLI settings."
+          />
+        )}
+        {activeTab === "scripts" && (
           <div
             style={{
               padding: 24,
@@ -32,7 +41,7 @@ export default function SettingsPage() {
               fontSize: 14,
             }}
           >
-            {tabLabels[activeTab]} — Coming soon...
+            Scripts — Coming soon...
           </div>
         )}
       </div>
