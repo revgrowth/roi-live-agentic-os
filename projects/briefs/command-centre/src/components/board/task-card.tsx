@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+import { GripVertical, Trash2 } from "lucide-react";
 import type { Task, TaskStatus } from "@/types/task";
 import { LevelBadge } from "./level-badge";
 import { useTaskStore } from "@/store/task-store";
@@ -43,7 +43,9 @@ function formatDuration(ms: number): string {
 export function TaskCard({ task }: { task: Task }) {
   const [expanded, setExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isTrashHovered, setIsTrashHovered] = useState(false);
   const getChildTasks = useTaskStore((s) => s.getChildTasks);
+  const deleteTask = useTaskStore((s) => s.deleteTask);
 
   const {
     attributes,
@@ -98,17 +100,41 @@ export function TaskCard({ task }: { task: Task }) {
       {...attributes}
       {...listeners}
     >
-      {/* Grab handle - visible on hover */}
+      {/* Hover actions: grab handle + delete */}
       {isHovered && !isDragging && (
         <div
           style={{
             position: "absolute",
             top: 8,
             right: 8,
-            color: "#D1D5DB",
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
           }}
         >
-          <GripVertical size={14} />
+          <GripVertical size={14} style={{ color: "#D1D5DB" }} />
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              deleteTask(task.id);
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseEnter={() => setIsTrashHovered(true)}
+            onMouseLeave={() => setIsTrashHovered(false)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 2,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Trash2
+              size={14}
+              style={{ color: isTrashHovered ? "#C04030" : "#5E5E65" }}
+            />
+          </button>
         </div>
       )}
 

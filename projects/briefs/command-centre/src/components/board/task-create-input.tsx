@@ -13,13 +13,18 @@ const levels: { value: TaskLevel; label: string }[] = [
 export function TaskCreateInput() {
   const [title, setTitle] = useState("");
   const [level, setLevel] = useState<TaskLevel>("task");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const createTask = useTaskStore((s) => s.createTask);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const trimmed = title.trim();
-    if (!trimmed) return;
-    await createTask(trimmed, level);
+    if (!trimmed || isSubmitting) return;
+    setIsSubmitting(true);
     setTitle("");
+    // Fire and forget — createTask is now optimistic
+    createTask(trimmed, level).finally(() => {
+      setIsSubmitting(false);
+    });
   };
 
   return (
@@ -34,6 +39,7 @@ export function TaskCreateInput() {
             handleSubmit();
           }
         }}
+        disabled={isSubmitting}
         placeholder="Describe what you need done..."
         style={{
           flex: 1,
@@ -45,6 +51,8 @@ export function TaskCreateInput() {
           outline: "none",
           color: "#111827",
           height: 36,
+          opacity: isSubmitting ? 0.6 : 1,
+          transition: "opacity 150ms ease",
         }}
         onFocus={(e) => {
           e.currentTarget.style.borderColor = "#3B82F6";
@@ -90,31 +98,6 @@ export function TaskCreateInput() {
         ))}
       </div>
 
-      {/* Run button */}
-      <button
-        onClick={handleSubmit}
-        style={{
-          padding: "0 16px",
-          fontSize: 14,
-          fontWeight: 500,
-          backgroundColor: "#3B82F6",
-          color: "#FFFFFF",
-          border: "none",
-          borderRadius: 6,
-          cursor: "pointer",
-          height: 36,
-          boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-          transition: "background-color 150ms ease",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = "#2563EB";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = "#3B82F6";
-        }}
-      >
-        Run
-      </button>
     </div>
   );
 }
