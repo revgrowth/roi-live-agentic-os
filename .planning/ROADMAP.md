@@ -15,7 +15,7 @@ This roadmap delivers a locally hosted dashboard that replaces the terminal for 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Design Prompts** - Copy-paste-ready Google Stitch prompts for every dashboard view, grounded in reference research and prompting best practices
-- [ ] **Phase 2: Core Loop** - Infrastructure, Kanban board, task execution, and live updates working end-to-end
+- [x] **Phase 2: Core Loop** - Infrastructure, Kanban board, task execution, and live updates working end-to-end
 - [ ] **Phase 3: Outputs and Monitoring** - Output files surface on cards with preview/download, cost tracking, and detail panel
 - [ ] **Phase 4: Scheduling and Management** - Cron job scheduling plus Context, Brand, and Skills tabs
 - [ ] **Phase 5: Client Switching** - Multi-client scoping across all views
@@ -108,7 +108,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Design Prompts | 2/2 | Complete | 2026-03-25 |
-| 2. Core Loop | 3/5 | In progress (gap closure) | - |
+| 2. Core Loop | 5/5 | Complete | 2026-03-26 |
 | 3. Outputs and Monitoring | 0/2 | Not started | - |
 | 4. Scheduling and Management | 0/3 | Not started | - |
 | 5. Client Switching | 0/3 | Not started | - |
