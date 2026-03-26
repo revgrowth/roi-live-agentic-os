@@ -30,6 +30,8 @@ export function useSSE() {
       "task:status",
       "task:progress",
       "task:output",
+      "task:question",
+      "task:log",
     ];
 
     for (const eventType of taskEvents) {
