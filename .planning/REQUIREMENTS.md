@@ -94,10 +94,10 @@
 ### Script Runner
 
 - [x] **SCRIPT-01**: Scripts tab lists available system scripts from `scripts/` directory with human-readable labels and descriptions
-- [ ] **SCRIPT-02**: Scripts that require arguments (e.g. `add-client.sh`) show an input form in the UI before execution (client name field for add-client)
-- [ ] **SCRIPT-03**: Running a script streams stdout/stderr output live to the UI in a terminal-style output area
-- [ ] **SCRIPT-04**: Destructive or long-running scripts (e.g. `update.sh`) require confirmation before execution
-- [ ] **SCRIPT-05**: Script execution shows running/success/error status with appropriate visual indicators
+- [x] **SCRIPT-02**: Scripts that require arguments (e.g. `add-client.sh`) show an input form in the UI before execution (client name field for add-client)
+- [x] **SCRIPT-03**: Running a script streams stdout/stderr output live to the UI in a terminal-style output area
+- [x] **SCRIPT-04**: Destructive or long-running scripts (e.g. `update.sh`) require confirmation before execution
+- [x] **SCRIPT-05**: Script execution shows running/success/error status with appropriate visual indicators
 
 ## v2 Requirements
 
@@ -188,10 +188,10 @@
 | SETTINGS-05 | Phase 7 | Complete |
 | SETTINGS-06 | Phase 7 | Complete |
 | SCRIPT-01 | Phase 7 | Complete |
-| SCRIPT-02 | Phase 7 | Pending |
-| SCRIPT-03 | Phase 7 | Pending |
-| SCRIPT-04 | Phase 7 | Pending |
-| SCRIPT-05 | Phase 7 | Pending |
+| SCRIPT-02 | Phase 7 | Complete |
+| SCRIPT-03 | Phase 7 | Complete |
+| SCRIPT-04 | Phase 7 | Complete |
+| SCRIPT-05 | Phase 7 | Complete |
 
 **Coverage:**
 - v1 requirements: 39 total
