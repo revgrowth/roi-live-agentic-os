@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
+import { ScriptList } from "@/components/settings/script-list";
 import { EnvEditor } from "@/components/settings/env-editor";
 import { JsonEditor } from "@/components/settings/json-editor";
 
@@ -32,18 +33,7 @@ export default function SettingsPage() {
             emptyMessage="No .claude/settings.json file found. Create one to configure Claude CLI settings."
           />
         )}
-        {activeTab === "scripts" && (
-          <div
-            style={{
-              padding: 24,
-              color: "#5E5E65",
-              fontFamily: "var(--font-inter), Inter, sans-serif",
-              fontSize: 14,
-            }}
-          >
-            Scripts — Coming soon...
-          </div>
-        )}
+        {activeTab === "scripts" && <ScriptList />}
       </div>
     </AppShell>
   );
