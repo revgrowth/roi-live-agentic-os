@@ -64,7 +64,7 @@
 
 ### Client Switching
 
-- [ ] **CLIENT-01**: Client switcher in nav bar scopes all views to a specific client folder or root
+- [x] **CLIENT-01**: Client switcher in nav bar scopes all views to a specific client folder or root
 - [ ] **CLIENT-02**: Board, cron jobs, context, brand, and skills all filter by selected client
 
 ### Design (UI Implementation)
@@ -144,7 +144,7 @@
 | CTX-01 | Phase 4 | Pending |
 | BRAND-01 | Phase 4 | Pending |
 | SKILL-01 | Phase 4 | Pending |
-| CLIENT-01 | Phase 5 | Pending |
+| CLIENT-01 | Phase 5 | Complete |
 | CLIENT-02 | Phase 5 | Pending |
 | UI-01 | Phase 2 | Pending |
 | UI-02 | Phase 2 | Pending |
