@@ -43,53 +43,56 @@ export function TaskCreateInput() {
         placeholder="Describe what you need done..."
         style={{
           flex: 1,
-          padding: "8px 12px",
+          padding: "8px 16px",
           fontSize: 14,
+          fontFamily: "var(--font-inter), Inter, sans-serif",
           backgroundColor: "#FFFFFF",
-          border: "1px solid #E5E7EB",
+          border: "1px solid rgba(218, 193, 185, 0.2)",
           borderRadius: 6,
           outline: "none",
-          color: "#111827",
-          height: 36,
+          color: "#1B1C1B",
+          height: 40,
           opacity: isSubmitting ? 0.6 : 1,
-          transition: "opacity 150ms ease",
+          transition: "all 150ms ease",
         }}
         onFocus={(e) => {
-          e.currentTarget.style.borderColor = "#3B82F6";
-          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(59,130,246,0.1)";
+          e.currentTarget.style.borderColor = "#93452A";
+          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(147, 69, 42, 0.1)";
         }}
         onBlur={(e) => {
-          e.currentTarget.style.borderColor = "#E5E7EB";
+          e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.2)";
           e.currentTarget.style.boxShadow = "none";
         }}
       />
 
-      {/* Level selector */}
+      {/* Level selector — selection chips */}
       <div
         style={{
           display: "flex",
-          border: "1px solid #E5E7EB",
+          gap: 2,
+          backgroundColor: "#EAE8E6",
           borderRadius: 6,
-          overflow: "hidden",
-          backgroundColor: "#FFFFFF",
-          height: 36,
+          padding: 2,
+          height: 40,
+          alignItems: "center",
         }}
       >
-        {levels.map((l, i) => (
+        {levels.map((l) => (
           <button
             key={l.value}
             onClick={() => setLevel(l.value)}
             style={{
-              padding: "0 12px",
+              padding: "0 14px",
               fontSize: 12,
               fontWeight: 500,
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
               border: "none",
               cursor: "pointer",
+              borderRadius: 4,
+              height: 32,
               backgroundColor:
-                level === l.value ? "#EFF6FF" : "transparent",
-              color: level === l.value ? "#3B82F6" : "#9CA3AF",
-              borderRight:
-                i < levels.length - 1 ? "1px solid #E5E7EB" : "none",
+                level === l.value ? "#FFDBCF" : "transparent",
+              color: level === l.value ? "#390C00" : "#5E5E65",
               transition: "all 150ms ease",
             }}
           >

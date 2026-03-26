@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from "./sidebar";
+import { StatsBar } from "./stats-bar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -34,7 +35,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             Command Centre
           </h2>
         </header>
-        <div style={{ padding: "0 32px 32px", display: "flex", flexDirection: "column", gap: 32 }}>
+        <div style={{ padding: "0 32px" }}>
+          <StatsBar />
+        </div>
+        <div style={{ padding: "0 32px 32px", display: "flex", flexDirection: "column", gap: 24, marginTop: 24 }}>
           {children}
         </div>
       </main>

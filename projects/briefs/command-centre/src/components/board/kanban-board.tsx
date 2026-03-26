@@ -1,17 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
-import { DndContext, DragEndEvent, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { useMemo, useState } from "react";
+import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { useTaskStore } from "@/store/task-store";
 import type { Task, TaskStatus } from "@/types/task";
 import { KanbanColumn } from "./kanban-column";
 import { TaskCreateInput } from "./task-create-input";
+import { TaskCard } from "./task-card";
 
 const columns: TaskStatus[] = ["backlog", "queued", "running", "review", "done"];
 
 export function KanbanBoard() {
   const tasks = useTaskStore((s) => s.tasks);
   const moveTask = useTaskStore((s) => s.moveTask);
+  const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   const tasksByStatus = useMemo(() => {
     const grouped: Record<TaskStatus, Task[]> = {
@@ -40,7 +42,13 @@ export function KanbanBoard() {
     })
   );
 
+  const handleDragStart = (event: DragStartEvent) => {
+    const task = tasks.find((t) => t.id === event.active.id);
+    if (task) setActiveTask(task);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
+    setActiveTask(null);
     const { active, over } = event;
     if (!over) return;
 
@@ -76,7 +84,9 @@ export function KanbanBoard() {
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        onDragCancel={() => setActiveTask(null)}
       >
         <div
           style={{
@@ -94,6 +104,9 @@ export function KanbanBoard() {
             />
           ))}
         </div>
+        <DragOverlay dropAnimation={{ duration: 200, easing: "ease" }}>
+          {activeTask ? <TaskCard task={activeTask} isOverlay /> : null}
+        </DragOverlay>
       </DndContext>
     </div>
   );

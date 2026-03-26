@@ -4,16 +4,23 @@ import type { TaskLevel } from "@/types/task";
 
 const levelConfig: Record<
   TaskLevel,
-  { label: string; bg: string; text: string; border: string }
+  { label: string; bg: string; text: string }
 > = {
-  task: { label: "Task", bg: "#F3F4F6", text: "#4B5563", border: "#E5E7EB" },
+  task: {
+    label: "Task",
+    bg: "#EAE8E6",
+    text: "#5E5E65",
+  },
   project: {
     label: "Project",
-    bg: "#EFF6FF",
-    text: "#1D4ED8",
-    border: "#BFDBFE",
+    bg: "#FFDBCF",
+    text: "#390C00",
   },
-  gsd: { label: "GSD", bg: "#F5F3FF", text: "#6D28D9", border: "#DDD6FE" },
+  gsd: {
+    label: "GSD",
+    bg: "rgba(147, 69, 42, 0.12)",
+    text: "#93452A",
+  },
 };
 
 export function LevelBadge({ level }: { level: TaskLevel }) {
@@ -24,11 +31,11 @@ export function LevelBadge({ level }: { level: TaskLevel }) {
         display: "inline-block",
         fontSize: 11,
         fontWeight: 500,
+        fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
         padding: "2px 8px",
         borderRadius: 4,
         backgroundColor: config.bg,
         color: config.text,
-        border: `1px solid ${config.border}`,
         lineHeight: "16px",
       }}
     >

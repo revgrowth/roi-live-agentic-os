@@ -9,11 +9,11 @@ import type { Task, TaskStatus } from "@/types/task";
 import { TaskCard } from "./task-card";
 
 const statusColors: Record<TaskStatus, string> = {
-  backlog: "#9CA3AF",
-  queued: "#6B7280",
-  running: "#3B82F6",
-  review: "#F59E0B",
-  done: "#10B981",
+  backlog: "#5E5E65",
+  queued: "#5E5E65",
+  running: "#93452A",
+  review: "#B25D3F",
+  done: "#6B8E6B",
 };
 
 const columnLabels: Record<TaskStatus, string> = {
@@ -39,22 +39,21 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
       style={{
         flex: 1,
         minWidth: 260,
-        backgroundColor: "#F3F4F6",
-        borderRadius: 8,
-        padding: 12,
+        backgroundColor: "#F6F3F1",
+        borderRadius: 12,
+        padding: 16,
         display: "flex",
         flexDirection: "column",
         maxHeight: "calc(100vh - 200px)",
       }}
     >
-      {/* Header */}
+      {/* Header — no border, uses spacing for separation */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 8,
-          paddingBottom: 12,
-          borderBottom: "1px solid #E5E7EB",
+          gap: 10,
+          paddingBottom: 16,
           marginBottom: 12,
         }}
       >
@@ -70,19 +69,23 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
         />
         <span
           style={{
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: 600,
-            color: "#111827",
+            fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+            color: "#1B1C1B",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
           }}
         >
           {columnLabels[status]}
         </span>
         <span
           style={{
-            fontSize: 12,
-            color: "#9CA3AF",
-            backgroundColor: "#E5E7EB",
-            padding: "1px 8px",
+            fontSize: 11,
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+            color: "#5E5E65",
+            backgroundColor: "#EAE8E6",
+            padding: "2px 10px",
             borderRadius: 10,
             fontWeight: 500,
             marginLeft: "auto",
@@ -99,7 +102,7 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
           overflowY: "auto",
           display: "flex",
           flexDirection: "column",
-          gap: 8,
+          gap: 10,
         }}
       >
         <SortableContext
@@ -109,13 +112,14 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
           {tasks.length === 0 ? (
             <div
               style={{
-                border: `2px dashed ${isOver ? "#3B82F6" : "#D1D5DB"}`,
+                border: `2px dashed ${isOver ? "rgba(147, 69, 42, 0.4)" : "rgba(218, 193, 185, 0.3)"}`,
                 borderRadius: 8,
                 padding: "32px 16px",
                 textAlign: "center",
-                color: "#9CA3AF",
+                color: "#5E5E65",
                 fontSize: 13,
-                backgroundColor: isOver ? "#EFF6FF" : "transparent",
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                backgroundColor: isOver ? "rgba(255, 219, 207, 0.15)" : "transparent",
                 transition: "all 150ms ease",
               }}
             >
@@ -129,10 +133,10 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
         {tasks.length > 0 && isOver && (
           <div
             style={{
-              border: "2px dashed #3B82F6",
+              border: "2px dashed rgba(147, 69, 42, 0.4)",
               borderRadius: 8,
               padding: 16,
-              backgroundColor: "#EFF6FF",
+              backgroundColor: "rgba(255, 219, 207, 0.15)",
               transition: "all 150ms ease",
             }}
           />

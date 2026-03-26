@@ -9,11 +9,11 @@ import { LevelBadge } from "./level-badge";
 import { useTaskStore } from "@/store/task-store";
 
 const statusColors: Record<TaskStatus, string> = {
-  backlog: "#9CA3AF",
-  queued: "#6B7280",
-  running: "#3B82F6",
-  review: "#F59E0B",
-  done: "#10B981",
+  backlog: "#5E5E65",
+  queued: "#5E5E65",
+  running: "#93452A",
+  review: "#B25D3F",
+  done: "#6B8E6B",
 };
 
 function timeAgo(dateStr: string): string {
@@ -40,7 +40,7 @@ function formatDuration(ms: number): string {
   return `${m}m ${s.toString().padStart(2, "0")}s`;
 }
 
-export function TaskCard({ task }: { task: Task }) {
+export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isTrashHovered, setIsTrashHovered] = useState(false);
@@ -57,17 +57,35 @@ export function TaskCard({ task }: { task: Task }) {
   } = useSortable({ id: task.id });
 
   const dndTransform = CSS.Transform.toString(transform);
-  const dragScale = isDragging ? " scale(1.02)" : "";
   const style = {
-    transform: dndTransform ? `${dndTransform}${dragScale}` : dragScale || undefined,
+    transform: isOverlay ? "scale(1.03)" : dndTransform || undefined,
     transition: transition ?? "all 150ms ease",
-    opacity: isDragging ? 0.9 : 1,
+    opacity: isDragging && !isOverlay ? 0.3 : 1,
   };
+
+  // When dragging (original card position), render as a dashed placeholder
+  if (isDragging && !isOverlay) {
+    return (
+      <div
+        ref={setNodeRef}
+        style={{
+          ...style,
+          border: "2px dashed rgba(218, 193, 185, 0.4)",
+          borderRadius: 8,
+          padding: 16,
+          minHeight: 80,
+          backgroundColor: "transparent",
+        }}
+        {...attributes}
+        {...listeners}
+      />
+    );
+  }
 
   const isRunning = task.status === "running";
   const isDone = task.status === "done";
   const hasError = task.errorMessage !== null;
-  const borderColor = hasError ? "#EF4444" : statusColors[task.status];
+  const borderColor = hasError ? "#C04030" : statusColors[task.status];
 
   const isParent = task.level !== "task";
   const childTasks = isParent ? getChildTasks(task.id) : [];
@@ -81,17 +99,15 @@ export function TaskCard({ task }: { task: Task }) {
       ref={setNodeRef}
       style={{
         ...style,
-        backgroundColor: hasError ? "#FEF2F2" : "#FFFFFF",
-        border: `1px solid ${hasError ? "#FCA5A5" : isHovered ? "#D1D5DB" : "#E5E7EB"}`,
+        backgroundColor: hasError ? "#FFF5F3" : "#FFFFFF",
+        border: `1px solid ${hasError ? "rgba(192, 64, 48, 0.25)" : "rgba(218, 193, 185, 0.2)"}`,
         borderLeft: `3px solid ${borderColor}`,
         borderRadius: 8,
         padding: 16,
-        boxShadow: isDragging
-          ? "0 8px 16px rgba(0,0,0,0.12)"
-          : isHovered
-            ? "0 4px 6px rgba(0,0,0,0.07)"
-            : "0 1px 2px rgba(0,0,0,0.05)",
-        cursor: "grab",
+        boxShadow: isOverlay
+          ? "0 16px 40px rgba(147, 69, 42, 0.15)"
+          : "none",
+        cursor: isOverlay ? "grabbing" : "grab",
         userSelect: "none" as const,
         position: "relative" as const,
       }}
@@ -143,7 +159,8 @@ export function TaskCard({ task }: { task: Task }) {
         style={{
           fontSize: 14,
           fontWeight: 500,
-          color: "#111827",
+          fontFamily: "var(--font-inter), Inter, sans-serif",
+          color: "#1B1C1B",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
@@ -170,10 +187,11 @@ export function TaskCard({ task }: { task: Task }) {
               display: "inline-block",
               fontSize: 11,
               fontWeight: 500,
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
               padding: "2px 8px",
               borderRadius: 4,
-              backgroundColor: "#FEE2E2",
-              color: "#DC2626",
+              backgroundColor: "rgba(192, 64, 48, 0.1)",
+              color: "#C04030",
               lineHeight: "16px",
             }}
           >
@@ -199,8 +217,8 @@ export function TaskCard({ task }: { task: Task }) {
                 width: 8,
                 height: 8,
                 borderRadius: "50%",
-                backgroundColor: "#3B82F6",
-                animation: "pulse 2s ease-in-out infinite",
+                backgroundColor: "#93452A",
+                animation: "pulse-dot 2s ease-in-out infinite",
                 flexShrink: 0,
               }}
             />
@@ -208,7 +226,7 @@ export function TaskCard({ task }: { task: Task }) {
               <span
                 style={{
                   fontSize: 12,
-                  color: "#4B5563",
+                  color: "#5E5E65",
                   fontStyle: "italic",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -225,8 +243,8 @@ export function TaskCard({ task }: { task: Task }) {
               display: "flex",
               gap: 12,
               fontSize: 11,
-              color: "#9CA3AF",
-              fontFamily: "var(--font-jetbrains-mono), monospace",
+              color: "#5E5E65",
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
             }}
           >
             {task.costUsd !== null && (
@@ -244,7 +262,7 @@ export function TaskCard({ task }: { task: Task }) {
         <div
           style={{
             fontSize: 12,
-            color: "#EF4444",
+            color: "#C04030",
             marginTop: 4,
             overflow: "hidden",
             display: "-webkit-box",
@@ -265,7 +283,13 @@ export function TaskCard({ task }: { task: Task }) {
           marginTop: 8,
         }}
       >
-        <span style={{ fontSize: 12, color: "#9CA3AF" }}>
+        <span
+          style={{
+            fontSize: 12,
+            color: "#5E5E65",
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+          }}
+        >
           {timeAgo(task.updatedAt)}
         </span>
         <div
@@ -273,8 +297,8 @@ export function TaskCard({ task }: { task: Task }) {
             display: "flex",
             gap: 8,
             fontSize: 12,
-            color: "#9CA3AF",
-            fontFamily: "var(--font-jetbrains-mono), monospace",
+            color: "#5E5E65",
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
           }}
         >
           {isDone && task.durationMs !== null && (
@@ -300,7 +324,8 @@ export function TaskCard({ task }: { task: Task }) {
               alignItems: "center",
               gap: 4,
               fontSize: 12,
-              color: "#4B5563",
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+              color: "#5E5E65",
               background: "none",
               border: "none",
               cursor: "pointer",
@@ -327,7 +352,7 @@ export function TaskCard({ task }: { task: Task }) {
             style={{
               marginTop: 6,
               height: 4,
-              backgroundColor: "#E5E7EB",
+              backgroundColor: "#EAE8E6",
               borderRadius: 2,
               overflow: "hidden",
             }}
@@ -336,7 +361,7 @@ export function TaskCard({ task }: { task: Task }) {
               style={{
                 height: "100%",
                 width: `${childTasks.length > 0 ? (completedChildren / childTasks.length) * 100 : 0}%`,
-                backgroundColor: "#3B82F6",
+                background: "linear-gradient(135deg, #93452A 0%, #B25D3F 100%)",
                 borderRadius: 2,
                 transition: "width 300ms ease",
               }}
@@ -368,7 +393,8 @@ export function TaskCard({ task }: { task: Task }) {
                   <span
                     style={{
                       fontSize: 12,
-                      color: "#4B5563",
+                      color: "#5E5E65",
+                      fontFamily: "var(--font-inter), Inter, sans-serif",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",

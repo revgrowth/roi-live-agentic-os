@@ -22,13 +22,13 @@ export function StatsBar() {
     <div
       style={{
         height: 72,
-        backgroundColor: "#F9FAFB",
-        borderBottom: "1px solid #F3F4F6",
+        backgroundColor: "#F6F3F1",
         display: "flex",
         alignItems: "center",
         padding: "0 40px",
         gap: 0,
         flexShrink: 0,
+        borderRadius: 12,
       }}
     >
       <StatItem
@@ -52,7 +52,7 @@ function Separator() {
       style={{
         width: 1,
         height: 32,
-        backgroundColor: "#F3F4F6",
+        backgroundColor: "rgba(218, 193, 185, 0.2)",
         margin: "0 32px",
       }}
     />
@@ -86,8 +86,8 @@ function StatItem({
               width: 8,
               height: 8,
               borderRadius: "50%",
-              backgroundColor: "#3B82F6",
-              animation: "pulse 2s ease-in-out infinite",
+              backgroundColor: "#93452A",
+              animation: "pulse-dot 2s ease-in-out infinite",
               flexShrink: 0,
             }}
           />
@@ -96,10 +96,10 @@ function StatItem({
           style={{
             fontSize: 24,
             fontWeight: 600,
-            color: "#111827",
+            color: "#1B1C1B",
             fontFamily: mono
-              ? "var(--font-jetbrains-mono), monospace"
-              : "inherit",
+              ? "var(--font-space-grotesk), Space Grotesk, sans-serif"
+              : "var(--font-epilogue), Epilogue, sans-serif",
             lineHeight: 1,
           }}
         >
@@ -108,8 +108,11 @@ function StatItem({
       </div>
       <div
         style={{
-          fontSize: 12,
-          color: "#9CA3AF",
+          fontSize: 11,
+          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+          textTransform: "uppercase",
+          letterSpacing: "0.08em",
+          color: "#5E5E65",
           marginTop: 4,
         }}
       >
