@@ -1,12 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import { StatsBar } from "./stats-bar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      <Sidebar />
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+      />
       <main style={{ flex: 1, minHeight: "100vh" }}>
         {/* Sticky header */}
         <header

@@ -38,7 +38,7 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
       ref={setNodeRef}
       style={{
         flex: 1,
-        minWidth: 260,
+        minWidth: 200,
         backgroundColor: "#F6F3F1",
         borderRadius: 12,
         padding: 16,

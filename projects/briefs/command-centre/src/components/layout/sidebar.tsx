@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Clock, Brain, Sparkles, Cpu, Plus } from "lucide-react";
+import { LayoutDashboard, Clock, Brain, Sparkles, Cpu, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 
 const navItems = [
   { label: "Board", icon: LayoutDashboard, active: true },
@@ -10,48 +10,70 @@ const navItems = [
   { label: "Skills", icon: Cpu, active: false },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean;
+  onToggle: () => void;
+}
+
+export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   return (
     <aside
       style={{
-        width: 256,
+        width: collapsed ? 64 : 256,
         backgroundColor: "#F6F3F1",
         display: "flex",
         flexDirection: "column",
-        padding: 16,
+        padding: collapsed ? "16px 8px" : 16,
         gap: 24,
         flexShrink: 0,
         fontFamily: "var(--font-inter), Inter, sans-serif",
         fontSize: 14,
         fontWeight: 500,
+        transition: "width 200ms ease, padding 200ms ease",
+        overflow: "hidden",
       }}
     >
       {/* Branding */}
-      <div style={{ padding: "16px 8px" }}>
-        <h1
-          style={{
-            fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
-            fontWeight: 700,
-            fontSize: 22,
-            color: "#93452A",
-            letterSpacing: "-0.02em",
-            margin: 0,
-          }}
-        >
-          Agentic OS
-        </h1>
-        <p
-          style={{
-            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-            fontSize: 10,
-            textTransform: "uppercase",
-            letterSpacing: "0.12em",
-            color: "#5E5E65",
-            marginTop: 4,
-          }}
-        >
-          Operational Intelligence
-        </p>
+      <div style={{ padding: collapsed ? "16px 0" : "16px 8px", textAlign: collapsed ? "center" : "left" }}>
+        {collapsed ? (
+          <span
+            style={{
+              fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+              fontWeight: 700,
+              fontSize: 22,
+              color: "#93452A",
+            }}
+          >
+            A
+          </span>
+        ) : (
+          <>
+            <h1
+              style={{
+                fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+                fontWeight: 700,
+                fontSize: 22,
+                color: "#93452A",
+                letterSpacing: "-0.02em",
+                margin: 0,
+              }}
+            >
+              Agentic OS
+            </h1>
+            <p
+              style={{
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontSize: 10,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "#5E5E65",
+                marginTop: 4,
+              }}
+            >
+              Operational Intelligence
+            </p>
+          </>
+        )}
       </div>
 
       {/* Navigation */}
@@ -64,8 +86,9 @@ export function Sidebar() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 12,
-                padding: "10px 12px",
+                justifyContent: collapsed ? "center" : "flex-start",
+                gap: collapsed ? 0 : 12,
+                padding: collapsed ? "10px 0" : "10px 12px",
                 borderRadius: 12,
                 cursor: item.active ? "default" : "pointer",
                 backgroundColor: item.active ? "#FFFFFF" : "transparent",
@@ -75,14 +98,41 @@ export function Sidebar() {
                 boxShadow: item.active
                   ? "0px 4px 12px rgba(147, 69, 42, 0.06)"
                   : "none",
+                width: collapsed ? 40 : "auto",
+                height: 40,
+                margin: collapsed ? "0 auto" : 0,
               }}
+              title={collapsed ? item.label : undefined}
             >
               <Icon size={20} />
-              <span style={{ fontWeight: 500 }}>{item.label}</span>
+              {!collapsed && <span style={{ fontWeight: 500, whiteSpace: "nowrap" }}>{item.label}</span>}
             </a>
           );
         })}
       </nav>
+
+      {/* Collapse toggle */}
+      <button
+        onClick={onToggle}
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          padding: 8,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#5E5E65",
+          borderRadius: 8,
+          transition: "color 150ms ease",
+          margin: collapsed ? "0 auto" : 0,
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.color = "#93452A"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = "#5E5E65"; }}
+        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+      >
+        {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+      </button>
 
       {/* New Agent button */}
       <button
@@ -91,20 +141,24 @@ export function Sidebar() {
           color: "#FFFFFF",
           fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
           fontWeight: 600,
-          padding: "12px 16px",
+          padding: collapsed ? "12px 0" : "12px 16px",
           borderRadius: 12,
           border: "none",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 8,
+          gap: collapsed ? 0 : 8,
           fontSize: 14,
           transition: "all 200ms ease",
+          width: collapsed ? 40 : "auto",
+          height: 40,
+          margin: collapsed ? "0 auto" : 0,
         }}
+        title={collapsed ? "New Agent" : undefined}
       >
         <Plus size={16} />
-        New Agent
+        {!collapsed && "New Agent"}
       </button>
     </aside>
   );
