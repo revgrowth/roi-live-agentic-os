@@ -21,6 +21,16 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: Client Switching** - Multi-client scoping across all views
 - [ ] **Phase 6: Task Execution and Detail UI** - Real task execution, task name/description fields, and full-screen task modal with live logs
 
+---
+
+## v1.1 Milestone: Settings & System Management
+
+**Goal:** Users can manage their agentic-os configuration and run system scripts entirely from the dashboard — no terminal needed for setup or maintenance tasks.
+
+### v1.1 Phases
+
+- [ ] **Phase 7: Settings & Script Runner** - Settings page with env/MCP/settings editors and script execution UI
+
 ## Phase Details
 
 ### Phase 1: Design Prompts
@@ -117,6 +127,28 @@ Plans:
 - [x] 06-02-PLAN.md — Task creation form: inline-expand with name/description fields, Notion-inspired UX, store update
 - [ ] 06-03-PLAN.md — Full-screen task modal: chat-style log view, tool call cards, auto-scroll, reply input, metadata sidebar, logs API
 
+### Phase 7: Settings & Script Runner
+**Goal**: Users can view/edit configuration files (.env, .mcp.json, settings.json) and run system scripts (add-client, update, install-crons, etc.) from a Settings page in the dashboard
+**Depends on**: Phase 6 (v1.0 complete)
+**Milestone**: v1.1
+**Requirements**: SETTINGS-01, SETTINGS-02, SETTINGS-03, SETTINGS-04, SETTINGS-05, SETTINGS-06, SCRIPT-01, SCRIPT-02, SCRIPT-03, SCRIPT-04, SCRIPT-05
+**Success Criteria** (what must be TRUE):
+  1. A Settings page is accessible from the sidebar with four tabs: Scripts, Environment, MCP, and Claude Settings
+  2. Environment tab shows `.env` key-value pairs with masked values, a reveal toggle, and a copy button per row — users can add, edit, and delete entries
+  3. MCP tab shows `.mcp.json` in a syntax-highlighted JSON editor with validation and save
+  4. Claude Settings tab shows `.claude/settings.json` in a syntax-highlighted JSON editor with validation and save
+  5. Scripts tab lists available system scripts with human-readable labels and descriptions
+  6. Scripts that need arguments (e.g. `add-client.sh`) show an input form before execution
+  7. Script execution streams output live to the UI and shows running/success/error status
+  8. Destructive scripts require confirmation before running
+**Plans**: 4 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Settings page scaffold, sidebar routing, tab layout, API routes for reading/writing .env, .mcp.json, and settings.json
+- [ ] 07-02-PLAN.md — Environment tab: masked key-value editor with reveal toggle, copy button, add/edit/delete, save to .env
+- [ ] 07-03-PLAN.md — MCP and Claude Settings tabs: syntax-highlighted JSON editors with validation and save
+- [ ] 07-04-PLAN.md — Scripts tab: script registry, argument forms, live output streaming, confirmation dialogs, status indicators
+
 ## Progress
 
 **Execution Order:**
@@ -126,7 +158,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|---------------|--------|-----------|
 | 1. Design Prompts | 2/2 | Complete | 2026-03-25 |
 | 2. Core Loop | 5/5 | Complete | 2026-03-26 |
-| 3. Outputs and Monitoring | 0/2 | Not started | - |
-| 4. Scheduling and Management | 0/3 | Not started | - |
-| 5. Client Switching | 0/3 | Not started | - |
-| 6. Task Execution and Detail UI | 1/3 | In Progress|  |
+| 3. Outputs and Monitoring | 2/2 | Complete | 2026-03-26 |
+| 4. Scheduling and Management | 3/3 | Complete | 2026-03-26 |
+| 5. Client Switching | 3/3 | Complete | 2026-03-26 |
+| 6. Task Execution and Detail UI | 2/3 | In Progress | - |
+| **v1.1** | | | |
+| 7. Settings & Script Runner | 0/4 | Not started | - |
