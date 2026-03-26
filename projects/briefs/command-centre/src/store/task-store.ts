@@ -2,8 +2,10 @@ import { create } from "zustand";
 import type { Task, TaskLevel, TaskUpdateInput } from "@/types/task";
 import type { TaskEvent } from "@/lib/event-bus";
 
-// Module-level set to track recently created task IDs for SSE self-echo suppression
+// SSE dedup: track IDs we created so SSE echoes are suppressed
 const _recentlyCreatedIds = new Set<string>();
+// Track pending optimistic creates by tempId -> title for SSE reconciliation
+const _pendingCreates = new Map<string, string>();
 
 interface TaskStore {
   tasks: Task[];
@@ -53,7 +55,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       status: "backlog",
       level,
       parentId: null,
-      columnOrder: -Date.now(), // Guarantees sorting to top (lowest value)
+      columnOrder: -Date.now(),
       createdAt: now,
       updatedAt: now,
       costUsd: null,
@@ -65,10 +67,12 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       completedAt: null,
     };
 
+    // Track pending create for SSE reconciliation
+    _pendingCreates.set(tempId, title);
+
     // Optimistic: add temp task to state immediately
     set((state) => ({ tasks: [tempTask, ...state.tasks] }));
 
-    // Fire request in background
     try {
       const res = await fetch("/api/tasks", {
         method: "POST",
@@ -78,16 +82,26 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       if (!res.ok) throw new Error("Failed to create task");
       const realTask = await res.json();
 
-      // Track real ID so SSE self-echo is suppressed
+      _pendingCreates.delete(tempId);
       _recentlyCreatedIds.add(realTask.id);
       setTimeout(() => _recentlyCreatedIds.delete(realTask.id), 10000);
 
-      // Replace temp task with real task from server
-      set((state) => ({
-        tasks: state.tasks.map((t) => (t.id === tempId ? realTask : t)),
-      }));
+      set((state) => {
+        // Check if SSE already added this task (SSE beat the API response)
+        const sseAlreadyAdded = state.tasks.some(
+          (t) => t.id === realTask.id
+        );
+        if (sseAlreadyAdded) {
+          // Just remove the temp — SSE already has the real task in state
+          return { tasks: state.tasks.filter((t) => t.id !== tempId) };
+        }
+        // Normal: replace temp with real
+        return {
+          tasks: state.tasks.map((t) => (t.id === tempId ? realTask : t)),
+        };
+      });
     } catch (err) {
-      // Remove temp task on error
+      _pendingCreates.delete(tempId);
       set((state) => ({
         tasks: state.tasks.filter((t) => t.id !== tempId),
         error: err instanceof Error ? err.message : "Unknown error",
@@ -116,14 +130,59 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
   moveTask: async (id: string, newStatus: string, newOrder: number) => {
     const prev = get().tasks;
-    // Optimistic update
-    set((state) => ({
-      tasks: state.tasks.map((t) =>
-        t.id === id
-          ? { ...t, status: newStatus as Task["status"], columnOrder: newOrder }
-          : t
-      ),
-    }));
+
+    // Optimistic: reorder properly by removing the task, inserting at new position,
+    // and reindexing all columnOrder values in affected columns
+    set((state) => {
+      const task = state.tasks.find((t) => t.id === id);
+      if (!task) return state;
+
+      const oldStatus = task.status;
+
+      // Build updated tasks array
+      let updated = state.tasks.map((t) => {
+        if (t.id === id) {
+          return { ...t, status: newStatus as Task["status"], columnOrder: newOrder };
+        }
+        return t;
+      });
+
+      // Get tasks in the destination column (sorted), reindex their columnOrder
+      const destTasks = updated
+        .filter((t) => t.status === newStatus && !t.parentId)
+        .sort((a, b) => {
+          // Put the moved task at the desired position
+          if (a.id === id) return newOrder - 0.5 - b.columnOrder;
+          if (b.id === id) return a.columnOrder - (newOrder - 0.5);
+          return a.columnOrder - b.columnOrder;
+        });
+
+      // Reindex destination column
+      const destOrderMap = new Map<string, number>();
+      destTasks.forEach((t, i) => destOrderMap.set(t.id, i));
+
+      // If moved across columns, also reindex source column
+      const sourceOrderMap = new Map<string, number>();
+      if (oldStatus !== newStatus) {
+        const sourceTasks = updated
+          .filter((t) => t.status === oldStatus && !t.parentId && t.id !== id)
+          .sort((a, b) => a.columnOrder - b.columnOrder);
+        sourceTasks.forEach((t, i) => sourceOrderMap.set(t.id, i));
+      }
+
+      updated = updated.map((t) => {
+        if (destOrderMap.has(t.id)) {
+          return { ...t, columnOrder: destOrderMap.get(t.id)! };
+        }
+        if (sourceOrderMap.has(t.id)) {
+          return { ...t, columnOrder: sourceOrderMap.get(t.id)! };
+        }
+        return t;
+      });
+
+      return { tasks: updated };
+    });
+
     try {
       const res = await fetch(`/api/tasks/${id}`, {
         method: "PATCH",
@@ -131,7 +190,6 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         body: JSON.stringify({ status: newStatus, columnOrder: newOrder }),
       });
       if (!res.ok) {
-        // Revert on error
         set({ tasks: prev });
         throw new Error("Failed to move task");
       }
@@ -141,14 +199,22 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   },
 
   deleteTask: async (id: string) => {
+    // Optimistic: remove immediately
+    const prev = get().tasks;
+    set((state) => ({
+      tasks: state.tasks.filter((t) => t.id !== id && t.parentId !== id),
+    }));
+
     try {
       const res = await fetch(`/api/tasks/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete task");
-      set((state) => ({
-        tasks: state.tasks.filter((t) => t.id !== id && t.parentId !== id),
-      }));
+      if (!res.ok) {
+        // Revert on error
+        set({ tasks: prev });
+        throw new Error("Failed to delete task");
+      }
     } catch (err) {
       set({
+        tasks: prev,
         error: err instanceof Error ? err.message : "Unknown error",
       });
     }
@@ -157,14 +223,32 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   applySSEEvent: (event: TaskEvent) => {
     switch (event.type) {
       case "task:created":
-        // Skip self-echo: if we just created this task optimistically, the SSE event is redundant
+        // Skip self-echo
         if (_recentlyCreatedIds.has(event.task.id)) {
           _recentlyCreatedIds.delete(event.task.id);
           break;
         }
         set((state) => {
-          // Avoid duplicates (e.g. rapid SSE reconnect)
+          // Already exists — skip
           if (state.tasks.some((t) => t.id === event.task.id)) return state;
+
+          // Check if this matches a pending optimistic create (SSE arrived before API response)
+          const pendingEntry = [..._pendingCreates.entries()].find(
+            ([, title]) => title === event.task.title
+          );
+          if (pendingEntry) {
+            const [tempId] = pendingEntry;
+            // Mark as recently created so if API response also arrives, it's handled
+            _recentlyCreatedIds.add(event.task.id);
+            _pendingCreates.delete(tempId);
+            // Replace temp with real task from SSE
+            return {
+              tasks: state.tasks.map((t) =>
+                t.id === tempId ? event.task : t
+              ),
+            };
+          }
+
           return { tasks: [...state.tasks, event.task] };
         });
         break;
