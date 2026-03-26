@@ -71,7 +71,7 @@ Auto-detect from context:
 2. **Look rotation** — if config has a look rotation list:
    - Check which look was used last (from the most recent file in `projects/viz-ugc-heygen/`)
    - Auto-select the next look in rotation
-   - Tell the user which look was picked and why ("Rotating to Look 2 — Simon Coton -- 5")
+   - Tell the user which look was picked and why ("Rotating to Look 2 — {look name}")
    - User can override: "use look 3 instead" or "use the default"
 3. **If no config** — fall back to discovery:
    - Call `mcp__heygen__get_avatar_groups` then `mcp__heygen__get_avatars_in_avatar_group` with group_id

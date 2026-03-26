@@ -173,6 +173,13 @@ if [[ ! -f "$REPO_ROOT/context/learnings.md" ]]; then
 else
     success "context/learnings.md already exists"
 fi
+
+# Copy skill config templates
+AVATAR_CFG="$REPO_ROOT/.claude/skills/viz-ugc-heygen/references/avatar-config.md"
+if [[ ! -f "$AVATAR_CFG" ]] && [[ -f "${AVATAR_CFG}.template" ]]; then
+    cp "${AVATAR_CFG}.template" "$AVATAR_CFG"
+    success "Created avatar-config.md from template"
+fi
 echo ""
 
 # =============================================================================

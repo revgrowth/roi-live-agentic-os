@@ -4,20 +4,20 @@
 
 | Name | Voice ID | Source |
 |------|----------|--------|
-| Simon - Professional Voice | `ad8953005ca644e588c0c7e7e99c1bce` | ElevenLabs clone |
+| Your Voice Name | `your-voice-id` | ElevenLabs clone |
 
 ## Avatar Group
 
-- **Group ID:** `16f1057f84bd43b695749582ca09978f`
-- **Name:** Simon Coton
+- **Group ID:** `your-group-id`
+- **Name:** Your Name
 
 ## Looks
 
 | # | Name | Avatar ID |
 |---|------|-----------|
-| 1 | Simon Coton | `1d97d7482dc44cf79ba5312aa7bb90d9` |
-| 2 | Simon Coton -- 5 | `ed9879b9f83348beb42aa2ff7bdaddee` |
-| 3 | Simon Coton -- 6 | `2b92dc8132e746558f034ea6e86a11be` |
+| 1 | Look 1 | `avatar-id-1` |
+| 2 | Look 2 | `avatar-id-2` |
+| 3 | Look 3 | `avatar-id-3` |
 
 ## Voice Defaults
 
@@ -96,7 +96,7 @@ Style: Default,Roboto-Bold,18.0,&H00FFFFFF,&H000000FF,&H00F56E2E,&H80000000,1,0,
 
 ## Avatar Defaults
 
-- **Default look:** 3 (Simon Coton -- 6)
+- **Default look:** 1
 - **Default style:** normal
-- **Rotation:** Cycle through looks 1 → 2 → 3 → 1 sequentially per video
+- **Rotation:** Cycle through looks sequentially per video
 - **Rotation tracking:** Check the most recent file in `projects/viz-ugc-heygen/` for last look used
