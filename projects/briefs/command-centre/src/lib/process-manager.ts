@@ -1,7 +1,7 @@
 import { spawn, type ChildProcess } from "child_process";
 import { createInterface } from "readline";
 import { getDb } from "./db";
-import { getConfig } from "./config";
+import { getConfig, getClientAgenticOsDir } from "./config";
 import { emitTaskEvent } from "./event-bus";
 import { ClaudeOutputParser } from "./claude-parser";
 import { fileWatcher } from "./file-watcher";
@@ -61,11 +61,25 @@ class ProcessManager {
 
     const config = getConfig();
 
+    // Determine working directory: client-scoped or root
+    const cwd = task.clientId
+      ? getClientAgenticOsDir(task.clientId)
+      : config.agenticOsDir;
+
+    // Validate client directory exists before spawning
+    if (task.clientId) {
+      const fs = await import("fs");
+      if (!fs.existsSync(cwd)) {
+        this.handleTaskError(taskId, `Client directory not found: clients/${task.clientId}`);
+        return;
+      }
+    }
+
     // Spawn Claude CLI
     let proc: ChildProcess;
     try {
       proc = spawn("claude", ["--output-format", "stream-json", "--verbose", "-p", task.title], {
-        cwd: config.agenticOsDir,
+        cwd,
         stdio: ["ignore", "pipe", "pipe"],
         env: { ...process.env },
       });

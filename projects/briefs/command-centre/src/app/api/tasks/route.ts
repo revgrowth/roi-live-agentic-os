@@ -8,17 +8,28 @@ export async function GET(request: NextRequest) {
     const db = getDb();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
+    const clientId = searchParams.get("clientId");
 
-    let tasks: Task[];
+    // Build query with optional filters
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+
     if (status) {
-      tasks = db
-        .prepare("SELECT * FROM tasks WHERE status = ? ORDER BY columnOrder ASC")
-        .all(status) as Task[];
-    } else {
-      tasks = db
-        .prepare("SELECT * FROM tasks ORDER BY columnOrder ASC")
-        .all() as Task[];
+      conditions.push("status = ?");
+      params.push(status);
     }
+
+    // clientId filter: if provided and not "root", scope to that client
+    // If "root" or absent, return all tasks (root sees everything)
+    if (clientId && clientId !== "root") {
+      conditions.push("clientId = ?");
+      params.push(clientId);
+    }
+
+    const where = conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : "";
+    const tasks = db
+      .prepare(`SELECT * FROM tasks${where} ORDER BY columnOrder ASC`)
+      .all(...params) as Task[];
 
     return NextResponse.json(tasks);
   } catch (error) {
@@ -36,7 +47,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate input
-    const { title, level } = body as TaskCreateInput;
+    const { title, level, clientId: bodyClientId } = body as TaskCreateInput;
     if (!title || typeof title !== "string" || title.trim().length === 0) {
       return NextResponse.json(
         { error: "title is required and must be a non-empty string" },
@@ -74,12 +85,12 @@ export async function POST(request: NextRequest) {
       errorMessage: null,
       startedAt: null,
       completedAt: null,
-      clientId: null,
+      clientId: bodyClientId || null,
     };
 
     db.prepare(
-      `INSERT INTO tasks (id, title, status, level, parentId, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (id, title, status, level, parentId, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       task.id,
       task.title,
@@ -95,7 +106,8 @@ export async function POST(request: NextRequest) {
       task.activityLabel,
       task.errorMessage,
       task.startedAt,
-      task.completedAt
+      task.completedAt,
+      task.clientId
     );
 
     emitTaskEvent({
