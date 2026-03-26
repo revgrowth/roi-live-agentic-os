@@ -29,7 +29,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ### v1.1 Phases
 
-- [ ] **Phase 7: Settings & Script Runner** - Settings page with env/MCP/settings editors and script execution UI
+- [x] **Phase 7: Settings & Script Runner** - Settings page with env/MCP/settings editors and script execution UI (completed 2026-03-26)
 
 ## Phase Details
 
@@ -145,9 +145,9 @@ Plans:
 
 Plans:
 - [x] 07-01-PLAN.md — Settings page scaffold, sidebar routing, tab layout, API routes for reading/writing .env, .mcp.json, and settings.json
-- [ ] 07-02-PLAN.md — Environment tab: masked key-value editor with reveal toggle, copy button, add/edit/delete, save to .env
-- [ ] 07-03-PLAN.md — MCP and Claude Settings tabs: syntax-highlighted JSON editors with validation and save
-- [ ] 07-04-PLAN.md — Scripts tab: script registry, argument forms, live output streaming, confirmation dialogs, status indicators
+- [x] 07-02-PLAN.md — Environment tab: masked key-value editor with reveal toggle, copy button, add/edit/delete, save to .env
+- [x] 07-03-PLAN.md — MCP and Claude Settings tabs: syntax-highlighted JSON editors with validation and save
+- [x] 07-04-PLAN.md — Scripts tab: script registry, argument forms, live output streaming, confirmation dialogs, status indicators
 
 ## Progress
 
@@ -163,4 +163,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 5. Client Switching | 3/3 | Complete | 2026-03-26 |
 | 6. Task Execution and Detail UI | 2/3 | In Progress | - |
 | **v1.1** | | | |
-| 7. Settings & Script Runner | 0/4 | Not started | - |
+| 7. Settings & Script Runner | 4/4 | Complete   | 2026-03-26 |

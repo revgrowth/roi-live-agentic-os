@@ -85,8 +85,8 @@
 ### Settings & Configuration
 
 - [x] **SETTINGS-01**: Settings page accessible from sidebar with tabbed layout for Scripts, Environment, MCP, and Claude Settings
-- [ ] **SETTINGS-02**: Environment tab displays `.env` key-value pairs with values masked by default, a reveal toggle per row, and a copy-to-clipboard button per value
-- [ ] **SETTINGS-03**: Environment tab supports adding, editing, and deleting key-value pairs, saving back to `.env` file
+- [x] **SETTINGS-02**: Environment tab displays `.env` key-value pairs with values masked by default, a reveal toggle per row, and a copy-to-clipboard button per value
+- [x] **SETTINGS-03**: Environment tab supports adding, editing, and deleting key-value pairs, saving back to `.env` file
 - [ ] **SETTINGS-04**: MCP tab displays `.mcp.json` in a syntax-highlighted JSON editor with save functionality
 - [ ] **SETTINGS-05**: Claude Settings tab displays `.claude/settings.json` in a syntax-highlighted JSON editor with save functionality
 - [ ] **SETTINGS-06**: JSON editors validate syntax before saving and show inline error indicators for malformed JSON
@@ -182,8 +182,8 @@
 | EXEC-06-05 | Phase 6 | Pending |
 
 | SETTINGS-01 | Phase 7 | Complete |
-| SETTINGS-02 | Phase 7 | Pending |
-| SETTINGS-03 | Phase 7 | Pending |
+| SETTINGS-02 | Phase 7 | Complete |
+| SETTINGS-03 | Phase 7 | Complete |
 | SETTINGS-04 | Phase 7 | Pending |
 | SETTINGS-05 | Phase 7 | Pending |
 | SETTINGS-06 | Phase 7 | Pending |
