@@ -2,7 +2,7 @@ import matter from "gray-matter";
 import { Cron } from "croner";
 import fs from "fs";
 import path from "path";
-import { getConfig } from "./config";
+import { getConfig, getClientAgenticOsDir } from "./config";
 import { getDb } from "./db";
 import type {
   CronJob,
@@ -154,9 +154,9 @@ function parseJobFile(
   };
 }
 
-export function listCronJobs(): CronJob[] {
-  const config = getConfig();
-  const jobsDir = path.join(config.agenticOsDir, "cron", "jobs");
+export function listCronJobs(clientId?: string | null): CronJob[] {
+  const baseDir = getClientAgenticOsDir(clientId ?? null);
+  const jobsDir = path.join(baseDir, "cron", "jobs");
 
   try {
     const files = fs.readdirSync(jobsDir);
