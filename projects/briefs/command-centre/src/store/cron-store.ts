@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { useClientStore } from "./client-store";
 import type { CronJob, CronRun, CronJobCreateInput } from "@/types/cron";
 
 interface CronStore {
@@ -29,7 +30,11 @@ export const useCronStore = create<CronStore>((set, get) => ({
   fetchJobs: async () => {
     set({ isLoading: true, error: null });
     try {
-      const res = await fetch("/api/cron");
+      const clientId = useClientStore.getState().selectedClientId;
+      const url = clientId
+        ? `/api/cron?clientId=${encodeURIComponent(clientId)}`
+        : "/api/cron";
+      const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch cron jobs");
       const jobs = await res.json();
       set({ jobs, isLoading: false });
@@ -80,7 +85,11 @@ export const useCronStore = create<CronStore>((set, get) => ({
 
   createJob: async (input: CronJobCreateInput) => {
     try {
-      const res = await fetch("/api/cron", {
+      const clientId = useClientStore.getState().selectedClientId;
+      const url = clientId
+        ? `/api/cron?clientId=${encodeURIComponent(clientId)}`
+        : "/api/cron";
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),

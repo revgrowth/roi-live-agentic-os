@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { Plus, Clock } from "lucide-react";
 import { useCronStore } from "@/store/cron-store";
+import { useClientStore } from "@/store/client-store";
 import { CronRow } from "./cron-row";
 import { CreateJobPanel } from "./create-job-panel";
 
@@ -11,10 +12,11 @@ export function CronJobsView() {
   const isLoading = useCronStore((s) => s.isLoading);
   const fetchJobs = useCronStore((s) => s.fetchJobs);
   const setShowCreatePanel = useCronStore((s) => s.setShowCreatePanel);
+  const selectedClientId = useClientStore((s) => s.selectedClientId);
 
   useEffect(() => {
     fetchJobs();
-  }, [fetchJobs]);
+  }, [fetchJobs, selectedClientId]);
 
   const activeCount = jobs.filter((j) => j.active).length;
   const pausedCount = jobs.filter((j) => !j.active).length;
