@@ -45,6 +45,9 @@ cron/jobs/claude-code-trending.md
 cron/jobs/nano-banana-trending.md
 cron/jobs/test-watchdog.md
 
+# Client workspaces (users track these — we don't)
+clients/
+
 # WIP / scratch files
 scripts/test-parser.ts
 docs/kanban.md

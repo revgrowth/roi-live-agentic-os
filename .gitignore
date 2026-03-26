@@ -25,6 +25,3 @@
 # Cron runtime (logs and status are generated at runtime)
 cron/logs/
 cron/status/
-
-# Client workspaces (each client has their own repo/branch)
-clients/
