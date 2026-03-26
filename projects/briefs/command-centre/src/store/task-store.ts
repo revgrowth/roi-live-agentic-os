@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Task, TaskLevel, TaskUpdateInput } from "@/types/task";
+import type { Task, TaskLevel, TaskUpdateInput, OutputFile } from "@/types/task";
 import type { TaskEvent } from "@/lib/event-bus";
 
 // SSE dedup: track IDs we created so SSE echoes are suppressed
@@ -11,6 +11,8 @@ interface TaskStore {
   tasks: Task[];
   isLoading: boolean;
   error: string | null;
+  outputFiles: Record<string, OutputFile[]>;
+  selectedTaskId: string | null;
 
   // Actions
   fetchTasks: () => Promise<void>;
@@ -19,17 +21,23 @@ interface TaskStore {
   moveTask: (id: string, newStatus: string, newOrder: number) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   applySSEEvent: (event: TaskEvent) => void;
+  fetchOutputFiles: (taskId: string) => Promise<void>;
+  openPanel: (taskId: string) => void;
+  closePanel: () => void;
 
   // Selectors
   getTasksByStatus: (status: string) => Task[];
   getChildTasks: (parentId: string) => Task[];
   getRunningCount: () => number;
+  getOutputFiles: (taskId: string) => OutputFile[];
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
   tasks: [],
   isLoading: false,
   error: null,
+  outputFiles: {},
+  selectedTaskId: null,
 
   fetchTasks: async () => {
     set({ isLoading: true, error: null });
@@ -261,12 +269,37 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
           ),
         }));
         break;
+      case "task:output":
+        // Re-fetch outputs for this task
+        get().fetchOutputFiles(event.task.id);
+        break;
       case "task:deleted":
         set((state) => ({
           tasks: state.tasks.filter((t) => t.id !== event.task.id),
         }));
         break;
     }
+  },
+
+  fetchOutputFiles: async (taskId: string) => {
+    try {
+      const res = await fetch(`/api/tasks/${taskId}/outputs`);
+      if (!res.ok) return;
+      const files = await res.json();
+      set((state) => ({
+        outputFiles: { ...state.outputFiles, [taskId]: files },
+      }));
+    } catch {
+      // Silently fail -- outputs are non-critical
+    }
+  },
+
+  openPanel: (taskId: string) => {
+    set({ selectedTaskId: taskId });
+  },
+
+  closePanel: () => {
+    set({ selectedTaskId: null });
   },
 
   getTasksByStatus: (status: string) => {
@@ -283,5 +316,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
   getRunningCount: () => {
     return get().tasks.filter((t) => t.status === "running").length;
+  },
+
+  getOutputFiles: (taskId: string) => {
+    return get().outputFiles[taskId] || [];
   },
 }));

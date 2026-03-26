@@ -28,6 +28,7 @@ export function useSSE() {
       "task:deleted",
       "task:status",
       "task:progress",
+      "task:output",
     ];
 
     for (const eventType of taskEvents) {

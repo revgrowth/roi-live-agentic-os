@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2 } from "lucide-react";
-import type { Task, TaskStatus } from "@/types/task";
+import type { Task, TaskStatus, OutputFile } from "@/types/task";
 import { LevelBadge } from "./level-badge";
 import { useTaskStore } from "@/store/task-store";
+import { OutputChips } from "./output-chips";
+import { FilePreviewModal } from "./file-preview-modal";
 
 const statusColors: Record<TaskStatus, string> = {
   backlog: "#5E5E65",
@@ -44,8 +46,19 @@ export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
   const [expanded, setExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isTrashHovered, setIsTrashHovered] = useState(false);
+  const [previewFile, setPreviewFile] = useState<OutputFile | null>(null);
   const getChildTasks = useTaskStore((s) => s.getChildTasks);
   const deleteTask = useTaskStore((s) => s.deleteTask);
+  const outputFiles = useTaskStore((s) => s.outputFiles[task.id] || []);
+  const fetchOutputFiles = useTaskStore((s) => s.fetchOutputFiles);
+  const openPanel = useTaskStore((s) => s.openPanel);
+
+  // Fetch output files for completed/review tasks
+  useEffect(() => {
+    if (task.status === "review" || task.status === "done") {
+      fetchOutputFiles(task.id);
+    }
+  }, [task.status, task.id, fetchOutputFiles]);
 
   const {
     attributes,
@@ -310,6 +323,9 @@ export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
         </div>
       </div>
 
+      {/* Output file chips */}
+      <OutputChips files={outputFiles} onFileClick={setPreviewFile} />
+
       {/* Child task count + expand for project/gsd */}
       {isParent && hasChildren && (
         <div style={{ marginTop: 8 }}>
@@ -408,6 +424,12 @@ export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
           )}
         </div>
       )}
+
+      {/* File preview modal */}
+      <FilePreviewModal
+        file={previewFile}
+        onClose={() => setPreviewFile(null)}
+      />
     </div>
   );
 }
