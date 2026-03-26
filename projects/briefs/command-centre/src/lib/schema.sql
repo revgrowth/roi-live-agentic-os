@@ -33,4 +33,17 @@ CREATE TABLE IF NOT EXISTS task_outputs (
 );
 CREATE INDEX IF NOT EXISTS idx_task_outputs_taskId ON task_outputs(taskId);
 
--- Migration: clientId column added dynamically in db.ts (ALTER TABLE is not idempotent in SQLite)
+CREATE TABLE IF NOT EXISTS cron_runs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  jobSlug TEXT NOT NULL,
+  startedAt TEXT NOT NULL,
+  completedAt TEXT,
+  result TEXT NOT NULL DEFAULT 'running' CHECK (result IN ('success', 'failure', 'running')),
+  durationSec REAL,
+  costUsd REAL,
+  exitCode INTEGER,
+  createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_cron_runs_jobSlug ON cron_runs(jobSlug);
+CREATE INDEX IF NOT EXISTS idx_cron_runs_startedAt ON cron_runs(startedAt);
