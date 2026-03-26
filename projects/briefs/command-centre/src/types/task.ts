@@ -19,6 +19,17 @@ export interface Task {
   completedAt: string | null;
 }
 
+export interface OutputFile {
+  id: string;
+  taskId: string;
+  fileName: string;
+  filePath: string;
+  relativePath: string;
+  extension: string;
+  sizeBytes: number | null;
+  createdAt: string;
+}
+
 export interface TaskCreateInput {
   title: string;
   level: TaskLevel;

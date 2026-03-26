@@ -10,5 +10,12 @@ export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
     const { initQueueWatcher } = await import("./lib/queue-watcher");
     initQueueWatcher();
+
+    // Clean up file watchers on shutdown
+    const { fileWatcher } = await import("./lib/file-watcher");
+    const cleanupFileWatchers = () => fileWatcher.cleanupAll();
+    process.on("exit", cleanupFileWatchers);
+    process.on("SIGTERM", cleanupFileWatchers);
+    process.on("SIGINT", cleanupFileWatchers);
   }
 }

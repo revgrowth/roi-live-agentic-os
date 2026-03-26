@@ -6,7 +6,8 @@ export type TaskEventType =
   | "task:updated"
   | "task:deleted"
   | "task:status"
-  | "task:progress";
+  | "task:progress"
+  | "task:output";
 
 export interface TaskEvent {
   type: TaskEventType;

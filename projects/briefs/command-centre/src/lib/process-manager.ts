@@ -4,6 +4,7 @@ import { getDb } from "./db";
 import { getConfig } from "./config";
 import { emitTaskEvent } from "./event-bus";
 import { ClaudeOutputParser } from "./claude-parser";
+import { fileWatcher } from "./file-watcher";
 import type { Task } from "@/types/task";
 
 /**
@@ -54,6 +55,9 @@ class ProcessManager {
 
     const updatedTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
     emitTaskEvent({ type: "task:status", task: updatedTask, timestamp: now });
+
+    // Start file watcher to detect output files
+    await fileWatcher.startWatching(taskId);
 
     const config = getConfig();
 
@@ -166,6 +170,9 @@ class ProcessManager {
     this.sessions.delete(taskId);
     this.lastProgressEmit.delete(taskId);
 
+    // Stop file watcher
+    await fileWatcher.stopWatching(taskId);
+
     // Update task to backlog (cancelled)
     const db = getDb();
     const now = new Date().toISOString();
@@ -194,6 +201,7 @@ class ProcessManager {
     }
     this.sessions.clear();
     this.lastProgressEmit.clear();
+    fileWatcher.cleanupAll();
   }
 
   // -- Internal handlers --
@@ -242,6 +250,9 @@ class ProcessManager {
       return;
     }
 
+    // Stop file watcher before updating DB
+    fileWatcher.stopWatching(taskId).catch(() => {});
+
     const db = getDb();
     const now = new Date().toISOString();
 
@@ -261,6 +272,9 @@ class ProcessManager {
     if (!this.sessions.has(taskId) && !this.lastProgressEmit.has(taskId)) {
       return;
     }
+
+    // Stop file watcher before updating DB
+    fileWatcher.stopWatching(taskId).catch(() => {});
 
     const db = getDb();
     const now = new Date().toISOString();

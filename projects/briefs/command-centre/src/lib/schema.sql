@@ -19,3 +19,16 @@ CREATE TABLE IF NOT EXISTS tasks (
 
 CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
 CREATE INDEX IF NOT EXISTS idx_tasks_parentId ON tasks(parentId);
+
+CREATE TABLE IF NOT EXISTS task_outputs (
+  id TEXT PRIMARY KEY,
+  taskId TEXT NOT NULL,
+  fileName TEXT NOT NULL,
+  filePath TEXT NOT NULL,
+  relativePath TEXT NOT NULL,
+  extension TEXT NOT NULL DEFAULT '',
+  sizeBytes INTEGER,
+  createdAt TEXT NOT NULL,
+  FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_task_outputs_taskId ON task_outputs(taskId);
