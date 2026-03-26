@@ -14,12 +14,11 @@ interface TaskStore {
   error: string | null;
   outputFiles: Record<string, OutputFile[]>;
   logEntries: Record<string, LogEntry[]>;
-  questionText: string | null;
   selectedTaskId: string | null;
 
   // Actions
   fetchTasks: () => Promise<void>;
-  createTask: (title: string, description: string | null, level: TaskLevel) => Promise<void>;
+  createTask: (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null) => Promise<void>;
   updateTask: (id: string, updates: TaskUpdateInput) => Promise<void>;
   moveTask: (id: string, newStatus: string, newOrder: number) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -27,7 +26,7 @@ interface TaskStore {
   fetchOutputFiles: (taskId: string) => Promise<void>;
   fetchLogEntries: (taskId: string) => Promise<void>;
   appendLogEntry: (taskId: string, entry: LogEntry) => void;
-  setQuestionText: (text: string | null) => void;
+  syncPhases: (parentTaskId: string) => Promise<void>;
   openPanel: (taskId: string) => void;
   closePanel: () => void;
 
@@ -44,7 +43,6 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   error: null,
   outputFiles: {},
   logEntries: {},
-  questionText: null,
   selectedTaskId: null,
 
   fetchTasks: async () => {
@@ -64,7 +62,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }
   },
 
-  createTask: async (title: string, description: string | null, level: TaskLevel) => {
+  createTask: async (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null) => {
     const tempId = "temp-" + crypto.randomUUID();
     const now = new Date().toISOString();
     const currentClientId = useClientStore.getState().selectedClientId;
@@ -74,7 +72,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       description: description || null,
       status: "backlog",
       level,
-      parentId: null,
+      parentId: parentId || null,
+      projectSlug: projectSlug || null,
       columnOrder: -Date.now(),
       createdAt: now,
       updatedAt: now,
@@ -86,6 +85,11 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       startedAt: null,
       completedAt: null,
       clientId: currentClientId,
+      needsInput: false,
+      phaseNumber: null,
+      gsdStep: null,
+      contextSources: null,
+      cronJobSlug: null,
     };
 
     // Track pending create for SSE reconciliation
@@ -99,7 +103,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, level, clientId }),
+        body: JSON.stringify({ title, description, level, projectSlug, clientId, parentId }),
       });
       if (!res.ok) throw new Error("Failed to create task");
       const realTask = await res.json();
@@ -292,7 +296,6 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
           tasks: state.tasks.map((t) =>
             t.id === event.task.id ? event.task : t
           ),
-          questionText: event.questionText || null,
         }));
         break;
       case "task:log":
@@ -338,14 +341,35 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   appendLogEntry: (taskId: string, entry: LogEntry) => {
     set((state) => {
       const existing = state.logEntries[taskId] || [];
+      // Deduplicate: skip if this entry ID already exists (from initial fetch)
+      if (existing.some((e) => e.id === entry.id)) return state;
+      // Deduplicate user_reply: optimistic entry uses "local-" ID, server uses a different UUID.
+      // Match by type + content to prevent double display.
+      if (entry.type === "user_reply") {
+        const isDuplicate = existing.some(
+          (e) => e.type === "user_reply" && e.content === entry.content
+        );
+        if (isDuplicate) return state;
+      }
       return {
         logEntries: { ...state.logEntries, [taskId]: [...existing, entry] },
       };
     });
   },
 
-  setQuestionText: (text: string | null) => {
-    set({ questionText: text });
+  syncPhases: async (parentTaskId: string) => {
+    try {
+      const res = await fetch(`/api/tasks/${parentTaskId}/sync-phases`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Failed to sync phases");
+      // Re-fetch all tasks to pick up the new children
+      await get().fetchTasks();
+    } catch (err) {
+      set({
+        error: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
   },
 
   openPanel: (taskId: string) => {

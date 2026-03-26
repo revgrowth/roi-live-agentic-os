@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileText, Eye, Download } from "lucide-react";
+import Link from "next/link";
+import { FileText, Image, FileType, Download, ExternalLink } from "lucide-react";
 import { useTaskStore } from "@/store/task-store";
-import { FilePreviewModal } from "../board/file-preview-modal";
 import type { OutputFile } from "@/types/task";
+
+const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg"]);
+const PDF_EXTENSIONS = new Set(["pdf"]);
 
 function formatBytes(bytes: number | null): string {
   if (bytes === null) return "--";
@@ -13,10 +16,15 @@ function formatBytes(bytes: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function PanelOutputs({ taskId }: { taskId: string }) {
+function getFileIcon(ext: string) {
+  if (IMAGE_EXTENSIONS.has(ext)) return Image;
+  if (PDF_EXTENSIONS.has(ext)) return FileType;
+  return FileText;
+}
+
+export function PanelOutputs({ taskId, onFileClick }: { taskId: string; onFileClick?: (file: OutputFile) => void }) {
   const outputFiles = useTaskStore((s) => s.outputFiles[taskId]) ?? [];
   const fetchOutputFiles = useTaskStore((s) => s.fetchOutputFiles);
-  const [previewFile, setPreviewFile] = useState<OutputFile | null>(null);
   const [hoveredFileId, setHoveredFileId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -90,133 +98,152 @@ export function PanelOutputs({ taskId }: { taskId: string }) {
             gap: 8,
           }}
         >
-          {outputFiles.map((file) => (
-            <div
-              key={file.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "10px 12px",
-                borderRadius: "0.375rem",
-                backgroundColor:
-                  hoveredFileId === file.id ? "#F6F3F1" : "#FFFFFF",
-                cursor: "default",
-              }}
-              onMouseEnter={() => setHoveredFileId(file.id)}
-              onMouseLeave={() => setHoveredFileId(null)}
-            >
-              {/* Left: icon + filename + extension chip */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  flex: 1,
-                  minWidth: 0,
-                }}
-              >
-                <FileText
-                  size={16}
-                  color="#5E5E65"
-                  style={{ flexShrink: 0 }}
-                />
-                <span
-                  style={{
-                    fontSize: 14,
-                    fontFamily: "var(--font-inter), Inter, sans-serif",
-                    color: "#1B1C1B",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {file.fileName}
-                </span>
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontFamily:
-                      "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                    color: "#5E5E65",
-                    backgroundColor: "#EAE8E6",
-                    padding: "1px 6px",
-                    borderRadius: "0.25rem",
-                    flexShrink: 0,
-                  }}
-                >
-                  .{file.extension}
-                </span>
-              </div>
+          {outputFiles.map((file) => {
+            const Icon = getFileIcon(file.extension);
+            const docsHref = `/docs?file=${encodeURIComponent(file.relativePath)}`;
+            const isImage = IMAGE_EXTENSIONS.has(file.extension);
 
-              {/* Right: size + actions */}
+            return (
               <div
+                key={file.id}
+                onClick={() => onFileClick?.(file)}
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 8,
-                  flexShrink: 0,
-                  marginLeft: 12,
+                  justifyContent: "space-between",
+                  padding: "10px 12px",
+                  borderRadius: "0.375rem",
+                  backgroundColor:
+                    hoveredFileId === file.id ? "#F6F3F1" : "#FFFFFF",
+                  cursor: onFileClick ? "pointer" : "default",
                 }}
+                onMouseEnter={() => setHoveredFileId(file.id)}
+                onMouseLeave={() => setHoveredFileId(null)}
               >
-                <span
+                {/* Left: icon + filename + extension chip */}
+                <div
                   style={{
-                    fontSize: 12,
-                    fontFamily:
-                      "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                    color: "#5E5E65",
-                  }}
-                >
-                  {formatBytes(file.sizeBytes)}
-                </span>
-                <button
-                  onClick={() => setPreviewFile(file)}
-                  title="Preview"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 4,
                     display: "flex",
                     alignItems: "center",
-                    color: "#93452A",
-                    borderRadius: "0.25rem",
+                    gap: 8,
+                    flex: 1,
+                    minWidth: 0,
                   }}
                 >
-                  <Eye size={16} />
-                </button>
-                <button
-                  onClick={() => {
-                    window.open(
-                      `/api/files/download?path=${encodeURIComponent(file.relativePath)}`,
-                      "_blank"
-                    );
-                  }}
-                  title="Download"
+                  {/* Thumbnail for images */}
+                  {isImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={`/api/files/preview?path=${encodeURIComponent(file.relativePath)}`}
+                      alt=""
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 4,
+                        objectFit: "cover",
+                        flexShrink: 0,
+                        backgroundColor: "#F6F3F1",
+                      }}
+                    />
+                  ) : (
+                    <Icon
+                      size={16}
+                      color="#5E5E65"
+                      style={{ flexShrink: 0 }}
+                    />
+                  )}
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontFamily: "var(--font-inter), Inter, sans-serif",
+                      color: "#1B1C1B",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {file.fileName}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontFamily:
+                        "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                      color: "#5E5E65",
+                      backgroundColor: "#EAE8E6",
+                      padding: "1px 6px",
+                      borderRadius: "0.25rem",
+                      flexShrink: 0,
+                    }}
+                  >
+                    .{file.extension}
+                  </span>
+                </div>
+
+                {/* Right: size + actions */}
+                <div
                   style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 4,
                     display: "flex",
                     alignItems: "center",
-                    color: "#5E5E65",
-                    borderRadius: "0.25rem",
+                    gap: 8,
+                    flexShrink: 0,
+                    marginLeft: 12,
                   }}
                 >
-                  <Download size={16} />
-                </button>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontFamily:
+                        "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                      color: "#5E5E65",
+                    }}
+                  >
+                    {formatBytes(file.sizeBytes)}
+                  </span>
+                  <Link
+                    href={docsHref}
+                    title="Open in Docs"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 4,
+                      display: "flex",
+                      alignItems: "center",
+                      color: "#93452A",
+                      borderRadius: "0.25rem",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <ExternalLink size={16} />
+                  </Link>
+                  <button
+                    onClick={() => {
+                      window.open(
+                        `/api/files/download?path=${encodeURIComponent(file.relativePath)}`,
+                        "_blank"
+                      );
+                    }}
+                    title="Download"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 4,
+                      display: "flex",
+                      alignItems: "center",
+                      color: "#5E5E65",
+                      borderRadius: "0.25rem",
+                    }}
+                  >
+                    <Download size={16} />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
-
-      {/* File preview modal */}
-      <FilePreviewModal
-        file={previewFile}
-        onClose={() => setPreviewFile(null)}
-      />
     </div>
   );
 }

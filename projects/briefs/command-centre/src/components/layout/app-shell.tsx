@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "./sidebar";
 import { StatsBar } from "./stats-bar";
 import { ScopeBar } from "./scope-bar";
@@ -8,21 +8,32 @@ import { ScopeBar } from "./scope-bar";
 export function AppShell({ children, title }: { children: React.ReactNode; title?: string }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  // Auto-collapse sidebar on narrow viewports
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1280px)");
+    const handler = (e: MediaQueryListEvent | MediaQueryList) => {
+      setSidebarCollapsed(e.matches);
+    };
+    handler(mq);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
-      <main style={{ flex: 1, minHeight: "100vh" }}>
+      <main style={{ flex: 1, minWidth: 0, minHeight: "100vh" }}>
         {/* Sticky header */}
         <header
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "0 32px",
-            height: 64,
+            padding: "0 24px",
+            height: 56,
             position: "sticky",
             top: 0,
             zIndex: 50,
@@ -43,10 +54,10 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
           </h2>
         </header>
         <ScopeBar />
-        <div style={{ padding: "0 32px" }}>
+        <div style={{ padding: "0 24px" }}>
           <StatsBar />
         </div>
-        <div style={{ padding: "0 32px 32px", display: "flex", flexDirection: "column", gap: 24, marginTop: 24 }}>
+        <div style={{ padding: "0 24px 24px", display: "flex", flexDirection: "column", gap: 16, marginTop: 16 }}>
           {children}
         </div>
       </main>

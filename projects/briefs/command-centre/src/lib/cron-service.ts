@@ -272,7 +272,7 @@ export function deleteCronJob(slug: string): void {
 
 export function getCronRunHistory(slug: string): CronRun[] {
   const db = getDb();
-  return db
+  const rows = db
     .prepare(
       `SELECT id, jobSlug, startedAt, completedAt, result, durationSec, costUsd, exitCode
        FROM cron_runs
@@ -281,4 +281,45 @@ export function getCronRunHistory(slug: string): CronRun[] {
        LIMIT 50`
     )
     .all(slug) as CronRun[];
+
+  if (rows.length > 0) return rows;
+
+  // Fallback: synthesize a single entry from the status JSON file
+  // (covers runs that happened before SQLite recording was added)
+  const status = readRunStatus(slug);
+  if (!status || !status.lastRun) return [];
+
+  const startedAt = status.lastRun;
+  const durationSec = status.duration ?? 0;
+  const completedAt = new Date(
+    new Date(startedAt).getTime() + durationSec * 1000
+  ).toISOString();
+
+  return [
+    {
+      id: -1,
+      jobSlug: slug,
+      startedAt,
+      completedAt,
+      result: status.result ?? "success",
+      durationSec,
+      costUsd: 0,
+      exitCode: status.exitCode ?? 0,
+    },
+  ];
+}
+
+export function getCronJobLog(slug: string): string {
+  const config = getConfig();
+  const logPath = path.join(config.agenticOsDir, "cron", "logs", `${slug}.log`);
+  try {
+    const content = fs.readFileSync(logPath, "utf-8");
+    // Return last 50KB max to avoid sending huge logs
+    if (content.length > 50000) {
+      return "... (truncated)\n" + content.slice(-50000);
+    }
+    return content;
+  } catch {
+    return "";
+  }
 }

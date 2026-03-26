@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { FileText, Folder, FolderOpen } from "lucide-react";
 import type { FileNode } from "@/types/file";
+import { useClientId, appendClientId } from "@/hooks/use-client-id";
 
 interface FileTreeProps {
   onSelectFile: (path: string) => void;
@@ -10,6 +11,7 @@ interface FileTreeProps {
 }
 
 export function FileTree({ onSelectFile, selectedPath }: FileTreeProps) {
+  const clientId = useClientId();
   const [rootNodes, setRootNodes] = useState<FileNode[]>([]);
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set());
   const [childrenMap, setChildrenMap] = useState<Record<string, FileNode[]>>({});
@@ -18,14 +20,14 @@ export function FileTree({ onSelectFile, selectedPath }: FileTreeProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/files?dir=context")
+    fetch(appendClientId("/api/files?dir=context", clientId))
       .then((r) => r.json())
       .then((nodes: FileNode[]) => {
         setRootNodes(nodes);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [clientId]);
 
   const toggleDir = useCallback(
     (dirPath: string) => {
@@ -38,7 +40,7 @@ export function FileTree({ onSelectFile, selectedPath }: FileTreeProps) {
           // Fetch children if not already loaded
           if (!childrenMap[dirPath]) {
             const isMemory = dirPath === "context/memory" || dirPath.endsWith("/memory");
-            const url = `/api/files?dir=${encodeURIComponent(dirPath)}${isMemory ? "&limit=30" : ""}`;
+            const url = appendClientId(`/api/files?dir=${encodeURIComponent(dirPath)}${isMemory ? "&limit=30" : ""}`, clientId);
             fetch(url)
               .then((r) => r.json())
               .then((children: FileNode[]) => {
@@ -52,13 +54,13 @@ export function FileTree({ onSelectFile, selectedPath }: FileTreeProps) {
         return next;
       });
     },
-    [childrenMap]
+    [childrenMap, clientId]
   );
 
   const loadMoreMemory = useCallback(
     (dirPath: string) => {
       const newLimit = memoryLimit + 30;
-      fetch(`/api/files?dir=${encodeURIComponent(dirPath)}&limit=${newLimit}`)
+      fetch(appendClientId(`/api/files?dir=${encodeURIComponent(dirPath)}&limit=${newLimit}`, clientId))
         .then((r) => r.json())
         .then((children: FileNode[]) => {
           setChildrenMap((prev) => ({ ...prev, [dirPath]: children }));
@@ -66,7 +68,7 @@ export function FileTree({ onSelectFile, selectedPath }: FileTreeProps) {
           if (children.length < newLimit) setMemoryTotal(children.length);
         });
     },
-    [memoryLimit]
+    [memoryLimit, clientId]
   );
 
   const renderNode = (node: FileNode, depth: number = 0) => {

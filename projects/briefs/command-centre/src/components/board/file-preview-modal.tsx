@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { X, Download } from "lucide-react";
+import { X, Download, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import type { OutputFile } from "@/types/task";
+
+const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg", "ico"]);
 
 interface PreviewResponse {
   content: string | null;
@@ -86,12 +89,16 @@ export function FilePreviewModal({
   onClose: () => void;
 }) {
   const [preview, setPreview] = useState<PreviewResponse | null>(null);
+  const [binaryUrl, setBinaryUrl] = useState<string | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const isBinary = file ? (IMAGE_EXTENSIONS.has(file.extension) || file.extension === "pdf") : false;
 
   useEffect(() => {
     if (!file) {
       setPreview(null);
+      setBinaryUrl(null);
       setError(false);
       return;
     }
@@ -99,19 +106,28 @@ export function FilePreviewModal({
     setLoading(true);
     setError(false);
 
-    fetch(`/api/files/preview?path=${encodeURIComponent(file.relativePath)}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load preview");
-        return res.json();
-      })
-      .then((data: PreviewResponse) => {
-        setPreview(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError(true);
-        setLoading(false);
-      });
+    const ext = file.extension.toLowerCase();
+    if (IMAGE_EXTENSIONS.has(ext) || ext === "pdf") {
+      // Binary files: just build a URL to the preview endpoint
+      setBinaryUrl(`/api/files/preview?path=${encodeURIComponent(file.relativePath)}`);
+      setPreview(null);
+      setLoading(false);
+    } else {
+      setBinaryUrl(null);
+      fetch(`/api/files/preview?path=${encodeURIComponent(file.relativePath)}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to load preview");
+          return res.json();
+        })
+        .then((data: PreviewResponse) => {
+          setPreview(data);
+          setLoading(false);
+        })
+        .catch(() => {
+          setError(true);
+          setLoading(false);
+        });
+    }
   }, [file]);
 
   if (!file) return null;
@@ -122,6 +138,8 @@ export function FilePreviewModal({
       "_blank"
     );
   };
+
+  const docsLink = `/docs?file=${encodeURIComponent(file.relativePath)}`;
 
   return (
     <div
@@ -186,6 +204,26 @@ export function FilePreviewModal({
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Link
+              href={docsLink}
+              onClick={onClose}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "#93452A",
+                fontSize: 13,
+                fontFamily:
+                  "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                textDecoration: "none",
+              }}
+            >
+              <ExternalLink size={14} />
+              Open in Docs
+            </Link>
             <button
               onClick={handleDownload}
               style={{
@@ -195,7 +233,7 @@ export function FilePreviewModal({
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                color: "#93452A",
+                color: "#5E5E65",
                 fontSize: 13,
                 fontFamily:
                   "var(--font-space-grotesk), Space Grotesk, sans-serif",
@@ -255,6 +293,37 @@ export function FilePreviewModal({
               Download instead
             </button>
           </div>
+        )}
+
+        {/* Image preview */}
+        {binaryUrl && IMAGE_EXTENSIONS.has(file.extension.toLowerCase()) && (
+          <div style={{ textAlign: "center" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={binaryUrl}
+              alt={file.fileName}
+              style={{
+                maxWidth: "100%",
+                maxHeight: "60vh",
+                borderRadius: 8,
+                objectFit: "contain",
+              }}
+            />
+          </div>
+        )}
+
+        {/* PDF preview */}
+        {binaryUrl && file.extension.toLowerCase() === "pdf" && (
+          <iframe
+            src={binaryUrl}
+            title={file.fileName}
+            style={{
+              width: "100%",
+              height: "60vh",
+              border: "none",
+              borderRadius: 8,
+            }}
+          />
         )}
 
         {preview && preview.truncated && (

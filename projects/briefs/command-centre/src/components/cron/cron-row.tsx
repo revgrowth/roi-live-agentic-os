@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Play, Pause, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 import { useCronStore } from "@/store/cron-store";
 import { RunHistory } from "./run-history";
@@ -7,6 +8,13 @@ import type { CronJob } from "@/types/cron";
 
 interface CronRowProps {
   job: CronJob;
+  index: number;
+  onDragStart: (e: React.DragEvent, index: number) => void;
+  onDragOver: (e: React.DragEvent, index: number) => void;
+  onDrop: (e: React.DragEvent, index: number) => void;
+  onDragEnd: () => void;
+  isDragOver: boolean;
+  isDragging: boolean;
 }
 
 function formatSchedule(days: string, time: string): string {
@@ -56,18 +64,35 @@ function formatDuration(sec: number): string {
   return `${min}m ${remaining}s`;
 }
 
-export function CronRow({ job }: CronRowProps) {
+export function CronRow({
+  job,
+  index,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+  isDragOver,
+  isDragging,
+}: CronRowProps) {
   const expandedJob = useCronStore((s) => s.expandedJob);
   const runHistory = useCronStore((s) => s.runHistory);
   const expandJob = useCronStore((s) => s.expandJob);
   const toggleJob = useCronStore((s) => s.toggleJob);
   const deleteJob = useCronStore((s) => s.deleteJob);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const isExpanded = expandedJob === job.slug;
   const runs = runHistory[job.slug] || [];
 
   return (
-    <div style={{ marginBottom: 10 }}>
+    <div
+      style={{ marginBottom: 10 }}
+      draggable
+      onDragStart={(e) => onDragStart(e, index)}
+      onDragOver={(e) => onDragOver(e, index)}
+      onDrop={(e) => onDrop(e, index)}
+      onDragEnd={onDragEnd}
+    >
       {/* Main row */}
       <div
         onClick={() => expandJob(isExpanded ? null : job.slug)}
@@ -79,9 +104,11 @@ export function CronRow({ job }: CronRowProps) {
           padding: "14px 16px",
           backgroundColor: "#FFFFFF",
           borderRadius: isExpanded ? "0.5rem 0.5rem 0 0" : "0.5rem",
-          cursor: "pointer",
-          transition: "background-color 150ms ease",
+          cursor: "grab",
+          transition: "background-color 150ms ease, opacity 150ms ease",
           fontFamily: "var(--font-inter), Inter, sans-serif",
+          opacity: isDragging ? 0.4 : 1,
+          borderTop: isDragOver ? "2px solid #93452A" : "2px solid transparent",
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = "#F6F3F1";
@@ -221,34 +248,74 @@ export function CronRow({ job }: CronRowProps) {
           >
             {job.active ? <Pause size={16} /> : <Play size={16} />}
           </button>
-          <button
-            onClick={() => deleteJob(job.slug)}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: 6,
-              borderRadius: 6,
-              display: "flex",
-              alignItems: "center",
-              color: "#5E5E65",
-              transition: "color 150ms ease",
-            }}
-            title="Delete"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#EF4444";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "#5E5E65";
-            }}
-          >
-            <Trash2 size={16} />
-          </button>
+          {confirmingDelete ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <button
+                onClick={() => {
+                  deleteJob(job.slug);
+                  setConfirmingDelete(false);
+                }}
+                style={{
+                  background: "#EF4444",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "3px 8px",
+                  borderRadius: 4,
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: "#FFFFFF",
+                  fontFamily: "var(--font-inter), Inter, sans-serif",
+                }}
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => setConfirmingDelete(false)}
+                style={{
+                  background: "none",
+                  border: "1px solid #D1D1D6",
+                  cursor: "pointer",
+                  padding: "3px 8px",
+                  borderRadius: 4,
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: "#5E5E65",
+                  fontFamily: "var(--font-inter), Inter, sans-serif",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmingDelete(true)}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 6,
+                borderRadius: 6,
+                display: "flex",
+                alignItems: "center",
+                color: "#5E5E65",
+                transition: "color 150ms ease",
+              }}
+              title="Delete"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#EF4444";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "#5E5E65";
+              }}
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Expanded run history */}
-      {isExpanded && <RunHistory runs={runs} />}
+      {isExpanded && <RunHistory runs={runs} jobSlug={job.slug} />}
     </div>
   );
 }

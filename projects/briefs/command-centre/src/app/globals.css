@@ -23,10 +23,27 @@ body {
   }
 }
 
+@keyframes pulse-badge {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
 .custom-shadow {
   box-shadow: 0px 12px 32px rgba(147, 69, 42, 0.06);
 }
 
 .terracotta-gradient {
   background: linear-gradient(135deg, #93452A 0%, #B25D3F 100%);
+}
+
+/* Chat markdown: remove top margin on first child and bottom margin on last child */
+.chat-markdown > :first-child {
+  margin-top: 0 !important;
+}
+.chat-markdown > :last-child {
+  margin-bottom: 0 !important;
 }

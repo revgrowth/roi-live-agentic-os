@@ -3,17 +3,27 @@
 import { useState, useRef, useCallback } from "react";
 import { ArrowUp } from "lucide-react";
 import type { LogEntry } from "@/types/task";
+import { useTaskStore } from "@/store/task-store";
+import { SlashCommandMenu } from "@/components/shared/slash-command-menu";
+import type { SlashCommand } from "@/lib/slash-commands";
 
 interface ReplyInputProps {
   taskId: string;
   isVisible: boolean;
+  needsInput?: boolean;
+  taskStatus?: string;
   onOptimisticReply?: (entry: LogEntry) => void;
 }
 
-export function ReplyInput({ taskId, isVisible, onOptimisticReply }: ReplyInputProps) {
+export function ReplyInput({ taskId, isVisible, needsInput, taskStatus, onOptimisticReply }: ReplyInputProps) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showSlashMenu, setShowSlashMenu] = useState(false);
+  const [slashQuery, setSlashQuery] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const createTask = useTaskStore((s) => s.createTask);
+  const updateTask = useTaskStore((s) => s.updateTask);
 
   const handleSubmit = useCallback(async () => {
     const trimmed = message.trim();
@@ -35,29 +45,72 @@ export function ReplyInput({ taskId, isVisible, onOptimisticReply }: ReplyInputP
     setMessage("");
 
     try {
-      await fetch(`/api/tasks/${taskId}/reply`, {
+      const res = await fetch(`/api/tasks/${taskId}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: trimmed }),
       });
+      if (!res.ok) {
+        console.error(`[reply-input] Reply failed: ${res.status}`);
+        setError("Reply failed — try again");
+        setTimeout(() => setError(null), 3000);
+      }
     } catch {
-      // Silently fail -- the optimistic entry is already shown
+      setError("Reply failed — try again");
+      setTimeout(() => setError(null), 3000);
     } finally {
       setIsSending(false);
     }
   }, [message, isSending, taskId, onOptimisticReply]);
 
+  const handleSlashSelect = useCallback(async (cmd: SlashCommand) => {
+    setShowSlashMenu(false);
+    setSlashQuery("");
+    setMessage("");
+
+    // Create a new task from the slash command and auto-queue it
+    const taskTitle = cmd.label;
+    const taskDesc = `Run ${cmd.command}`;
+    await createTask(taskTitle, taskDesc, "task");
+    const tasks = useTaskStore.getState().tasks;
+    const newTask = tasks.find(
+      (t) => t.title === taskTitle && t.status === "backlog"
+    );
+    if (newTask) {
+      await updateTask(newTask.id, { status: "queued" });
+    }
+  }, [createTask, updateTask]);
+
+  const handleChange = useCallback((value: string) => {
+    setMessage(value);
+    if (value.startsWith("/")) {
+      setShowSlashMenu(true);
+      setSlashQuery(value);
+    } else {
+      setShowSlashMenu(false);
+      setSlashQuery("");
+    }
+  }, []);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      // Let slash menu handle its own keys
+      if (showSlashMenu && ["ArrowDown", "ArrowUp", "Enter", "Tab", "Escape"].includes(e.key)) return;
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         handleSubmit();
       }
     },
-    [handleSubmit]
+    [handleSubmit, showSlashMenu]
   );
 
   if (!isVisible) return null;
+
+  const placeholder = needsInput
+    ? "Reply to Claude...  Type / for commands"
+    : taskStatus === "review" || taskStatus === "done"
+      ? "Send a follow-up or type / for commands..."
+      : "Send a message...  Type / for commands";
 
   return (
     <div
@@ -66,13 +119,26 @@ export function ReplyInput({ taskId, isVisible, onOptimisticReply }: ReplyInputP
         borderTop: "1px solid #EAE8E6",
       }}
     >
+      {error && (
+        <div style={{ fontSize: 12, color: "#C04030", marginBottom: 6, fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif" }}>
+          {error}
+        </div>
+      )}
       <div style={{ position: "relative" }}>
+        {showSlashMenu && (
+          <SlashCommandMenu
+            query={slashQuery}
+            onSelect={handleSlashSelect}
+            onClose={() => { setShowSlashMenu(false); setSlashQuery(""); }}
+            anchor="above"
+          />
+        )}
         <textarea
           ref={textareaRef}
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Reply to Claude..."
+          placeholder={placeholder}
           rows={1}
           style={{
             width: "100%",

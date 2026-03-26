@@ -1,19 +1,26 @@
 "use client";
 
-import { FileText } from "lucide-react";
+import { FileText, Image, FileType } from "lucide-react";
 import type { OutputFile } from "@/types/task";
+
+const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg"]);
+const PDF_EXTENSIONS = new Set(["pdf"]);
 
 function truncateFilename(name: string, maxLen = 20): string {
   if (name.length <= maxLen) return name;
   return name.slice(0, maxLen - 3) + "...";
 }
 
+function getFileIcon(ext: string) {
+  if (IMAGE_EXTENSIONS.has(ext)) return Image;
+  if (PDF_EXTENSIONS.has(ext)) return FileType;
+  return FileText;
+}
+
 export function OutputChips({
   files,
-  onFileClick,
 }: {
   files: OutputFile[];
-  onFileClick: (file: OutputFile) => void;
 }) {
   if (files.length === 0) return null;
 
@@ -29,34 +36,31 @@ export function OutputChips({
         marginTop: 8,
       }}
     >
-      {visible.map((file) => (
-        <button
-          key={file.id}
-          onClick={(e) => {
-            e.stopPropagation();
-            onFileClick(file);
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 4,
-            fontSize: 11,
-            fontFamily:
-              "var(--font-space-grotesk), Space Grotesk, sans-serif",
-            padding: "2px 8px",
-            borderRadius: 4,
-            backgroundColor: "#FFDBCF",
-            color: "#390C00",
-            border: "none",
-            cursor: "pointer",
-            lineHeight: "16px",
-          }}
-        >
-          <FileText size={10} />
-          {truncateFilename(file.fileName)}
-        </button>
-      ))}
+      {visible.map((file) => {
+        const Icon = getFileIcon(file.extension);
+
+        return (
+          <span
+            key={file.id}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 11,
+              fontFamily:
+                "var(--font-space-grotesk), Space Grotesk, sans-serif",
+              padding: "2px 8px",
+              borderRadius: 4,
+              backgroundColor: "#FFDBCF",
+              color: "#390C00",
+              lineHeight: "16px",
+            }}
+          >
+            <Icon size={10} />
+            {truncateFilename(file.fileName)}
+          </span>
+        );
+      })}
       {remaining > 0 && (
         <span
           style={{

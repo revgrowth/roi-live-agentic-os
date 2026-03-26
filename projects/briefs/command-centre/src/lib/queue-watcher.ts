@@ -30,24 +30,54 @@ export function initQueueWatcher(): void {
     });
   });
 
-  // Recovery: reset orphaned queued/running tasks back to backlog
-  // (these are from a previous server session that crashed or was stopped)
+  // Recovery: handle orphaned tasks from previous server session
   try {
     const db = getDb();
     const now = new Date().toISOString();
 
-    const orphanedTasks = db
-      .prepare("SELECT * FROM tasks WHERE status IN ('queued', 'running') ORDER BY columnOrder ASC")
+    // Tasks that were actively running (no pending question) → back to backlog
+    const orphanedRunning = db
+      .prepare("SELECT * FROM tasks WHERE status = 'running' AND needsInput = 0 ORDER BY columnOrder ASC")
       .all() as Task[];
 
-    if (orphanedTasks.length > 0) {
-      console.log(`[queue-watcher] Resetting ${orphanedTasks.length} orphaned task(s) to backlog`);
-      db.prepare(
-        "UPDATE tasks SET status = 'backlog', updatedAt = ?, activityLabel = NULL, startedAt = NULL, errorMessage = NULL WHERE status IN ('queued', 'running')"
-      ).run(now);
+    // Tasks that were waiting for input → move to review (work was done, just can't continue the conversation)
+    const orphanedWaiting = db
+      .prepare("SELECT * FROM tasks WHERE status = 'running' AND needsInput = 1 ORDER BY columnOrder ASC")
+      .all() as Task[];
 
-      // Emit events so SSE clients update
-      for (const task of orphanedTasks) {
+    // Queued tasks that never started → back to backlog
+    const orphanedQueued = db
+      .prepare("SELECT * FROM tasks WHERE status = 'queued' ORDER BY columnOrder ASC")
+      .all() as Task[];
+
+    if (orphanedRunning.length > 0) {
+      console.log(`[queue-watcher] Resetting ${orphanedRunning.length} orphaned running task(s) to backlog`);
+      for (const task of orphanedRunning) {
+        db.prepare(
+          "UPDATE tasks SET status = 'backlog', updatedAt = ?, activityLabel = NULL, startedAt = NULL, errorMessage = NULL, needsInput = 0 WHERE id = ?"
+        ).run(now, task.id);
+        const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(task.id) as Task;
+        emitTaskEvent({ type: "task:status", task: updated, timestamp: now });
+      }
+    }
+
+    if (orphanedWaiting.length > 0) {
+      console.log(`[queue-watcher] Moving ${orphanedWaiting.length} waiting-for-input task(s) to review`);
+      for (const task of orphanedWaiting) {
+        db.prepare(
+          "UPDATE tasks SET status = 'review', updatedAt = ?, activityLabel = NULL, needsInput = 0, errorMessage = NULL WHERE id = ?"
+        ).run(now, task.id);
+        const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(task.id) as Task;
+        emitTaskEvent({ type: "task:status", task: updated, timestamp: now });
+      }
+    }
+
+    if (orphanedQueued.length > 0) {
+      console.log(`[queue-watcher] Resetting ${orphanedQueued.length} queued task(s) to backlog`);
+      for (const task of orphanedQueued) {
+        db.prepare(
+          "UPDATE tasks SET status = 'backlog', updatedAt = ?, activityLabel = NULL, startedAt = NULL, errorMessage = NULL WHERE id = ?"
+        ).run(now, task.id);
         const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(task.id) as Task;
         emitTaskEvent({ type: "task:status", task: updated, timestamp: now });
       }

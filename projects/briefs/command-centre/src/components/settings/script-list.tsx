@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Play, Check, XCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Play, Check, XCircle, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { ScriptConfirmModal } from "@/components/settings/script-confirm-modal";
 import { ScriptRunner } from "@/components/settings/script-runner";
 import type { ScriptDefinition } from "@/lib/script-registry";
@@ -164,6 +164,28 @@ export function ScriptList() {
               <div style={{ fontSize: 13, color: "#5E5E65", marginTop: 2 }}>
                 {script.description}
               </div>
+              {script.helpUrl && (
+                <a
+                  href={script.helpUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                    fontSize: 12,
+                    color: "#93452A",
+                    textDecoration: "none",
+                    marginTop: 4,
+                    fontWeight: 500,
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none"; }}
+                >
+                  <ExternalLink size={12} />
+                  Watch video guide
+                </a>
+              )}
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 16, flexShrink: 0 }}>

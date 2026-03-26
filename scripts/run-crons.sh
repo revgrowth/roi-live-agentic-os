@@ -184,6 +184,32 @@ run_job() {
   local job_start_epoch
   job_start_epoch=$(date +%s)
 
+  # Write "running" cron_run and create a corresponding task row
+  local db_path="${PROJECT_DIR}/.command-centre/data.db"
+  local db_slug
+  db_slug=$(basename "$file" .md)
+  local task_uuid
+  task_uuid=$(uuidgen 2>/dev/null || cat /proc/sys/kernel/random/uuid 2>/dev/null || echo "cron-${db_slug}-${job_start_epoch}")
+  task_uuid=$(echo "$task_uuid" | tr '[:upper:]' '[:lower:]')
+  local started_iso
+  if [[ "$(uname)" == "Darwin" ]]; then
+    started_iso=$(date -j -f "%s" "$job_start_epoch" -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "")
+  else
+    started_iso=$(date -u -d "@${job_start_epoch}" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "")
+  fi
+  local cron_run_id=""
+  if command -v sqlite3 &>/dev/null && [[ -f "$db_path" ]] && [[ -n "$started_iso" ]]; then
+    # Insert running cron_run
+    sqlite3 "$db_path" "INSERT INTO cron_runs (jobSlug, startedAt, result) VALUES ('${db_slug}', '${started_iso}', 'running');" 2>/dev/null || true
+    cron_run_id=$(sqlite3 "$db_path" "SELECT id FROM cron_runs WHERE jobSlug='${db_slug}' AND result='running' ORDER BY id DESC LIMIT 1;" 2>/dev/null || echo "")
+    # Insert task row so it appears on kanban board
+    local safe_name
+    safe_name=$(echo "$JOB_NAME" | sed "s/'/''/g")
+    local safe_desc
+    safe_desc=$(echo "${DESCRIPTION:-Scheduled cron job}" | sed "s/'/''/g")
+    sqlite3 "$db_path" "INSERT INTO tasks (id, title, description, status, level, columnOrder, createdAt, updatedAt, startedAt, cronJobSlug) VALUES ('${task_uuid}', '${safe_name}', '${safe_desc}', 'running', 'task', 0, '${started_iso}', '${started_iso}', '${started_iso}', '${db_slug}');" 2>/dev/null || true
+  fi
+
   while (( attempt < MAX_ATTEMPTS )); do
     attempt=$((attempt + 1))
     timed_out=false
@@ -247,6 +273,33 @@ run_job() {
 
   # Write status file
   write_job_status "$STATUS_FILE" "$final_result" "$total_duration" "$final_exit_code"
+
+  # Update cron_run and task in SQLite
+  local completed_iso
+  if [[ "$(uname)" == "Darwin" ]]; then
+    completed_iso=$(date -j -f "%s" "$job_end_epoch" -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "")
+  else
+    completed_iso=$(date -u -d "@${job_end_epoch}" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "")
+  fi
+  local db_result="failure"
+  [[ "$final_result" == "success" ]] && db_result="success"
+  if command -v sqlite3 &>/dev/null && [[ -f "$db_path" ]] && [[ -n "$completed_iso" ]]; then
+    # Update the running cron_run row (or insert if it wasn't created)
+    if [[ -n "$cron_run_id" ]]; then
+      sqlite3 "$db_path" "UPDATE cron_runs SET completedAt='${completed_iso}', result='${db_result}', durationSec=${total_duration}, exitCode=${final_exit_code} WHERE id=${cron_run_id};" 2>/dev/null || true
+    else
+      sqlite3 "$db_path" "INSERT INTO cron_runs (jobSlug, startedAt, completedAt, result, durationSec, exitCode) VALUES ('${db_slug}', '${started_iso}', '${completed_iso}', '${db_result}', ${total_duration}, ${final_exit_code});" 2>/dev/null || true
+    fi
+    # Update the task row: mark as done with duration
+    local task_status="done"
+    local error_val="NULL"
+    if [[ "$db_result" != "success" ]]; then
+      task_status="review"
+      error_val="'Exit code ${final_exit_code}'"
+    fi
+    local duration_ms=$((total_duration * 1000))
+    sqlite3 "$db_path" "UPDATE tasks SET status='${task_status}', completedAt='${completed_iso}', updatedAt='${completed_iso}', durationMs=${duration_ms}, errorMessage=${error_val} WHERE id='${task_uuid}';" 2>/dev/null || true
+  fi
 
   # Send notification based on notify setting
   local subtitle_prefix=""

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Mic, Target, Users, FileText, Palette } from "lucide-react";
 import type { FileNode } from "@/types/file";
+import { useClientId, appendClientId } from "@/hooks/use-client-id";
 
 interface BrandCardGridProps {
   onSelectFile: (path: string) => void;
@@ -43,11 +44,12 @@ function getIcon(fileName: string): React.ReactNode {
 }
 
 export function BrandCardGrid({ onSelectFile }: BrandCardGridProps) {
+  const clientId = useClientId();
   const [files, setFiles] = useState<FileNode[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/files?dir=brand_context")
+    fetch(appendClientId("/api/files?dir=brand_context", clientId))
       .then((r) => r.json())
       .then((nodes: FileNode[]) => {
         // Filter to only files (not directories)
@@ -55,7 +57,7 @@ export function BrandCardGrid({ onSelectFile }: BrandCardGridProps) {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [clientId]);
 
   if (loading) {
     return (

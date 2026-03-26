@@ -18,7 +18,7 @@ export async function GET(
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
-    return NextResponse.json(task);
+    return NextResponse.json({ ...task, needsInput: Boolean(task.needsInput) });
   } catch (error) {
     console.error("GET /api/tasks/[id] error:", error);
     return NextResponse.json(
@@ -64,6 +64,8 @@ export async function PATCH(
       "errorMessage",
       "startedAt",
       "completedAt",
+      "phaseNumber",
+      "gsdStep",
     ];
 
     for (const field of allowedFields) {
@@ -83,13 +85,14 @@ export async function PATCH(
       .prepare("SELECT * FROM tasks WHERE id = ?")
       .get(id) as Task;
 
+    const normalized = { ...updated, needsInput: Boolean(updated.needsInput) };
     emitTaskEvent({
       type: "task:updated",
-      task: updated,
+      task: normalized,
       timestamp: now,
     });
 
-    return NextResponse.json(updated);
+    return NextResponse.json(normalized);
   } catch (error) {
     console.error("PATCH /api/tasks/[id] error:", error);
     return NextResponse.json(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Clock } from "lucide-react";
 import { useCronStore } from "@/store/cron-store";
 import { useClientStore } from "@/store/client-store";
@@ -12,7 +12,36 @@ export function CronJobsView() {
   const isLoading = useCronStore((s) => s.isLoading);
   const fetchJobs = useCronStore((s) => s.fetchJobs);
   const setShowCreatePanel = useCronStore((s) => s.setShowCreatePanel);
+  const moveJob = useCronStore((s) => s.moveJob);
   const selectedClientId = useClientStore((s) => s.selectedClientId);
+
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDragIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(index));
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (dragIndex !== null && dragIndex !== index) {
+      moveJob(dragIndex, index);
+    }
+    setDragIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+    setDragOverIndex(null);
+  };
 
   useEffect(() => {
     fetchJobs();
@@ -20,6 +49,12 @@ export function CronJobsView() {
 
   const activeCount = jobs.filter((j) => j.active).length;
   const pausedCount = jobs.filter((j) => !j.active).length;
+
+  // Count jobs that ran today by checking lastRun timestamps
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const runsToday = jobs.filter(
+    (j) => j.lastRun?.lastRun && j.lastRun.lastRun.startsWith(todayStr)
+  ).length;
 
   const statCardStyle: React.CSSProperties = {
     backgroundColor: "#FFFFFF",
@@ -58,7 +93,7 @@ export function CronJobsView() {
           <div style={statLabelStyle}>Paused Jobs</div>
         </div>
         <div style={statCardStyle}>
-          <div style={statValueStyle}>0</div>
+          <div style={statValueStyle}>{runsToday}</div>
           <div style={statLabelStyle}>Runs Today</div>
         </div>
         <div style={statCardStyle}>
@@ -202,7 +237,19 @@ export function CronJobsView() {
 
       {/* Job rows */}
       {!isLoading &&
-        jobs.map((job) => <CronRow key={job.slug} job={job} />)}
+        jobs.map((job, i) => (
+          <CronRow
+            key={job.slug}
+            job={job}
+            index={i}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            onDragEnd={handleDragEnd}
+            isDragOver={dragOverIndex === i}
+            isDragging={dragIndex === i}
+          />
+        ))}
 
       {/* Create panel */}
       <CreateJobPanel />

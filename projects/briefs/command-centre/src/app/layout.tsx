@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import { SSEProvider } from "@/components/sse-provider";
+import { TaskDetailPanel } from "@/components/panel/task-detail-panel";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,7 +38,10 @@ export default function RootLayout({
         className={`${inter.variable} ${spaceGrotesk.variable} ${epilogue.variable} antialiased`}
         style={{ fontFamily: "var(--font-inter), Inter, sans-serif" }}
       >
-        {children}
+        <SSEProvider>
+          {children}
+          <TaskDetailPanel />
+        </SSEProvider>
       </body>
     </html>
   );

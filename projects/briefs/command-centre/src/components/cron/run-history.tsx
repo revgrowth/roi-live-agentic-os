@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import { FileText } from "lucide-react";
 import type { CronRun } from "@/types/cron";
 
 interface RunHistoryProps {
   runs: CronRun[];
+  jobSlug: string;
 }
 
 function formatRelativeTime(iso: string): string {
@@ -33,7 +36,31 @@ function formatDuration(sec: number | null): string {
   return `${min}m ${remaining}s`;
 }
 
-export function RunHistory({ runs }: RunHistoryProps) {
+export function RunHistory({ runs, jobSlug }: RunHistoryProps) {
+  const [log, setLog] = useState<string | null>(null);
+  const [loadingLog, setLoadingLog] = useState(false);
+
+  const toggleLog = async () => {
+    if (log !== null) {
+      setLog(null);
+      return;
+    }
+    setLoadingLog(true);
+    try {
+      const res = await fetch(`/api/cron/${jobSlug}/logs`);
+      if (res.ok) {
+        const data = await res.json();
+        setLog(data.log || "(empty log)");
+      } else {
+        setLog("(failed to load log)");
+      }
+    } catch {
+      setLog("(failed to load log)");
+    } finally {
+      setLoadingLog(false);
+    }
+  };
+
   if (runs.length === 0) {
     return (
       <div
@@ -140,10 +167,59 @@ export function RunHistory({ runs }: RunHistoryProps) {
               color: "#5E5E65",
             }}
           >
-            {run.costUsd !== null ? `$${run.costUsd.toFixed(2)}` : "--"}
+            {run.costUsd !== null && run.costUsd > 0
+              ? `$${run.costUsd.toFixed(2)}`
+              : "--"}
           </span>
         </div>
       ))}
+
+      {/* View Log button */}
+      <div style={{ marginTop: 8, paddingLeft: 8 }}>
+        <button
+          onClick={toggleLog}
+          disabled={loadingLog}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            background: "none",
+            border: "none",
+            cursor: loadingLog ? "wait" : "pointer",
+            padding: "4px 0",
+            fontFamily: "var(--font-inter), Inter, sans-serif",
+            fontSize: 12,
+            fontWeight: 500,
+            color: "#93452A",
+          }}
+        >
+          <FileText size={13} />
+          {loadingLog ? "Loading..." : log !== null ? "Hide Log" : "View Log"}
+        </button>
+      </div>
+
+      {/* Log output */}
+      {log !== null && (
+        <pre
+          style={{
+            marginTop: 8,
+            padding: 12,
+            backgroundColor: "#F6F3F1",
+            color: "#1B1C1B",
+            border: "1px solid #EAE8E6",
+            borderRadius: "0.375rem",
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace",
+            fontSize: 11,
+            lineHeight: 1.5,
+            maxHeight: 300,
+            overflowY: "auto",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+          }}
+        >
+          {log}
+        </pre>
+      )}
     </div>
   );
 }

@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Clock, Cpu, FileText, Rocket, Settings, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Clock, Cpu, FileText, Settings, ChevronLeft, ChevronRight, History } from "lucide-react";
 import { ClientSwitcher } from "./client-switcher";
 
 const mainNavItems = [
   { label: "Board", icon: LayoutDashboard, href: "/" },
   { label: "Cron Jobs", icon: Clock, href: "/cron" },
+  { label: "History", icon: History, href: "/history" },
   { label: "Skills", icon: Cpu, href: "/skills" },
   { label: "Docs", icon: FileText, href: "/docs" },
-  { label: "GSD", icon: Rocket, href: "/gsd" },
 ];
 
 const bottomNavItems = [

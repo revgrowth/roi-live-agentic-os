@@ -1,25 +1,23 @@
 "use client";
 
 import type { TaskLevel } from "@/types/task";
+import { LEVEL_LABELS } from "@/types/task";
 
 const levelConfig: Record<
   TaskLevel,
-  { label: string; bg: string; text: string }
+  { bg: string; text: string }
 > = {
   task: {
-    label: "Task",
     bg: "#EAE8E6",
     text: "#5E5E65",
   },
   project: {
-    label: "Project",
-    bg: "#FFDBCF",
-    text: "#390C00",
+    bg: "#EFF6FF",
+    text: "#1D4ED8",
   },
   gsd: {
-    label: "GSD",
-    bg: "rgba(147, 69, 42, 0.12)",
-    text: "#93452A",
+    bg: "#F5F3FF",
+    text: "#6D28D9",
   },
 };
 
@@ -39,7 +37,7 @@ export function LevelBadge({ level }: { level: TaskLevel }) {
         lineHeight: "16px",
       }}
     >
-      {config.label}
+      {LEVEL_LABELS[level]}
     </span>
   );
 }

@@ -1,13 +1,18 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Pencil, Eye } from "lucide-react";
+import { Pencil, Eye, Trash2, Download } from "lucide-react";
 import { MarkdownPreview } from "@/components/shared/markdown-preview";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
+import { useClientId, appendClientId } from "@/hooks/use-client-id";
 import type { FileContent } from "@/types/file";
+
+const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg", "ico"]);
+const BINARY_EXTENSIONS = new Set([...IMAGE_EXTENSIONS, "pdf"]);
 
 interface ContentViewerProps {
   selectedPath: string | null;
+  onFileDeleted?: () => void;
 }
 
 function formatRelativeTime(isoDate: string): string {
@@ -21,21 +26,43 @@ function formatRelativeTime(isoDate: string): string {
   return `${days}d ago`;
 }
 
-export function ContentViewer({ selectedPath }: ContentViewerProps) {
+export function ContentViewer({ selectedPath, onFileDeleted }: ContentViewerProps) {
+  const clientId = useClientId();
   const [file, setFile] = useState<FileContent | null>(null);
   const [mode, setMode] = useState<"preview" | "edit">("preview");
   const [loading, setLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [conflict, setConflict] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchFile = useCallback(async (path: string) => {
+  const getExtension = (p: string) => {
+    const parts = p.split(".");
+    return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : "";
+  };
+
+  const isBinaryFile = selectedPath ? BINARY_EXTENSIONS.has(getExtension(selectedPath)) : false;
+
+  const fetchFile = useCallback(async (filePath: string) => {
+    const ext = filePath.split(".").pop()?.toLowerCase() || "";
+    if (BINARY_EXTENSIONS.has(ext)) {
+      // Binary files don't need text content fetch
+      setFile({
+        path: filePath,
+        content: "",
+        lastModified: new Date().toISOString(),
+      });
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setConflict(false);
     setMode("preview");
     try {
-      const res = await fetch(`/api/files/${encodeURIComponent(path)}`);
+      const res = await fetch(appendClientId(`/api/files/${encodeURIComponent(filePath)}`, clientId));
       if (!res.ok) throw new Error("Failed to load file");
       const data: FileContent = await res.json();
       setFile(data);
@@ -45,7 +72,7 @@ export function ContentViewer({ selectedPath }: ContentViewerProps) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [clientId]);
 
   useEffect(() => {
     if (selectedPath) {
@@ -61,7 +88,7 @@ export function ContentViewer({ selectedPath }: ContentViewerProps) {
     setIsSaving(true);
     setConflict(false);
     try {
-      const res = await fetch(`/api/files/${encodeURIComponent(selectedPath)}`, {
+      const res = await fetch(appendClientId(`/api/files/${encodeURIComponent(selectedPath)}`, clientId), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content, lastModified: file.lastModified }),
@@ -78,6 +105,24 @@ export function ContentViewer({ selectedPath }: ContentViewerProps) {
       setError(err instanceof Error ? err.message : "Save failed");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedPath) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(appendClientId(`/api/files/${encodeURIComponent(selectedPath)}`, clientId), {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Delete failed");
+      setFile(null);
+      setShowDeleteConfirm(false);
+      onFileDeleted?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Delete failed");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -168,6 +213,14 @@ export function ContentViewer({ selectedPath }: ContentViewerProps) {
   if (!file) return null;
 
   const fileName = selectedPath.split("/").pop() || selectedPath;
+  const ext = getExtension(selectedPath);
+
+  const handleDownload = () => {
+    window.open(
+      `/api/files/download?path=${encodeURIComponent(selectedPath)}`,
+      "_blank"
+    );
+  };
 
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", height: "100%" }}>
@@ -204,47 +257,155 @@ export function ContentViewer({ selectedPath }: ContentViewerProps) {
           >
             {selectedPath}
           </p>
-          <p
-            style={{
-              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              fontSize: 11,
-              color: "#5E5E65",
-              margin: "2px 0 0",
-            }}
-          >
-            last modified: {formatRelativeTime(file.lastModified)}
-          </p>
+          {!isBinaryFile && (
+            <p
+              style={{
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontSize: 11,
+                color: "#5E5E65",
+                margin: "2px 0 0",
+              }}
+            >
+              last modified: {formatRelativeTime(file.lastModified)}
+            </p>
+          )}
         </div>
 
-        <button
-          onClick={() => setMode(mode === "preview" ? "edit" : "preview")}
+        <div style={{ display: "flex", gap: 8 }}>
+          {isBinaryFile ? (
+            <button
+              onClick={handleDownload}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 14px",
+                border: "none",
+                borderRadius: "0.25rem",
+                backgroundColor: "#F6F3F1",
+                color: "#5E5E65",
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                fontSize: 13,
+                fontWeight: 500,
+                cursor: "pointer",
+                transition: "background 150ms ease",
+              }}
+            >
+              <Download size={14} /> Download
+            </button>
+          ) : (
+            <button
+              onClick={() => setMode(mode === "preview" ? "edit" : "preview")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 14px",
+                border: "none",
+                borderRadius: "0.25rem",
+                backgroundColor: mode === "edit" ? "#FFDBCF" : "#F6F3F1",
+                color: mode === "edit" ? "#390C00" : "#5E5E65",
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                fontSize: 13,
+                fontWeight: 500,
+                cursor: "pointer",
+                transition: "background 150ms ease",
+              }}
+            >
+              {mode === "preview" ? (
+                <>
+                  <Pencil size={14} /> Edit
+                </>
+              ) : (
+                <>
+                  <Eye size={14} /> Preview
+                </>
+              )}
+            </button>
+          )}
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "6px 14px",
+              border: "none",
+              borderRadius: "0.25rem",
+              backgroundColor: "#F6F3F1",
+              color: "#5E5E65",
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: "pointer",
+              transition: "background 150ms ease, color 150ms ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#FEF2F2";
+              e.currentTarget.style.color = "#EF4444";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#F6F3F1";
+              e.currentTarget.style.color = "#5E5E65";
+            }}
+          >
+            <Trash2 size={14} /> Delete
+          </button>
+        </div>
+      </div>
+
+      {/* Delete confirmation */}
+      {showDeleteConfirm && (
+        <div
           style={{
+            backgroundColor: "#FEF2F2",
+            padding: 12,
+            borderRadius: "0.375rem",
+            marginBottom: 16,
             display: "flex",
             alignItems: "center",
-            gap: 6,
-            padding: "6px 14px",
-            border: "none",
-            borderRadius: "0.25rem",
-            backgroundColor: mode === "edit" ? "#FFDBCF" : "#F6F3F1",
-            color: mode === "edit" ? "#390C00" : "#5E5E65",
-            fontFamily: "var(--font-inter), Inter, sans-serif",
-            fontSize: 13,
-            fontWeight: 500,
-            cursor: "pointer",
-            transition: "background 150ms ease",
+            justifyContent: "space-between",
           }}
         >
-          {mode === "preview" ? (
-            <>
-              <Pencil size={14} /> Edit
-            </>
-          ) : (
-            <>
-              <Eye size={14} /> Preview
-            </>
-          )}
-        </button>
-      </div>
+          <p style={{ fontFamily: "var(--font-inter), Inter, sans-serif", fontSize: 13, color: "#991B1B", margin: 0 }}>
+            Delete {fileName}? This cannot be undone.
+          </p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={() => setShowDeleteConfirm(false)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#5E5E65",
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                fontSize: 13,
+                fontWeight: 500,
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={isDeleting}
+              style={{
+                background: "#EF4444",
+                border: "none",
+                color: "#FFFFFF",
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: isDeleting ? "wait" : "pointer",
+                padding: "4px 12px",
+                borderRadius: "0.25rem",
+                opacity: isDeleting ? 0.6 : 1,
+              }}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Conflict warning */}
       {conflict && (
@@ -282,7 +443,41 @@ export function ContentViewer({ selectedPath }: ContentViewerProps) {
 
       {/* Content */}
       <div style={{ flex: 1 }}>
-        {mode === "preview" ? (
+        {isBinaryFile ? (
+          <>
+            {/* Image rendering */}
+            {IMAGE_EXTENSIONS.has(ext) && (
+              <div style={{ textAlign: "center", padding: "16px 0" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/api/files/preview?path=${encodeURIComponent(selectedPath)}`}
+                  alt={fileName}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "70vh",
+                    borderRadius: 8,
+                    objectFit: "contain",
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+                  }}
+                />
+              </div>
+            )}
+
+            {/* PDF rendering */}
+            {ext === "pdf" && (
+              <iframe
+                src={`/api/files/preview?path=${encodeURIComponent(selectedPath)}`}
+                title={fileName}
+                style={{
+                  width: "100%",
+                  height: "70vh",
+                  border: "none",
+                  borderRadius: 8,
+                }}
+              />
+            )}
+          </>
+        ) : mode === "preview" ? (
           <MarkdownPreview content={file.content} />
         ) : (
           <MarkdownEditor

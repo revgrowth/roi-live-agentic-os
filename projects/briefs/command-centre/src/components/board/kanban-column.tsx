@@ -38,10 +38,10 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
       ref={setNodeRef}
       style={{
         flex: 1,
-        minWidth: 200,
+        minWidth: 0,
         backgroundColor: "#F6F3F1",
         borderRadius: 12,
-        padding: 16,
+        padding: 12,
         display: "flex",
         flexDirection: "column",
         maxHeight: "calc(100vh - 200px)",
@@ -53,8 +53,8 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
           display: "flex",
           alignItems: "center",
           gap: 10,
-          paddingBottom: 16,
-          marginBottom: 12,
+          paddingBottom: 10,
+          marginBottom: 8,
         }}
       >
         <span
@@ -102,7 +102,7 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
           overflowY: "auto",
           display: "flex",
           flexDirection: "column",
-          gap: 10,
+          gap: 8,
         }}
       >
         <SortableContext

@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listDirectory } from "@/lib/file-service";
+import { getClientAgenticOsDir } from "@/lib/config";
 
-const ALLOWED_ROOTS = ["context", "brand_context"];
+const ALLOWED_ROOTS = ["context", "brand_context", "docs", "projects", ".planning", ".claude/skills"];
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const dir = searchParams.get("dir");
+    const clientId = searchParams.get("clientId");
 
     if (!dir) {
       return NextResponse.json(
@@ -28,8 +30,9 @@ export async function GET(request: NextRequest) {
 
     const limitParam = searchParams.get("limit");
     const limit = limitParam ? parseInt(limitParam, 10) : undefined;
+    const baseDir = getClientAgenticOsDir(clientId);
 
-    const nodes = listDirectory(dir, limit ? { limit } : undefined);
+    const nodes = listDirectory(dir, { limit, baseDir });
     return NextResponse.json(nodes);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Internal server error";

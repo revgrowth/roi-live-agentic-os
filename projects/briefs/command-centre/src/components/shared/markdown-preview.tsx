@@ -8,9 +8,146 @@ interface MarkdownPreviewProps {
   className?: string;
 }
 
+/**
+ * Parse YAML frontmatter from markdown content.
+ * Returns the parsed key-value pairs and the remaining body.
+ */
+function parseFrontmatter(raw: string): { meta: Record<string, string | string[]> | null; body: string } {
+  const match = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
+  if (!match) return { meta: null, body: raw };
+
+  const yamlBlock = match[1];
+  const body = match[2];
+  const meta: Record<string, string | string[]> = {};
+
+  let currentKey: string | null = null;
+  let currentArray: string[] | null = null;
+  let foldedKey: string | null = null;
+  let foldedLines: string[] = [];
+
+  const flushFolded = () => {
+    if (foldedKey && foldedLines.length > 0) {
+      meta[foldedKey] = foldedLines.join(" ").trim();
+    }
+    foldedKey = null;
+    foldedLines = [];
+  };
+
+  for (const line of yamlBlock.split("\n")) {
+    // If we're collecting a folded scalar (> or |), indented lines belong to it
+    if (foldedKey) {
+      if (line.match(/^\s+/) && !line.match(/^(\w[\w\s]*?):\s/)) {
+        foldedLines.push(line.trim());
+        continue;
+      } else {
+        flushFolded();
+      }
+    }
+
+    // Array item (e.g., "  - value")
+    const arrayItem = line.match(/^\s+-\s+(.+)/);
+    if (arrayItem && currentKey) {
+      if (!currentArray) {
+        currentArray = [];
+        meta[currentKey] = currentArray;
+      }
+      currentArray.push(arrayItem[1].replace(/^["']|["']$/g, ""));
+      continue;
+    }
+
+    // Key-value pair (e.g., "name: value")
+    const kv = line.match(/^(\w[\w\s]*?):\s*(.*)/);
+    if (kv) {
+      currentKey = kv[1].trim();
+      currentArray = null;
+      const val = kv[2].trim().replace(/^["']|["']$/g, "");
+      // Folded (>) or literal (|) scalar — collect subsequent indented lines
+      if (val === ">" || val === "|") {
+        foldedKey = currentKey;
+        foldedLines = [];
+      } else if (val) {
+        meta[currentKey] = val;
+      }
+    }
+  }
+
+  flushFolded();
+
+  return { meta, body };
+}
+
 export function MarkdownPreview({ content, className }: MarkdownPreviewProps) {
+  const { meta, body } = parseFrontmatter(content);
+
   return (
     <div className={className} style={{ maxWidth: 720, lineHeight: 1.6, fontFamily: "var(--font-inter), Inter, sans-serif" }}>
+      {meta && Object.keys(meta).length > 0 && (
+        <div
+          style={{
+            backgroundColor: "#F6F3F1",
+            borderRadius: "0.375rem",
+            padding: "12px 16px",
+            marginBottom: 20,
+            border: "1px solid rgba(218, 193, 185, 0.2)",
+          }}
+        >
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>
+              {Object.entries(meta).map(([key, value]) => (
+                <tr key={key}>
+                  <td
+                    style={{
+                      padding: "3px 12px 3px 0",
+                      fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: "#5E5E65",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.04em",
+                      verticalAlign: "top",
+                      whiteSpace: "nowrap",
+                      width: 1,
+                    }}
+                  >
+                    {key}
+                  </td>
+                  <td
+                    style={{
+                      padding: "3px 0",
+                      fontFamily: "var(--font-inter), Inter, sans-serif",
+                      fontSize: 13,
+                      color: "#1B1C1B",
+                      verticalAlign: "top",
+                    }}
+                  >
+                    {Array.isArray(value) ? (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                        {value.map((v, i) => (
+                          <span
+                            key={i}
+                            style={{
+                              backgroundColor: "#FFDBCF",
+                              color: "#390C00",
+                              padding: "1px 8px",
+                              borderRadius: 4,
+                              fontSize: 11,
+                              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                            }}
+                          >
+                            {v}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      value
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -90,7 +227,7 @@ export function MarkdownPreview({ content, className }: MarkdownPreviewProps) {
           ),
         }}
       >
-        {content}
+        {body}
       </ReactMarkdown>
     </div>
   );

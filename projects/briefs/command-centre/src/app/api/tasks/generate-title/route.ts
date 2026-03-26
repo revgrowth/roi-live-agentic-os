@@ -1,0 +1,81 @@
+import { NextRequest, NextResponse } from "next/server";
+import { spawn } from "child_process";
+
+function quickExtract(description: string): string {
+  // Take the first sentence or first 50 chars, whichever is shorter
+  const firstLine = description.split("\n")[0].trim();
+  const firstSentence = firstLine.match(/^[^.!?]+[.!?]?/)?.[0] || firstLine;
+  if (firstSentence.length <= 60) return firstSentence;
+  return firstSentence.slice(0, 57).replace(/\s+\S*$/, "") + "...";
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { description } = await request.json();
+    if (!description || typeof description !== "string") {
+      return NextResponse.json({ error: "description is required" }, { status: 400 });
+    }
+
+    const fallback = quickExtract(description);
+
+    // Try AI-generated title with a fast timeout
+    try {
+      const title = await generateTitle(description);
+      if (title) {
+        return NextResponse.json({ title });
+      }
+    } catch {
+      // Fall back to quick extract
+    }
+
+    return NextResponse.json({ title: fallback });
+  } catch (error) {
+    console.error("POST /api/tasks/generate-title error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+function generateTitle(description: string): Promise<string | null> {
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => {
+      try { proc.kill("SIGTERM"); } catch { /* gone */ }
+      resolve(null);
+    }, 8000);
+
+    const cleanEnv = { ...process.env };
+    delete cleanEnv.CLAUDECODE;
+
+    const prompt = `Generate a short task title (max 6 words) for this task description. Return ONLY the title, nothing else.\n\n${description.slice(0, 500)}`;
+
+    const proc = spawn("claude", ["-p", prompt, "--output-format", "text"], {
+      stdio: ["pipe", "pipe", "pipe"],
+      env: cleanEnv,
+    });
+
+    if (proc.stdin) proc.stdin.end();
+
+    let stdout = "";
+    proc.stdout?.on("data", (chunk: Buffer) => {
+      stdout += chunk.toString();
+    });
+
+    proc.on("close", (code) => {
+      clearTimeout(timeout);
+      if (code === 0 && stdout.trim()) {
+        // Clean up the response — remove quotes, trim
+        let title = stdout.trim().replace(/^["']|["']$/g, "");
+        if (title.length > 60) {
+          title = title.slice(0, 57).replace(/\s+\S*$/, "") + "...";
+        }
+        resolve(title);
+      } else {
+        resolve(null);
+      }
+    });
+
+    proc.on("error", () => {
+      clearTimeout(timeout);
+      resolve(null);
+    });
+  });
+}

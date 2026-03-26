@@ -2,6 +2,45 @@ import { create } from "zustand";
 import { useClientStore } from "./client-store";
 import type { CronJob, CronRun, CronJobCreateInput } from "@/types/cron";
 
+const CRON_ORDER_KEY = "cron-job-order";
+
+function loadCronOrder(): string[] | null {
+  try {
+    const stored =
+      typeof window !== "undefined"
+        ? localStorage.getItem(CRON_ORDER_KEY)
+        : null;
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveCronOrder(slugs: string[]) {
+  try {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(CRON_ORDER_KEY, JSON.stringify(slugs));
+    }
+  } catch {
+    // Ignore
+  }
+}
+
+function applySavedOrder(jobs: CronJob[]): CronJob[] {
+  const order = loadCronOrder();
+  if (!order) return jobs;
+  const sorted = [...jobs];
+  sorted.sort((a, b) => {
+    const ai = order.indexOf(a.slug);
+    const bi = order.indexOf(b.slug);
+    if (ai === -1 && bi === -1) return 0;
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+  return sorted;
+}
+
 interface CronStore {
   jobs: CronJob[];
   isLoading: boolean;
@@ -17,6 +56,7 @@ interface CronStore {
   expandJob: (slug: string | null) => void;
   fetchRunHistory: (slug: string) => Promise<void>;
   setShowCreatePanel: (show: boolean) => void;
+  moveJob: (fromIndex: number, toIndex: number) => void;
 }
 
 export const useCronStore = create<CronStore>((set, get) => ({
@@ -36,7 +76,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
         : "/api/cron";
       const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch cron jobs");
-      const jobs = await res.json();
+      const jobs = applySavedOrder(await res.json());
       set({ jobs, isLoading: false });
     } catch (err) {
       set({
@@ -129,5 +169,14 @@ export const useCronStore = create<CronStore>((set, get) => ({
 
   setShowCreatePanel: (show: boolean) => {
     set({ showCreatePanel: show });
+  },
+
+  moveJob: (fromIndex: number, toIndex: number) => {
+    const jobs = [...get().jobs];
+    if (fromIndex < 0 || fromIndex >= jobs.length || toIndex < 0 || toIndex >= jobs.length) return;
+    const [moved] = jobs.splice(fromIndex, 1);
+    jobs.splice(toIndex, 0, moved);
+    saveCronOrder(jobs.map((j) => j.slug));
+    set({ jobs });
   },
 }));

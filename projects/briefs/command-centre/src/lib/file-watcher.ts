@@ -37,9 +37,13 @@ class FileWatcher {
       ignoreInitial: true,
       depth: 5,
       ignored: [
-        /(^|[/\\])\./,       // dotfiles
-        /node_modules/,       // node_modules
-        /\.next/,             // Next.js build output
+        /(^|[/\\])\./,           // dotfiles
+        /node_modules/,           // node_modules
+        /\.next/,                 // Next.js build output
+        /briefs\/command-centre/, // dashboard source code (not deliverables)
+        /\.lock$/,                // lock files
+        /tsconfig/,               // TypeScript configs
+        /tsbuildinfo$/,           // TS build info
       ],
     });
 
@@ -79,10 +83,34 @@ class FileWatcher {
 
   private handleNewFile(taskId: string, filePath: string, agenticOsDir: string): void {
     try {
-      const stat = fs.statSync(filePath);
       const fileName = path.basename(filePath);
+      const extension = path.extname(filePath).replace(".", "").toLowerCase();
+
+      // Only track deliverable file types — skip source code and config files
+      const deliverableExtensions = new Set([
+        "md", "txt", "pdf", "csv", "json",
+        "png", "jpg", "jpeg", "gif", "svg", "webp",
+        "mp4", "mp3", "wav",
+        "html", "xml",
+        "doc", "docx", "xls", "xlsx", "ppt", "pptx",
+      ]);
+      const sourceExtensions = new Set([
+        "ts", "tsx", "js", "jsx", "css", "scss", "less",
+        "py", "rb", "go", "rs", "java", "c", "cpp", "h",
+        "sh", "bash", "zsh", "sql",
+      ]);
+
+      if (sourceExtensions.has(extension)) {
+        console.log(`[file-watcher] Skipping source file: ${fileName}`);
+        return;
+      }
+      if (!deliverableExtensions.has(extension) && extension !== "") {
+        console.log(`[file-watcher] Skipping non-deliverable: ${fileName}`);
+        return;
+      }
+
+      const stat = fs.statSync(filePath);
       const relativePath = path.relative(agenticOsDir, filePath);
-      const extension = path.extname(filePath).replace(".", "");
       const id = crypto.randomUUID();
       const now = new Date().toISOString();
 

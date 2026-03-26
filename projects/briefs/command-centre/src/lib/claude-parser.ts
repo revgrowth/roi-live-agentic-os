@@ -10,6 +10,7 @@ export interface CompleteData {
   costUsd: number;
   tokensUsed: number;
   durationMs: number;
+  sessionId?: string;
 }
 
 export interface ClaudeParserCallbacks {
@@ -166,7 +167,9 @@ export class ClaudeOutputParser {
       tokensUsed = parsed.total_tokens;
     }
 
-    this.callbacks.onComplete({ costUsd, tokensUsed, durationMs });
+    const sessionId = typeof parsed.session_id === "string" ? parsed.session_id : undefined;
+
+    this.callbacks.onComplete({ costUsd, tokensUsed, durationMs, sessionId });
   }
 
   private handleError(parsed: Record<string, unknown>): void {

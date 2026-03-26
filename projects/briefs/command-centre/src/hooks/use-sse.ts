@@ -39,9 +39,10 @@ export function useSSE() {
         try {
           const event = JSON.parse(e.data);
           // Filter SSE events by selected client
+          // "root" or null/empty means show all tasks (root sees everything)
           const selectedClientId = useClientStore.getState().selectedClientId;
-          if (selectedClientId && event.task?.clientId !== selectedClientId) {
-            // Non-Root client selected and event is for a different client -- skip
+          if (selectedClientId && selectedClientId !== "root" && event.task?.clientId !== selectedClientId) {
+            // Non-root client selected and event is for a different client -- skip
             return;
           }
           applySSEEvent(event);

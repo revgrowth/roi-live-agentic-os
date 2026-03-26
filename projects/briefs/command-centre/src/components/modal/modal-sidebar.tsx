@@ -1,11 +1,11 @@
 "use client";
 
 import { AlertCircle } from "lucide-react";
-import type { Task } from "@/types/task";
+import type { Task, OutputFile } from "@/types/task";
 import { PanelStats } from "../panel/panel-stats";
 import { PanelOutputs } from "../panel/panel-outputs";
 
-export function ModalSidebar({ task }: { task: Task }) {
+export function ModalSidebar({ task, onFileClick }: { task: Task; onFileClick?: (file: OutputFile) => void }) {
   return (
     <div
       style={{
@@ -54,7 +54,7 @@ export function ModalSidebar({ task }: { task: Task }) {
       <div style={{ height: 8 }} />
 
       {/* Outputs */}
-      <PanelOutputs taskId={task.id} />
+      <PanelOutputs taskId={task.id} onFileClick={onFileClick} />
 
       {/* Error section */}
       {task.errorMessage && (

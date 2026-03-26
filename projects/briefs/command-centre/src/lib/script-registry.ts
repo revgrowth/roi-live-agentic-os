@@ -13,6 +13,7 @@ export interface ScriptDefinition {
   args: ArgDefinition[];
   destructive: boolean;
   longRunning?: boolean;
+  helpUrl?: string;
 }
 
 export const SCRIPT_REGISTRY: ScriptDefinition[] = [
@@ -23,89 +24,17 @@ export const SCRIPT_REGISTRY: ScriptDefinition[] = [
     file: "add-client.sh",
     args: [{ name: "clientName", label: "Client Name", required: true, placeholder: "e.g. Acme Corp" }],
     destructive: false,
-  },
-  {
-    id: "add-skill",
-    label: "Add Skill",
-    description: "Install a skill from the catalog into the skills directory",
-    file: "add-skill.sh",
-    args: [{ name: "skillName", label: "Skill Name", required: true, placeholder: "e.g. mkt-email-sequence" }],
-    destructive: false,
-  },
-  {
-    id: "remove-skill",
-    label: "Remove Skill",
-    description: "Uninstall a skill and remove its folder from the skills directory",
-    file: "remove-skill.sh",
-    args: [{ name: "skillName", label: "Skill Name", required: true, placeholder: "e.g. mkt-email-sequence" }],
-    destructive: true,
-  },
-  {
-    id: "list-skills",
-    label: "List Skills",
-    description: "Show all installed skills with their descriptions",
-    file: "list-skills.sh",
-    args: [],
-    destructive: false,
+    helpUrl: "https://www.skool.com/scrapes/classroom/d1cfafed?md=154cbf4e7d7844ca9b79b18804053464",
   },
   {
     id: "update",
     label: "Update Agentic OS",
-    description: "Pull the latest version and update all files",
+    description: "Check for updates, compare changes against your local repo, and safely pull the latest version — your user data is always protected",
     file: "update.sh",
     args: [],
     destructive: true,
     longRunning: true,
-  },
-  {
-    id: "install-crons",
-    label: "Install Cron Dispatcher",
-    description: "Set up the LaunchAgent for scheduled job execution",
-    file: "install-crons.sh",
-    args: [],
-    destructive: false,
-  },
-  {
-    id: "uninstall-crons",
-    label: "Uninstall Cron Dispatcher",
-    description: "Remove the LaunchAgent and stop scheduled job execution",
-    file: "uninstall-crons.sh",
-    args: [],
-    destructive: true,
-  },
-  {
-    id: "check-updates",
-    label: "Check for Updates",
-    description: "Check if a newer version of Agentic OS is available",
-    file: "check-updates.sh",
-    args: [],
-    destructive: false,
-  },
-  {
-    id: "update-clients",
-    label: "Update All Clients",
-    description: "Sync shared skills and configuration to all client workspaces",
-    file: "update-clients.sh",
-    args: [],
-    destructive: true,
-  },
-  {
-    id: "install",
-    label: "Install Agentic OS",
-    description: "Run the full installation process including dependencies and configuration",
-    file: "install.sh",
-    args: [],
-    destructive: true,
-    longRunning: true,
-  },
-  {
-    id: "setup",
-    label: "Setup",
-    description: "Run initial setup including environment configuration and dependency checks",
-    file: "setup.sh",
-    args: [],
-    destructive: false,
-    longRunning: true,
+    helpUrl: "https://www.skool.com/scrapes/classroom/d1cfafed?md=b4a2a68f8f8849b4addcead7bf83ade7",
   },
 ];
 

@@ -1,7 +1,11 @@
 import { onTaskEvent, offTaskEvent } from "@/lib/event-bus";
 import type { TaskEvent } from "@/lib/event-bus";
+import { startCronTaskSync } from "@/lib/cron-task-sync";
 
 export const dynamic = "force-dynamic";
+
+// Start the cron-task sync poller when the first SSE client connects
+startCronTaskSync();
 
 export async function GET() {
   const encoder = new TextEncoder();

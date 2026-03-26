@@ -15,7 +15,9 @@ CREATE TABLE IF NOT EXISTS tasks (
   errorMessage TEXT,
   startedAt TEXT,
   completedAt TEXT,
-  FOREIGN KEY (parentId) REFERENCES tasks(id) ON DELETE SET NULL
+  phaseNumber INTEGER,
+  gsdStep TEXT CHECK (gsdStep IN ('discuss', 'plan', 'execute', 'verify')),
+  FOREIGN KEY (parentId) REFERENCES tasks(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
@@ -48,3 +50,17 @@ CREATE TABLE IF NOT EXISTS cron_runs (
 
 CREATE INDEX IF NOT EXISTS idx_cron_runs_jobSlug ON cron_runs(jobSlug);
 CREATE INDEX IF NOT EXISTS idx_cron_runs_startedAt ON cron_runs(startedAt);
+
+CREATE TABLE IF NOT EXISTS task_logs (
+  id TEXT PRIMARY KEY,
+  taskId TEXT NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('text', 'tool_use', 'tool_result', 'question', 'user_reply', 'system')),
+  timestamp TEXT NOT NULL,
+  content TEXT NOT NULL DEFAULT '',
+  toolName TEXT,
+  toolArgs TEXT,
+  toolResult TEXT,
+  isCollapsed INTEGER DEFAULT 0,
+  FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_task_logs_taskId ON task_logs(taskId);

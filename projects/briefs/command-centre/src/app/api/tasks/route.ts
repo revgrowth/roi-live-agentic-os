@@ -27,9 +27,12 @@ export async function GET(request: NextRequest) {
     }
 
     const where = conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : "";
-    const tasks = db
+    const rows = db
       .prepare(`SELECT * FROM tasks${where} ORDER BY columnOrder ASC`)
       .all(...params) as Task[];
+
+    // Normalize SQLite integer to boolean for needsInput
+    const tasks = rows.map((t) => ({ ...t, needsInput: Boolean(t.needsInput) }));
 
     return NextResponse.json(tasks);
   } catch (error) {
@@ -47,7 +50,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate input
-    const { title, description, level, clientId: bodyClientId } = body as TaskCreateInput;
+    const { title, description, level, projectSlug: bodyProjectSlug, clientId: bodyClientId, parentId: bodyParentId, phaseNumber: bodyPhaseNumber, gsdStep: bodyGsdStep, cronJobSlug: bodyCronJobSlug } = body as TaskCreateInput & { cronJobSlug?: string };
     if (!title || typeof title !== "string" || title.trim().length === 0) {
       return NextResponse.json(
         { error: "title is required and must be a non-empty string" },
@@ -75,7 +78,8 @@ export async function POST(request: NextRequest) {
       description: description?.trim() || null,
       status: "backlog",
       level,
-      parentId: null,
+      parentId: bodyParentId || null,
+      projectSlug: bodyProjectSlug || null,
       columnOrder: minOrder.minOrder - 1,
       createdAt: now,
       updatedAt: now,
@@ -87,11 +91,16 @@ export async function POST(request: NextRequest) {
       startedAt: null,
       completedAt: null,
       clientId: bodyClientId || null,
+      needsInput: false,
+      phaseNumber: bodyPhaseNumber ?? null,
+      gsdStep: bodyGsdStep ?? null,
+      contextSources: null,
+      cronJobSlug: bodyCronJobSlug || null,
     };
 
     db.prepare(
-      `INSERT INTO tasks (id, title, description, status, level, parentId, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       task.id,
       task.title,
@@ -99,6 +108,7 @@ export async function POST(request: NextRequest) {
       task.status,
       task.level,
       task.parentId,
+      task.projectSlug,
       task.columnOrder,
       task.createdAt,
       task.updatedAt,
@@ -109,7 +119,11 @@ export async function POST(request: NextRequest) {
       task.errorMessage,
       task.startedAt,
       task.completedAt,
-      task.clientId
+      task.clientId,
+      0,
+      task.phaseNumber,
+      task.gsdStep,
+      task.cronJobSlug
     );
 
     emitTaskEvent({

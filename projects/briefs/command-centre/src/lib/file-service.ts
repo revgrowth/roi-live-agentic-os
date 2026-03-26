@@ -5,12 +5,11 @@ import { getConfig } from "./config";
 import type { FileNode, FileContent, SkillDependency, InstalledSkill } from "@/types/file";
 
 /**
- * Validate that a resolved path is within the agentic-os directory.
+ * Validate that a resolved path is within the given root directory.
  * Prevents directory traversal attacks.
  */
-function validatePath(resolved: string): void {
-  const { agenticOsDir } = getConfig();
-  const normalizedRoot = path.resolve(agenticOsDir);
+function validatePath(resolved: string, rootDir: string): void {
+  const normalizedRoot = path.resolve(rootDir);
   const normalizedTarget = path.resolve(resolved);
   if (!normalizedTarget.startsWith(normalizedRoot + path.sep) && normalizedTarget !== normalizedRoot) {
     throw new Error("Path traversal detected: access denied");
@@ -18,12 +17,13 @@ function validatePath(resolved: string): void {
 }
 
 /**
- * Resolve a relative path to an absolute path within the agentic-os directory.
+ * Resolve a relative path to an absolute path within a base directory.
+ * Defaults to the agentic-os root if no baseDir is provided.
  */
-function resolvePath(relativePath: string): string {
-  const { agenticOsDir } = getConfig();
-  const resolved = path.join(agenticOsDir, relativePath);
-  validatePath(resolved);
+function resolvePath(relativePath: string, baseDir?: string): string {
+  const root = baseDir || getConfig().agenticOsDir;
+  const resolved = path.join(root, relativePath);
+  validatePath(resolved, root);
   return resolved;
 }
 
@@ -31,8 +31,8 @@ function resolvePath(relativePath: string): string {
  * List immediate children of a directory.
  * For context/memory/ specifically: sort by filename descending, limit entries.
  */
-export function listDirectory(relativePath: string, options?: { limit?: number }): FileNode[] {
-  const resolved = resolvePath(relativePath);
+export function listDirectory(relativePath: string, options?: { limit?: number; baseDir?: string }): FileNode[] {
+  const resolved = resolvePath(relativePath, options?.baseDir);
 
   if (!fs.existsSync(resolved) || !fs.statSync(resolved).isDirectory()) {
     throw new Error(`Directory not found: ${relativePath}`);
@@ -67,8 +67,8 @@ export function listDirectory(relativePath: string, options?: { limit?: number }
 /**
  * Read a file's content and metadata.
  */
-export function readFile(relativePath: string): FileContent {
-  const resolved = resolvePath(relativePath);
+export function readFile(relativePath: string, baseDir?: string): FileContent {
+  const resolved = resolvePath(relativePath, baseDir);
 
   if (!fs.existsSync(resolved)) {
     throw new Error(`File not found: ${relativePath}`);
@@ -87,8 +87,8 @@ export function readFile(relativePath: string): FileContent {
 /**
  * Write a file with atomic write and optimistic concurrency check.
  */
-export function writeFile(relativePath: string, content: string, expectedLastModified?: string): FileContent {
-  const resolved = resolvePath(relativePath);
+export function writeFile(relativePath: string, content: string, expectedLastModified?: string, baseDir?: string): FileContent {
+  const resolved = resolvePath(relativePath, baseDir);
 
   // Optimistic concurrency check
   if (expectedLastModified && fs.existsSync(resolved)) {
@@ -110,6 +110,48 @@ export function writeFile(relativePath: string, content: string, expectedLastMod
     content,
     lastModified: stat.mtime.toISOString(),
   };
+}
+
+/**
+ * Delete a file within the agentic-os directory.
+ */
+export function deleteFile(relativePath: string, baseDir?: string): void {
+  const resolved = resolvePath(relativePath, baseDir);
+
+  if (!fs.existsSync(resolved)) {
+    throw new Error(`File not found: ${relativePath}`);
+  }
+
+  if (fs.statSync(resolved).isDirectory()) {
+    throw new Error(`Cannot delete directories: ${relativePath}`);
+  }
+
+  fs.unlinkSync(resolved);
+}
+
+/**
+ * Move a file from one path to another within the agentic-os directory.
+ */
+export function moveFile(fromPath: string, toPath: string, baseDir?: string): void {
+  const root = baseDir || getConfig().agenticOsDir;
+  const resolvedFrom = resolvePath(fromPath, root);
+  const resolvedTo = resolvePath(toPath, root);
+
+  if (!fs.existsSync(resolvedFrom)) {
+    throw new Error(`File not found: ${fromPath}`);
+  }
+
+  if (fs.existsSync(resolvedTo)) {
+    throw new Error(`Target already exists: ${toPath}`);
+  }
+
+  // Ensure target directory exists
+  const targetDir = path.dirname(resolvedTo);
+  if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+  }
+
+  fs.renameSync(resolvedFrom, resolvedTo);
 }
 
 /**
