@@ -124,6 +124,7 @@ export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
         userSelect: "none" as const,
         position: "relative" as const,
       }}
+      onClick={() => openPanel(task.id)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       {...attributes}
