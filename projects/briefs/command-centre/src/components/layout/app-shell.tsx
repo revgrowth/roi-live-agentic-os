@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import { StatsBar } from "./stats-bar";
+import { ScopeBar } from "./scope-bar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -41,6 +42,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             Command Centre
           </h2>
         </header>
+        <ScopeBar />
         <div style={{ padding: "0 32px" }}>
           <StatsBar />
         </div>

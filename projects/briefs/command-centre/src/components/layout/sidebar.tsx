@@ -1,6 +1,7 @@
 "use client";
 
 import { LayoutDashboard, Clock, Brain, Sparkles, Cpu, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { ClientSwitcher } from "./client-switcher";
 
 const navItems = [
   { label: "Board", icon: LayoutDashboard, active: true },
@@ -160,6 +161,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <Plus size={16} />
         {!collapsed && "New Agent"}
       </button>
+
+      {/* Client switcher divider */}
+      <div style={{ borderTop: "1px solid rgba(218, 193, 185, 0.2)", margin: "16px 0" }} />
+
+      {/* Client switcher */}
+      <ClientSwitcher collapsed={collapsed} />
     </aside>
   );
 }

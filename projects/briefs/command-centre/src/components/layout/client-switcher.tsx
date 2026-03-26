@@ -1,0 +1,346 @@
+"use client";
+
+import { useEffect, useState, useRef } from "react";
+import { ChevronDown, Globe, Check, Loader2, AlertCircle } from "lucide-react";
+import { useClientStore } from "@/store/client-store";
+import { useTaskStore } from "@/store/task-store";
+
+interface ClientSwitcherProps {
+  collapsed?: boolean;
+}
+
+export function ClientSwitcher({ collapsed = false }: ClientSwitcherProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const {
+    clients,
+    selectedClientId,
+    isLoading,
+    error,
+    fetchClients,
+    setSelectedClient,
+    getSelectedClient,
+  } = useClientStore();
+
+  const fetchTasks = useTaskStore((s) => s.fetchTasks);
+
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [isOpen]);
+
+  const selectedClient = getSelectedClient();
+  const displayName = selectedClient ? selectedClient.name : "Root";
+
+  const handleSelect = (clientId: string | null) => {
+    setSelectedClient(clientId);
+    fetchTasks();
+    setIsOpen(false);
+  };
+
+  // Empty state: no clients detected
+  if (!isLoading && !error && clients.length === 0) {
+    return (
+      <div style={{ padding: collapsed ? "8px 0" : "8px 12px" }}>
+        {!collapsed && (
+          <>
+            <div
+              style={{
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontSize: 10,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "#5E5E65",
+                marginBottom: 8,
+              }}
+            >
+              WORKSPACE
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                height: 40,
+                padding: "0 12px",
+                borderRadius: 6,
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                fontSize: 14,
+                fontWeight: 500,
+                color: "#1C1B1F",
+              }}
+            >
+              <Globe size={16} style={{ color: "#5E5E65" }} />
+              Root
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div style={{ padding: collapsed ? "8px 0" : "8px 12px" }}>
+        {!collapsed && (
+          <>
+            <div
+              style={{
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontSize: 10,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "#5E5E65",
+                marginBottom: 8,
+              }}
+            >
+              WORKSPACE
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                height: 40,
+                padding: "0 12px",
+                color: "#EF4444",
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                fontSize: 13,
+              }}
+            >
+              <AlertCircle size={16} />
+              Error loading clients
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div ref={containerRef} style={{ position: "relative", padding: collapsed ? "8px 0" : "8px 0" }}>
+      {/* Section label */}
+      {!collapsed && (
+        <div
+          style={{
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+            fontSize: 10,
+            textTransform: "uppercase",
+            letterSpacing: "0.12em",
+            color: "#5E5E65",
+            marginBottom: 8,
+            padding: "0 12px",
+          }}
+        >
+          WORKSPACE
+        </div>
+      )}
+
+      {/* Trigger button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: collapsed ? "center" : "space-between",
+          gap: 8,
+          width: collapsed ? 40 : "100%",
+          height: 40,
+          padding: collapsed ? 0 : "0 12px",
+          borderRadius: 6,
+          border: "none",
+          background: "transparent",
+          cursor: "pointer",
+          fontFamily: "var(--font-inter), Inter, sans-serif",
+          fontSize: 14,
+          fontWeight: 500,
+          color: "#1C1B1F",
+          transition: "background 150ms ease",
+          margin: collapsed ? "0 auto" : 0,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = "#F6F3F1";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = "transparent";
+        }}
+        title={collapsed ? `Workspace: ${displayName}` : undefined}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+          {selectedClient ? (
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                backgroundColor: selectedClient.color,
+                flexShrink: 0,
+              }}
+            />
+          ) : (
+            <Globe size={16} style={{ color: "#5E5E65", flexShrink: 0 }} />
+          )}
+          {!collapsed && (
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {displayName}
+            </span>
+          )}
+        </div>
+        {!collapsed && (
+          isLoading ? (
+            <Loader2 size={16} style={{ color: "#5E5E65", animation: "spin 1s linear infinite" }} />
+          ) : (
+            <ChevronDown size={16} style={{ color: "#5E5E65", flexShrink: 0 }} />
+          )
+        )}
+      </button>
+
+      {/* Dropdown (opens upward) */}
+      {isOpen && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "100%",
+            left: 0,
+            right: collapsed ? "auto" : 0,
+            width: collapsed ? 240 : undefined,
+            marginBottom: 4,
+            backgroundColor: "#FFFFFF",
+            borderRadius: 8,
+            boxShadow: "0 4px 12px rgba(147, 69, 42, 0.08)",
+            border: "1px solid rgba(218, 193, 185, 0.2)",
+            maxHeight: 280,
+            overflowY: "auto",
+            padding: 4,
+            zIndex: 100,
+          }}
+        >
+          {/* Root option */}
+          <button
+            onClick={() => handleSelect(null)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              height: 40,
+              padding: "8px 12px",
+              borderRadius: 6,
+              border: "none",
+              background: selectedClientId === null ? "#FFDBCF" : "transparent",
+              cursor: "pointer",
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              fontSize: 14,
+              color: selectedClientId === null ? "#390C00" : "#5E5E65",
+              transition: "background 150ms ease",
+            }}
+            onMouseEnter={(e) => {
+              if (selectedClientId !== null) e.currentTarget.style.backgroundColor = "#F6F3F1";
+            }}
+            onMouseLeave={(e) => {
+              if (selectedClientId !== null) e.currentTarget.style.backgroundColor = "transparent";
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <Globe size={16} style={{ color: selectedClientId === null ? "#390C00" : "#5E5E65" }} />
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontWeight: 500 }}>Root</div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: selectedClientId === null ? "#390C00" : "#5E5E65",
+                    opacity: 0.7,
+                  }}
+                >
+                  All clients
+                </div>
+              </div>
+            </div>
+            {selectedClientId === null && <Check size={16} />}
+          </button>
+
+          {/* Divider */}
+          <div
+            style={{
+              height: 1,
+              backgroundColor: "rgba(218, 193, 185, 0.2)",
+              margin: "4px 0",
+            }}
+          />
+
+          {/* Client items */}
+          {clients.map((client) => (
+            <button
+              key={client.slug}
+              onClick={() => handleSelect(client.slug)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                height: 40,
+                padding: "8px 12px",
+                borderRadius: 6,
+                border: "none",
+                background: selectedClientId === client.slug ? "#FFDBCF" : "transparent",
+                cursor: "pointer",
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                fontSize: 14,
+                color: selectedClientId === client.slug ? "#390C00" : "#5E5E65",
+                transition: "background 150ms ease",
+              }}
+              onMouseEnter={(e) => {
+                if (selectedClientId !== client.slug) e.currentTarget.style.backgroundColor = "#F6F3F1";
+              }}
+              onMouseLeave={(e) => {
+                if (selectedClientId !== client.slug) e.currentTarget.style.backgroundColor = "transparent";
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                <span
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    backgroundColor: client.color,
+                    flexShrink: 0,
+                  }}
+                />
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {client.name}
+                </span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span
+                  style={{
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    fontSize: 12,
+                    color: selectedClientId === client.slug ? "#390C00" : "#5E5E65",
+                    opacity: 0.6,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  clients/{client.slug}
+                </span>
+                {selectedClientId === client.slug && <Check size={16} />}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

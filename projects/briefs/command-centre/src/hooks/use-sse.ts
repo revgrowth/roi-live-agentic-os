@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useTaskStore } from "@/store/task-store";
+import { useClientStore } from "@/store/client-store";
 
 export function useSSE() {
   const [isConnected, setIsConnected] = useState(false);
@@ -35,6 +36,12 @@ export function useSSE() {
       es.addEventListener(eventType, (e: MessageEvent) => {
         try {
           const event = JSON.parse(e.data);
+          // Filter SSE events by selected client
+          const selectedClientId = useClientStore.getState().selectedClientId;
+          if (selectedClientId && event.task?.clientId !== selectedClientId) {
+            // Non-Root client selected and event is for a different client -- skip
+            return;
+          }
           applySSEEvent(event);
         } catch {
           // Ignore malformed events

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Task, TaskLevel, TaskUpdateInput, OutputFile } from "@/types/task";
 import type { TaskEvent } from "@/lib/event-bus";
+import { useClientStore } from "./client-store";
 
 // SSE dedup: track IDs we created so SSE echoes are suppressed
 const _recentlyCreatedIds = new Set<string>();
@@ -42,7 +43,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   fetchTasks: async () => {
     set({ isLoading: true, error: null });
     try {
-      const res = await fetch("/api/tasks");
+      const clientId = useClientStore.getState().selectedClientId;
+      const url = clientId ? `/api/tasks?clientId=${encodeURIComponent(clientId)}` : "/api/tasks";
+      const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch tasks");
       const tasks = await res.json();
       set({ tasks, isLoading: false });
@@ -57,6 +60,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   createTask: async (title: string, level: TaskLevel) => {
     const tempId = "temp-" + crypto.randomUUID();
     const now = new Date().toISOString();
+    const currentClientId = useClientStore.getState().selectedClientId;
     const tempTask: Task = {
       id: tempId,
       title,
@@ -73,7 +77,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       errorMessage: null,
       startedAt: null,
       completedAt: null,
-      clientId: null,
+      clientId: currentClientId,
     };
 
     // Track pending create for SSE reconciliation
@@ -83,10 +87,11 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     set((state) => ({ tasks: [tempTask, ...state.tasks] }));
 
     try {
+      const clientId = useClientStore.getState().selectedClientId;
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, level }),
+        body: JSON.stringify({ title, level, clientId }),
       });
       if (!res.ok) throw new Error("Failed to create task");
       const realTask = await res.json();
