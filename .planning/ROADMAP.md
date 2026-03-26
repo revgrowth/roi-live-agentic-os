@@ -114,7 +114,7 @@ Plans:
 
 Plans:
 - [ ] 06-01-PLAN.md — Backend: DB migration, types (LogEntry, description), parser question detection, process manager stdin pipe/reply, reply API, SSE event types
-- [ ] 06-02-PLAN.md — Task creation form: inline-expand with name/description fields, Notion-inspired UX, store update
+- [x] 06-02-PLAN.md — Task creation form: inline-expand with name/description fields, Notion-inspired UX, store update
 - [ ] 06-03-PLAN.md — Full-screen task modal: chat-style log view, tool call cards, auto-scroll, reply input, metadata sidebar, logs API
 
 ## Progress
@@ -129,4 +129,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Outputs and Monitoring | 0/2 | Not started | - |
 | 4. Scheduling and Management | 0/3 | Not started | - |
 | 5. Client Switching | 0/3 | Not started | - |
-| 6. Task Execution and Detail UI | 0/3 | Not started | - |
+| 6. Task Execution and Detail UI | 1/3 | In Progress|  |

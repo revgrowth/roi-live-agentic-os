@@ -74,7 +74,7 @@
 
 ### Task Execution & Detail UI (Phase 6)
 
-- [ ] **EXEC-06-01**: Task creation captures both a short task name (card title) and a longer description (full brief sent to Claude) with inline-expand form
+- [x] **EXEC-06-01**: Task creation captures both a short task name (card title) and a longer description (full brief sent to Claude) with inline-expand form
 - [ ] **EXEC-06-02**: Process manager spawns Claude CLI with stdin piped (not ignored), enabling two-way communication for questions and replies
 - [ ] **EXEC-06-03**: Parser detects when Claude asks a question and emits question events via SSE, with reply API to pipe user responses to stdin
 - [ ] **EXEC-06-04**: Clicking a task opens a full-screen modal (not 480px slide-out) with chat-style execution logs, task metadata sidebar, and output files
@@ -156,7 +156,7 @@
 | CLIENT-02 | Phase 5 | Complete |
 | UI-01 | Phase 2 | Pending |
 | UI-02 | Phase 2 | Pending |
-| EXEC-06-01 | Phase 6 | Pending |
+| EXEC-06-01 | Phase 6 | Complete |
 | EXEC-06-02 | Phase 6 | Pending |
 | EXEC-06-03 | Phase 6 | Pending |
 | EXEC-06-04 | Phase 6 | Pending |
