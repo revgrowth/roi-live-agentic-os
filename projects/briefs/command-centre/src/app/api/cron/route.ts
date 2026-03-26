@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { listCronJobs, createCronJob } from "@/lib/cron-service";
 import type { CronJobCreateInput } from "@/types/cron";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const jobs = listCronJobs();
+    const clientId = request.nextUrl.searchParams.get("clientId");
+    const jobs = listCronJobs(clientId);
     return NextResponse.json(jobs);
   } catch (error) {
     console.error("GET /api/cron error:", error);
