@@ -14,7 +14,7 @@ function formatBytes(bytes: number | null): string {
 }
 
 export function PanelOutputs({ taskId }: { taskId: string }) {
-  const outputFiles = useTaskStore((s) => s.outputFiles[taskId] || []);
+  const outputFiles = useTaskStore((s) => s.outputFiles[taskId]) ?? [];
   const fetchOutputFiles = useTaskStore((s) => s.fetchOutputFiles);
   const [previewFile, setPreviewFile] = useState<OutputFile | null>(null);
   const [hoveredFileId, setHoveredFileId] = useState<string | null>(null);

@@ -49,7 +49,7 @@ export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
   const [previewFile, setPreviewFile] = useState<OutputFile | null>(null);
   const getChildTasks = useTaskStore((s) => s.getChildTasks);
   const deleteTask = useTaskStore((s) => s.deleteTask);
-  const outputFiles = useTaskStore((s) => s.outputFiles[task.id] || []);
+  const outputFiles = useTaskStore((s) => s.outputFiles[task.id]) ?? [];
   const fetchOutputFiles = useTaskStore((s) => s.fetchOutputFiles);
   const openPanel = useTaskStore((s) => s.openPanel);
 
