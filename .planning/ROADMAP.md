@@ -69,7 +69,7 @@ Plans:
 
 Plans:
 - [x] 03-01: Output file watcher, file listing on cards, inline preview, and download API
-- [ ] 03-02: Task detail slide-out panel, cost/token/duration tracking, and global stats bar
+- [x] 03-02: Task detail slide-out panel, cost/token/duration tracking, and global stats bar
 
 ### Phase 4: Scheduling and Management
 **Goal**: Users can schedule recurring tasks and browse their agentic-os configuration (context, brand, skills) from the dashboard

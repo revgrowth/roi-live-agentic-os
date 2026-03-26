@@ -38,7 +38,7 @@
 ### Tracking
 
 - [x] **TRACK-01**: Each task logs tokens used, cost, and duration
-- [ ] **TRACK-02**: Global stats bar shows: tasks running, tasks completed, active crons, today's spend
+- [x] **TRACK-02**: Global stats bar shows: tasks running, tasks completed, active crons, today's spend
 
 ### Outputs
 
@@ -48,8 +48,8 @@
 
 ### Detail Panel
 
-- [ ] **PANEL-01**: Clicking a card opens a slide-out panel with task level, skill used, progress, and stats
-- [ ] **PANEL-02**: Panel shows full list of output files with inline preview capability
+- [x] **PANEL-01**: Clicking a card opens a slide-out panel with task level, skill used, progress, and stats
+- [x] **PANEL-02**: Panel shows full list of output files with inline preview capability
 
 ### Cron
 
@@ -133,12 +133,12 @@
 | EXEC-03 | Phase 2 | Pending |
 | EXEC-04 | Phase 2 | Pending |
 | TRACK-01 | Phase 3 | Complete |
-| TRACK-02 | Phase 3 | Pending |
+| TRACK-02 | Phase 3 | Complete |
 | OUT-01 | Phase 3 | Complete |
 | OUT-02 | Phase 3 | Complete |
 | OUT-03 | Phase 3 | Complete |
-| PANEL-01 | Phase 3 | Pending |
-| PANEL-02 | Phase 3 | Pending |
+| PANEL-01 | Phase 3 | Complete |
+| PANEL-02 | Phase 3 | Complete |
 | CRON-01 | Phase 4 | Pending |
 | CRON-02 | Phase 4 | Pending |
 | CTX-01 | Phase 4 | Pending |
