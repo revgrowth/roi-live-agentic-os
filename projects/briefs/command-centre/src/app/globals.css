@@ -1,14 +1,32 @@
 @import "tailwindcss";
 
 body {
-  background-color: #fafbfc;
+  background-color: #FCF9F7;
+  color: #1B1C1B;
 }
 
-@keyframes pulse {
+@keyframes pulse-dot {
   0%, 100% {
     opacity: 1;
+    transform: scale(1);
   }
   50% {
-    opacity: 0.4;
+    opacity: 0.5;
+    transform: scale(1.3);
   }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.custom-shadow {
+  box-shadow: 0px 12px 32px rgba(147, 69, 42, 0.06);
+}
+
+.terracotta-gradient {
+  background: linear-gradient(135deg, #93452A 0%, #B25D3F 100%);
 }

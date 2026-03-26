@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const inter = Inter({
@@ -7,9 +8,16 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
+  variable: "--font-space-grotesk",
+});
+
+// Epilogue for headlines — loaded via next/font/google
+import { Epilogue } from "next/font/google";
+const epilogue = Epilogue({
+  subsets: ["latin"],
+  variable: "--font-epilogue",
 });
 
 export const metadata: Metadata = {
@@ -25,7 +33,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+        className={`${inter.variable} ${spaceGrotesk.variable} ${epilogue.variable} antialiased`}
+        style={{ fontFamily: "var(--font-inter), Inter, sans-serif" }}
       >
         {children}
       </body>

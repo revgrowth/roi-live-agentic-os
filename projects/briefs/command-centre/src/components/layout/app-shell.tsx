@@ -1,18 +1,43 @@
 "use client";
 
 import { Sidebar } from "./sidebar";
-import { StatsBar } from "./stats-bar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        <StatsBar />
-        <main style={{ flex: 1, padding: "32px 40px", overflow: "auto" }}>
+      <main style={{ flex: 1, minHeight: "100vh" }}>
+        {/* Sticky header */}
+        <header
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "0 32px",
+            height: 64,
+            position: "sticky",
+            top: 0,
+            zIndex: 50,
+            backgroundColor: "rgba(252, 249, 247, 0.8)",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+              fontWeight: 700,
+              fontSize: 20,
+              color: "#93452A",
+              margin: 0,
+            }}
+          >
+            Command Centre
+          </h2>
+        </header>
+        <div style={{ padding: "0 32px 32px", display: "flex", flexDirection: "column", gap: 32 }}>
           {children}
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
