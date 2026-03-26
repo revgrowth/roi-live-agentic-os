@@ -1,14 +1,16 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LayoutDashboard, Clock, Brain, Sparkles, Cpu, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { ClientSwitcher } from "./client-switcher";
 
 const navItems = [
-  { label: "Board", icon: LayoutDashboard, active: true },
-  { label: "Cron Jobs", icon: Clock, active: false },
-  { label: "Context", icon: Brain, active: false },
-  { label: "Brand", icon: Sparkles, active: false },
-  { label: "Skills", icon: Cpu, active: false },
+  { label: "Board", icon: LayoutDashboard, href: "/" },
+  { label: "Cron Jobs", icon: Clock, href: "/cron" },
+  { label: "Context", icon: Brain, href: "/context" },
+  { label: "Brand", icon: Sparkles, href: "/brand" },
+  { label: "Skills", icon: Cpu, href: "/skills" },
 ];
 
 interface SidebarProps {
@@ -17,6 +19,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+  const pathname = usePathname();
+
   return (
     <aside
       style={{
@@ -81,9 +85,11 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
         {navItems.map((item) => {
           const Icon = item.icon;
+          const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
           return (
-            <a
+            <Link
               key={item.label}
+              href={item.href}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -91,12 +97,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 gap: collapsed ? 0 : 12,
                 padding: collapsed ? "10px 0" : "10px 12px",
                 borderRadius: 12,
-                cursor: item.active ? "default" : "pointer",
-                backgroundColor: item.active ? "#FFFFFF" : "transparent",
-                color: item.active ? "#93452A" : "#5E5E65",
+                cursor: isActive ? "default" : "pointer",
+                backgroundColor: isActive ? "#FFFFFF" : "transparent",
+                color: isActive ? "#93452A" : "#5E5E65",
                 textDecoration: "none",
                 transition: "all 200ms ease",
-                boxShadow: item.active
+                boxShadow: isActive
                   ? "0px 4px 12px rgba(147, 69, 42, 0.06)"
                   : "none",
                 width: collapsed ? 40 : "auto",
@@ -107,7 +113,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             >
               <Icon size={20} />
               {!collapsed && <span style={{ fontWeight: 500, whiteSpace: "nowrap" }}>{item.label}</span>}
-            </a>
+            </Link>
           );
         })}
       </nav>
