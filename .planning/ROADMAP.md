@@ -19,6 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: Outputs and Monitoring** - Output files surface on cards with preview/download, cost tracking, and detail panel
 - [ ] **Phase 4: Scheduling and Management** - Cron job scheduling plus Context, Brand, and Skills tabs
 - [ ] **Phase 5: Client Switching** - Multi-client scoping across all views
+- [ ] **Phase 6: Task Execution and Detail UI** - Real task execution, task name/description fields, and full-screen task modal with live logs
 
 ## Phase Details
 
@@ -100,10 +101,26 @@ Plans:
 - [x] 05-02-PLAN.md — Client switcher UI, scope bar, board-scoped API filtering, and process manager
 - [ ] 05-03-PLAN.md — Client-scoped filtering for cron, context, brand, and skills views
 
+### Phase 6: Task Execution and Detail UI
+**Goal**: Tasks typed into the dashboard actually execute via Claude Code, with real status updates, live logs streamed to a full-screen task modal, and separate task name/description fields
+**Depends on**: Phase 5
+**Requirements**: EXEC-06-01, EXEC-06-02, EXEC-06-03, EXEC-06-04, EXEC-06-05
+**Success Criteria** (what must be TRUE):
+  1. When a user creates a task, Claude Code actually spawns and executes the work — status transitions (queued -> running -> review -> done) reflect real execution state
+  2. Task creation captures both a short task name (card title) and a longer task description (the full brief sent to Claude)
+  3. Clicking a task opens a full-screen modal (not the 480px slide-out) with output previews, execution logs streamed live, and all task metadata
+  4. Execution logs show real Claude Code stdout/stderr with stage markers as the task progresses
+**Plans**: 3 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Backend: DB migration, types (LogEntry, description), parser question detection, process manager stdin pipe/reply, reply API, SSE event types
+- [ ] 06-02-PLAN.md — Task creation form: inline-expand with name/description fields, Notion-inspired UX, store update
+- [ ] 06-03-PLAN.md — Full-screen task modal: chat-style log view, tool call cards, auto-scroll, reply input, metadata sidebar, logs API
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
@@ -112,3 +129,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 3. Outputs and Monitoring | 0/2 | Not started | - |
 | 4. Scheduling and Management | 0/3 | Not started | - |
 | 5. Client Switching | 0/3 | Not started | - |
+| 6. Task Execution and Detail UI | 0/3 | Not started | - |

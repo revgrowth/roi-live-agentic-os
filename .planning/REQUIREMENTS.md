@@ -58,9 +58,9 @@
 
 ### Management Tabs
 
-- [ ] **CTX-01**: Context tab displays and allows editing of memory/context files from the agentic-os project
-- [ ] **BRAND-01**: Brand tab displays and allows editing of brand context files (voice, positioning, ICP, style)
-- [ ] **SKILL-01**: Skills tab shows browsable list of installed skills with name, trigger description, and dependencies
+- [x] **CTX-01**: Context tab displays and allows editing of memory/context files from the agentic-os project
+- [x] **BRAND-01**: Brand tab displays and allows editing of brand context files (voice, positioning, ICP, style)
+- [x] **SKILL-01**: Skills tab shows browsable list of installed skills with name, trigger description, and dependencies
 
 ### Client Switching
 
@@ -71,6 +71,14 @@
 
 - [ ] **UI-01**: Clean light theme with minimal UI inspired by Vibe Kanban — no emojis, no dev jargon
 - [ ] **UI-02**: Nav structure: Board | Cron Jobs | Context | Brand | Skills with client switcher in top bar
+
+### Task Execution & Detail UI (Phase 6)
+
+- [ ] **EXEC-06-01**: Task creation captures both a short task name (card title) and a longer description (full brief sent to Claude) with inline-expand form
+- [ ] **EXEC-06-02**: Process manager spawns Claude CLI with stdin piped (not ignored), enabling two-way communication for questions and replies
+- [ ] **EXEC-06-03**: Parser detects when Claude asks a question and emits question events via SSE, with reply API to pipe user responses to stdin
+- [ ] **EXEC-06-04**: Clicking a task opens a full-screen modal (not 480px slide-out) with chat-style execution logs, task metadata sidebar, and output files
+- [ ] **EXEC-06-05**: Execution logs stream live with auto-scroll, tool calls shown as collapsible cards, and Jump to latest button when scrolled up
 
 ## v2 Requirements
 
@@ -141,19 +149,24 @@
 | PANEL-02 | Phase 3 | Complete |
 | CRON-01 | Phase 4 | Complete |
 | CRON-02 | Phase 4 | Complete |
-| CTX-01 | Phase 4 | Pending |
-| BRAND-01 | Phase 4 | Pending |
-| SKILL-01 | Phase 4 | Pending |
+| CTX-01 | Phase 4 | Complete |
+| BRAND-01 | Phase 4 | Complete |
+| SKILL-01 | Phase 4 | Complete |
 | CLIENT-01 | Phase 5 | Complete |
 | CLIENT-02 | Phase 5 | Complete |
 | UI-01 | Phase 2 | Pending |
 | UI-02 | Phase 2 | Pending |
+| EXEC-06-01 | Phase 6 | Pending |
+| EXEC-06-02 | Phase 6 | Pending |
+| EXEC-06-03 | Phase 6 | Pending |
+| EXEC-06-04 | Phase 6 | Pending |
+| EXEC-06-05 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 34 total
-- Mapped to phases: 34
+- v1 requirements: 39 total
+- Mapped to phases: 39
 - Unmapped: 0
 
 ---
 *Requirements defined: 2025-03-25*
-*Last updated: 2026-03-25 — DESIGN-01 through DESIGN-04 marked Complete (Phase 1 executed)*
+*Last updated: 2026-03-26 — EXEC-06-01 through EXEC-06-05 added for Phase 6*
