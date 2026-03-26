@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
+import { EnvEditor } from "@/components/settings/env-editor";
 
 type TabId = "scripts" | "env" | "mcp" | "claude";
 
@@ -19,16 +20,21 @@ export default function SettingsPage() {
   return (
     <AppShell title="Settings">
       <SettingsTabs activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as TabId)} />
-      <div style={{ padding: 24, minHeight: 400 }}>
-        <div
-          style={{
-            color: "#5E5E65",
-            fontFamily: "var(--font-inter), Inter, sans-serif",
-            fontSize: 14,
-          }}
-        >
-          {tabLabels[activeTab]} — Coming soon...
-        </div>
+      <div style={{ minHeight: 400 }}>
+        {activeTab === "env" ? (
+          <EnvEditor />
+        ) : (
+          <div
+            style={{
+              padding: 24,
+              color: "#5E5E65",
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              fontSize: 14,
+            }}
+          >
+            {tabLabels[activeTab]} — Coming soon...
+          </div>
+        )}
       </div>
     </AppShell>
   );
