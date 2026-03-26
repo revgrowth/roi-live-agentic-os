@@ -83,8 +83,8 @@ Plans:
 
 Plans:
 - [x] 04-01-PLAN.md — Cron types, service layer, schema migration, REST API, Zustand store, and Cron Jobs view with job table, run history, create panel, and schedule selector
-- [ ] 04-02-PLAN.md — Shared infrastructure: file/skill types with dependency parsing, file service, file/skills APIs, shared markdown preview/editor, slide-out panel, and sidebar routing
-- [ ] 04-03-PLAN.md — Context tab, Brand tab, and Skills tab page views consuming shared components from 04-02
+- [x] 04-02-PLAN.md — Shared infrastructure: file/skill types with dependency parsing, file service, file/skills APIs, shared markdown preview/editor, slide-out panel, and sidebar routing
+- [x] 04-03-PLAN.md — Context tab, Brand tab, and Skills tab page views consuming shared components from 04-02
 
 ### Phase 5: Client Switching
 **Goal**: Multi-client users can scope the entire dashboard to a specific client workspace
