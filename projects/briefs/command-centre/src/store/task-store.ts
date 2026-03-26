@@ -2,6 +2,9 @@ import { create } from "zustand";
 import type { Task, TaskLevel, TaskUpdateInput } from "@/types/task";
 import type { TaskEvent } from "@/lib/event-bus";
 
+// Module-level set to track recently created task IDs for SSE self-echo suppression
+const _recentlyCreatedIds = new Set<string>();
+
 interface TaskStore {
   tasks: Task[];
   isLoading: boolean;
@@ -42,6 +45,30 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   },
 
   createTask: async (title: string, level: TaskLevel) => {
+    const tempId = "temp-" + crypto.randomUUID();
+    const now = new Date().toISOString();
+    const tempTask: Task = {
+      id: tempId,
+      title,
+      status: "backlog",
+      level,
+      parentId: null,
+      columnOrder: -Date.now(), // Guarantees sorting to top (lowest value)
+      createdAt: now,
+      updatedAt: now,
+      costUsd: null,
+      tokensUsed: null,
+      durationMs: null,
+      activityLabel: null,
+      errorMessage: null,
+      startedAt: null,
+      completedAt: null,
+    };
+
+    // Optimistic: add temp task to state immediately
+    set((state) => ({ tasks: [tempTask, ...state.tasks] }));
+
+    // Fire request in background
     try {
       const res = await fetch("/api/tasks", {
         method: "POST",
@@ -49,16 +76,22 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         body: JSON.stringify({ title, level }),
       });
       if (!res.ok) throw new Error("Failed to create task");
-      const task = await res.json();
-      set((state) => {
-        // Avoid duplicate if SSE event arrived before API response
-        if (state.tasks.some((t) => t.id === task.id)) return state;
-        return { tasks: [...state.tasks, task] };
-      });
+      const realTask = await res.json();
+
+      // Track real ID so SSE self-echo is suppressed
+      _recentlyCreatedIds.add(realTask.id);
+      setTimeout(() => _recentlyCreatedIds.delete(realTask.id), 10000);
+
+      // Replace temp task with real task from server
+      set((state) => ({
+        tasks: state.tasks.map((t) => (t.id === tempId ? realTask : t)),
+      }));
     } catch (err) {
-      set({
+      // Remove temp task on error
+      set((state) => ({
+        tasks: state.tasks.filter((t) => t.id !== tempId),
         error: err instanceof Error ? err.message : "Unknown error",
-      });
+      }));
     }
   },
 
@@ -124,8 +157,13 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   applySSEEvent: (event: TaskEvent) => {
     switch (event.type) {
       case "task:created":
+        // Skip self-echo: if we just created this task optimistically, the SSE event is redundant
+        if (_recentlyCreatedIds.has(event.task.id)) {
+          _recentlyCreatedIds.delete(event.task.id);
+          break;
+        }
         set((state) => {
-          // Avoid duplicates
+          // Avoid duplicates (e.g. rapid SSE reconnect)
           if (state.tasks.some((t) => t.id === event.task.id)) return state;
           return { tasks: [...state.tasks, event.task] };
         });

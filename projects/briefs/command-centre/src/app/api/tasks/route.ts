@@ -50,12 +50,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get max columnOrder in backlog
-    const maxOrder = db
+    // Get min columnOrder in backlog — new tasks get lowest value to sort to top
+    const minOrder = db
       .prepare(
-        "SELECT COALESCE(MAX(columnOrder), -1) as maxOrder FROM tasks WHERE status = 'backlog'"
+        "SELECT COALESCE(MIN(columnOrder), 1) as minOrder FROM tasks WHERE status = 'backlog'"
       )
-      .get() as { maxOrder: number };
+      .get() as { minOrder: number };
 
     const now = new Date().toISOString();
     const task: Task = {
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       status: "backlog",
       level,
       parentId: null,
-      columnOrder: maxOrder.maxOrder + 1,
+      columnOrder: minOrder.minOrder - 1,
       createdAt: now,
       updatedAt: now,
       costUsd: null,
