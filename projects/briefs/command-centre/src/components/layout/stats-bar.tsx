@@ -12,9 +12,12 @@ export function StatsBar() {
   const todaySpend = tasks
     .filter(
       (t) =>
-        t.status === "done" &&
-        t.completedAt &&
-        t.completedAt.slice(0, 10) === today
+        t.costUsd !== null &&
+        (t.status === "done" || t.status === "running" || t.status === "review") &&
+        (
+          (t.completedAt && t.completedAt.slice(0, 10) === today) ||
+          (t.startedAt && t.startedAt.slice(0, 10) === today)
+        )
     )
     .reduce((sum, t) => sum + (t.costUsd ?? 0), 0);
 

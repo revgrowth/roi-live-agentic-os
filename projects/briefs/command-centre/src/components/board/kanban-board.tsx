@@ -7,6 +7,7 @@ import type { Task, TaskStatus } from "@/types/task";
 import { KanbanColumn } from "./kanban-column";
 import { TaskCreateInput } from "./task-create-input";
 import { TaskCard } from "./task-card";
+import { TaskDetailPanel } from "../panel/task-detail-panel";
 
 const columns: TaskStatus[] = ["backlog", "queued", "running", "review", "done"];
 
@@ -108,6 +109,7 @@ export function KanbanBoard() {
           {activeTask ? <TaskCard task={activeTask} isOverlay /> : null}
         </DragOverlay>
       </DndContext>
+      <TaskDetailPanel />
     </div>
   );
 }
