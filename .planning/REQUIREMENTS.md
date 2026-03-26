@@ -80,6 +80,25 @@
 - [ ] **EXEC-06-04**: Clicking a task opens a full-screen modal (not 480px slide-out) with chat-style execution logs, task metadata sidebar, and output files
 - [ ] **EXEC-06-05**: Execution logs stream live with auto-scroll, tool calls shown as collapsible cards, and Jump to latest button when scrolled up
 
+## v1.1 Requirements
+
+### Settings & Configuration
+
+- [x] **SETTINGS-01**: Settings page accessible from sidebar with tabbed layout for Scripts, Environment, MCP, and Claude Settings
+- [ ] **SETTINGS-02**: Environment tab displays `.env` key-value pairs with values masked by default, a reveal toggle per row, and a copy-to-clipboard button per value
+- [ ] **SETTINGS-03**: Environment tab supports adding, editing, and deleting key-value pairs, saving back to `.env` file
+- [ ] **SETTINGS-04**: MCP tab displays `.mcp.json` in a syntax-highlighted JSON editor with save functionality
+- [ ] **SETTINGS-05**: Claude Settings tab displays `.claude/settings.json` in a syntax-highlighted JSON editor with save functionality
+- [ ] **SETTINGS-06**: JSON editors validate syntax before saving and show inline error indicators for malformed JSON
+
+### Script Runner
+
+- [x] **SCRIPT-01**: Scripts tab lists available system scripts from `scripts/` directory with human-readable labels and descriptions
+- [ ] **SCRIPT-02**: Scripts that require arguments (e.g. `add-client.sh`) show an input form in the UI before execution (client name field for add-client)
+- [ ] **SCRIPT-03**: Running a script streams stdout/stderr output live to the UI in a terminal-style output area
+- [ ] **SCRIPT-04**: Destructive or long-running scripts (e.g. `update.sh`) require confirmation before execution
+- [ ] **SCRIPT-05**: Script execution shows running/success/error status with appropriate visual indicators
+
 ## v2 Requirements
 
 ### Smart Routing
@@ -162,11 +181,24 @@
 | EXEC-06-04 | Phase 6 | Pending |
 | EXEC-06-05 | Phase 6 | Pending |
 
+| SETTINGS-01 | Phase 7 | Complete |
+| SETTINGS-02 | Phase 7 | Pending |
+| SETTINGS-03 | Phase 7 | Pending |
+| SETTINGS-04 | Phase 7 | Pending |
+| SETTINGS-05 | Phase 7 | Pending |
+| SETTINGS-06 | Phase 7 | Pending |
+| SCRIPT-01 | Phase 7 | Complete |
+| SCRIPT-02 | Phase 7 | Pending |
+| SCRIPT-03 | Phase 7 | Pending |
+| SCRIPT-04 | Phase 7 | Pending |
+| SCRIPT-05 | Phase 7 | Pending |
+
 **Coverage:**
 - v1 requirements: 39 total
-- Mapped to phases: 39
+- v1.1 requirements: 11 total
+- Mapped to phases: 50
 - Unmapped: 0
 
 ---
 *Requirements defined: 2025-03-25*
-*Last updated: 2026-03-26 — EXEC-06-01 through EXEC-06-05 added for Phase 6*
+*Last updated: 2026-03-26 — v1.1 Settings & Script Runner requirements added*

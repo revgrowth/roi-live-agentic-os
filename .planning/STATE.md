@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
+milestone: v1.1
+milestone_name: "Milestone: Settings & System Management"
 status: Ready to execute
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-26T14:43:58.103Z"
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-03-26T18:12:01.260Z"
 progress:
-  total_phases: 6
+  total_phases: 7
   completed_phases: 5
-  total_plans: 18
-  completed_plans: 17
+  total_plans: 22
+  completed_plans: 18
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2025-03-25)
 
 **Core value:** A user can describe a task, watch it run, and get the output -- without ever opening a terminal.
-**Current focus:** Phase 06 — task-execution-and-detail-ui
+**Current focus:** Phase 07 — settings-script-runner
 
 ## Current Position
 
-Phase: 06 (task-execution-and-detail-ui) — EXECUTING
-Plan: 3 of 3
+Phase: 07 (settings-script-runner) — EXECUTING
+Plan: 2 of 4
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Plan: 3 of 3
 | Phase 04 P03 | 4min | 2 tasks | 9 files |
 | Phase 06 P02 | 2min | 1 tasks | 2 files |
 | Phase 06 P01 | 5min | 2 tasks | 10 files |
+| Phase 07 P01 | 2min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -117,17 +118,23 @@ Recent decisions affecting current work:
 - [Phase 06]: SessionEntry wrapper type for ChildProcess+stdin in process-manager sessions Map
 - [Phase 06]: In-memory log entry storage on ProcessManager for streaming performance (ephemeral per session)
 - [Phase 06]: Question detection via last-line heuristic with ? and common Claude patterns
+- [Phase 07]: NDJSON streaming for script output instead of SSE — simpler for request-response script execution
+- [Phase 07]: Module-level Set for runningScripts concurrency — prevents same script running twice
+- [Phase 07]: Split sidebar navItems into main and bottom groups with visual divider
 
 ### Roadmap Evolution
 
 - Phase 6 added: Task Execution and Detail UI — real task execution, task name/description fields, and full-screen task modal with live logs
+- v1.1 milestone added: Phase 7 (Settings & Script Runner) — settings page with .env masked editor, JSON editors for .mcp.json and settings.json, and script runner with live output streaming
 
 ### Pending Todos
 
-2 pending:
+4 pending:
 
 - **Add docs tab for viewing/editing CLAUDE.md and README** (area: ui)
 - **GSD project/phase visualization and command execution in UI** (area: ui)
+- **Settings page with .env, .mcp.json, settings.json editors** (area: ui, v1.1)
+- **Script runner with argument forms and live output streaming** (area: ui, v1.1)
 
 ### Blockers/Concerns
 
@@ -137,6 +144,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-26T14:43:58.101Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-03-26T18:12:01.257Z
+Stopped at: Completed 07-01-PLAN.md
 Resume file: None

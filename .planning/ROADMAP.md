@@ -144,7 +144,7 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Settings page scaffold, sidebar routing, tab layout, API routes for reading/writing .env, .mcp.json, and settings.json
+- [x] 07-01-PLAN.md — Settings page scaffold, sidebar routing, tab layout, API routes for reading/writing .env, .mcp.json, and settings.json
 - [ ] 07-02-PLAN.md — Environment tab: masked key-value editor with reveal toggle, copy button, add/edit/delete, save to .env
 - [ ] 07-03-PLAN.md — MCP and Claude Settings tabs: syntax-highlighted JSON editors with validation and save
 - [ ] 07-04-PLAN.md — Scripts tab: script registry, argument forms, live output streaming, confirmation dialogs, status indicators
