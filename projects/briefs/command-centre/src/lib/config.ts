@@ -21,3 +21,13 @@ export function getConfig(): Config {
   cachedConfig = { agenticOsDir, dbPath };
   return cachedConfig;
 }
+
+/**
+ * Resolve the agentic-os directory for a specific client,
+ * or the root agentic-os directory if no clientId is provided.
+ */
+export function getClientAgenticOsDir(clientId: string | null): string {
+  const config = getConfig();
+  if (!clientId) return config.agenticOsDir;
+  return path.join(config.agenticOsDir, "clients", clientId);
+}
