@@ -7,12 +7,15 @@ export type TaskEventType =
   | "task:deleted"
   | "task:status"
   | "task:progress"
-  | "task:output";
+  | "task:output"
+  | "task:question"
+  | "task:log";
 
 export interface TaskEvent {
   type: TaskEventType;
   task: Task;
   timestamp: string;
+  questionText?: string;
 }
 
 const emitter = new EventEmitter();

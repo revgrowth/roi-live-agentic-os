@@ -1,9 +1,23 @@
 export type TaskStatus = "backlog" | "queued" | "running" | "review" | "done";
 export type TaskLevel = "task" | "project" | "gsd";
 
+export type LogEntryType = "text" | "tool_use" | "tool_result" | "question" | "user_reply" | "system";
+
+export interface LogEntry {
+  id: string;
+  type: LogEntryType;
+  timestamp: string;
+  content: string;
+  toolName?: string;
+  toolArgs?: string;
+  toolResult?: string;
+  isCollapsed?: boolean;
+}
+
 export interface Task {
   id: string;
   title: string;
+  description: string | null;
   status: TaskStatus;
   level: TaskLevel;
   parentId: string | null;
@@ -33,6 +47,7 @@ export interface OutputFile {
 
 export interface TaskCreateInput {
   title: string;
+  description?: string | null;
   level: TaskLevel;
   clientId?: string | null;
 }
@@ -41,6 +56,7 @@ export type TaskUpdateInput = Partial<
   Pick<
     Task,
     | "title"
+    | "description"
     | "status"
     | "level"
     | "parentId"

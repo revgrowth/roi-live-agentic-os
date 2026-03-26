@@ -52,6 +52,7 @@ export async function PATCH(
 
     const allowedFields: (keyof TaskUpdateInput)[] = [
       "title",
+      "description",
       "status",
       "level",
       "parentId",

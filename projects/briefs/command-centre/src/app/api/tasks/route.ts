@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate input
-    const { title, level, clientId: bodyClientId } = body as TaskCreateInput;
+    const { title, description, level, clientId: bodyClientId } = body as TaskCreateInput;
     if (!title || typeof title !== "string" || title.trim().length === 0) {
       return NextResponse.json(
         { error: "title is required and must be a non-empty string" },
@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
     const task: Task = {
       id: crypto.randomUUID(),
       title: title.trim(),
+      description: description?.trim() || null,
       status: "backlog",
       level,
       parentId: null,
@@ -89,11 +90,12 @@ export async function POST(request: NextRequest) {
     };
 
     db.prepare(
-      `INSERT INTO tasks (id, title, status, level, parentId, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (id, title, description, status, level, parentId, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       task.id,
       task.title,
+      task.description,
       task.status,
       task.level,
       task.parentId,

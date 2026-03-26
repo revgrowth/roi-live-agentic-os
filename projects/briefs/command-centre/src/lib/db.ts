@@ -37,5 +37,11 @@ export function getDb(): Database.Database {
     db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_clientId ON tasks(clientId)");
   }
 
+  // Migration: add description column if it doesn't exist
+  const descCol = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
+  if (!descCol.some((c) => c.name === "description")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN description TEXT");
+  }
+
   return db;
 }
