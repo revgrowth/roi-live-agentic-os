@@ -17,7 +17,7 @@ interface TaskStore {
 
   // Actions
   fetchTasks: () => Promise<void>;
-  createTask: (title: string, level: TaskLevel) => Promise<void>;
+  createTask: (title: string, description: string | null, level: TaskLevel) => Promise<void>;
   updateTask: (id: string, updates: TaskUpdateInput) => Promise<void>;
   moveTask: (id: string, newStatus: string, newOrder: number) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -57,13 +57,14 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }
   },
 
-  createTask: async (title: string, level: TaskLevel) => {
+  createTask: async (title: string, description: string | null, level: TaskLevel) => {
     const tempId = "temp-" + crypto.randomUUID();
     const now = new Date().toISOString();
     const currentClientId = useClientStore.getState().selectedClientId;
     const tempTask: Task = {
       id: tempId,
       title,
+      description: description || null,
       status: "backlog",
       level,
       parentId: null,
@@ -91,7 +92,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, level, clientId }),
+        body: JSON.stringify({ title, description, level, clientId }),
       });
       if (!res.ok) throw new Error("Failed to create task");
       const realTask = await res.json();
