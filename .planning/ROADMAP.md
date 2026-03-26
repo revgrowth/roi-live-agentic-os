@@ -113,7 +113,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Backend: DB migration, types (LogEntry, description), parser question detection, process manager stdin pipe/reply, reply API, SSE event types
+- [x] 06-01-PLAN.md — Backend: DB migration, types (LogEntry, description), parser question detection, process manager stdin pipe/reply, reply API, SSE event types
 - [x] 06-02-PLAN.md — Task creation form: inline-expand with name/description fields, Notion-inspired UX, store update
 - [ ] 06-03-PLAN.md — Full-screen task modal: chat-style log view, tool call cards, auto-scroll, reply input, metadata sidebar, logs API
 
