@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 05-01-PLAN.md (Client Foundation)
-last_updated: "2026-03-26T12:11:21.203Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 05-02-PLAN.md (Client Switcher UI)
+last_updated: "2026-03-26T12:18:13.865Z"
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 15
-  completed_plans: 9
+  completed_plans: 12
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2025-03-25)
 ## Current Position
 
 Phase: 04 (scheduling-and-management) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -51,6 +51,8 @@ Plan: 2 of 3
 | Phase 03 P01 | 6min | 2 tasks | 14 files |
 | Phase 03 P02 | 2min | 2 tasks | 7 files |
 | Phase 05 P01 | 5min | 2 tasks | 9 files |
+| Phase 04 P01 | 8min | 2 tasks | 16 files |
+| Phase 05 P02 | 3min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -92,6 +94,13 @@ Recent decisions affecting current work:
 - [Phase 03]: Stats bar todaySpend includes running and review tasks for real-time cost visibility
 - [Phase 05]: djb2 hash for deterministic client color assignment from slug
 - [Phase 05]: PRAGMA table_info migration pattern for safe clientId column addition
+- [Phase 04]: Used croner library for cron expression parsing and next-run calculation
+- [Phase 04]: File-based CRUD with gray-matter for YAML frontmatter, matching existing dispatcher format
+- [Phase 04]: Atomic write pattern (write to .tmp then fs.renameSync) for cron job file safety
+- [Phase 04]: Schedule selector with preset chips for non-technical users instead of raw cron expressions
+- [Phase 05]: Cross-store reading via useClientStore.getState() for task store and SSE hook
+- [Phase 05]: Zustand persist middleware with partialize to only persist selectedClientId in localStorage
+- [Phase 05]: SSE client filtering done client-side at event handler level
 
 ### Pending Todos
 
@@ -105,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T12:11:21.194Z
-Stopped at: Completed 05-01-PLAN.md (Client Foundation)
+Last session: 2026-03-26T12:18:13.863Z
+Stopped at: Completed 05-02-PLAN.md (Client Switcher UI)
 Resume file: None

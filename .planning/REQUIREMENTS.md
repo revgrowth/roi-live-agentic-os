@@ -53,8 +53,8 @@
 
 ### Cron
 
-- [ ] **CRON-01**: User can create recurring tasks with daily, weekly, monthly, or custom cron expression
-- [ ] **CRON-02**: Dedicated Cron Jobs view shows run history, average duration, average cost, next run, and active/paused status
+- [x] **CRON-01**: User can create recurring tasks with daily, weekly, monthly, or custom cron expression
+- [x] **CRON-02**: Dedicated Cron Jobs view shows run history, average duration, average cost, next run, and active/paused status
 
 ### Management Tabs
 
@@ -65,7 +65,7 @@
 ### Client Switching
 
 - [x] **CLIENT-01**: Client switcher in nav bar scopes all views to a specific client folder or root
-- [ ] **CLIENT-02**: Board, cron jobs, context, brand, and skills all filter by selected client
+- [x] **CLIENT-02**: Board, cron jobs, context, brand, and skills all filter by selected client
 
 ### Design (UI Implementation)
 
@@ -139,13 +139,13 @@
 | OUT-03 | Phase 3 | Complete |
 | PANEL-01 | Phase 3 | Complete |
 | PANEL-02 | Phase 3 | Complete |
-| CRON-01 | Phase 4 | Pending |
-| CRON-02 | Phase 4 | Pending |
+| CRON-01 | Phase 4 | Complete |
+| CRON-02 | Phase 4 | Complete |
 | CTX-01 | Phase 4 | Pending |
 | BRAND-01 | Phase 4 | Pending |
 | SKILL-01 | Phase 4 | Pending |
 | CLIENT-01 | Phase 5 | Complete |
-| CLIENT-02 | Phase 5 | Pending |
+| CLIENT-02 | Phase 5 | Complete |
 | UI-01 | Phase 2 | Pending |
 | UI-02 | Phase 2 | Pending |
 

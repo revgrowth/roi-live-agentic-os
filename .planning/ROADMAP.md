@@ -82,7 +82,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Cron types, service layer, schema migration, REST API, Zustand store, and Cron Jobs view with job table, run history, create panel, and schedule selector
+- [x] 04-01-PLAN.md — Cron types, service layer, schema migration, REST API, Zustand store, and Cron Jobs view with job table, run history, create panel, and schedule selector
 - [ ] 04-02-PLAN.md — Shared infrastructure: file/skill types with dependency parsing, file service, file/skills APIs, shared markdown preview/editor, slide-out panel, and sidebar routing
 - [ ] 04-03-PLAN.md — Context tab, Brand tab, and Skills tab page views consuming shared components from 04-02
 
@@ -96,8 +96,8 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Client types, detection module, API endpoint, DB migration, and config helper
-- [ ] 05-02-PLAN.md — Client switcher UI, scope bar, board-scoped API filtering, and process manager
+- [x] 05-01-PLAN.md — Client types, detection module, API endpoint, DB migration, and config helper
+- [x] 05-02-PLAN.md — Client switcher UI, scope bar, board-scoped API filtering, and process manager
 - [ ] 05-03-PLAN.md — Client-scoped filtering for cron, context, brand, and skills views
 
 ## Progress
