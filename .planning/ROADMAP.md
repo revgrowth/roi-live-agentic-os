@@ -68,7 +68,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Output file watcher, file listing on cards, inline preview, and download API
+- [x] 03-01: Output file watcher, file listing on cards, inline preview, and download API
 - [ ] 03-02: Task detail slide-out panel, cost/token/duration tracking, and global stats bar
 
 ### Phase 4: Scheduling and Management
