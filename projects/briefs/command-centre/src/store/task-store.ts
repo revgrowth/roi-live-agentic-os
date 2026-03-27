@@ -90,6 +90,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       gsdStep: null,
       contextSources: null,
       cronJobSlug: null,
+      claudeSessionId: null,
     };
 
     // Track pending create for SSE reconciliation
@@ -164,11 +165,17 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       if (!task) return state;
 
       const oldStatus = task.status;
+      const now = new Date().toISOString();
 
       // Build updated tasks array
       let updated = state.tasks.map((t) => {
         if (t.id === id) {
-          return { ...t, status: newStatus as Task["status"], columnOrder: newOrder };
+          const patch: Partial<Task> = { status: newStatus as Task["status"], columnOrder: newOrder };
+          // Optimistically set startedAt when transitioning to running/review/done
+          if (["running", "review", "done"].includes(newStatus) && !t.startedAt) {
+            patch.startedAt = now;
+          }
+          return { ...t, ...patch };
         }
         return t;
       });
@@ -219,6 +226,11 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         set({ tasks: prev });
         throw new Error("Failed to move task");
       }
+      // Apply server response to get authoritative values (startedAt, etc.)
+      const serverTask = await res.json();
+      set((state) => ({
+        tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...serverTask } : t)),
+      }));
     } catch {
       set({ tasks: prev });
     }

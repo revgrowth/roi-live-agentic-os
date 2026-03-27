@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Trash2, Rocket, Clock, Plus, Play, Timer } from "lucide-react";
+import { GripVertical, Trash2, Clock, Plus, Play, Timer } from "lucide-react";
 import type { Task, TaskStatus } from "@/types/task";
 import { LevelBadge } from "./level-badge";
 import { useTaskStore } from "@/store/task-store";
@@ -44,8 +43,10 @@ function formatDuration(ms: number): string {
 }
 
 function formatElapsedLive(startedAt: string | null): string {
-  if (!startedAt) return "0s";
-  const ms = Date.now() - new Date(startedAt).getTime();
+  if (!startedAt) return "...";
+  const start = new Date(startedAt).getTime();
+  if (isNaN(start)) return "...";
+  const ms = Math.max(0, Date.now() - start);
   const sec = Math.floor(ms / 1000);
   if (sec < 60) return `${sec}s`;
   const min = Math.floor(sec / 60);
@@ -122,12 +123,10 @@ export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
   const [expanded, setExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isTrashHovered, setIsTrashHovered] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
   const getChildTasks = useTaskStore((s) => s.getChildTasks);
   const createTask = useTaskStore((s) => s.createTask);
   const updateTask = useTaskStore((s) => s.updateTask);
   const deleteTask = useTaskStore((s) => s.deleteTask);
-  const syncPhases = useTaskStore((s) => s.syncPhases);
   const outputFiles = useTaskStore((s) => s.outputFiles[task.id]) ?? [];
   const fetchOutputFiles = useTaskStore((s) => s.fetchOutputFiles);
   const openPanel = useTaskStore((s) => s.openPanel);
@@ -177,7 +176,9 @@ export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
   }
 
   const isRunning = task.status === "running";
+  const isReview = task.status === "review";
   const isDone = task.status === "done";
+  const needsHuman = isReview || task.needsInput === true;
   const hasError = task.errorMessage !== null;
   const borderColor = hasError ? "#C04030" : statusColors[task.status];
 
@@ -199,11 +200,16 @@ export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
       ref={setNodeRef}
       style={{
         ...style,
-        backgroundColor: hasError ? "#FFF5F3" : "#FFFFFF",
-        border: `1px solid ${hasError ? "rgba(192, 64, 48, 0.25)" : "rgba(218, 193, 185, 0.2)"}`,
-        borderLeft: `3px solid ${borderColor}`,
+        backgroundColor: hasError ? "#FFF5F3" : needsHuman ? "#FFFAF8" : "#FFFFFF",
+        border: needsHuman
+          ? "1.5px dashed rgba(210, 120, 60, 0.5)"
+          : `1px solid ${hasError ? "rgba(192, 64, 48, 0.25)" : "rgba(218, 193, 185, 0.15)"}`,
+        borderLeft: needsHuman
+          ? "1.5px dashed rgba(210, 120, 60, 0.5)"
+          : `3px solid ${borderColor}`,
         borderRadius: 8,
         padding: 14,
+        opacity: (isRunning && !needsHuman) ? 0.7 : isDone ? 0.75 : 1,
         boxShadow: isOverlay
           ? "0 16px 40px rgba(147, 69, 42, 0.15)"
           : "none",
@@ -261,7 +267,8 @@ export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
           fontSize: 14,
           fontWeight: 500,
           fontFamily: "var(--font-inter), Inter, sans-serif",
-          color: "#1B1C1B",
+          color: isDone ? "#9C9CA0" : "#1B1C1B",
+          textDecoration: isDone ? "line-through" : "none",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
@@ -349,24 +356,6 @@ export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
             {task.projectSlug}
           </span>
         )}
-        {task.needsInput === true && (
-          <span
-            style={{
-              display: "inline-block",
-              fontSize: 11,
-              fontWeight: 500,
-              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              padding: "2px 8px",
-              borderRadius: 4,
-              backgroundColor: "rgba(178, 93, 63, 0.12)",
-              color: "#B25D3F",
-              lineHeight: "16px",
-              animation: "pulse-badge 2s ease-in-out infinite",
-            }}
-          >
-            Needs input
-          </span>
-        )}
         {hasError && (
           <span
             style={{
@@ -386,71 +375,43 @@ export function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
         )}
       </div>
 
-      {/* GSD project link + sync button */}
-      {task.level === "gsd" && (
+      {/* Running state: pulsing dot + activity + elapsed time */}
+      {isRunning && !needsHuman && (
+        <RunningState task={task} />
+      )}
+
+      {/* Awaiting input state */}
+      {needsHuman && !isDone && (
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: 6,
-            marginBottom: 8,
+            marginTop: 4,
           }}
         >
-          <Link
-            href="/gsd"
-            onClick={(e) => e.stopPropagation()}
-            onPointerDown={(e) => e.stopPropagation()}
+          <span
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "6px 10px",
-              borderRadius: 6,
-              backgroundColor: "rgba(147, 69, 42, 0.06)",
-              color: "#93452A",
-              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              fontSize: 12,
-              fontWeight: 500,
-              textDecoration: "none",
-              transition: "background 150ms ease",
-              flex: 1,
+              display: "inline-block",
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              backgroundColor: "#D2783C",
+              animation: "pulse-dot 2s ease-in-out infinite",
+              flexShrink: 0,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(147, 69, 42, 0.12)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(147, 69, 42, 0.06)"; }}
-          >
-            <Rocket size={12} />
-            View Phases
-          </Link>
-          <button
-            onClick={async (e) => {
-              e.stopPropagation();
-              setIsSyncing(true);
-              try { await syncPhases(task.id); } finally { setIsSyncing(false); }
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-            disabled={isSyncing}
+          />
+          <span
             style={{
-              padding: "6px 10px",
-              borderRadius: 6,
-              border: "1px solid rgba(147, 69, 42, 0.2)",
-              backgroundColor: "transparent",
-              color: "#93452A",
-              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
               fontSize: 12,
+              color: "#D2783C",
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
               fontWeight: 500,
-              cursor: isSyncing ? "not-allowed" : "pointer",
-              opacity: isSyncing ? 0.6 : 1,
-              whiteSpace: "nowrap",
             }}
           >
-            {isSyncing ? "Syncing..." : "Sync Phases"}
-          </button>
+            Awaiting input
+          </span>
         </div>
-      )}
-
-      {/* Running state: pulsing dot + activity + elapsed time */}
-      {isRunning && (
-        <RunningState task={task} />
       )}
 
       {/* Error message preview */}

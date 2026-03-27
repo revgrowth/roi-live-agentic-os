@@ -22,6 +22,12 @@
 # Command Centre data (inside project folders)
 **/.command-centre/
 
+# Agent worktrees (temporary, per-machine)
+.claude/worktrees/
+
+# SQLite databases (inside project folders)
+**/data.db
+
 # Cron runtime (logs and status are generated at runtime)
 cron/logs/
 cron/status/

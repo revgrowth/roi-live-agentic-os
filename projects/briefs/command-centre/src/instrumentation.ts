@@ -11,6 +11,15 @@ export async function register() {
     const { initQueueWatcher } = await import("./lib/queue-watcher");
     initQueueWatcher();
 
+    // Write port file so hooks can discover the command centre
+    const fs = await import("fs");
+    const path = await import("path");
+    const { getConfig } = await import("./lib/config");
+    const port = process.env.PORT || "3000";
+    const portDir = path.default.join(getConfig().agenticOsDir, ".command-centre");
+    fs.default.mkdirSync(portDir, { recursive: true });
+    fs.default.writeFileSync(path.default.join(portDir, "port"), port);
+
     // Clean up file watchers on shutdown
     const { fileWatcher } = await import("./lib/file-watcher");
     const cleanupFileWatchers = () => fileWatcher.cleanupAll();

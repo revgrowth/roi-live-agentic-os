@@ -170,10 +170,10 @@ export function TaskModal() {
   if (!selectedTaskId || !task) return null;
 
   const isRunning = task.status === "running";
-  // Show the input whenever the task has been executed at least once
-  // (running, review, or done — anything except backlog/queued)
+  // Show the input whenever the task has been executed at least once,
+  // or when it's waiting for user input (e.g. question asked during creation)
   const hasBeenExecuted = task.status === "running" || task.status === "review" || task.status === "done";
-  const showReplyInput = hasBeenExecuted;
+  const showReplyInput = hasBeenExecuted || task.needsInput === true;
 
   // Determine what's showing
   const showDashboard = !activeFile && !newTaskAttachment && !drillView;

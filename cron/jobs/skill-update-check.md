@@ -34,3 +34,5 @@ Format:
 - **Issues** — any broken references or missing folders (skip if none)
 
 If the catalog file doesn't exist or can't be read, note the error and exit without creating the output file.
+
+If there are no new catalog entries, no broken references, and no issues found, end your response with `[SILENT]` on its own line. This suppresses the desktop notification since there's nothing to report.

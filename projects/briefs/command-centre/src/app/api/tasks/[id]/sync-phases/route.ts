@@ -145,6 +145,7 @@ export async function POST(
           gsdStep: step,
           contextSources: null,
           cronJobSlug: null,
+          claudeSessionId: null,
         };
 
         db.prepare(

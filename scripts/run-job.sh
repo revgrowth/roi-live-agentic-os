@@ -80,6 +80,28 @@ format_duration() {
 TIMEOUT_SECS=$(parse_timeout "$TIMEOUT_RAW")
 LOG_FILE="${LOGS_DIR}/${JOB_ARG}.log"
 STATUS_FILE="${STATUS_DIR}/${JOB_ARG}.json"
+PID_FILE="${STATUS_DIR}/${JOB_ARG}.pid"
+
+# Concurrency guard — skip if another instance is already running
+if [[ -f "$PID_FILE" ]]; then
+  existing_pid=$(cat "$PID_FILE")
+  if kill -0 "$existing_pid" 2>/dev/null; then
+    echo "Skipping ${JOB_NAME} — already running (PID ${existing_pid})"
+    exit 0
+  else
+    # Stale PID file — process died without cleanup
+    rm -f "$PID_FILE"
+  fi
+fi
+
+# Write PID file for this job instance
+echo $$ > "$PID_FILE"
+
+# Ensure PID file is cleaned up on exit (normal, error, or signal)
+cleanup_pid() {
+  rm -f "$PID_FILE"
+}
+trap cleanup_pid EXIT
 
 echo "Running job: ${JOB_NAME} (model: ${MODEL}, timeout: ${TIMEOUT_RAW}, retry: ${RETRY})"
 echo ""
@@ -96,6 +118,7 @@ fi
 ATTEMPT=0
 MAX_ATTEMPTS=$(( RETRY + 1 ))
 EXIT_CODE=1
+OUTPUT_FILE=$(mktemp)
 
 while (( ATTEMPT < MAX_ATTEMPTS )); do
   ATTEMPT=$((ATTEMPT + 1))
@@ -109,10 +132,10 @@ while (( ATTEMPT < MAX_ATTEMPTS )); do
     echo "=== [$(date -u +%Y-%m-%dT%H:%M:%SZ)] MANUAL START: ${JOB_NAME} (attempt ${ATTEMPT}/${MAX_ATTEMPTS}) ==="
     START_TIME=$(date +%s)
 
-    # Launch Claude with timeout watchdog
+    # Launch Claude with timeout watchdog, capturing output for [SILENT] check
     env -u CLAUDECODE claude -p "$PROMPT" \
       --model "$MODEL" \
-      --dangerously-skip-permissions 2>&1 | tee /dev/stderr &
+      --dangerously-skip-permissions 2>&1 | tee /dev/stderr "$OUTPUT_FILE" &
     CLAUDE_PID=$!
 
     ( sleep "$TIMEOUT_SECS" && kill "$CLAUDE_PID" 2>/dev/null ) &
@@ -171,6 +194,13 @@ cat > "$STATUS_FILE" <<STATUSEOF
 {"last_run":"$(date -u +%Y-%m-%dT%H:%M:%SZ)","result":"${RESULT}","duration":${RUNTIME},"exit_code":${EXIT_CODE},"run_count":${NEW_RUN_COUNT},"fail_count":${NEW_FAIL_COUNT}}
 STATUSEOF
 
+# --- Check for [SILENT] marker in output ---
+IS_SILENT=false
+if [[ "$RESULT" == "success" ]] && grep -q '\[SILENT\]' "$OUTPUT_FILE" 2>/dev/null; then
+  IS_SILENT=true
+fi
+rm -f "$OUTPUT_FILE"
+
 # --- Send notification based on notify field ---
 NOTIFY_SUCCESS=false
 NOTIFY_FAILURE=false
@@ -181,7 +211,9 @@ case "$NOTIFY" in
   silent)     ;;
 esac
 
-if (( EXIT_CODE == 0 )) && [[ "$NOTIFY_SUCCESS" == "true" ]]; then
+if [[ "$IS_SILENT" == "true" ]]; then
+  : # Job signalled nothing to report — logged but no notification
+elif (( EXIT_CODE == 0 )) && [[ "$NOTIFY_SUCCESS" == "true" ]]; then
   send_notification "Agentic OS" "✓ ${JOB_NAME}" "Completed in ${DURATION_HUMAN}"
 elif [[ "$RESULT" == "timeout" ]] && [[ "$NOTIFY_FAILURE" == "true" ]]; then
   send_notification "Agentic OS" "✗ ${JOB_NAME} timed out" "Killed after ${TIMEOUT_RAW} limit"

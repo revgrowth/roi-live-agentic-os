@@ -53,10 +53,10 @@ export async function POST(
     "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
   ).run(entryId, id, "user_reply", now, trimmed, null, null, null, 0);
 
-  // Reactivate the task to running
+  // Reactivate the task to running (set startedAt if not already set)
   db.prepare(
-    "UPDATE tasks SET status = 'running', updatedAt = ?, activityLabel = ?, needsInput = 0, errorMessage = NULL WHERE id = ?"
-  ).run(now, "Processing reply...", id);
+    "UPDATE tasks SET status = 'running', updatedAt = ?, activityLabel = ?, needsInput = 0, errorMessage = NULL, startedAt = COALESCE(startedAt, ?) WHERE id = ?"
+  ).run(now, "Processing reply...", now, id);
 
   const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id) as Task;
   emitTaskEvent({

@@ -57,6 +57,12 @@ if [[ -d "${PROJECT_DIR}/.claude/hooks_info" ]]; then
   echo "  Copied hooks_info"
 fi
 
+# Copy hooks if they exist (session-sync, gsd hooks, etc.)
+if [[ -d "${PROJECT_DIR}/.claude/hooks" ]]; then
+  cp -R "${PROJECT_DIR}/.claude/hooks" "${CLIENT_DIR}/.claude/hooks"
+  echo "  Copied hooks"
+fi
+
 # Copy scripts from root
 cp -R "${PROJECT_DIR}/scripts" "${CLIENT_DIR}/scripts"
 echo "  Copied scripts"

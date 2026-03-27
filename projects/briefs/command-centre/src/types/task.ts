@@ -53,6 +53,7 @@ export interface Task {
   gsdStep: GsdStep | null;
   contextSources: string | null;
   cronJobSlug: string | null;
+  claudeSessionId: string | null;
 }
 
 export interface OutputFile {

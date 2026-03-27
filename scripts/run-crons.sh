@@ -170,6 +170,23 @@ run_job() {
 
   local LOG_FILE="${LOGS_DIR}/$(basename "$file" .md).log"
   local STATUS_FILE="${STATUS_DIR}/$(basename "$file" .md).json"
+  local PID_FILE="${STATUS_DIR}/$(basename "$file" .md).pid"
+
+  # Concurrency guard — skip if another instance is already running
+  if [[ -f "$PID_FILE" ]]; then
+    local existing_pid
+    existing_pid=$(cat "$PID_FILE")
+    if kill -0 "$existing_pid" 2>/dev/null; then
+      echo "[dispatcher] Skipping ${JOB_NAME} — already running (PID ${existing_pid})"
+      return 0
+    else
+      # Stale PID file — process died without cleanup
+      rm -f "$PID_FILE"
+    fi
+  fi
+
+  # Write PID file for this job instance
+  echo $$ > "$PID_FILE"
 
   local label_prefix=""
   [[ -n "$catchup_label" ]] && label_prefix="CATCH-UP "
@@ -181,6 +198,8 @@ run_job() {
   local final_exit_code=1
   local final_result="failure"
   local timed_out=false
+  local OUTPUT_FILE
+  OUTPUT_FILE=$(mktemp)
   local job_start_epoch
   job_start_epoch=$(date +%s)
 
@@ -221,10 +240,11 @@ run_job() {
     local attempt_start
     attempt_start=$(date +%s)
 
-    # Launch claude with timeout watchdog
+    # Launch claude with timeout watchdog, capturing output for [SILENT] check
+    : > "$OUTPUT_FILE"  # truncate for this attempt
     env -u CLAUDECODE claude -p "$PROMPT" \
       --model "$MODEL" \
-      --dangerously-skip-permissions 2>&1 &
+      --dangerously-skip-permissions 2>&1 | tee "$OUTPUT_FILE" &
     local CLAUDE_PID=$!
 
     # Watchdog: kill claude if it exceeds timeout
@@ -301,6 +321,16 @@ run_job() {
     sqlite3 "$db_path" "UPDATE tasks SET status='${task_status}', completedAt='${completed_iso}', updatedAt='${completed_iso}', durationMs=${duration_ms}, errorMessage=${error_val} WHERE id='${task_uuid}';" 2>/dev/null || true
   fi
 
+  # Check for [SILENT] marker in output (job signals nothing to report)
+  local is_silent=false
+  if [[ "$final_result" == "success" ]] && grep -q '\[SILENT\]' "$OUTPUT_FILE" 2>/dev/null; then
+    is_silent=true
+  fi
+  rm -f "$OUTPUT_FILE"
+
+  # Clean up PID file
+  rm -f "$PID_FILE"
+
   # Send notification based on notify setting
   local subtitle_prefix=""
   [[ -n "$catchup_label" ]] && subtitle_prefix=" ${catchup_label}"
@@ -314,7 +344,9 @@ run_job() {
     silent)     ;;
   esac
 
-  if [[ "$final_result" == "success" ]] && [[ "$should_notify_success" == "true" ]]; then
+  if [[ "$is_silent" == "true" ]]; then
+    : # Job signalled nothing to report — logged but no notification
+  elif [[ "$final_result" == "success" ]] && [[ "$should_notify_success" == "true" ]]; then
     send_notification "Agentic OS" "✓ ${JOB_NAME}${subtitle_prefix}" "Completed in $(format_duration $total_duration)"
   elif [[ "$final_result" == "timeout" ]] && [[ "$should_notify_failure" == "true" ]]; then
     send_notification "Agentic OS" "✗ ${JOB_NAME} timed out${subtitle_prefix}" "Killed after ${TIMEOUT_RAW} limit"

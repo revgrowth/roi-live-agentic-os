@@ -80,7 +80,7 @@ export function MarkdownPreview({ content, className }: MarkdownPreviewProps) {
   const { meta, body } = parseFrontmatter(content);
 
   return (
-    <div className={className} style={{ maxWidth: 720, lineHeight: 1.6, fontFamily: "var(--font-inter), Inter, sans-serif" }}>
+    <div className={className} style={{ width: "100%", lineHeight: 1.6, fontFamily: "var(--font-inter), Inter, sans-serif" }}>
       {meta && Object.keys(meta).length > 0 && (
         <div
           style={{

@@ -5,33 +5,33 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import type { Task, TaskStatus } from "@/types/task";
+import type { Task } from "@/types/task";
 import { TaskCard } from "./task-card";
 
-const statusColors: Record<TaskStatus, string> = {
-  backlog: "#5E5E65",
+export type DisplayColumn = "backlog" | "queued" | "in_progress" | "completed";
+
+const columnColors: Record<DisplayColumn, string> = {
+  backlog: "#9C9CA0",
   queued: "#5E5E65",
-  running: "#93452A",
-  review: "#B25D3F",
-  done: "#6B8E6B",
+  in_progress: "#D2783C",
+  completed: "#6B8E6B",
 };
 
-const columnLabels: Record<TaskStatus, string> = {
+const columnLabels: Record<DisplayColumn, string> = {
   backlog: "Backlog",
   queued: "Queued",
-  running: "Running",
-  review: "Review",
-  done: "Done",
+  in_progress: "In Progress",
+  completed: "Completed",
 };
 
 interface KanbanColumnProps {
-  status: TaskStatus;
+  column: DisplayColumn;
   tasks: Task[];
 }
 
-export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
-  const { setNodeRef, isOver } = useDroppable({ id: status });
-  const color = statusColors[status];
+export function KanbanColumn({ column, tasks }: KanbanColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({ id: column });
+  const color = columnColors[column];
 
   return (
     <div
@@ -47,7 +47,7 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
         maxHeight: "calc(100vh - 200px)",
       }}
     >
-      {/* Header — no border, uses spacing for separation */}
+      {/* Header */}
       <div
         style={{
           display: "flex",
@@ -77,7 +77,7 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
             letterSpacing: "0.04em",
           }}
         >
-          {columnLabels[status]}
+          {columnLabels[column]}
         </span>
         <span
           style={{

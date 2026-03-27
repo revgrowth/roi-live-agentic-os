@@ -71,6 +71,13 @@ for CLIENT_DIR in "${CLIENTS_DIR}"/*/; do
   if [[ -d "${PROJECT_DIR}/.claude/hooks_info" ]]; then
     rm -rf "${CLIENT_DIR}/.claude/hooks_info"
     cp -R "${PROJECT_DIR}/.claude/hooks_info" "${CLIENT_DIR}/.claude/hooks_info"
+    echo "  Hooks info synced"
+  fi
+
+  # Sync hooks (session-sync, gsd hooks, etc.)
+  if [[ -d "${PROJECT_DIR}/.claude/hooks" ]]; then
+    rm -rf "${CLIENT_DIR}/.claude/hooks"
+    cp -R "${PROJECT_DIR}/.claude/hooks" "${CLIENT_DIR}/.claude/hooks"
     echo "  Hooks synced"
   fi
 

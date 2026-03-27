@@ -5,6 +5,7 @@ import type { Task } from "@/types/task";
 
 interface StatusUpdateInput {
   status: string;
+  title?: string;
   activityLabel?: string;
   costUsd?: number;
   tokensUsed?: number;
@@ -49,11 +50,8 @@ export async function PATCH(
       values.push(now);
     }
 
-    // Set completedAt when transitioning to review or done
-    if (
-      (body.status === "review" || body.status === "done") &&
-      !existing.completedAt
-    ) {
+    // Set completedAt only when transitioning to done (not review — review is a pause)
+    if (body.status === "done" && !existing.completedAt) {
       updates.push("completedAt = ?");
       values.push(now);
 
@@ -66,7 +64,16 @@ export async function PATCH(
       }
     }
 
-    // Optional fields from agent self-reporting
+    // Clear completedAt if going back to running (session resumed)
+    if (body.status === "running" && existing.completedAt) {
+      updates.push("completedAt = NULL");
+    }
+
+    // Optional fields from agent/hook self-reporting
+    if (body.title !== undefined) {
+      updates.push("title = ?");
+      values.push(body.title);
+    }
     if (body.activityLabel !== undefined) {
       updates.push("activityLabel = ?");
       values.push(body.activityLabel);

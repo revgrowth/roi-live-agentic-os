@@ -96,6 +96,7 @@ export async function POST(request: NextRequest) {
       gsdStep: bodyGsdStep ?? null,
       contextSources: null,
       cronJobSlug: bodyCronJobSlug || null,
+      claudeSessionId: null,
     };
 
     db.prepare(

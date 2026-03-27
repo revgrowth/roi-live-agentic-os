@@ -1,9 +1,17 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useTaskStore } from "@/store/task-store";
 
-/** Max Pro plan: ~45M tokens/month ≈ 1.5M/day */
-const DAILY_TOKEN_LIMIT = 1_500_000;
+interface StatsBarData {
+  cronActive: number;
+  cronTotal: number;
+  weekTokens: number;
+  todayTokens: number;
+}
+
+// Persist last-known data across mounts so tab switches don't flash
+let cachedData: StatsBarData | null = null;
 
 function formatTokens(n: number): string {
   if (n === 0) return "0";
@@ -14,24 +22,54 @@ function formatTokens(n: number): string {
 
 export function StatsBar() {
   const tasks = useTaskStore((s) => s.tasks);
+  const [data, setData] = useState<StatsBarData | null>(cachedData);
+  const fetchedRef = useRef(false);
+
+  useEffect(() => {
+    // Skip re-fetch if we already have cached data from a recent mount
+    if (cachedData && !fetchedRef.current) {
+      fetchedRef.current = true;
+      // Still refresh in background, but no flash
+      fetch("/api/dashboard/summary")
+        .then((r) => r.ok ? r.json() : null)
+        .then((d) => {
+          if (d) {
+            const next = {
+              cronActive: d.system?.cronActive ?? 0,
+              cronTotal: d.system?.cronTotal ?? 0,
+              weekTokens: d.claudeUsage?.weekTokens ?? 0,
+              todayTokens: d.claudeUsage?.todayTokens ?? 0,
+            };
+            cachedData = next;
+            setData(next);
+          }
+        })
+        .catch(() => {});
+      return;
+    }
+
+    fetch("/api/dashboard/summary")
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (d) {
+          const next = {
+            cronActive: d.system?.cronActive ?? 0,
+            cronTotal: d.system?.cronTotal ?? 0,
+            weekTokens: d.claudeUsage?.weekTokens ?? 0,
+            todayTokens: d.claudeUsage?.todayTokens ?? 0,
+          };
+          cachedData = next;
+          setData(next);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const runningCount = tasks.filter((t) => t.status === "running").length;
+  const awaitingCount = tasks.filter(
+    (t) => t.status === "review" || t.needsInput === true || t.errorMessage !== null
+  ).length;
   const doneCount = tasks.filter((t) => t.status === "done").length;
-
-  const today = new Date().toISOString().slice(0, 10);
-  const todayTokens = tasks
-    .filter(
-      (t) =>
-        t.tokensUsed !== null &&
-        (t.status === "done" || t.status === "running" || t.status === "review") &&
-        (
-          (t.completedAt && t.completedAt.slice(0, 10) === today) ||
-          (t.startedAt && t.startedAt.slice(0, 10) === today)
-        )
-    )
-    .reduce((sum, t) => sum + (t.tokensUsed ?? 0), 0);
-
-  const usagePct = Math.min(100, Math.round((todayTokens / DAILY_TOKEN_LIMIT) * 100));
 
   return (
     <div
@@ -47,16 +85,29 @@ export function StatsBar() {
       }}
     >
       <StatItem
-        label="Tasks Running"
+        label="Running"
         value={runningCount.toString()}
         showDot={runningCount > 0}
       />
       <Separator />
-      <StatItem label="Tasks Completed" value={doneCount.toString()} />
+      <StatItem
+        label="Awaiting Input"
+        value={awaitingCount.toString()}
+        color={awaitingCount > 0 ? "#D2783C" : undefined}
+      />
       <Separator />
-      <StatItem label="Active Crons" value="0" />
+      <StatItem label="Completed" value={doneCount.toString()} />
       <Separator />
-      <UsageStat label="Token Usage" used={todayTokens} pct={usagePct} />
+      <StatItem
+        label="Active Crons"
+        value={data ? `${data.cronActive}/${data.cronTotal}` : "--"}
+      />
+      <Separator />
+      <TokenStat
+        label="Tokens This Week"
+        weekTokens={data?.weekTokens ?? 0}
+        todayTokens={data?.todayTokens ?? 0}
+      />
     </div>
   );
 }
@@ -78,20 +129,16 @@ function StatItem({
   label,
   value,
   showDot,
+  color,
 }: {
   label: string;
   value: string;
   showDot?: boolean;
+  color?: string;
 }) {
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {showDot && (
           <span
             style={{
@@ -109,7 +156,7 @@ function StatItem({
           style={{
             fontSize: 20,
             fontWeight: 600,
-            color: "#1B1C1B",
+            color: color || "#1B1C1B",
             fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
             lineHeight: 1,
           }}
@@ -133,26 +180,18 @@ function StatItem({
   );
 }
 
-function UsageStat({
+function TokenStat({
   label,
-  used,
-  pct,
+  weekTokens,
+  todayTokens,
 }: {
   label: string;
-  used: number;
-  pct: number;
+  weekTokens: number;
+  todayTokens: number;
 }) {
-  const barColor = pct >= 90 ? "#C0392B" : pct >= 70 ? "#D4762C" : "#93452A";
-
   return (
     <div style={{ minWidth: 120 }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "baseline",
-          gap: 6,
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
         <span
           style={{
             fontSize: 20,
@@ -162,38 +201,21 @@ function UsageStat({
             lineHeight: 1,
           }}
         >
-          {formatTokens(used)}
+          {formatTokens(weekTokens)}
         </span>
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 500,
-            color: "#5E5E65",
-            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-            lineHeight: 1,
-          }}
-        >
-          / {formatTokens(DAILY_TOKEN_LIMIT)}
-        </span>
-      </div>
-      <div
-        style={{
-          height: 4,
-          backgroundColor: "rgba(218, 193, 185, 0.3)",
-          borderRadius: 2,
-          marginTop: 6,
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            height: "100%",
-            width: `${pct}%`,
-            backgroundColor: barColor,
-            borderRadius: 2,
-            transition: "width 0.3s ease",
-          }}
-        />
+        {todayTokens > 0 && (
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 500,
+              color: "#5E5E65",
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+              lineHeight: 1,
+            }}
+          >
+            ({formatTokens(todayTokens)} today)
+          </span>
+        )}
       </div>
       <div
         style={{

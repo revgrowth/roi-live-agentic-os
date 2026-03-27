@@ -126,7 +126,28 @@ function Invoke-Job {
     $basename = [System.IO.Path]::GetFileNameWithoutExtension($File)
     $logFile = Join-Path $LogsDir "$basename.log"
     $statusFile = Join-Path $StatusDir "$basename.json"
+    $pidFile = Join-Path $StatusDir "$basename.pid"
     $timeoutMs = ConvertTo-TimeoutMs $Timeout
+
+    # Concurrency guard — skip if another instance is already running
+    if (Test-Path $pidFile) {
+        $existingPid = Get-Content $pidFile -ErrorAction SilentlyContinue
+        if ($existingPid) {
+            try {
+                $proc = Get-Process -Id ([int]$existingPid) -ErrorAction Stop
+                if (-not $proc.HasExited) {
+                    Add-Content $logFile "[dispatcher] Skipping ${JobName} - already running (PID ${existingPid})"
+                    return
+                }
+            } catch {
+                # Process not found — stale PID file
+            }
+            Remove-Item $pidFile -ErrorAction SilentlyContinue
+        }
+    }
+
+    # Write PID file for this job instance
+    $PID | Set-Content $pidFile -Encoding UTF8
 
     # Read previous status for counters
     $prevStatus = Read-StatusFile $statusFile
@@ -141,6 +162,7 @@ function Invoke-Job {
     $success = $false
     $lastExitCodeVal = -1
     $totalDuration = 0
+    $capturedOutput = ""
 
     while ($attempt -lt $maxAttempts) {
         $attempt++
@@ -171,10 +193,13 @@ function Invoke-Job {
 
             $lastExitCodeVal = $process.ExitCode
 
-            # Append output to log
+            # Append output to log and capture for [SILENT] check
             if (Test-Path $tempOut) {
                 $outContent = Get-Content $tempOut -Raw -ErrorAction SilentlyContinue
-                if ($outContent) { Add-Content $logFile $outContent }
+                if ($outContent) {
+                    Add-Content $logFile $outContent
+                    $capturedOutput = $outContent
+                }
             }
             if (Test-Path $tempErr) {
                 $errContent = Get-Content $tempErr -Raw -ErrorAction SilentlyContinue
@@ -228,13 +253,24 @@ function Invoke-Job {
         fail_count = $failCount
     }
 
+    # Check for [SILENT] marker in output (job signals nothing to report)
+    $isSilent = $false
+    if ($success -and $capturedOutput -match '\[SILENT\]') {
+        $isSilent = $true
+    }
+
+    # Clean up PID file
+    Remove-Item $pidFile -ErrorAction SilentlyContinue
+
     # Notifications
     $durationTotal = Format-Duration $totalDuration
     $catchUpSuffix = if ($IsCatchUp) { " (catch-up)" } else { "" }
     $notifySuccess = $Notify -in @("on_finish", "on_success")
     $notifyFailure = $Notify -in @("on_finish", "on_failure")
 
-    if ($success -and $notifySuccess) {
+    if ($isSilent) {
+        # Job signalled nothing to report — logged but no notification
+    } elseif ($success -and $notifySuccess) {
         Send-Notification -Title "Agentic OS" -Subtitle "$([char]0x2713) ${JobName}${catchUpSuffix}" -Body "Completed in $durationTotal"
     } elseif ($timedOut -and $notifyFailure) {
         Send-Notification -Title "Agentic OS" -Subtitle "$([char]0x2717) ${JobName} timed out${catchUpSuffix}" -Body "Killed after $Timeout limit"

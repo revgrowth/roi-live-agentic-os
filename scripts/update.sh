@@ -74,6 +74,7 @@ PROTECTED_PATHS=(
     "context/USER.md"
     "context/SOUL.md"
     "context/learnings.md"
+    "context/learnings.md.template"
     "context/memory/"
     "brand_context/"
     "projects/"
@@ -249,6 +250,42 @@ if [[ ${#OTHER_MODIFIED_FILES[@]} -gt 0 ]]; then
 fi
 
 # =========================================================
+# Step 5c: Pre-pull conflict prevention
+# =========================================================
+# Files that were deleted upstream but may exist locally cause merge conflicts
+# that git stash can't prevent (stash saves changes, but the pull still tries
+# to delete the file). Back up and remove these before pulling, restore after.
+#
+# Also handles template files that both sides may have modified.
+CONFLICT_BACKUP_DIR="$BACKUP_DIR/conflict-prevention-$(date +%s)"
+CONFLICT_BACKED_UP=()
+
+# Fetch first so we can compare against origin/main
+git fetch origin 2>/dev/null || true
+
+for protected in "${PROTECTED_PATHS[@]}"; do
+    # Skip directory paths
+    [[ "$protected" == */ ]] && continue
+    local_file="$REPO_ROOT/$protected"
+    [[ ! -f "$local_file" ]] && continue
+
+    # Check if this file was deleted upstream or will conflict
+    if ! git cat-file -e "origin/main:${protected}" 2>/dev/null; then
+        # File deleted upstream but exists locally — back up and remove to prevent conflict
+        mkdir -p "$CONFLICT_BACKUP_DIR/$(dirname "$protected")"
+        cp "$local_file" "$CONFLICT_BACKUP_DIR/$protected"
+        git rm -f --cached "$protected" 2>/dev/null || true
+        CONFLICT_BACKED_UP+=("$protected")
+    elif git diff --name-only "HEAD...origin/main" -- "$protected" 2>/dev/null | grep -q .; then
+        # File changed upstream AND exists locally (potential merge conflict)
+        mkdir -p "$CONFLICT_BACKUP_DIR/$(dirname "$protected")"
+        cp "$local_file" "$CONFLICT_BACKUP_DIR/$protected"
+        git checkout HEAD -- "$protected" 2>/dev/null || true
+        CONFLICT_BACKED_UP+=("$protected")
+    fi
+done
+
+# =========================================================
 # Step 6: Pull upstream changes
 # =========================================================
 info "Checking for updates..."
@@ -259,6 +296,14 @@ PULL_OUTPUT=$(git pull origin main 2>&1) || {
     if $STASHED; then
         git stash pop --quiet 2>/dev/null || true
     fi
+    # Restore conflict-prevented files
+    for protected in "${CONFLICT_BACKED_UP[@]:-}"; do
+        [[ -z "$protected" ]] && continue
+        if [[ -f "$CONFLICT_BACKUP_DIR/$protected" ]]; then
+            mkdir -p "$(dirname "$REPO_ROOT/$protected")"
+            cp "$CONFLICT_BACKUP_DIR/$protected" "$REPO_ROOT/$protected"
+        fi
+    done
     # Restore modified skill files from backup
     for skill_name in "${MODIFIED_SKILLS[@]:-}"; do
         [[ -z "$skill_name" ]] && continue
@@ -313,6 +358,20 @@ NEW_HEAD=$(git rev-parse HEAD)
 COMMIT_COUNT=0
 if $HAS_UPSTREAM_CHANGES; then
     COMMIT_COUNT=$(git log --oneline "${OLD_HEAD}..${NEW_HEAD}" 2>/dev/null | wc -l | tr -d ' ')
+fi
+
+# =========================================================
+# Restore conflict-prevented files
+# =========================================================
+# These were backed up in Step 5c to prevent merge conflicts.
+# Restore the user's versions now that the pull is complete.
+if [[ ${#CONFLICT_BACKED_UP[@]} -gt 0 ]]; then
+    for protected in "${CONFLICT_BACKED_UP[@]}"; do
+        if [[ -f "$CONFLICT_BACKUP_DIR/$protected" ]]; then
+            mkdir -p "$(dirname "$REPO_ROOT/$protected")"
+            cp "$CONFLICT_BACKUP_DIR/$protected" "$REPO_ROOT/$protected"
+        fi
+    done
 fi
 
 # =========================================================

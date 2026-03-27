@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 
 function formatElapsed(startedAt: string | null): string {
   if (!startedAt) return "0s";
-  const ms = Date.now() - new Date(startedAt).getTime();
+  const start = new Date(startedAt).getTime();
+  if (isNaN(start)) return "0s";
+  const ms = Math.max(0, Date.now() - start);
   const sec = Math.floor(ms / 1000);
   if (sec < 60) return `${sec}s`;
   const min = Math.floor(sec / 60);

@@ -5,7 +5,7 @@ import { CronJobsView } from "@/components/cron/cron-table";
 
 export default function CronPage() {
   return (
-    <AppShell>
+    <AppShell title="Cron Jobs">
       <CronJobsView />
     </AppShell>
   );

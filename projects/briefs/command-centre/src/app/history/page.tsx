@@ -5,12 +5,43 @@ import { AppShell } from "@/components/layout/app-shell";
 import {
   Timer, CheckCircle2, AlertCircle, Clock, ChevronLeft, ChevronRight,
   ChevronDown, MessageSquare, Wrench, FileText, ExternalLink, Eye,
+  ArrowUpDown, ArrowUp, ArrowDown, Filter, X,
 } from "lucide-react";
 import type { Task, TaskLevel, LogEntry, OutputFile } from "@/types/task";
 import { LEVEL_LABELS } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 
 const PAGE_SIZE = 50;
+
+// ─── Filter/Sort types ───────────────────────────────────────────────────────
+
+type SortField = "completedAt" | "startedAt" | "durationMs" | "tokensUsed" | "costUsd" | "level";
+type SortDir = "asc" | "desc";
+type DateRange = "" | "today" | "week" | "month" | "90days";
+type TypeFilter = "" | "task" | "project" | "gsd";
+type StatusFilter = "" | "done" | "review" | "failed";
+
+const DATE_RANGE_LABELS: Record<DateRange, string> = {
+  "": "All time",
+  today: "Today",
+  week: "This week",
+  month: "This month",
+  "90days": "Last 90 days",
+};
+
+const TYPE_LABELS: Record<TypeFilter, string> = {
+  "": "All types",
+  task: "Task",
+  project: "Project",
+  gsd: "GSD",
+};
+
+const STATUS_LABELS: Record<StatusFilter, string> = {
+  "": "All statuses",
+  done: "Done",
+  review: "Review",
+  failed: "Failed",
+};
 
 // ─── Formatters ──────────────────────────────────────────────────────────────
 
@@ -46,6 +77,7 @@ function formatTime(iso: string): string {
 }
 
 function formatTokens(tokens: number): string {
+  if (tokens >= 1_000_000) return `${(tokens / 1_000_000).toFixed(1)}M`;
   if (tokens >= 1000) return `${(tokens / 1000).toFixed(1)}k`;
   return tokens.toString();
 }
@@ -125,6 +157,100 @@ function DigestIcon({ type }: { type: DigestEntry["type"] }) {
   }
 }
 
+// ─── Filter dropdown ─────────────────────────────────────────────────────────
+
+function FilterSelect<T extends string>({
+  value,
+  onChange,
+  options,
+}: {
+  value: T;
+  onChange: (v: T) => void;
+  options: Record<T, string>;
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value as T)}
+      style={{
+        padding: "7px 12px",
+        borderRadius: 8,
+        border: "1px solid rgba(218, 193, 185, 0.3)",
+        backgroundColor: value ? "#FFF5F0" : "#FFFFFF",
+        color: value ? "#93452A" : "#5E5E65",
+        fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+        fontSize: 13,
+        fontWeight: 500,
+        cursor: "pointer",
+        outline: "none",
+        appearance: "none",
+        WebkitAppearance: "none",
+        paddingRight: 28,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235E5E65' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "right 10px center",
+      }}
+    >
+      {Object.entries(options).map(([k, label]) => (
+        <option key={k} value={k}>
+          {label as string}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+// ─── Sortable header ─────────────────────────────────────────────────────────
+
+function SortableHeader({
+  label,
+  field,
+  currentSort,
+  currentDir,
+  onSort,
+  align,
+  width,
+}: {
+  label: string;
+  field: SortField;
+  currentSort: SortField;
+  currentDir: SortDir;
+  onSort: (field: SortField) => void;
+  align?: "left" | "right";
+  width?: number;
+}) {
+  const isActive = currentSort === field;
+  const Icon = isActive ? (currentDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+
+  return (
+    <th
+      onClick={() => onSort(field)}
+      style={{
+        ...thStyle,
+        width,
+        textAlign: align || "left",
+        cursor: "pointer",
+        userSelect: "none",
+        transition: "color 100ms ease",
+        color: isActive ? "#93452A" : "#5E5E65",
+      }}
+    >
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          justifyContent: align === "right" ? "flex-end" : "flex-start",
+          width: "100%",
+        }}
+      >
+        {label}
+        <Icon size={12} style={{ opacity: isActive ? 1 : 0.4 }} />
+      </div>
+    </th>
+  );
+}
+
 // ─── Expandable row ──────────────────────────────────────────────────────────
 
 function HistoryRow({ task }: { task: Task }) {
@@ -185,7 +311,6 @@ function HistoryRow({ task }: { task: Task }) {
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  maxWidth: 380,
                 }}
               >
                 {task.title}
@@ -199,7 +324,6 @@ function HistoryRow({ task }: { task: Task }) {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
-                    maxWidth: 380,
                   }}
                 >
                   {task.description}
@@ -235,14 +359,17 @@ function HistoryRow({ task }: { task: Task }) {
           {task.durationMs ? formatDuration(task.durationMs) : "--"}
         </td>
         <td style={{ ...tdStyle, ...monoCell, textAlign: "right" }}>
-          {task.costUsd != null ? `$${task.costUsd.toFixed(2)}` : "--"}
+          {task.tokensUsed != null && task.tokensUsed > 0 ? formatTokens(task.tokensUsed) : "--"}
+        </td>
+        <td style={{ ...tdStyle, ...monoCell, textAlign: "right" }}>
+          {task.costUsd != null && task.costUsd > 0 ? `$${task.costUsd.toFixed(2)}` : "--"}
         </td>
       </tr>
 
       {/* Expanded detail row */}
       {expanded && (
         <tr style={{ borderBottom: "1px solid rgba(218, 193, 185, 0.15)" }}>
-          <td colSpan={7} style={{ padding: 0 }}>
+          <td colSpan={8} style={{ padding: 0 }}>
             <div
               style={{
                 padding: "16px 24px 20px 46px",
@@ -253,8 +380,8 @@ function HistoryRow({ task }: { task: Task }) {
               {/* Stats row */}
               <div style={{ display: "flex", gap: 24, marginBottom: 16, flexWrap: "wrap" }}>
                 <StatPill label="Duration" value={task.durationMs ? formatDuration(task.durationMs) : "--"} />
-                <StatPill label="Cost" value={task.costUsd != null ? `$${task.costUsd.toFixed(2)}` : "--"} />
-                <StatPill label="Tokens" value={task.tokensUsed != null ? formatTokens(task.tokensUsed) : "--"} />
+                <StatPill label="Cost" value={task.costUsd != null && task.costUsd > 0 ? `$${task.costUsd.toFixed(2)}` : "--"} />
+                <StatPill label="Tokens" value={task.tokensUsed != null && task.tokensUsed > 0 ? formatTokens(task.tokensUsed) : "--"} />
                 {task.cronJobSlug && <StatPill label="Cron Job" value={task.cronJobSlug} />}
               </div>
 
@@ -403,17 +530,36 @@ export default function HistoryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const fetchStoreTasks = useTaskStore((s) => s.fetchTasks);
 
+  // Filters
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("");
+  const [dateRange, setDateRange] = useState<DateRange>("");
+
+  // Sort
+  const [sortBy, setSortBy] = useState<SortField>("completedAt");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
   // Load all tasks into Zustand store so the TaskModal can find them
   useEffect(() => {
     fetchStoreTasks();
   }, [fetchStoreTasks]);
 
+  const hasActiveFilters = typeFilter !== "" || statusFilter !== "" || dateRange !== "";
+
   const fetchHistory = useCallback(async (pageNum: number) => {
     setIsLoading(true);
     try {
-      const res = await fetch(
-        `/api/tasks/history?limit=${PAGE_SIZE}&offset=${pageNum * PAGE_SIZE}`
-      );
+      const params = new URLSearchParams({
+        limit: String(PAGE_SIZE),
+        offset: String(pageNum * PAGE_SIZE),
+        sortBy,
+        sortDir,
+      });
+      if (typeFilter) params.set("type", typeFilter);
+      if (statusFilter) params.set("status", statusFilter);
+      if (dateRange) params.set("dateRange", dateRange);
+
+      const res = await fetch(`/api/tasks/history?${params}`);
       if (!res.ok) throw new Error("Failed to fetch history");
       const data = await res.json();
       setTasks(data.tasks);
@@ -423,19 +569,38 @@ export default function HistoryPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [sortBy, sortDir, typeFilter, statusFilter, dateRange]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [typeFilter, statusFilter, dateRange, sortBy, sortDir]);
 
   useEffect(() => {
     fetchHistory(page);
   }, [page, fetchHistory]);
 
+  const handleSort = (field: SortField) => {
+    if (sortBy === field) {
+      setSortDir((d) => (d === "desc" ? "asc" : "desc"));
+    } else {
+      setSortBy(field);
+      setSortDir("desc");
+    }
+  };
+
+  const clearFilters = () => {
+    setTypeFilter("");
+    setStatusFilter("");
+    setDateRange("");
+  };
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <AppShell>
-      <div style={{ padding: "32px 40px", maxWidth: 1200 }}>
+    <AppShell title="History">
+      <div style={{ padding: "32px 40px", width: "100%", boxSizing: "border-box" }}>
         {/* Header */}
-        <div style={{ marginBottom: 32 }}>
+        <div style={{ marginBottom: 24 }}>
           <h1
             style={{
               fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
@@ -451,45 +616,85 @@ export default function HistoryPage() {
               fontSize: 14, color: "#5E5E65", marginTop: 8,
             }}
           >
-            {total} completed task{total !== 1 ? "s" : ""}
+            {total} task{total !== 1 ? "s" : ""}{hasActiveFilters ? " (filtered)" : ""}
           </p>
+        </div>
+
+        {/* Filter bar */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            marginBottom: 16,
+            flexWrap: "wrap",
+          }}
+        >
+          <Filter size={14} color="#9C9CA0" style={{ flexShrink: 0 }} />
+          <FilterSelect value={dateRange} onChange={setDateRange} options={DATE_RANGE_LABELS} />
+          <FilterSelect value={typeFilter} onChange={setTypeFilter} options={TYPE_LABELS} />
+          <FilterSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_LABELS} />
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                padding: "6px 12px",
+                borderRadius: 8,
+                border: "none",
+                backgroundColor: "rgba(192, 64, 48, 0.08)",
+                color: "#C04030",
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: "pointer",
+              }}
+            >
+              <X size={12} />
+              Clear
+            </button>
+          )}
         </div>
 
         {/* Table */}
         <div
           style={{
             backgroundColor: "#FFFFFF", borderRadius: 12,
-            border: "1px solid rgba(218, 193, 185, 0.2)", overflow: "hidden",
+            border: "1px solid rgba(218, 193, 185, 0.2)", overflow: "auto",
           }}
         >
           <table
             style={{
-              width: "100%", borderCollapse: "collapse",
+              width: "100%", minWidth: 900, borderCollapse: "collapse",
               fontFamily: "var(--font-inter), Inter, sans-serif", fontSize: 14,
+              tableLayout: "auto",
             }}
           >
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(218, 193, 185, 0.3)", backgroundColor: "#FAFAF9" }}>
                 <th style={thStyle}>Task</th>
-                <th style={{ ...thStyle, width: 80 }}>Type</th>
+                <SortableHeader label="Type" field="level" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={80} />
                 <th style={{ ...thStyle, width: 100 }}>Status</th>
-                <th style={{ ...thStyle, width: 150 }}>Started</th>
-                <th style={{ ...thStyle, width: 150 }}>Completed</th>
-                <th style={{ ...thStyle, width: 90, textAlign: "right" }}>Duration</th>
-                <th style={{ ...thStyle, width: 80, textAlign: "right" }}>Cost</th>
+                <SortableHeader label="Started" field="startedAt" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={150} />
+                <SortableHeader label="Completed" field="completedAt" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={150} />
+                <SortableHeader label="Duration" field="durationMs" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={90} align="right" />
+                <SortableHeader label="Tokens" field="tokensUsed" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={80} align="right" />
+                <SortableHeader label="Cost" field="costUsd" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={80} align="right" />
               </tr>
             </thead>
             <tbody>
               {isLoading && tasks.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: 40, textAlign: "center", color: "#5E5E65" }}>
+                  <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#5E5E65" }}>
                     Loading...
                   </td>
                 </tr>
               ) : tasks.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: 40, textAlign: "center", color: "#5E5E65" }}>
-                    No completed tasks yet
+                  <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#5E5E65" }}>
+                    {hasActiveFilters ? "No tasks match these filters" : "No completed tasks yet"}
                   </td>
                 </tr>
               ) : (

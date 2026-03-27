@@ -175,6 +175,12 @@ This is the same entrypoint a future Telegram bot would use.
 - `on_failure` — only notifies on errors or timeouts
 - `silent` — never notifies
 
+**Smart silence (`[SILENT]`):** Jobs can suppress their notification on a per-run basis. If a job's prompt instructs Claude to end its response with `[SILENT]` when there's nothing to report, the dispatcher skips the notification but still logs the output normally. Use this for monitoring-style jobs (health checks, update scanners) where "all clear" doesn't need a ping. Action-oriented jobs (digests, research) should always notify.
+
+When building a job prompt that uses this, add a line like: *"If there are no issues to report, end your response with `[SILENT]`."*
+
+**No duplicate runs:** If a job is still running when the next scheduled trigger fires, the dispatcher skips the duplicate. This prevents slow jobs from piling up when the runtime exceeds the schedule interval. If a previous run crashed without cleaning up, the dispatcher detects the stale state and starts the job normally.
+
 **Catch-up behavior:** If the laptop was closed (sleep/lid shut) during a scheduled fixed-time job, the dispatcher detects the missed window on wake and runs the job automatically. Interval-based jobs (`every_Nh`) do not catch up — they simply resume on the next matching interval.
 
 **Timeout** prevents runaway jobs. Default is 30 minutes. If a job exceeds its timeout, the process is killed and the result is recorded as `timeout`. If `retry` > 0, the job is re-attempted up to N times, each with the full timeout.

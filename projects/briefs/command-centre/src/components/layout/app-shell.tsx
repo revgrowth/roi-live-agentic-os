@@ -5,7 +5,7 @@ import { Sidebar } from "./sidebar";
 import { StatsBar } from "./stats-bar";
 import { ScopeBar } from "./scope-bar";
 
-export function AppShell({ children, title }: { children: React.ReactNode; title?: string }) {
+export function AppShell({ children, title, hideStatsBar }: { children: React.ReactNode; title?: string; hideStatsBar?: boolean }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Auto-collapse sidebar on narrow viewports
@@ -54,9 +54,11 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
           </h2>
         </header>
         <ScopeBar />
-        <div style={{ padding: "0 24px" }}>
-          <StatsBar />
-        </div>
+        {!hideStatsBar && (
+          <div style={{ padding: "0 24px" }}>
+            <StatsBar />
+          </div>
+        )}
         <div style={{ padding: "0 24px 24px", display: "flex", flexDirection: "column", gap: 16, marginTop: 16 }}>
           {children}
         </div>

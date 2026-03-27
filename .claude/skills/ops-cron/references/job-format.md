@@ -123,11 +123,23 @@ The dispatcher (`scripts/run-crons.sh`) runs every minute via OS crontab. For ea
 2. Skip if `active: "false"`
 3. Check if `time` matches the current time (exact, comma-list, or interval)
 4. Check if `days` matches the current day
-5. Run: `claude -p "{prompt}" --model {model} --dangerously-skip-permissions` with the configured `timeout` (default 30m). If the process exceeds the timeout, it is killed.
-6. If the job fails and `retry` > 0, re-run up to N times. Each retry gets the full timeout.
-7. Write a status file to `cron/status/{filename}.json` with result (`success`/`failure`/`timeout`), duration, timestamp, and run/fail counters
-8. Send an OS notification based on the `notify` setting (`on_finish`, `on_failure`, or `silent`)
-9. Log output to `cron/logs/{filename}.log` with START/END timestamps
+5. **Concurrency check** — if this job is already running from a previous trigger, skip this run. Prevents duplicate instances when a slow job exceeds its schedule interval.
+6. Run: `claude -p "{prompt}" --model {model} --dangerously-skip-permissions` with the configured `timeout` (default 30m). If the process exceeds the timeout, it is killed.
+7. If the job fails and `retry` > 0, re-run up to N times. Each retry gets the full timeout.
+8. Write a status file to `cron/status/{filename}.json` with result (`success`/`failure`/`timeout`), duration, timestamp, and run/fail counters
+9. **Silent check** — if the job succeeded and its output contains `[SILENT]`, skip the notification (the job signalled there's nothing to report)
+10. Send an OS notification based on the `notify` setting (`on_finish`, `on_failure`, or `silent`) — unless suppressed by `[SILENT]`
+11. Log output to `cron/logs/{filename}.log` with START/END timestamps
+
+## The `[SILENT]` Convention
+
+Jobs can conditionally suppress their desktop notification by ending their output with `[SILENT]`. This is useful for monitoring jobs where "nothing to report" is the normal case.
+
+To use it, add a line to the job's prompt body:
+
+> "If there are no issues to report, end your response with `[SILENT]`."
+
+The job still runs, still logs, and still writes its status file — only the notification is skipped. `[SILENT]` is only respected on successful runs; failures and timeouts always notify (if the `notify` field allows it).
 
 ---
 

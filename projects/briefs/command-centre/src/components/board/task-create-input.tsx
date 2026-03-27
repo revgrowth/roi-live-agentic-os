@@ -37,7 +37,7 @@ const levels: { value: TaskLevel; label: string; hint: string }[] = [
   { value: "gsd", label: LEVEL_LABELS.gsd, hint: LEVEL_HINTS.gsd },
 ];
 
-export function TaskCreateInput() {
+export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }) {
   const [description, setDescription] = useState("");
   const [level, setLevel] = useState<TaskLevel>("task");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -140,7 +140,7 @@ export function TaskCreateInput() {
     setIsExpanded(false);
 
     // Create with fallback title right away
-    await createTask(fallbackTitle, fullDescription, level, null);
+    await createTask(fallbackTitle, fullDescription, level, projectSlug || null);
 
     // AI title generation in the background
     fetch("/api/tasks/generate-title", {
@@ -163,7 +163,7 @@ export function TaskCreateInput() {
       .catch(() => { /* fallback title is fine */ });
 
     setIsSubmitting(false);
-  }, [description, attachments, level, isSubmitting, createTask, updateTask]);
+  }, [description, attachments, level, isSubmitting, createTask, updateTask, projectSlug]);
 
   const handleQuickStart = useCallback(async (type: "start-here" | "wrap-up") => {
     if (quickStarting) return;

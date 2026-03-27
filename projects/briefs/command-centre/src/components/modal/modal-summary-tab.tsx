@@ -4,8 +4,9 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import {
   AlertCircle, FileText, Eye, CheckCircle2, Clock, Loader2, Inbox,
   ChevronRight, ChevronDown, MessageSquare, Wrench, Plus, Play,
-  ArrowUp,
+  ArrowUp, Rocket, Terminal, Copy, Check,
 } from "lucide-react";
+import Link from "next/link";
 import type { Task, TaskUpdateInput, OutputFile, LogEntry } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 import { TaskProgress } from "./task-progress";
@@ -187,6 +188,8 @@ export function ModalSummaryTab({
   const getChildTasks = useTaskStore((s) => s.getChildTasks);
   const createTask = useTaskStore((s) => s.createTask);
   const updateTask = useTaskStore((s) => s.updateTask);
+  const syncPhases = useTaskStore((s) => s.syncPhases);
+  const [isSyncing, setIsSyncing] = useState(false);
   const isParent = task.level !== "task";
   const childTasks = isParent ? getChildTasks(task.id) : [];
 
@@ -266,6 +269,70 @@ export function ModalSummaryTab({
           )}
         </div>
       </div>
+
+      {/* GSD project actions */}
+      {task.level === "gsd" && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            margin: "12px 24px 0 24px",
+          }}
+        >
+          <Link
+            href="/gsd"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 14px",
+              borderRadius: 6,
+              backgroundColor: "rgba(147, 69, 42, 0.06)",
+              color: "#93452A",
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+              fontSize: 13,
+              fontWeight: 500,
+              textDecoration: "none",
+              transition: "background 150ms ease",
+              flex: 1,
+              justifyContent: "center",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(147, 69, 42, 0.12)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(147, 69, 42, 0.06)"; }}
+          >
+            <Rocket size={13} />
+            View Phases
+          </Link>
+          <button
+            onClick={async () => {
+              setIsSyncing(true);
+              try { await syncPhases(task.id); } finally { setIsSyncing(false); }
+            }}
+            disabled={isSyncing}
+            style={{
+              padding: "8px 14px",
+              borderRadius: 6,
+              border: "1px solid rgba(147, 69, 42, 0.2)",
+              backgroundColor: "transparent",
+              color: "#93452A",
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: isSyncing ? "not-allowed" : "pointer",
+              opacity: isSyncing ? 0.6 : 1,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {isSyncing ? "Syncing..." : "Sync Phases"}
+          </button>
+        </div>
+      )}
+
+      {/* Resume in terminal — for session-linked tasks that aren't currently running */}
+      {task.claudeSessionId && task.status !== "running" && (
+        <ResumeSessionButton sessionId={task.claudeSessionId} />
+      )}
 
       {/* Progress bar */}
       {hasStarted && (
@@ -661,6 +728,70 @@ export function ModalSummaryTab({
           to { transform: rotate(360deg); }
         }
       `}</style>
+    </div>
+  );
+}
+
+function ResumeSessionButton({ sessionId }: { sessionId: string }) {
+  const [copied, setCopied] = useState(false);
+  const command = `claude --resume ${sessionId}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(command);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div style={{ margin: "12px 24px 0 24px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "10px 14px",
+          borderRadius: 8,
+          backgroundColor: "#F8F6F4",
+          border: "1px solid rgba(218, 193, 185, 0.2)",
+        }}
+      >
+        <Terminal size={14} style={{ color: "#93452A", flexShrink: 0 }} />
+        <code
+          style={{
+            flex: 1,
+            fontSize: 12,
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace",
+            color: "#5E5E65",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {command}
+        </code>
+        <button
+          onClick={handleCopy}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+            padding: "4px 10px",
+            borderRadius: 5,
+            border: "1px solid rgba(147, 69, 42, 0.2)",
+            backgroundColor: copied ? "rgba(107, 142, 107, 0.08)" : "rgba(147, 69, 42, 0.06)",
+            color: copied ? "#6B8E6B" : "#93452A",
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+            fontSize: 12,
+            fontWeight: 500,
+            cursor: "pointer",
+            transition: "all 150ms ease",
+            flexShrink: 0,
+          }}
+        >
+          {copied ? <Check size={12} /> : <Copy size={12} />}
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
     </div>
   );
 }

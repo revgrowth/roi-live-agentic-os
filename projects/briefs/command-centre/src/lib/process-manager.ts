@@ -470,6 +470,64 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     }
   }
 
+  // ── Auto-queue next sibling when a child completes ──────────────────
+
+  private autoQueueNextSibling(completedChild: Task): void {
+    if (!completedChild.parentId) return;
+
+    const db = getDb();
+    const now = new Date().toISOString();
+
+    // Find the next backlog sibling (by columnOrder)
+    const nextSibling = db.prepare(
+      `SELECT * FROM tasks WHERE parentId = ? AND status = 'backlog' ORDER BY columnOrder ASC LIMIT 1`
+    ).get(completedChild.parentId) as Task | undefined;
+
+    if (!nextSibling) {
+      // No more siblings to queue — check if all are done
+      const remaining = db.prepare(
+        `SELECT COUNT(*) as count FROM tasks WHERE parentId = ? AND status != 'done'`
+      ).get(completedChild.parentId) as { count: number };
+
+      if (remaining.count === 0) {
+        // All subtasks complete — move parent to review
+        db.prepare(
+          "UPDATE tasks SET status = 'review', updatedAt = ?, activityLabel = NULL, needsInput = 0 WHERE id = ?"
+        ).run(now, completedChild.parentId);
+
+        const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(completedChild.parentId) as Task;
+        emitTaskEvent({ type: "task:status", task: this.normalizeTask(updatedParent), timestamp: now });
+        console.log(`[process-manager] All subtasks done — parent ${completedChild.parentId.slice(0, 8)} moved to review`);
+      }
+      return;
+    }
+
+    // Queue the next sibling — it will need user go-ahead to start
+    db.prepare(
+      "UPDATE tasks SET status = 'review', updatedAt = ?, needsInput = 1, activityLabel = ? WHERE id = ?"
+    ).run(now, "Ready to start — waiting for go-ahead", nextSibling.id);
+
+    const updatedSibling = db.prepare("SELECT * FROM tasks WHERE id = ?").get(nextSibling.id) as Task;
+    emitTaskEvent({ type: "task:status", task: this.normalizeTask(updatedSibling), timestamp: now });
+
+    // Keep parent in "in progress" — update its activity
+    const completedCount = db.prepare(
+      `SELECT COUNT(*) as count FROM tasks WHERE parentId = ? AND status = 'done'`
+    ).get(completedChild.parentId) as { count: number };
+    const totalCount = db.prepare(
+      `SELECT COUNT(*) as count FROM tasks WHERE parentId = ?`
+    ).get(completedChild.parentId) as { count: number };
+
+    db.prepare(
+      "UPDATE tasks SET status = 'running', updatedAt = ?, activityLabel = ? WHERE id = ?"
+    ).run(now, `${completedCount.count}/${totalCount.count} tasks done — next task queued`, completedChild.parentId);
+
+    const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(completedChild.parentId) as Task;
+    emitTaskEvent({ type: "task:status", task: this.normalizeTask(updatedParent), timestamp: now });
+
+    console.log(`[process-manager] Auto-queued next sibling ${nextSibling.id.slice(0, 8)} "${nextSibling.title}" — ${completedCount.count}/${totalCount.count} done`);
+  }
+
   // ── Subtask extraction from structured output ──────────────────
 
   private extractAndCreateSubtasks(parentTaskId: string, parentTask: Task): void {
@@ -541,6 +599,7 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
         gsdStep: (sub.gsdStep as Task["gsdStep"]) ?? null,
         contextSources: null,
         cronJobSlug: null,
+        claudeSessionId: null,
       };
 
       db.prepare(
@@ -863,6 +922,11 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
           // Project: extract deliverable subtasks from the conversation output
           this.extractAndCreateSubtasks(taskId, updated);
         }
+      }
+
+      // Auto-queue next sibling subtask when a child completes
+      if (updated.parentId) {
+        this.autoQueueNextSibling(updated);
       }
     }
 

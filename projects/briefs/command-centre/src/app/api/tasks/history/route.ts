@@ -9,6 +9,11 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get("limit") || "100", 10), 500);
     const offset = parseInt(searchParams.get("offset") || "0", 10);
     const clientId = searchParams.get("clientId");
+    const type = searchParams.get("type"); // task level: task, project, gsd
+    const status = searchParams.get("status"); // done, review, failed
+    const dateRange = searchParams.get("dateRange"); // today, week, month, 90days
+    const sortBy = searchParams.get("sortBy") || "completedAt"; // completedAt, startedAt, durationMs, tokensUsed, costUsd, level
+    const sortDir = searchParams.get("sortDir") || "desc"; // asc, desc
 
     const conditions: string[] = [];
     const params: unknown[] = [];
@@ -21,11 +26,72 @@ export async function GET(request: NextRequest) {
       params.push(clientId);
     }
 
+    // Type filter (task level)
+    if (type && ["task", "project", "gsd"].includes(type)) {
+      conditions.push("level = ?");
+      params.push(type);
+    }
+
+    // Status filter
+    if (status === "done") {
+      // Override the IN clause — only done
+      conditions[0] = "status = 'done'";
+    } else if (status === "review") {
+      conditions[0] = "status = 'review'";
+    } else if (status === "failed") {
+      conditions.push("errorMessage IS NOT NULL");
+    }
+
+    // Date range filter (based on startedAt)
+    if (dateRange) {
+      const now = new Date();
+      let cutoff: Date | null = null;
+
+      switch (dateRange) {
+        case "today": {
+          cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          break;
+        }
+        case "week": {
+          cutoff = new Date(now);
+          cutoff.setDate(cutoff.getDate() - 7);
+          break;
+        }
+        case "month": {
+          cutoff = new Date(now);
+          cutoff.setMonth(cutoff.getMonth() - 1);
+          break;
+        }
+        case "90days": {
+          cutoff = new Date(now);
+          cutoff.setDate(cutoff.getDate() - 90);
+          break;
+        }
+      }
+
+      if (cutoff) {
+        conditions.push("COALESCE(startedAt, createdAt) >= ?");
+        params.push(cutoff.toISOString());
+      }
+    }
+
+    // Validate sort column
+    const allowedSortCols: Record<string, string> = {
+      completedAt: "COALESCE(completedAt, updatedAt)",
+      startedAt: "COALESCE(startedAt, createdAt)",
+      durationMs: "COALESCE(durationMs, 0)",
+      tokensUsed: "COALESCE(tokensUsed, 0)",
+      costUsd: "COALESCE(costUsd, 0)",
+      level: "level",
+    };
+    const sortCol = allowedSortCols[sortBy] || allowedSortCols.completedAt;
+    const direction = sortDir === "asc" ? "ASC" : "DESC";
+
     const where = conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : "";
 
     const rows = db
       .prepare(
-        `SELECT * FROM tasks${where} ORDER BY COALESCE(completedAt, updatedAt) DESC LIMIT ? OFFSET ?`
+        `SELECT * FROM tasks${where} ORDER BY ${sortCol} ${direction} LIMIT ? OFFSET ?`
       )
       .all(...params, limit, offset) as Task[];
 

@@ -158,13 +158,17 @@ export class ClaudeOutputParser {
     const costUsd = typeof parsed.cost_usd === "number" ? parsed.cost_usd : 0;
     const durationMs = typeof parsed.duration_ms === "number" ? parsed.duration_ms : 0;
 
-    // Token count can be in usage.total_tokens or at the top level
+    // Token count: check total_tokens first, then sum input_tokens + output_tokens
     let tokensUsed = 0;
     const usage = parsed.usage as Record<string, unknown> | undefined;
     if (usage && typeof usage.total_tokens === "number") {
       tokensUsed = usage.total_tokens;
+    } else if (usage && typeof usage.input_tokens === "number") {
+      tokensUsed = usage.input_tokens + (typeof usage.output_tokens === "number" ? usage.output_tokens : 0);
     } else if (typeof parsed.total_tokens === "number") {
       tokensUsed = parsed.total_tokens;
+    } else if (typeof parsed.input_tokens === "number") {
+      tokensUsed = parsed.input_tokens + (typeof parsed.output_tokens === "number" ? parsed.output_tokens : 0);
     }
 
     const sessionId = typeof parsed.session_id === "string" ? parsed.session_id : undefined;

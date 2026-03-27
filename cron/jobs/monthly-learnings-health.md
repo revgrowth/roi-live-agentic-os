@@ -67,3 +67,5 @@ Format:
 - {specific suggestions: "Consolidate 3 redundant entries in ## mkt-brand-voice", "Add learnings section for str-ai-seo", etc.}
 
 If learnings.md doesn't exist, create a minimal report noting the file is missing and suggesting the user run a few skills to generate initial learnings.
+
+If it's not the first Monday of the month (skipping), or if the audit finds zero issues across all categories, end your response with `[SILENT]` on its own line. This suppresses the desktop notification since there's nothing actionable to report.

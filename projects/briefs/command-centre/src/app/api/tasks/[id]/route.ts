@@ -2,6 +2,53 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
 import type { Task, TaskUpdateInput } from "@/types/task";
+import type Database from "better-sqlite3";
+
+/** When a child task completes, auto-queue the next backlog sibling for user go-ahead */
+function autoQueueNextSibling(db: Database.Database, completedChild: Task, now: string): void {
+  if (!completedChild.parentId) return;
+
+  const nextSibling = db.prepare(
+    `SELECT * FROM tasks WHERE parentId = ? AND status = 'backlog' ORDER BY columnOrder ASC LIMIT 1`
+  ).get(completedChild.parentId) as Task | undefined;
+
+  if (!nextSibling) {
+    // Check if all siblings are done
+    const remaining = db.prepare(
+      `SELECT COUNT(*) as count FROM tasks WHERE parentId = ? AND status != 'done'`
+    ).get(completedChild.parentId) as { count: number };
+
+    if (remaining.count === 0) {
+      db.prepare(
+        "UPDATE tasks SET status = 'review', updatedAt = ?, activityLabel = NULL, needsInput = 0 WHERE id = ?"
+      ).run(now, completedChild.parentId);
+      const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(completedChild.parentId) as Task;
+      emitTaskEvent({ type: "task:status", task: { ...updatedParent, needsInput: Boolean(updatedParent.needsInput) }, timestamp: now });
+    }
+    return;
+  }
+
+  // Queue the next sibling — needs user go-ahead
+  db.prepare(
+    "UPDATE tasks SET status = 'review', updatedAt = ?, needsInput = 1, activityLabel = ? WHERE id = ?"
+  ).run(now, "Ready to start — waiting for go-ahead", nextSibling.id);
+  const updatedSibling = db.prepare("SELECT * FROM tasks WHERE id = ?").get(nextSibling.id) as Task;
+  emitTaskEvent({ type: "task:status", task: { ...updatedSibling, needsInput: Boolean(updatedSibling.needsInput) }, timestamp: now });
+
+  // Update parent progress
+  const completedCount = db.prepare(
+    `SELECT COUNT(*) as count FROM tasks WHERE parentId = ? AND status = 'done'`
+  ).get(completedChild.parentId) as { count: number };
+  const totalCount = db.prepare(
+    `SELECT COUNT(*) as count FROM tasks WHERE parentId = ?`
+  ).get(completedChild.parentId) as { count: number };
+
+  db.prepare(
+    "UPDATE tasks SET status = 'running', updatedAt = ?, activityLabel = ?, startedAt = COALESCE(startedAt, ?) WHERE id = ?"
+  ).run(now, `${completedCount.count}/${totalCount.count} tasks done — next task queued`, now, completedChild.parentId);
+  const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(completedChild.parentId) as Task;
+  emitTaskEvent({ type: "task:status", task: { ...updatedParent, needsInput: Boolean(updatedParent.needsInput) }, timestamp: now });
+}
 
 export async function GET(
   _request: NextRequest,
@@ -75,6 +122,13 @@ export async function PATCH(
       }
     }
 
+    // Auto-set startedAt when transitioning to running/review/done if not already set
+    const newStatus = body.status;
+    if (newStatus && ["running", "review", "done"].includes(newStatus) && !existing.startedAt && !("startedAt" in body)) {
+      updates.push("startedAt = ?");
+      values.push(now);
+    }
+
     values.push(id);
 
     db.prepare(`UPDATE tasks SET ${updates.join(", ")} WHERE id = ?`).run(
@@ -91,6 +145,26 @@ export async function PATCH(
       task: normalized,
       timestamp: now,
     });
+
+    // Auto-queue next sibling when a child task is manually marked done
+    if (body.status === "done" && updated.parentId) {
+      autoQueueNextSibling(db, updated, now);
+    }
+
+    // When a parent task is moved to "queued", auto-queue its first backlog child
+    if (body.status === "queued" && !updated.parentId) {
+      const firstChild = db.prepare(
+        `SELECT * FROM tasks WHERE parentId = ? AND status = 'backlog' ORDER BY columnOrder ASC LIMIT 1`
+      ).get(id) as Task | undefined;
+
+      if (firstChild) {
+        db.prepare(
+          "UPDATE tasks SET status = 'queued', updatedAt = ? WHERE id = ?"
+        ).run(now, firstChild.id);
+        const updatedChild = db.prepare("SELECT * FROM tasks WHERE id = ?").get(firstChild.id) as Task;
+        emitTaskEvent({ type: "task:status", task: { ...updatedChild, needsInput: Boolean(updatedChild.needsInput) }, timestamp: now });
+      }
+    }
 
     return NextResponse.json(normalized);
   } catch (error) {
