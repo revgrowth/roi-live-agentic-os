@@ -84,5 +84,57 @@ export function getDb(): Database.Database {
     db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_cronJobSlug ON tasks(cronJobSlug)");
   }
 
+  // Migration: add claudePid column for process-alive reaper
+  const pidCol = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
+  if (!pidCol.some((c) => c.name === "claudePid")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN claudePid INTEGER");
+  }
+
+  // Migration: add taskId column to cron_runs for linking runs to task outputs
+  const cronRunCols = db.prepare("PRAGMA table_info(cron_runs)").all() as Array<{ name: string }>;
+  if (!cronRunCols.some((c) => c.name === "taskId")) {
+    db.exec("ALTER TABLE cron_runs ADD COLUMN taskId TEXT");
+  }
+
+  // Migration: add trigger column to cron_runs for manual vs scheduled distinction
+  const cronRunTriggerCol = db.prepare("PRAGMA table_info(cron_runs)").all() as Array<{ name: string }>;
+  if (!cronRunTriggerCol.some((c) => c.name === "trigger")) {
+    db.exec("ALTER TABLE cron_runs ADD COLUMN trigger TEXT DEFAULT 'scheduled'");
+  }
+
+  // Migration: add permissionMode column for controlling Claude CLI permission mode per task
+  const permCol = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
+  if (!permCol.some((c) => c.name === "permissionMode")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN permissionMode TEXT DEFAULT 'default'");
+  }
+
+  // Migration: add conversationId column to tasks for autonomous mode linkage
+  const convCol = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
+  if (!convCol.some((c) => c.name === "conversationId")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN conversationId TEXT");
+    db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_conversationId ON tasks(conversationId)");
+  }
+
+  // Migration: add originMessageId column to tasks
+  if (!convCol.some((c) => c.name === "originMessageId")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN originMessageId TEXT");
+  }
+
+  // Migration: add teamId column to tasks for Claude teams
+  if (!convCol.some((c) => c.name === "teamId")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN teamId TEXT");
+  }
+
+  // Migration: add coordinationLevel column to tasks
+  if (!convCol.some((c) => c.name === "coordinationLevel")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN coordinationLevel TEXT");
+  }
+
+  // Migration: add surfacedToConversation to task_logs
+  const logSurfCol = db.prepare("PRAGMA table_info(task_logs)").all() as Array<{ name: string }>;
+  if (!logSurfCol.some((c) => c.name === "surfacedToConversation")) {
+    db.exec("ALTER TABLE task_logs ADD COLUMN surfacedToConversation INTEGER DEFAULT 0");
+  }
+
   return db;
 }

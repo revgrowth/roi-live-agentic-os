@@ -15,6 +15,23 @@ export const LEVEL_HINTS: Record<TaskLevel, string> = {
   gsd: "Something that needs building in stages — an app, a system, a complex workflow",
 };
 export type GsdStep = "discuss" | "plan" | "execute" | "verify";
+export type PermissionMode = "plan" | "default" | "acceptEdits" | "auto" | "bypassPermissions";
+
+export const PERMISSION_MODE_LABELS: Record<PermissionMode, string> = {
+  plan: "Plan",
+  default: "Default",
+  acceptEdits: "Accept edits",
+  auto: "Auto",
+  bypassPermissions: "YOLO",
+};
+
+export const PERMISSION_MODE_HINTS: Record<PermissionMode, string> = {
+  plan: "Claude plans first, then asks to execute",
+  default: "Claude asks before risky actions",
+  acceptEdits: "Auto-approve file edits, ask for commands",
+  auto: "Claude acts autonomously with minimal prompts",
+  bypassPermissions: "Skip all permission checks — no guardrails",
+};
 
 export type LogEntryType = "text" | "tool_use" | "tool_result" | "question" | "user_reply" | "system";
 
@@ -54,6 +71,12 @@ export interface Task {
   contextSources: string | null;
   cronJobSlug: string | null;
   claudeSessionId: string | null;
+  claudePid?: number | null;
+  permissionMode: PermissionMode;
+  conversationId?: string | null;
+  originMessageId?: string | null;
+  teamId?: string | null;
+  coordinationLevel?: "inject" | "shared_context" | "team" | null;
 }
 
 export interface OutputFile {
@@ -76,6 +99,9 @@ export interface TaskCreateInput {
   parentId?: string | null;
   phaseNumber?: number | null;
   gsdStep?: GsdStep | null;
+  permissionMode?: PermissionMode;
+  conversationId?: string | null;
+  originMessageId?: string | null;
 }
 
 export type TaskUpdateInput = Partial<
@@ -99,5 +125,10 @@ export type TaskUpdateInput = Partial<
     | "needsInput"
     | "phaseNumber"
     | "gsdStep"
+    | "permissionMode"
+    | "conversationId"
+    | "originMessageId"
+    | "teamId"
+    | "coordinationLevel"
   >
 >;
