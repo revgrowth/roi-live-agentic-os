@@ -30,15 +30,24 @@ export interface CronStats {
   avgCostUsd: number;
 }
 
+export interface CronRunOutput {
+  fileName: string;
+  filePath: string;
+  extension: string;
+}
+
 export interface CronRun {
   id: number;
   jobSlug: string;
+  taskId: string | null;
   startedAt: string;
   completedAt: string | null;
   result: "success" | "failure" | "running";
   durationSec: number | null;
   costUsd: number | null;
   exitCode: number | null;
+  trigger: "manual" | "scheduled";
+  outputs: CronRunOutput[];
 }
 
 export interface CronJobCreateInput {

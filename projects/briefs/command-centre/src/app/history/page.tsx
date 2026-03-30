@@ -1,21 +1,87 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import {
   Timer, CheckCircle2, AlertCircle, Clock, ChevronLeft, ChevronRight,
   ChevronDown, MessageSquare, Wrench, FileText, ExternalLink, Eye,
-  ArrowUpDown, ArrowUp, ArrowDown, Filter, X,
+  ArrowUpDown, ArrowUp, ArrowDown, Filter, X, GripVertical,
 } from "lucide-react";
 import type { Task, TaskLevel, LogEntry, OutputFile } from "@/types/task";
 import { LEVEL_LABELS } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 
 const PAGE_SIZE = 50;
+const STORAGE_KEY = "cc-history-columns";
+
+// ─── Column definitions ──────────────────────────────────────────────────────
+
+type ColumnId = "task" | "level" | "status" | "startedAt" | "completedAt" | "durationMs" | "tokensUsed" | "costUsd";
+type SortField = "completedAt" | "startedAt" | "durationMs" | "tokensUsed" | "costUsd" | "level";
+
+interface ColumnDef {
+  id: ColumnId;
+  label: string;
+  defaultWidth: number;
+  minWidth: number;
+  sortField?: SortField;
+  align?: "left" | "right";
+}
+
+const ALL_COLUMNS: ColumnDef[] = [
+  { id: "task",        label: "Task",      defaultWidth: 0,   minWidth: 150 },
+  { id: "level",       label: "Type",      defaultWidth: 100, minWidth: 60,  sortField: "level" },
+  { id: "status",      label: "Status",    defaultWidth: 110, minWidth: 70 },
+  { id: "startedAt",   label: "Started",   defaultWidth: 150, minWidth: 90,  sortField: "startedAt" },
+  { id: "completedAt", label: "Completed", defaultWidth: 150, minWidth: 90,  sortField: "completedAt" },
+  { id: "durationMs",  label: "Duration",  defaultWidth: 100, minWidth: 60,  sortField: "durationMs",  align: "right" },
+  { id: "tokensUsed",  label: "Tokens",    defaultWidth: 90,  minWidth: 50,  sortField: "tokensUsed",  align: "right" },
+  { id: "costUsd",     label: "Cost",      defaultWidth: 90,  minWidth: 50,  sortField: "costUsd",     align: "right" },
+];
+
+const DEFAULT_ORDER: ColumnId[] = ALL_COLUMNS.map((c) => c.id);
+const DEFAULT_WIDTHS: Record<string, number> = Object.fromEntries(ALL_COLUMNS.map((c) => [c.id, c.defaultWidth]));
+
+function getColumnDef(id: ColumnId): ColumnDef {
+  return ALL_COLUMNS.find((c) => c.id === id)!;
+}
+
+// ─── Persistence ─────────────────────────────────────────────────────────────
+
+interface ColumnPrefs {
+  order: ColumnId[];
+  widths: Record<string, number>;
+}
+
+function loadColumnPrefs(): ColumnPrefs {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as ColumnPrefs;
+      // Validate: ensure all columns present
+      const knownIds = new Set(DEFAULT_ORDER);
+      const validOrder = parsed.order.filter((id) => knownIds.has(id));
+      // Add any missing columns
+      for (const id of DEFAULT_ORDER) {
+        if (!validOrder.includes(id)) validOrder.push(id);
+      }
+      return {
+        order: validOrder,
+        widths: { ...DEFAULT_WIDTHS, ...parsed.widths },
+      };
+    }
+  } catch { /* ignore */ }
+  return { order: [...DEFAULT_ORDER], widths: { ...DEFAULT_WIDTHS } };
+}
+
+function saveColumnPrefs(prefs: ColumnPrefs) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+  } catch { /* ignore */ }
+}
 
 // ─── Filter/Sort types ───────────────────────────────────────────────────────
 
-type SortField = "completedAt" | "startedAt" | "durationMs" | "tokensUsed" | "costUsd" | "level";
 type SortDir = "asc" | "desc";
 type DateRange = "" | "today" | "week" | "month" | "90days";
 type TypeFilter = "" | "task" | "project" | "gsd";
@@ -59,6 +125,7 @@ function formatDuration(ms: number): string {
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return "--";
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "--";
   const now = new Date();
   const isToday = d.toDateString() === now.toDateString();
   const yesterday = new Date(now);
@@ -82,7 +149,7 @@ function formatTokens(tokens: number): string {
   return tokens.toString();
 }
 
-// ─── Chat digest (reused from modal-summary-tab pattern) ─────────────────────
+// ─── Chat digest ─────────────────────────────────────────────────────────────
 
 type DigestEntry = { type: "text" | "tools" | "question" | "reply"; label: string; time: string };
 
@@ -200,67 +267,92 @@ function FilterSelect<T extends string>({
   );
 }
 
-// ─── Sortable header ─────────────────────────────────────────────────────────
+// ─── Cell renderers ──────────────────────────────────────────────────────────
 
-function SortableHeader({
-  label,
-  field,
-  currentSort,
-  currentDir,
-  onSort,
-  align,
-  width,
-}: {
-  label: string;
-  field: SortField;
-  currentSort: SortField;
-  currentDir: SortDir;
-  onSort: (field: SortField) => void;
-  align?: "left" | "right";
-  width?: number;
-}) {
-  const isActive = currentSort === field;
-  const Icon = isActive ? (currentDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
-
-  return (
-    <th
-      onClick={() => onSort(field)}
-      style={{
-        ...thStyle,
-        width,
-        textAlign: align || "left",
-        cursor: "pointer",
-        userSelect: "none",
-        transition: "color 100ms ease",
-        color: isActive ? "#93452A" : "#5E5E65",
-      }}
-    >
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 4,
-          justifyContent: align === "right" ? "flex-end" : "flex-start",
-          width: "100%",
-        }}
-      >
-        {label}
-        <Icon size={12} style={{ opacity: isActive ? 1 : 0.4 }} />
-      </div>
-    </th>
-  );
+function renderCell(colId: ColumnId, task: Task, expanded: boolean): React.ReactNode {
+  switch (colId) {
+    case "task":
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <ChevronDown
+            size={14}
+            color="#9C9CA0"
+            style={{
+              flexShrink: 0,
+              transform: expanded ? "rotate(0deg)" : "rotate(-90deg)",
+              transition: "transform 150ms ease",
+            }}
+          />
+          <div style={{ overflow: "hidden", minWidth: 0 }}>
+            <div
+              style={{
+                fontWeight: 500,
+                color: "#1B1C1B",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {task.title}
+            </div>
+            {task.description && !expanded && (
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "#5E5E65",
+                  marginTop: 2,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {task.description}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    case "level":
+      return task.cronJobSlug ? (
+        <span style={{ ...badgeBase, backgroundColor: "rgba(59, 130, 246, 0.1)", color: "#3B82F6" }}>
+          <Timer size={10} /> Scheduled
+        </span>
+      ) : (
+        <span
+          style={{
+            fontSize: 12, fontWeight: 500,
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+            padding: "2px 8px", borderRadius: 4,
+            backgroundColor: "rgba(94, 94, 101, 0.08)", color: "#5E5E65",
+          }}
+        >
+          {LEVEL_LABELS[task.level as TaskLevel] || task.level}
+        </span>
+      );
+    case "status":
+      return <StatusBadge status={task.status} hasError={task.errorMessage !== null} />;
+    case "startedAt":
+      return <span style={monoCell}>{formatDate(task.startedAt)}</span>;
+    case "completedAt":
+      return <span style={monoCell}>{formatDate(task.completedAt)}</span>;
+    case "durationMs":
+      return <span style={monoCell}>{task.durationMs ? formatDuration(task.durationMs) : "--"}</span>;
+    case "tokensUsed":
+      return <span style={monoCell}>{task.tokensUsed != null && task.tokensUsed > 0 ? formatTokens(task.tokensUsed) : "--"}</span>;
+    case "costUsd":
+      return <span style={monoCell}>{task.costUsd != null && task.costUsd > 0 ? `$${task.costUsd.toFixed(2)}` : "--"}</span>;
+  }
 }
 
 // ─── Expandable row ──────────────────────────────────────────────────────────
 
-function HistoryRow({ task }: { task: Task }) {
+function HistoryRow({ task, columnOrder, columnWidths }: { task: Task; columnOrder: ColumnId[]; columnWidths: Record<string, number> }) {
   const [expanded, setExpanded] = useState(false);
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const [outputFiles, setOutputFiles] = useState<OutputFile[]>([]);
   const [detailLoaded, setDetailLoaded] = useState(false);
   const openPanel = useTaskStore((s) => s.openPanel);
 
-  // Fetch logs + outputs on first expand
   useEffect(() => {
     if (!expanded || detailLoaded) return;
     setDetailLoaded(true);
@@ -280,7 +372,6 @@ function HistoryRow({ task }: { task: Task }) {
 
   return (
     <>
-      {/* Main row */}
       <tr
         onClick={() => setExpanded(!expanded)}
         style={{
@@ -292,84 +383,27 @@ function HistoryRow({ task }: { task: Task }) {
         onMouseEnter={(e) => { if (!expanded) e.currentTarget.style.backgroundColor = "rgba(218, 193, 185, 0.06)"; }}
         onMouseLeave={(e) => { if (!expanded) e.currentTarget.style.backgroundColor = "transparent"; }}
       >
-        <td style={tdStyle}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <ChevronDown
-              size={14}
-              color="#9C9CA0"
+        {columnOrder.map((colId) => {
+          const def = getColumnDef(colId);
+          const w = columnWidths[colId] || def.defaultWidth;
+          return (
+            <td
+              key={colId}
               style={{
-                flexShrink: 0,
-                transform: expanded ? "rotate(0deg)" : "rotate(-90deg)",
-                transition: "transform 150ms ease",
-              }}
-            />
-            <div style={{ overflow: "hidden", minWidth: 0 }}>
-              <div
-                style={{
-                  fontWeight: 500,
-                  color: "#1B1C1B",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {task.title}
-              </div>
-              {task.description && !expanded && (
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "#5E5E65",
-                    marginTop: 2,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {task.description}
-                </div>
-              )}
-            </div>
-          </div>
-        </td>
-        <td style={tdStyle}>
-          {task.cronJobSlug ? (
-            <span style={{ ...badgeBase, backgroundColor: "rgba(59, 130, 246, 0.1)", color: "#3B82F6" }}>
-              <Timer size={10} /> Cron
-            </span>
-          ) : (
-            <span
-              style={{
-                fontSize: 12, fontWeight: 500,
-                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                padding: "2px 8px", borderRadius: 4,
-                backgroundColor: "rgba(94, 94, 101, 0.08)", color: "#5E5E65",
+                ...tdStyle,
+                textAlign: def.align || "left",
+                width: w > 0 ? w : undefined,
               }}
             >
-              {LEVEL_LABELS[task.level as TaskLevel] || task.level}
-            </span>
-          )}
-        </td>
-        <td style={tdStyle}>
-          <StatusBadge status={task.status} hasError={task.errorMessage !== null} />
-        </td>
-        <td style={{ ...tdStyle, ...monoCell }}>{formatDate(task.startedAt)}</td>
-        <td style={{ ...tdStyle, ...monoCell }}>{formatDate(task.completedAt)}</td>
-        <td style={{ ...tdStyle, ...monoCell, textAlign: "right" }}>
-          {task.durationMs ? formatDuration(task.durationMs) : "--"}
-        </td>
-        <td style={{ ...tdStyle, ...monoCell, textAlign: "right" }}>
-          {task.tokensUsed != null && task.tokensUsed > 0 ? formatTokens(task.tokensUsed) : "--"}
-        </td>
-        <td style={{ ...tdStyle, ...monoCell, textAlign: "right" }}>
-          {task.costUsd != null && task.costUsd > 0 ? `$${task.costUsd.toFixed(2)}` : "--"}
-        </td>
+              {renderCell(colId, task, expanded)}
+            </td>
+          );
+        })}
       </tr>
 
-      {/* Expanded detail row */}
       {expanded && (
         <tr style={{ borderBottom: "1px solid rgba(218, 193, 185, 0.15)" }}>
-          <td colSpan={8} style={{ padding: 0 }}>
+          <td colSpan={columnOrder.length} style={{ padding: 0 }}>
             <div
               style={{
                 padding: "16px 24px 20px 46px",
@@ -382,10 +416,9 @@ function HistoryRow({ task }: { task: Task }) {
                 <StatPill label="Duration" value={task.durationMs ? formatDuration(task.durationMs) : "--"} />
                 <StatPill label="Cost" value={task.costUsd != null && task.costUsd > 0 ? `$${task.costUsd.toFixed(2)}` : "--"} />
                 <StatPill label="Tokens" value={task.tokensUsed != null && task.tokensUsed > 0 ? formatTokens(task.tokensUsed) : "--"} />
-                {task.cronJobSlug && <StatPill label="Cron Job" value={task.cronJobSlug} />}
+                {task.cronJobSlug && <StatPill label="Scheduled Task" value={task.cronJobSlug} />}
               </div>
 
-              {/* Error banner */}
               {task.errorMessage && (
                 <div
                   style={{
@@ -401,7 +434,6 @@ function HistoryRow({ task }: { task: Task }) {
                 </div>
               )}
 
-              {/* Description */}
               {task.description && (
                 <p
                   style={{
@@ -413,7 +445,6 @@ function HistoryRow({ task }: { task: Task }) {
                 </p>
               )}
 
-              {/* Activity digest */}
               {digest.length > 0 && (
                 <div style={{ marginBottom: 16 }}>
                   <div style={sectionLabel}>Activity</div>
@@ -447,7 +478,6 @@ function HistoryRow({ task }: { task: Task }) {
                 </div>
               )}
 
-              {/* Output files */}
               {outputFiles.length > 0 && (
                 <div style={{ marginBottom: 16 }}>
                   <div style={sectionLabel}>Output Files ({outputFiles.length})</div>
@@ -479,7 +509,6 @@ function HistoryRow({ task }: { task: Task }) {
                 </div>
               )}
 
-              {/* View full log button */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -539,6 +568,102 @@ export default function HistoryPage() {
   const [sortBy, setSortBy] = useState<SortField>("completedAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
+  // Column prefs (order + widths)
+  const [columnOrder, setColumnOrder] = useState<ColumnId[]>(DEFAULT_ORDER);
+  const [columnWidths, setColumnWidths] = useState<Record<string, number>>(DEFAULT_WIDTHS);
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
+
+  // Load prefs from localStorage on mount
+  useEffect(() => {
+    const prefs = loadColumnPrefs();
+    setColumnOrder(prefs.order);
+    setColumnWidths(prefs.widths);
+    setPrefsLoaded(true);
+  }, []);
+
+  // Save prefs whenever they change (after initial load)
+  useEffect(() => {
+    if (prefsLoaded) {
+      saveColumnPrefs({ order: columnOrder, widths: columnWidths });
+    }
+  }, [columnOrder, columnWidths, prefsLoaded]);
+
+  // Column resize
+  const resizingRef = useRef<{ colId: ColumnId; startX: number; startWidth: number } | null>(null);
+
+  const handleResizeStart = useCallback((e: React.MouseEvent, colId: ColumnId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const def = getColumnDef(colId);
+    const startWidth = columnWidths[colId] || def.defaultWidth;
+    resizingRef.current = { colId, startX: e.clientX, startWidth };
+
+    const onMouseMove = (ev: MouseEvent) => {
+      if (!resizingRef.current) return;
+      const delta = ev.clientX - resizingRef.current.startX;
+      const def = getColumnDef(resizingRef.current.colId);
+      const newWidth = Math.max(def.minWidth, resizingRef.current.startWidth + delta);
+      setColumnWidths((prev) => ({ ...prev, [resizingRef.current!.colId]: newWidth }));
+    };
+
+    const onMouseUp = () => {
+      resizingRef.current = null;
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  }, [columnWidths]);
+
+  // Column drag-reorder
+  const dragColRef = useRef<ColumnId | null>(null);
+  const [dragOverCol, setDragOverCol] = useState<ColumnId | null>(null);
+
+  const handleDragStart = useCallback((e: React.DragEvent, colId: ColumnId) => {
+    dragColRef.current = colId;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", colId);
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent, colId: ColumnId) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (dragColRef.current && dragColRef.current !== colId) {
+      setDragOverCol(colId);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent, targetColId: ColumnId) => {
+    e.preventDefault();
+    const sourceColId = dragColRef.current;
+    if (!sourceColId || sourceColId === targetColId) {
+      setDragOverCol(null);
+      dragColRef.current = null;
+      return;
+    }
+    setColumnOrder((prev) => {
+      const next = [...prev];
+      const srcIdx = next.indexOf(sourceColId);
+      const tgtIdx = next.indexOf(targetColId);
+      if (srcIdx === -1 || tgtIdx === -1) return prev;
+      next.splice(srcIdx, 1);
+      next.splice(tgtIdx, 0, sourceColId);
+      return next;
+    });
+    setDragOverCol(null);
+    dragColRef.current = null;
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    setDragOverCol(null);
+    dragColRef.current = null;
+  }, []);
+
   // Load all tasks into Zustand store so the TaskModal can find them
   useEffect(() => {
     fetchStoreTasks();
@@ -594,7 +719,14 @@ export default function HistoryPage() {
     setDateRange("");
   };
 
+  const resetColumns = () => {
+    setColumnOrder([...DEFAULT_ORDER]);
+    setColumnWidths({ ...DEFAULT_WIDTHS });
+  };
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
+  const isCustomised = JSON.stringify(columnOrder) !== JSON.stringify(DEFAULT_ORDER)
+    || JSON.stringify(columnWidths) !== JSON.stringify(DEFAULT_WIDTHS);
 
   return (
     <AppShell title="History">
@@ -656,6 +788,28 @@ export default function HistoryPage() {
               Clear
             </button>
           )}
+          <div style={{ flex: 1 }} />
+          {isCustomised && (
+            <button
+              onClick={resetColumns}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                padding: "6px 12px",
+                borderRadius: 8,
+                border: "1px solid rgba(218, 193, 185, 0.3)",
+                backgroundColor: "transparent",
+                color: "#9C9CA0",
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontSize: 11,
+                fontWeight: 500,
+                cursor: "pointer",
+              }}
+            >
+              Reset columns
+            </button>
+          )}
         </div>
 
         {/* Table */}
@@ -669,36 +823,97 @@ export default function HistoryPage() {
             style={{
               width: "100%", minWidth: 900, borderCollapse: "collapse",
               fontFamily: "var(--font-inter), Inter, sans-serif", fontSize: 14,
-              tableLayout: "auto",
+              tableLayout: "fixed",
             }}
           >
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(218, 193, 185, 0.3)", backgroundColor: "#FAFAF9" }}>
-                <th style={thStyle}>Task</th>
-                <SortableHeader label="Type" field="level" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={80} />
-                <th style={{ ...thStyle, width: 100 }}>Status</th>
-                <SortableHeader label="Started" field="startedAt" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={150} />
-                <SortableHeader label="Completed" field="completedAt" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={150} />
-                <SortableHeader label="Duration" field="durationMs" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={90} align="right" />
-                <SortableHeader label="Tokens" field="tokensUsed" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={80} align="right" />
-                <SortableHeader label="Cost" field="costUsd" currentSort={sortBy} currentDir={sortDir} onSort={handleSort} width={80} align="right" />
+                {columnOrder.map((colId) => {
+                  const def = getColumnDef(colId);
+                  const w = columnWidths[colId] || def.defaultWidth;
+                  const isActive = def.sortField ? sortBy === def.sortField : false;
+                  const Icon = isActive ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+                  const isDragTarget = dragOverCol === colId;
+
+                  return (
+                    <th
+                      key={colId}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, colId)}
+                      onDragOver={(e) => handleDragOver(e, colId)}
+                      onDrop={(e) => handleDrop(e, colId)}
+                      onDragEnd={handleDragEnd}
+                      onClick={() => def.sortField && handleSort(def.sortField)}
+                      style={{
+                        ...thStyle,
+                        width: w > 0 ? w : undefined,
+                        textAlign: def.align || "left",
+                        cursor: def.sortField ? "pointer" : "grab",
+                        userSelect: "none",
+                        color: isActive ? "#93452A" : "#5E5E65",
+                        position: "relative",
+                        borderLeft: isDragTarget ? "2px solid #93452A" : "none",
+                        transition: "border-color 100ms ease",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 4,
+                          justifyContent: def.align === "right" ? "flex-end" : "flex-start",
+                          width: "100%",
+                        }}
+                      >
+                        <GripVertical size={10} color="#CDCDCD" style={{ flexShrink: 0, cursor: "grab" }} />
+                        {def.label}
+                        {def.sortField && (
+                          <Icon size={12} style={{ opacity: isActive ? 1 : 0.4, flexShrink: 0 }} />
+                        )}
+                      </div>
+                      {/* Resize handle */}
+                      <div
+                        onMouseDown={(e) => handleResizeStart(e, colId)}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          right: -2,
+                          bottom: 0,
+                          width: 5,
+                          cursor: "col-resize",
+                          zIndex: 1,
+                        }}
+                        onMouseEnter={(e) => { (e.currentTarget.style.backgroundColor) = "rgba(147, 69, 42, 0.2)"; }}
+                        onMouseLeave={(e) => { (e.currentTarget.style.backgroundColor) = "transparent"; }}
+                      />
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
               {isLoading && tasks.length === 0 ? (
                 <tr>
-                  <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#5E5E65" }}>
+                  <td colSpan={columnOrder.length} style={{ padding: 40, textAlign: "center", color: "#5E5E65" }}>
                     Loading...
                   </td>
                 </tr>
               ) : tasks.length === 0 ? (
                 <tr>
-                  <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#5E5E65" }}>
+                  <td colSpan={columnOrder.length} style={{ padding: 40, textAlign: "center", color: "#5E5E65" }}>
                     {hasActiveFilters ? "No tasks match these filters" : "No completed tasks yet"}
                   </td>
                 </tr>
               ) : (
-                tasks.map((task) => <HistoryRow key={task.id} task={task} />)
+                tasks.map((task) => (
+                  <HistoryRow
+                    key={task.id}
+                    task={task}
+                    columnOrder={columnOrder}
+                    columnWidths={columnWidths}
+                  />
+                ))
               )}
             </tbody>
           </table>
@@ -754,6 +969,8 @@ const thStyle: React.CSSProperties = {
 
 const tdStyle: React.CSSProperties = {
   padding: "14px 16px",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
 };
 
 const monoCell: React.CSSProperties = {

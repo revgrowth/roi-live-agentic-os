@@ -222,29 +222,41 @@ function detectQuestion(text: string): string | null {
 }
 
 /**
- * Extract a short activity label from assistant text.
- * Takes the last meaningful sentence/phrase, truncated to 80 chars.
+ * Extract a short, plain-English activity label from assistant text.
+ * Strips technical noise (file paths, code, markers) and returns
+ * a business-readable summary of what Claude is doing or has done.
  */
 function extractActivityLabel(text: string): string | null {
-  // Clean up the text: remove markdown formatting, collapse whitespace
-  const cleaned = text
-    .replace(/```[\s\S]*?```/g, "") // remove code blocks
-    .replace(/[#*_`~]/g, "") // remove markdown formatting chars
-    .replace(/\n+/g, " ") // collapse newlines
-    .replace(/\s+/g, " ") // collapse whitespace
+  // Clean up the text
+  let cleaned = text
+    .replace(/```[\s\S]*?```/g, "")              // remove code blocks
+    .replace(/\[SILENT\]/gi, "")                  // remove silent markers
+    .replace(/`[^`]+`/g, "")                      // remove inline code
+    .replace(/[#*_~]/g, "")                       // remove markdown formatting
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")      // [text](url) → text
+    .replace(/(?:\/[\w.-]+){2,}/g, "")            // remove file paths like /foo/bar/baz.md
+    .replace(/[\w.-]+\/[\w.-]+\/[\w.-]+/g, "")    // remove relative paths like projects/ops-cron/file.md
+    .replace(/\b\w+\.(md|json|ts|tsx|js|jsx|py|sh|yaml|yml|csv|txt|log|pdf|png|svg)\b/gi, "")  // remove filenames
+    .replace(/\n+/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 
-  if (!cleaned) return null;
+  if (!cleaned || cleaned.length < 5) return null;
 
-  // Split into sentences and take the last non-empty one
-  const sentences = cleaned.split(/[.!?]+/).filter((s) => s.trim().length > 5);
-  const label = sentences.length > 0 ? sentences[sentences.length - 1].trim() : cleaned.trim();
+  // Split into sentences and pick the last substantive one
+  const sentences = cleaned.split(/[.!?]+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 8)
+    // Skip sentences that are mostly technical
+    .filter((s) => !/^(saved|wrote|created|updated|deleted|reading|writing|running|executed)\s+(to|from|at|in)\b/i.test(s))
+    .filter((s) => !/^(Report|Output|File|Log|Result) saved/i.test(s));
 
-  if (!label) return null;
+  // Fallback to any sentence if all were filtered
+  const fallbackSentences = cleaned.split(/[.!?]+/).map((s) => s.trim()).filter((s) => s.length > 8);
+  const pool = sentences.length > 0 ? sentences : fallbackSentences;
+  const label = pool.length > 0 ? pool[pool.length - 1] : cleaned;
 
-  // Truncate to 80 chars
-  if (label.length > 80) {
-    return label.slice(0, 77) + "...";
-  }
-  return label;
+  if (!label || label.length < 5) return null;
+
+  return label.length > 100 ? label.slice(0, 97) + "..." : label;
 }

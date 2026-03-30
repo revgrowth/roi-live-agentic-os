@@ -116,6 +116,18 @@ class FileWatcher {
 
       const db = getDb();
 
+      // Deduplicate: skip if this exact file path is already recorded for ANY task.
+      // This prevents concurrent watchers (from parallel cron runs) from attributing
+      // the same file to multiple tasks.
+      const existing = db.prepare(
+        "SELECT id FROM task_outputs WHERE filePath = ? LIMIT 1"
+      ).get(filePath) as { id: string } | undefined;
+
+      if (existing) {
+        console.log(`[file-watcher] Skipping duplicate output ${fileName} (already tracked)`);
+        return;
+      }
+
       // Insert into task_outputs
       db.prepare(
         "INSERT INTO task_outputs (id, taskId, fileName, filePath, relativePath, extension, sizeBytes, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"

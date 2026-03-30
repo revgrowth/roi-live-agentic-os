@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Archive, ArrowLeft, X } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { PhasePipeline } from "@/components/gsd/phase-pipeline";
 import { PhaseDetail } from "@/components/gsd/phase-detail";
@@ -8,19 +11,21 @@ import { ContentViewer } from "@/components/context/content-viewer";
 import type { GsdProject } from "@/types/gsd";
 
 export default function GsdPage() {
+  const router = useRouter();
   const [project, setProject] = useState<GsdProject | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPhase, setSelectedPhase] = useState<number | null>(null);
   const [viewingFile, setViewingFile] = useState<string | null>(null);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [archiving, setArchiving] = useState(false);
 
-  useEffect(() => {
+  const loadProject = useCallback((keepSelection?: boolean) => {
     fetch("/api/gsd")
       .then((r) => r.json())
       .then((data) => {
         setProject(data as GsdProject);
-        if (data.hasPlanning && data.phases?.length > 0) {
-          // Select first non-complete phase, or last phase
+        if (data.hasPlanning && data.phases?.length > 0 && !keepSelection) {
           const current = data.phases.find((p: { status: string }) => p.status !== "complete");
           setSelectedPhase(current?.number ?? data.phases[data.phases.length - 1].number);
         }
@@ -32,9 +37,35 @@ export default function GsdPage() {
       });
   }, []);
 
+  useEffect(() => {
+    loadProject();
+  }, [loadProject]);
+
   const handleViewFile = useCallback((path: string) => {
     setViewingFile(path);
   }, []);
+
+  const handlePhaseUpdated = useCallback(() => {
+    loadProject(true);
+  }, [loadProject]);
+
+  const handleArchive = useCallback(async () => {
+    if (!project?.briefSlug) return;
+    setArchiving(true);
+    try {
+      const res = await fetch("/api/gsd/archive", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: project.briefSlug }),
+      });
+      if (res.ok) {
+        setShowArchiveConfirm(false);
+        router.push("/");
+      }
+    } finally {
+      setArchiving(false);
+    }
+  }, [project?.briefSlug, router]);
 
   if (loading) {
     return (
@@ -154,6 +185,25 @@ export default function GsdPage() {
   return (
     <AppShell title="GSD">
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        {/* Back to overview */}
+        <Link
+          href="/"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+            fontSize: 13,
+            fontWeight: 500,
+            color: "#93452A",
+            textDecoration: "none",
+            marginBottom: -16,
+          }}
+        >
+          <ArrowLeft size={14} />
+          Overview
+        </Link>
+
         {/* Project header */}
         <div
           style={{
@@ -192,6 +242,32 @@ export default function GsdPage() {
             </div>
 
             <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+              {/* Archive button */}
+              {project.briefSlug && (
+                <button
+                  onClick={() => setShowArchiveConfirm(true)}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    padding: "6px 12px",
+                    fontSize: 12,
+                    fontWeight: 500,
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    border: "1px solid rgba(59, 130, 246, 0.2)",
+                    borderRadius: 6,
+                    backgroundColor: "rgba(59, 130, 246, 0.06)",
+                    color: "#3B82F6",
+                    cursor: "pointer",
+                    transition: "background-color 150ms ease",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(59, 130, 246, 0.12)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(59, 130, 246, 0.06)"; }}
+                >
+                  <Archive size={13} />
+                  Archive
+                </button>
+              )}
               <div style={{ textAlign: "right" }}>
                 <span
                   style={{
@@ -273,9 +349,127 @@ export default function GsdPage() {
 
         {/* Phase detail */}
         {selectedPhaseData && (
-          <PhaseDetail phase={selectedPhaseData} onViewFile={handleViewFile} />
+          <PhaseDetail phase={selectedPhaseData} onViewFile={handleViewFile} onPhaseUpdated={handlePhaseUpdated} />
         )}
       </div>
+
+      {/* Archive confirmation modal */}
+      {showArchiveConfirm && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setShowArchiveConfirm(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 14,
+              padding: "28px 32px",
+              maxWidth: 480,
+              width: "90%",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.2)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <span style={{ fontFamily: "var(--font-inter), Inter, sans-serif", fontSize: 16, fontWeight: 600, color: "#1B1C1B" }}>
+                Archive GSD Project
+              </span>
+              <button
+                onClick={() => setShowArchiveConfirm(false)}
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: 4, border: "none", backgroundColor: "transparent", color: "#9C9CA0", cursor: "pointer", borderRadius: 4 }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <p style={{ fontFamily: "var(--font-inter), Inter, sans-serif", fontSize: 14, color: "#5E5E65", lineHeight: 1.6, margin: "0 0 8px" }}>
+              This will archive the GSD project for <strong>{project.name}</strong>. Here&apos;s what happens:
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "16px 0", padding: "16px 20px", backgroundColor: "#F6F3F1", borderRadius: 10 }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <span style={stepNumStyle}>1</span>
+                <span style={stepTextStyle}>
+                  <strong>.planning/</strong> moves into <strong>projects/briefs/{project.briefSlug}/planning-archive/</strong>
+                </span>
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <span style={stepNumStyle}>2</span>
+                <span style={stepTextStyle}>
+                  The brief&apos;s status changes from <strong>active</strong> to <strong>complete</strong>
+                </span>
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <span style={stepNumStyle}>3</span>
+                <span style={stepTextStyle}>
+                  The project disappears from Active Projects and frees up the .planning/ slot for a new GSD project
+                </span>
+              </div>
+            </div>
+
+            <p style={{ fontFamily: "var(--font-inter), Inter, sans-serif", fontSize: 13, color: "#9C9CA0", lineHeight: 1.6, margin: "0 0 4px" }}>
+              Nothing is deleted. All planning artifacts, phase plans, and research are preserved in the archive folder.
+            </p>
+
+            <div style={{ display: "flex", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setShowArchiveConfirm(false)}
+                style={{
+                  padding: "8px 16px", fontSize: 13, fontWeight: 500,
+                  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                  border: "1px solid rgba(218, 193, 185, 0.3)", borderRadius: 8,
+                  backgroundColor: "transparent", color: "#5E5E65", cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleArchive}
+                disabled={archiving}
+                style={{
+                  padding: "8px 16px", fontSize: 13, fontWeight: 600,
+                  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                  border: "none", borderRadius: 8,
+                  backgroundColor: "#3B82F6", color: "#FFFFFF", cursor: archiving ? "not-allowed" : "pointer",
+                  opacity: archiving ? 0.6 : 1,
+                }}
+              >
+                {archiving ? "Archiving..." : "Yes, archive this project"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
+
+const stepNumStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 20,
+  height: 20,
+  borderRadius: "50%",
+  backgroundColor: "rgba(59, 130, 246, 0.1)",
+  color: "#3B82F6",
+  fontSize: 11,
+  fontWeight: 700,
+  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+  flexShrink: 0,
+};
+
+const stepTextStyle: React.CSSProperties = {
+  fontFamily: "var(--font-inter), Inter, sans-serif",
+  fontSize: 13,
+  color: "#1B1C1B",
+  lineHeight: 1.5,
+};

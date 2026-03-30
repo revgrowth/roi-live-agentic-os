@@ -130,10 +130,23 @@ export function getDb(): Database.Database {
     db.exec("ALTER TABLE tasks ADD COLUMN coordinationLevel TEXT");
   }
 
+  // Migration: add lastReplyAt column — tracks when the user last interacted
+  const replyAtCol = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
+  if (!replyAtCol.some((c) => c.name === "lastReplyAt")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN lastReplyAt TEXT");
+  }
+
   // Migration: add surfacedToConversation to task_logs
   const logSurfCol = db.prepare("PRAGMA table_info(task_logs)").all() as Array<{ name: string }>;
   if (!logSurfCol.some((c) => c.name === "surfacedToConversation")) {
     db.exec("ALTER TABLE task_logs ADD COLUMN surfacedToConversation INTEGER DEFAULT 0");
+  }
+
+  // Migration: add goalGroup column for semantic task clustering
+  const goalCol = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
+  if (!goalCol.some((c) => c.name === "goalGroup")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN goalGroup TEXT");
+    db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_goalGroup ON tasks(goalGroup)");
   }
 
   return db;

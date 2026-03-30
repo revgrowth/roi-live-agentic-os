@@ -18,7 +18,7 @@ interface TaskStore {
 
   // Actions
   fetchTasks: () => Promise<void>;
-  createTask: (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null) => Promise<void>;
+  createTask: (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null, permissionMode?: string) => Promise<void>;
   updateTask: (id: string, updates: TaskUpdateInput) => Promise<void>;
   moveTask: (id: string, newStatus: string, newOrder: number) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -62,7 +62,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }
   },
 
-  createTask: async (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null) => {
+  createTask: async (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null, permissionMode?: string) => {
     const tempId = "temp-" + crypto.randomUUID();
     const now = new Date().toISOString();
     const currentClientId = useClientStore.getState().selectedClientId;
@@ -70,7 +70,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       id: tempId,
       title,
       description: description || null,
-      status: "backlog",
+      status: "queued",
       level,
       parentId: parentId || null,
       projectSlug: projectSlug || null,
@@ -91,6 +91,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       contextSources: null,
       cronJobSlug: null,
       claudeSessionId: null,
+      permissionMode: (permissionMode as Task["permissionMode"]) || "default",
+      lastReplyAt: null,
+      goalGroup: null,
     };
 
     // Track pending create for SSE reconciliation
@@ -104,7 +107,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, level, projectSlug, clientId, parentId }),
+        body: JSON.stringify({ title, description, level, projectSlug, clientId, parentId, permissionMode: permissionMode || "default" }),
       });
       if (!res.ok) throw new Error("Failed to create task");
       const realTask = await res.json();

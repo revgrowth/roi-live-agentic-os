@@ -272,17 +272,44 @@ export function deleteCronJob(slug: string): void {
 
 export function getCronRunHistory(slug: string): CronRun[] {
   const db = getDb();
+
+  interface CronRunRow {
+    id: number;
+    jobSlug: string;
+    taskId: string | null;
+    startedAt: string;
+    completedAt: string | null;
+    result: "success" | "failure" | "running";
+    durationSec: number | null;
+    costUsd: number | null;
+    exitCode: number | null;
+    trigger: "manual" | "scheduled" | null;
+  }
+
   const rows = db
     .prepare(
-      `SELECT id, jobSlug, startedAt, completedAt, result, durationSec, costUsd, exitCode
+      `SELECT id, jobSlug, taskId, startedAt, completedAt, result, durationSec, costUsd, exitCode, trigger
        FROM cron_runs
        WHERE jobSlug = ?
        ORDER BY startedAt DESC
        LIMIT 50`
     )
-    .all(slug) as CronRun[];
+    .all(slug) as CronRunRow[];
 
-  if (rows.length > 0) return rows;
+  if (rows.length > 0) {
+    // Fetch outputs for each run that has a taskId
+    return rows.map((row) => {
+      let outputs: CronRun["outputs"] = [];
+      if (row.taskId) {
+        outputs = db
+          .prepare(
+            `SELECT fileName, filePath, extension FROM task_outputs WHERE taskId = ? ORDER BY createdAt ASC`
+          )
+          .all(row.taskId) as CronRun["outputs"];
+      }
+      return { ...row, trigger: row.trigger || "scheduled", outputs };
+    });
+  }
 
   // Fallback: synthesize a single entry from the status JSON file
   // (covers runs that happened before SQLite recording was added)
@@ -299,12 +326,15 @@ export function getCronRunHistory(slug: string): CronRun[] {
     {
       id: -1,
       jobSlug: slug,
+      taskId: null,
       startedAt,
       completedAt,
       result: status.result ?? "success",
       durationSec,
       costUsd: 0,
       exitCode: status.exitCode ?? 0,
+      trigger: "scheduled" as const,
+      outputs: [],
     },
   ];
 }

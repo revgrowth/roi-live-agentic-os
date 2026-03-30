@@ -37,6 +37,11 @@ class ProcessManager {
     process.on("SIGINT", cleanup);
   }
 
+  /** Check if this task has an active in-memory session (managed by processManager) */
+  hasActiveSession(taskId: string): boolean {
+    return this.sessions.has(taskId) || this.waitingForReply.has(taskId);
+  }
+
   /**
    * Execute a task by spawning a Claude CLI session.
    */
@@ -600,6 +605,9 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
         contextSources: null,
         cronJobSlug: null,
         claudeSessionId: null,
+        permissionMode: "default",
+        lastReplyAt: null,
+        goalGroup: null,
       };
 
       db.prepare(
@@ -687,16 +695,28 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     const cleanEnv = { ...process.env };
     delete cleanEnv.CLAUDECODE;
 
+    // Read the task's permission mode from the DB
+    const db = getDb();
+    const taskRow = db.prepare("SELECT permissionMode FROM tasks WHERE id = ?").get(taskId) as { permissionMode: string | null } | undefined;
+    const permissionMode = taskRow?.permissionMode || "default";
+
     // Build args
     const args = [
       "--output-format", "stream-json",
       "--verbose",
       "-p", prompt,
-      "--permission-mode", "default",
+      "--permission-mode", permissionMode,
     ];
 
-    // Pre-approve safe read-only tools
-    args.push("--allowedTools", "Read,Glob,Grep,WebSearch,WebFetch");
+    // bypassPermissions needs the dangerously-skip flag
+    if (permissionMode === "bypassPermissions") {
+      args.push("--dangerously-skip-permissions");
+    }
+
+    // Pre-approve safe read-only tools (not needed in plan mode or bypass mode)
+    if (permissionMode !== "plan" && permissionMode !== "bypassPermissions") {
+      args.push("--allowedTools", "Read,Glob,Grep,WebSearch,WebFetch");
+    }
 
     if (isContinuation) {
       // Use --resume with the stored session ID to continue the correct conversation.
@@ -877,17 +897,22 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
       console.log(`[process-manager] Stored claudeSessionId=${data.sessionId} for ${taskId.slice(0, 8)}`);
     }
 
-    // Check if a question was asked during this turn
-    const questionAsked = session?.pendingQuestion ?? false;
-    console.log(`[process-manager] handleTurnComplete(${taskId.slice(0, 8)}): questionAsked=${questionAsked}, hasSession=${!!session}`);
+    // Check if a question was asked during this turn.
+    // Cron jobs are non-interactive — ignore question detection since nobody can reply.
+    const db2 = getDb();
+    const cronCheck = db2.prepare("SELECT cronJobSlug FROM tasks WHERE id = ?").get(taskId) as { cronJobSlug: string | null } | undefined;
+    const isCronTask = !!cronCheck?.cronJobSlug;
+    const questionAsked = isCronTask ? false : (session?.pendingQuestion ?? false);
+    console.log(`[process-manager] handleTurnComplete(${taskId.slice(0, 8)}): questionAsked=${questionAsked}, isCronTask=${isCronTask}, hasSession=${!!session}`);
 
     if (questionAsked) {
       // Turn ended but Claude asked a question — keep task running, wait for reply
       console.log(`[process-manager] Turn complete with pending question for ${taskId} — adding to waitingForReply`);
 
+      // Don't overwrite activityLabel — handleQuestion already set it to the question text
       db.prepare(
-        "UPDATE tasks SET updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, activityLabel = ?, needsInput = 1 WHERE id = ?"
-      ).run(now, totalCost, totalTokens, totalDuration, "Waiting for input...", taskId);
+        "UPDATE tasks SET updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, needsInput = 1 WHERE id = ?"
+      ).run(now, totalCost, totalTokens, totalDuration, taskId);
 
       this.waitingForReply.add(taskId);
       this.sessions.delete(taskId);
@@ -896,21 +921,30 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
       emitTaskEvent({ type: "task:status", task: this.normalizeTask(updated), timestamp: now });
     } else {
       // No question — task is done.
-      // If this was a follow-up reply on an already-reviewed task, graduate to "done".
-      // Otherwise, move to "review" for the user to check.
-      const finalStatus = (session?.resumedFromReview) ? "done" : "review";
-      console.log(`[process-manager] Task ${taskId} completed — moving to ${finalStatus}${session?.resumedFromReview ? " (follow-up on reviewed task)" : ""}`);
+      // Cron tasks go straight to "done" (nobody to review them).
+      // Interactive tasks go to "review" so the user can check the work.
+      const finalStatus = isCronTask ? "done" : "review";
+      console.log(`[process-manager] Task ${taskId} completed — moving to ${finalStatus}${isCronTask ? " (cron — auto-done)" : ""}${session?.resumedFromReview ? " (follow-up on reviewed task)" : ""}`);
 
       fileWatcher.stopWatching(taskId).catch(() => {});
 
+      // Build a plain-English completion summary from the last log entries
+      const completionLabel = this.buildCompletionSummary(taskId, db);
+
       db.prepare(
-        "UPDATE tasks SET status = ?, completedAt = ?, updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, activityLabel = NULL, needsInput = 0 WHERE id = ?"
-      ).run(finalStatus, now, now, totalCost, totalTokens, totalDuration, taskId);
+        "UPDATE tasks SET status = ?, completedAt = ?, updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, activityLabel = ?, needsInput = 0 WHERE id = ?"
+      ).run(finalStatus, now, now, totalCost, totalTokens, totalDuration, completionLabel, taskId);
 
       this.sessions.delete(taskId);
       this.waitingForReply.delete(taskId);
 
       const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
+
+      // Record cron run data BEFORE emitting events (so history is available when UI refreshes)
+      if (updated.cronJobSlug) {
+        this.recordCronRun(updated, totalCost, totalDuration);
+      }
+
       emitTaskEvent({ type: "task:status", task: this.normalizeTask(updated), timestamp: now });
 
       // Auto-create subtasks for parent tasks on completion
@@ -933,18 +967,22 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     this.lastProgressEmit.delete(taskId);
   }
 
+  /**
+   * Called when question-like text is detected in Claude's output.
+   * Updates the UI to show the question, but does NOT set session.pendingQuestion —
+   * that's controlled by the turn-aware wrapper so only the LAST text block's
+   * question state matters (intermediate questions followed by more work don't count).
+   */
   handleQuestion(taskId: string, questionText: string): void {
-    const session = this.sessions.get(taskId);
-    if (session) {
-      session.pendingQuestion = true;
-    }
-    console.log(`[process-manager] handleQuestion(${taskId.slice(0, 8)}): pendingQuestion=${session?.pendingQuestion}, hasSession=${!!session}`);
+    console.log(`[process-manager] handleQuestion(${taskId.slice(0, 8)}): detected question in output`);
 
     const db = getDb();
     const now = new Date().toISOString();
 
+    // Use the question text as the activity label so the card shows what's being asked
+    const label = questionText.length > 100 ? questionText.slice(0, 97) + "..." : questionText;
     db.prepare("UPDATE tasks SET updatedAt = ?, activityLabel = ?, needsInput = 1 WHERE id = ?")
-      .run(now, "Waiting for input...", taskId);
+      .run(now, label, taskId);
 
     const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
     emitTaskEvent({ type: "task:question", task: this.normalizeTask(updated), timestamp: now, questionText });
@@ -963,17 +1001,36 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     const db = getDb();
     const now = new Date().toISOString();
 
-    // Errors stay in "running" with needsInput flag
-    db.prepare(
-      "UPDATE tasks SET updatedAt = ?, errorMessage = ?, activityLabel = ?, needsInput = 1 WHERE id = ?"
-    ).run(now, errorMessage, "Error — needs attention", taskId);
+    // Check if this is a cron task — cron tasks should complete on error, not wait for input
+    const task = db.prepare("SELECT cronJobSlug FROM tasks WHERE id = ?").get(taskId) as { cronJobSlug: string | null } | undefined;
+    const isCronTask = !!task?.cronJobSlug;
 
-    this.waitingForReply.add(taskId);
-    this.sessions.delete(taskId);
-    this.lastProgressEmit.delete(taskId);
+    if (isCronTask) {
+      // Cron tasks: move to "done" with error flag — nobody can reply
+      db.prepare(
+        "UPDATE tasks SET status = ?, completedAt = ?, updatedAt = ?, errorMessage = ?, activityLabel = ?, needsInput = 0 WHERE id = ?"
+      ).run("done", now, now, errorMessage, "Failed — see error", taskId);
+
+      this.sessions.delete(taskId);
+      this.lastProgressEmit.delete(taskId);
+    } else {
+      // Interactive tasks: stay in "running" with needsInput flag
+      db.prepare(
+        "UPDATE tasks SET updatedAt = ?, errorMessage = ?, activityLabel = ?, needsInput = 1 WHERE id = ?"
+      ).run(now, errorMessage, "Error — needs attention", taskId);
+
+      this.waitingForReply.add(taskId);
+      this.sessions.delete(taskId);
+      this.lastProgressEmit.delete(taskId);
+    }
 
     const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
     emitTaskEvent({ type: "task:status", task: this.normalizeTask(updated), timestamp: now });
+
+    // Record failed cron run if this task was triggered by a cron job
+    if (updated.cronJobSlug) {
+      this.recordCronRun(updated, 0, 0);
+    }
   }
 
   addLogEntry(taskId: string, entry: LogEntry): void {
@@ -997,6 +1054,159 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     }
   }
 
+  /**
+   * Build a plain-English completion summary for the user.
+   * Reads the last text log entries and output files to describe
+   * what happened in business terms, not technical terms.
+   */
+  private buildCompletionSummary(taskId: string, db: ReturnType<typeof getDb>): string {
+    // 1. Check for output files
+    const outputs = db.prepare(
+      "SELECT fileName FROM task_outputs WHERE taskId = ? ORDER BY createdAt DESC LIMIT 5"
+    ).all(taskId) as Array<{ fileName: string }>;
+
+    // 2. Get the last few text log entries (Claude's actual output)
+    const logs = db.prepare(
+      `SELECT content FROM task_logs
+       WHERE taskId = ? AND type = 'text' AND length(content) > 20
+       ORDER BY timestamp DESC LIMIT 4`
+    ).all(taskId) as Array<{ content: string }>;
+
+    // 3. Find the best summary line from Claude's output
+    //    Look for lines that describe outcomes, not technical actions
+    let bestLine: string | null = null;
+    for (const log of logs) {
+      const cleaned = log.content
+        .replace(/```[\s\S]*?```/g, "")
+        .replace(/\[SILENT\]/gi, "")
+        .replace(/`[^`]+`/g, "")
+        .replace(/[#*_~]/g, "")
+        .trim();
+
+      if (!cleaned || cleaned.length < 10) continue;
+
+      // Split into lines and find the best one
+      const lines = cleaned.split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l.length > 15)
+        // Skip lines that are just file paths or technical actions
+        .filter((l) => !/^(Saved|Wrote|Created|Updated|Reading|Writing|Running|Executed|Report saved)\s+(to|from|at|in)\s+/i.test(l))
+        .filter((l) => !l.match(/^[-*]\s*(\/|projects\/|src\/)/))
+        .filter((l) => !/^Working directory/i.test(l))
+        .filter((l) => !/^Co-Authored-By/i.test(l));
+
+      // Prefer lines that sound like summaries
+      const summaryLine = lines.find((l) =>
+        /^(no |all |found |there |nothing |everything |completed |checked |reviewed |analysed |analyzed |updated |the |your |this |here|we )/i.test(l)
+      ) || lines.find((l) =>
+        /\b(available|complete|ready|done|success|found|checked|reviewed|no issues|no changes|up to date)\b/i.test(l)
+      ) || lines[0];
+
+      if (summaryLine) {
+        bestLine = summaryLine;
+        break;
+      }
+    }
+
+    // 4. Build the final label
+    if (bestLine) {
+      // Clean up and truncate
+      let label = bestLine
+        .replace(/(?:\/[\w.-]+){2,}/g, "")          // remove file paths
+        .replace(/[\w.-]+\/[\w.-]+\/[\w.-]+/g, "")   // remove relative paths
+        .replace(/\b\w+\.(md|json|ts|tsx|js|py|sh)\b/gi, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      // Remove leading bullets/dashes
+      label = label.replace(/^[-*•]\s*/, "");
+
+      if (label.length > 5) {
+        // Capitalise first letter
+        label = label.charAt(0).toUpperCase() + label.slice(1);
+        return label.length > 120 ? label.slice(0, 117) + "..." : label;
+      }
+    }
+
+    // 5. Fallback: describe outputs
+    if (outputs.length > 0) {
+      const count = outputs.length;
+      return count === 1
+        ? `Produced 1 file`
+        : `Produced ${count} files`;
+    }
+
+    return "Completed";
+  }
+
+  /**
+   * Record a cron run in the cron_runs table and update cron/status/{slug}.json
+   * so the cron jobs UI shows accurate last-run and history data.
+   */
+  private recordCronRun(task: Task, costUsd: number, durationMs: number): void {
+    const slug = task.cronJobSlug;
+    if (!slug) return;
+
+    const db = getDb();
+    const now = new Date().toISOString();
+    const durationSec = Math.round(durationMs / 1000);
+    const result = task.errorMessage ? "failure" : "success";
+    const exitCode = task.errorMessage ? 1 : 0;
+
+    // Check if a running row already exists for this task (inserted by manual run endpoint)
+    try {
+      const existing = db.prepare(
+        `SELECT id FROM cron_runs WHERE taskId = ? AND result = 'running' LIMIT 1`
+      ).get(task.id) as { id: number } | undefined;
+
+      if (existing) {
+        // Update the existing running row with completion data (preserves trigger value)
+        db.prepare(
+          `UPDATE cron_runs SET completedAt = ?, result = ?, durationSec = ?, costUsd = ?, exitCode = ?
+           WHERE id = ?`
+        ).run(now, result, durationSec, costUsd, exitCode, existing.id);
+      } else {
+        // No existing row — insert fresh (handles scheduled runs from external dispatcher)
+        db.prepare(
+          `INSERT INTO cron_runs (jobSlug, taskId, startedAt, completedAt, result, durationSec, costUsd, exitCode, trigger)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'scheduled')`
+        ).run(slug, task.id, task.startedAt || now, now, result, durationSec, costUsd, exitCode);
+      }
+    } catch (err) {
+      console.error(`[process-manager] Failed to record cron_runs for ${slug}:`, err);
+    }
+
+    // Update cron/status/{slug}.json
+    try {
+      const fs = require("fs") as typeof import("fs");
+      const pathMod = require("path") as typeof import("path");
+      const config = getConfig();
+      const statusDir = pathMod.join(config.agenticOsDir, "cron", "status");
+      fs.mkdirSync(statusDir, { recursive: true });
+
+      // Read existing status to preserve run_count/fail_count
+      const statusPath = pathMod.join(statusDir, `${slug}.json`);
+      let existing = { run_count: 0, fail_count: 0 };
+      try {
+        existing = JSON.parse(fs.readFileSync(statusPath, "utf-8"));
+      } catch { /* first run */ }
+
+      const status = {
+        last_run: now,
+        result,
+        duration: durationSec,
+        exit_code: exitCode,
+        run_count: (existing.run_count || 0) + 1,
+        fail_count: (existing.fail_count || 0) + (result === "failure" ? 1 : 0),
+      };
+
+      fs.writeFileSync(statusPath, JSON.stringify(status, null, 2), "utf-8");
+      console.log(`[process-manager] Updated cron status for ${slug}: ${result}`);
+    } catch (err) {
+      console.error(`[process-manager] Failed to update cron status for ${slug}:`, err);
+    }
+  }
+
   private handleSpawnError(taskId: string, err: unknown): void {
     const message = err instanceof Error ? err.message : "Unknown spawn error";
     this.handleTaskError(taskId, `Failed to start Claude CLI: ${message}`);
@@ -1011,8 +1221,23 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
  * Thin wrapper around ClaudeOutputParser that routes callbacks
  * to the ProcessManager's methods (which are now turn-aware).
  */
+/**
+ * Turn-aware wrapper around ClaudeOutputParser.
+ *
+ * Key behaviour: only the LAST assistant text block determines whether the task
+ * needs user input. If Claude asks a question in the middle of its work but then
+ * continues with more output, the intermediate question does NOT block completion.
+ *
+ * How it works:
+ * - `lastTextWasQuestion` resets to false on every new assistant text block
+ * - When a question IS detected, it's set to true (and UI is updated immediately)
+ * - At completion time, `session.pendingQuestion` is set from `lastTextWasQuestion`
+ * - So only the very last text determines the outcome
+ */
 class ClauseOutputParserWithTurnAwareness {
   private parser: ClaudeOutputParser;
+  /** Tracks whether the most recent assistant text block contained a question */
+  private lastTextWasQuestion = false;
 
   constructor(
     private taskId: string,
@@ -1020,11 +1245,25 @@ class ClauseOutputParserWithTurnAwareness {
     private pm: ProcessManager,
   ) {
     this.parser = new ClaudeOutputParser({
-      onProgress: (data) => pm.handleProgress(taskId, data),
-      onComplete: (data) => pm.handleTurnComplete(taskId, data),
+      onProgress: (data) => {
+        // New assistant text arriving — reset question flag (will be re-set by onQuestion if this text IS a question)
+        if (data.activityLabel) {
+          this.lastTextWasQuestion = false;
+        }
+        pm.handleProgress(taskId, data);
+      },
+      onComplete: (data) => {
+        // Commit the question state: only true if the LAST text block was a question
+        session.pendingQuestion = this.lastTextWasQuestion;
+        console.log(`[process-manager] Turn complete for ${taskId.slice(0, 8)}: lastTextWasQuestion=${this.lastTextWasQuestion}`);
+        pm.handleTurnComplete(taskId, data);
+      },
       onError: (error) => pm.handleTaskError(taskId, error),
       onLogEntry: (entry) => pm.addLogEntry(taskId, entry),
-      onQuestion: (questionText) => pm.handleQuestion(taskId, questionText),
+      onQuestion: (questionText) => {
+        this.lastTextWasQuestion = true;
+        pm.handleQuestion(taskId, questionText);
+      },
     });
   }
 

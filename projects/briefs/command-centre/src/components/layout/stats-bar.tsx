@@ -65,9 +65,9 @@ export function StatsBar() {
       .catch(() => {});
   }, []);
 
-  const runningCount = tasks.filter((t) => t.status === "running").length;
+  const runningCount = tasks.filter((t) => t.status === "running" && !t.needsInput).length;
   const awaitingCount = tasks.filter(
-    (t) => t.status === "review" || t.needsInput === true || t.errorMessage !== null
+    (t) => t.status === "review" || (t.status === "running" && t.needsInput === true) || t.errorMessage !== null
   ).length;
   const doneCount = tasks.filter((t) => t.status === "done").length;
 
@@ -99,8 +99,8 @@ export function StatsBar() {
       <StatItem label="Completed" value={doneCount.toString()} />
       <Separator />
       <StatItem
-        label="Active Crons"
-        value={data ? `${data.cronActive}/${data.cronTotal}` : "--"}
+        label="Active Schedules"
+        value={data ? `${data.cronActive}` : "--"}
       />
       <Separator />
       <TokenStat

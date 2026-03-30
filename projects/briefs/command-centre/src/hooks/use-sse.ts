@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useTaskStore } from "@/store/task-store";
 import { useClientStore } from "@/store/client-store";
+import { useChatStore } from "@/store/chat-store";
 
 export function useSSE() {
   const [isConnected, setIsConnected] = useState(false);
   const retryDelay = useRef(3000);
   const eventSourceRef = useRef<EventSource | null>(null);
   const applySSEEvent = useTaskStore((s) => s.applySSEEvent);
+  const applyChatSSE = useChatStore((s) => s.applyChatSSE);
 
   const connect = useCallback(() => {
     if (eventSourceRef.current) {
@@ -52,6 +54,19 @@ export function useSSE() {
       });
     }
 
+    // Chat events for autonomous mode
+    const chatEvents = ["chat:message", "chat:decision"];
+    for (const eventType of chatEvents) {
+      es.addEventListener(eventType, (e: MessageEvent) => {
+        try {
+          const event = JSON.parse(e.data);
+          applyChatSSE(event);
+        } catch {
+          // Ignore malformed events
+        }
+      });
+    }
+
     es.onerror = () => {
       setIsConnected(false);
       es.close();
@@ -62,7 +77,7 @@ export function useSSE() {
       retryDelay.current = Math.min(delay * 2, 30000);
       setTimeout(connect, delay);
     };
-  }, [applySSEEvent]);
+  }, [applySSEEvent, applyChatSSE]);
 
   useEffect(() => {
     connect();

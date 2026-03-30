@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { FileText } from "lucide-react";
-import type { CronRun } from "@/types/cron";
+import { FileText, Image, FileType, ExternalLink } from "lucide-react";
+import type { CronRun, CronRunOutput } from "@/types/cron";
 
 interface RunHistoryProps {
   runs: CronRun[];
   jobSlug: string;
+  prompt?: string;
 }
 
 function formatRelativeTime(iso: string): string {
   const date = new Date(iso);
+  if (isNaN(date.getTime())) return "--";
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMin = Math.floor(diffMs / 60000);
@@ -36,9 +38,66 @@ function formatDuration(sec: number | null): string {
   return `${min}m ${remaining}s`;
 }
 
-export function RunHistory({ runs, jobSlug }: RunHistoryProps) {
+const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg"]);
+const PDF_EXTENSIONS = new Set(["pdf"]);
+
+function getFileIcon(ext: string) {
+  if (IMAGE_EXTENSIONS.has(ext)) return Image;
+  if (PDF_EXTENSIONS.has(ext)) return FileType;
+  return FileText;
+}
+
+function truncateFilename(name: string, maxLen = 28): string {
+  if (name.length <= maxLen) return name;
+  return name.slice(0, maxLen - 3) + "...";
+}
+
+function OutputLink({ output }: { output: CronRunOutput }) {
+  const Icon = getFileIcon(output.extension);
+
+  return (
+    <a
+      href={`vscode://file${output.filePath}`}
+      onClick={(e) => {
+        e.preventDefault();
+        // Copy path to clipboard and open via the API
+        navigator.clipboard.writeText(output.filePath).catch(() => {});
+        window.open(`vscode://file${output.filePath}`, "_blank");
+      }}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        fontSize: 11,
+        fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+        padding: "2px 8px",
+        borderRadius: 4,
+        backgroundColor: "#FFDBCF",
+        color: "#390C00",
+        lineHeight: "16px",
+        textDecoration: "none",
+        cursor: "pointer",
+        transition: "background-color 150ms ease",
+      }}
+      title={output.filePath}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = "#F5C4B0";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = "#FFDBCF";
+      }}
+    >
+      <Icon size={10} />
+      {truncateFilename(output.fileName)}
+      <ExternalLink size={9} style={{ opacity: 0.6 }} />
+    </a>
+  );
+}
+
+export function RunHistory({ runs, jobSlug, prompt }: RunHistoryProps) {
   const [log, setLog] = useState<string | null>(null);
   const [loadingLog, setLoadingLog] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false);
 
   const toggleLog = async () => {
     if (log !== null) {
@@ -91,7 +150,7 @@ export function RunHistory({ runs, jobSlug }: RunHistoryProps) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 100px 100px 80px",
+          gridTemplateColumns: "1fr 80px 100px 100px 80px 1fr",
           gap: 8,
           padding: "0 8px 8px",
           fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
@@ -102,9 +161,11 @@ export function RunHistory({ runs, jobSlug }: RunHistoryProps) {
         }}
       >
         <span>Date</span>
+        <span>Trigger</span>
         <span>Result</span>
         <span>Duration</span>
         <span>Cost</span>
+        <span>Outputs</span>
       </div>
 
       {/* Rows */}
@@ -113,7 +174,7 @@ export function RunHistory({ runs, jobSlug }: RunHistoryProps) {
           key={run.id}
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 100px 100px 80px",
+            gridTemplateColumns: "1fr 80px 100px 100px 80px 1fr",
             gap: 8,
             padding: "6px 8px",
             alignItems: "center",
@@ -123,6 +184,23 @@ export function RunHistory({ runs, jobSlug }: RunHistoryProps) {
         >
           <span style={{ color: "#1B1C1B" }}>
             {formatRelativeTime(run.startedAt)}
+          </span>
+          <span>
+            <span
+              style={{
+                display: "inline-block",
+                padding: "2px 8px",
+                borderRadius: 4,
+                fontSize: 11,
+                fontWeight: 500,
+                backgroundColor:
+                  run.trigger === "manual" ? "#FFFBEB" : "#F3F4F6",
+                color:
+                  run.trigger === "manual" ? "#D97706" : "#6B7280",
+              }}
+            >
+              {run.trigger === "manual" ? "Manual" : "Scheduled"}
+            </span>
           </span>
           <span>
             <span
@@ -171,11 +249,55 @@ export function RunHistory({ runs, jobSlug }: RunHistoryProps) {
               ? `$${run.costUsd.toFixed(2)}`
               : "--"}
           </span>
+          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+            {run.outputs.length > 0 ? (
+              <>
+                {run.outputs.slice(0, 2).map((output, i) => (
+                  <OutputLink key={i} output={output} />
+                ))}
+                {run.outputs.length > 2 && (
+                  <span
+                    style={{
+                      fontSize: 11,
+                      color: "#5E5E65",
+                      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                      lineHeight: "20px",
+                    }}
+                  >
+                    +{run.outputs.length - 2} more
+                  </span>
+                )}
+              </>
+            ) : (
+              <span style={{ fontSize: 11, color: "#9E9EA0" }}>--</span>
+            )}
+          </div>
         </div>
       ))}
 
-      {/* View Log button */}
-      <div style={{ marginTop: 8, paddingLeft: 8 }}>
+      {/* Action buttons row */}
+      <div style={{ marginTop: 8, paddingLeft: 8, display: "flex", gap: 16 }}>
+        {prompt && (
+          <button
+            onClick={() => setShowPrompt(!showPrompt)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "4px 0",
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              fontSize: 12,
+              fontWeight: 500,
+              color: "#93452A",
+            }}
+          >
+            <FileText size={13} />
+            {showPrompt ? "Hide Prompt" : "View Prompt"}
+          </button>
+        )}
         <button
           onClick={toggleLog}
           disabled={loadingLog}
@@ -197,6 +319,29 @@ export function RunHistory({ runs, jobSlug }: RunHistoryProps) {
           {loadingLog ? "Loading..." : log !== null ? "Hide Log" : "View Log"}
         </button>
       </div>
+
+      {/* Prompt content */}
+      {showPrompt && prompt && (
+        <pre
+          style={{
+            marginTop: 8,
+            padding: 12,
+            backgroundColor: "#FFFFFF",
+            color: "#1B1C1B",
+            border: "1px solid #EAE8E6",
+            borderRadius: "0.375rem",
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace",
+            fontSize: 11,
+            lineHeight: 1.5,
+            maxHeight: 300,
+            overflowY: "auto",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+          }}
+        >
+          {prompt}
+        </pre>
+      )}
 
       {/* Log output */}
       {log !== null && (

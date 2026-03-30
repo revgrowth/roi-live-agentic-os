@@ -100,7 +100,7 @@ export function CronJobsView() {
           <div style={{ ...statValueStyle, fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif" }}>
             $0.00
           </div>
-          <div style={statLabelStyle}>Today&apos;s Cron Spend</div>
+          <div style={statLabelStyle}>Today&apos;s Spend</div>
         </div>
       </div>
 
@@ -122,7 +122,7 @@ export function CronJobsView() {
             margin: 0,
           }}
         >
-          Cron Jobs
+          Scheduled Tasks
         </h3>
         <button
           onClick={() => setShowCreatePanel(true)}
@@ -150,7 +150,7 @@ export function CronJobsView() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.5fr 1fr 0.8fr 0.8fr 0.7fr 90px 80px",
+          gridTemplateColumns: "1.5fr 1fr 0.8fr 0.8fr 0.7fr 90px 110px",
           gap: 12,
           padding: "8px 16px",
           fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
@@ -181,7 +181,7 @@ export function CronJobsView() {
             color: "#5E5E65",
           }}
         >
-          Loading cron jobs...
+          Loading scheduled tasks...
         </div>
       )}
 
@@ -204,7 +204,7 @@ export function CronJobsView() {
               margin: "0 0 8px 0",
             }}
           >
-            No cron jobs configured yet
+            No scheduled tasks configured yet
           </h4>
           <p
             style={{

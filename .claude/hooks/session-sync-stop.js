@@ -1,8 +1,10 @@
 #!/usr/bin/env node
-// Stop hook — logs Claude's response and marks task as "review"
-// Stop fires after EVERY turn with `last_assistant_message` containing Claude's response.
+// Stop hook — logs Claude's response, marks task as "review", then checks
+// after a delay whether the session is still alive. If not → marks "done".
+//
+// Stop fires after EVERY turn with `last_assistant_message`.
 // The UserPromptSubmit hook flips status back to "running" when the user replies.
-// Fire-and-forget: spawns background process so it doesn't block
+// Fire-and-forget: spawns background process so it doesn't block.
 
 const fs = require("fs");
 const path = require("path");
@@ -36,54 +38,95 @@ process.stdin.on("end", () => {
 
   const safePort = JSON.stringify(String(port || "3000"));
   const response = data.last_assistant_message || "";
-  // Truncate for log entry (keep it reasonable)
   const logContent = response.length > 4000 ? response.slice(0, 3997) + "..." : response;
 
-  // Spawn background process for API calls
+  // Extract a meaningful activity label from Claude's response:
+  // Prefer the last question, otherwise the last sentence, otherwise truncate
+  function extractLabel(text) {
+    if (!text) return "Waiting for input";
+    const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+    // Find last line ending with ?
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (lines[i].endsWith("?")) {
+        const q = lines[i].replace(/^\*+|\*+$/g, "").trim();
+        return q.length > 100 ? q.slice(0, 97) + "..." : q;
+      }
+    }
+    // Fall back to last non-empty line
+    const last = lines[lines.length - 1] || "";
+    const clean = last.replace(/^\*+|\*+$/g, "").trim();
+    return clean.length > 100 ? clean.slice(0, 97) + "..." : clean || "Waiting for input";
+  }
+  const activityLabel = extractLabel(response);
+
+  // Get the parent process ID (the Claude CLI process)
+  const claudePid = process.ppid;
+
+  // Spawn background process for API calls + delayed session-alive check
   const child = spawn(
     process.execPath,
     [
       "-e",
       `
     const http = require("http");
+    const fs = require("fs");
 
-    // 1. Update status to review
-    const statusPayload = JSON.stringify({ status: "review", activityLabel: "Waiting for input" });
-
-    const statusReq = http.request({
-      hostname: "localhost",
-      port: ${safePort},
-      path: "/api/tasks/${taskId}/status",
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(statusPayload) },
-      timeout: 5000,
-    }, () => {});
-    statusReq.on("error", () => {});
-    statusReq.on("timeout", () => statusReq.destroy());
-    statusReq.write(statusPayload);
-    statusReq.end();
-
-    // 2. Log Claude's response as a text entry
-    const responseText = ${JSON.stringify(logContent)};
-    if (responseText) {
-      const logPayload = JSON.stringify({
-        type: "text",
-        content: responseText,
+    function makeRequest(method, urlPath, body) {
+      return new Promise((resolve) => {
+        const payload = JSON.stringify(body);
+        const req = http.request({
+          hostname: "localhost",
+          port: ${safePort},
+          path: urlPath,
+          method,
+          headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) },
+          timeout: 5000,
+        }, (res) => {
+          let data = "";
+          res.on("data", (c) => data += c);
+          res.on("end", () => resolve(data));
+        });
+        req.on("error", () => resolve(null));
+        req.on("timeout", () => { req.destroy(); resolve(null); });
+        req.write(payload);
+        req.end();
       });
-
-      const logReq = http.request({
-        hostname: "localhost",
-        port: ${safePort},
-        path: "/api/tasks/${taskId}/logs",
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(logPayload) },
-        timeout: 5000,
-      }, () => {});
-      logReq.on("error", () => {});
-      logReq.on("timeout", () => logReq.destroy());
-      logReq.write(logPayload);
-      logReq.end();
     }
+
+    async function run() {
+      // 1. Set status to review with meaningful label
+      await makeRequest("PATCH", "/api/tasks/${taskId}/status",
+        { status: "review", activityLabel: ${JSON.stringify(activityLabel)} });
+
+      const responseText = ${JSON.stringify(logContent)};
+      if (responseText) {
+        await makeRequest("POST", "/api/tasks/${taskId}/logs",
+          { type: "text", content: responseText });
+      }
+
+      // 2. Wait 3 seconds, then check if the Claude process is still alive
+      await new Promise((r) => setTimeout(r, 3000));
+
+      let processAlive = false;
+      try {
+        // kill(pid, 0) checks if process exists — doesn't actually send a signal
+        process.kill(${claudePid}, 0);
+        processAlive = true;
+      } catch {
+        processAlive = false;
+      }
+
+      if (!processAlive) {
+        // Claude process is gone — session truly ended
+        await makeRequest("PATCH", "/api/tasks/${taskId}/status",
+          { status: "done", activityLabel: "Session ended" });
+
+        // Clean up tmp file
+        try { fs.unlinkSync(${JSON.stringify(tmpFile)}); } catch {}
+      }
+    }
+
+    run();
   `,
     ],
     {

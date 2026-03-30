@@ -460,9 +460,10 @@ export function ModalChat({
                   >
                     <div
                       style={{
-                        backgroundColor: "#93452A",
-                        color: "#FFFFFF",
-                        borderRadius: "0.5rem",
+                        backgroundColor: "rgba(147, 69, 42, 0.06)",
+                        border: "1px solid rgba(218, 193, 185, 0.3)",
+                        color: "#1B1C1B",
+                        borderRadius: "0.5rem 0.5rem 0.25rem 0.5rem",
                         padding: "6px 10px",
                         fontSize: 13,
                         fontFamily: "var(--font-inter), Inter, sans-serif",

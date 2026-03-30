@@ -34,4 +34,5 @@ export interface GsdProject {
   lastUpdated: string;
   phases: GsdPhase[];
   hasPlanning: boolean;
+  briefSlug: string | null;
 }

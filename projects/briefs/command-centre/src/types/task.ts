@@ -73,10 +73,12 @@ export interface Task {
   claudeSessionId: string | null;
   claudePid?: number | null;
   permissionMode: PermissionMode;
+  lastReplyAt: string | null;
   conversationId?: string | null;
   originMessageId?: string | null;
   teamId?: string | null;
   coordinationLevel?: "inject" | "shared_context" | "team" | null;
+  goalGroup: string | null;
 }
 
 export interface OutputFile {
@@ -130,5 +132,6 @@ export type TaskUpdateInput = Partial<
     | "originMessageId"
     | "teamId"
     | "coordinationLevel"
+    | "goalGroup"
   >
 >;

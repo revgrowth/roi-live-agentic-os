@@ -32,6 +32,7 @@ export interface DashboardSummary {
     completedItems: number;
     totalItems: number;
     boardTaskCount: number;
+    hasPlanning: boolean;
   }>;
   recentTasks: Array<{
     id: string;

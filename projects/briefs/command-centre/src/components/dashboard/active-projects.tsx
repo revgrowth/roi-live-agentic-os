@@ -1,8 +1,16 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FolderOpen } from "lucide-react";
+import { FolderOpen, Layers } from "lucide-react";
 import type { DashboardSummary } from "@/types/dashboard";
+
+interface GsdInfo {
+  exists: boolean;
+  projectName?: string;
+  currentPhase?: number | null;
+  totalPhases?: number | null;
+}
 
 interface ActiveProjectsProps {
   activeProjects: DashboardSummary["activeProjects"];
@@ -15,6 +23,18 @@ const LEVEL_INFO: Record<number, { bg: string; text: string; label: string }> = 
 };
 
 export function ActiveProjects({ activeProjects }: ActiveProjectsProps) {
+  const [gsdInfo, setGsdInfo] = useState<GsdInfo | null>(null);
+
+  const hasDeepBuild = activeProjects.some((p) => p.level === 3);
+  useEffect(() => {
+    if (hasDeepBuild) {
+      fetch("/api/gsd/status")
+        .then((res) => res.json())
+        .then(setGsdInfo)
+        .catch(() => setGsdInfo(null));
+    }
+  }, [hasDeepBuild]);
+
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={headerStyle}>
@@ -25,14 +45,17 @@ export function ActiveProjects({ activeProjects }: ActiveProjectsProps) {
         <div style={gridStyle}>
           {activeProjects.map((project) => {
             const info = LEVEL_INFO[project.level] || LEVEL_INFO[2];
+            const isDeepBuild = project.level === 3;
             const progress = project.totalItems > 0
               ? Math.round((project.completedItems / project.totalItems) * 100)
-              : 0;
+              : isDeepBuild && gsdInfo?.exists && gsdInfo.totalPhases
+                ? Math.round(((gsdInfo.currentPhase || 1) / gsdInfo.totalPhases) * 100)
+                : 0;
 
             return (
               <Link
                 key={project.slug}
-                href={`/board?project=${encodeURIComponent(project.slug)}`}
+                href={isDeepBuild ? "/gsd" : `/board?project=${encodeURIComponent(project.slug)}`}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
                 <div
@@ -50,20 +73,36 @@ export function ActiveProjects({ activeProjects }: ActiveProjectsProps) {
                     <p style={goalStyle}>{project.goal}</p>
                   )}
                   <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
-                    {project.totalItems > 0 && (
+                    {isDeepBuild && gsdInfo?.exists && gsdInfo.totalPhases ? (
                       <>
                         <div style={progressBarBgStyle}>
-                          <div style={{ ...progressBarFillStyle, width: `${progress}%` }} />
+                          <div style={{ ...progressBarFillStyle, width: `${progress}%`, backgroundColor: "#3B82F6" }} />
                         </div>
-                        <span style={progressLabelStyle}>
-                          {project.completedItems}/{project.totalItems} deliverables
-                        </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <Layers size={11} color="#3B82F6" />
+                          <span style={progressLabelStyle}>
+                            Phase {gsdInfo.currentPhase || 1} of {gsdInfo.totalPhases}
+                          </span>
+                        </div>
                       </>
-                    )}
-                    {project.boardTaskCount > 0 && (
-                      <span style={progressLabelStyle}>
-                        {project.boardTaskCount} task{project.boardTaskCount !== 1 ? "s" : ""} on board
-                      </span>
+                    ) : (
+                      <>
+                        {project.totalItems > 0 && (
+                          <>
+                            <div style={progressBarBgStyle}>
+                              <div style={{ ...progressBarFillStyle, width: `${progress}%`, ...(project.hasPlanning ? { backgroundColor: "#3B82F6" } : {}) }} />
+                            </div>
+                            <span style={progressLabelStyle}>
+                              {project.completedItems}/{project.totalItems} {project.hasPlanning ? "phases" : "deliverables"}
+                            </span>
+                          </>
+                        )}
+                        {project.boardTaskCount > 0 && (
+                          <span style={progressLabelStyle}>
+                            {project.boardTaskCount} task{project.boardTaskCount !== 1 ? "s" : ""} on board
+                          </span>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

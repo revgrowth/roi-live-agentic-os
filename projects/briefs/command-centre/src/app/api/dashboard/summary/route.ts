@@ -5,6 +5,7 @@ import os from "os";
 import { getDb } from "@/lib/db";
 import { getConfig, getClientAgenticOsDir } from "@/lib/config";
 import type { DashboardSummary } from "@/types/dashboard";
+import { parseRoadmap } from "@/lib/gsd-parser";
 
 interface StatsCache {
   lastComputedDate?: string;
@@ -177,6 +178,10 @@ export async function GET(request: NextRequest) {
     const briefsDir = path.join(baseDir, "projects", "briefs");
     const activeProjects: DashboardSummary["activeProjects"] = [];
 
+    // Check if .planning/ exists (indicates an active GSD project)
+    const planningDir = path.join(baseDir, ".planning");
+    const hasPlanningDir = fs.existsSync(planningDir) && fs.existsSync(path.join(planningDir, "PROJECT.md"));
+
     if (fs.existsSync(briefsDir)) {
       const entries = fs.readdirSync(briefsDir, { withFileTypes: true });
       for (const entry of entries) {
@@ -210,15 +215,38 @@ export async function GET(request: NextRequest) {
            WHERE projectSlug = ? AND status != 'done'${clientCondition}`
         ).get(entry.name, ...clientParams) as { count: number };
 
-        activeProjects.push({
-          name,
-          slug: entry.name,
-          level,
-          goal,
-          completedItems: checked,
-          totalItems: checked + unchecked,
-          boardTaskCount: taskCountRow.count,
-        });
+        // A GSD project (level 3) is active if .planning/ exists
+        const isGsdWithPlanning = level === 3 && hasPlanningDir;
+
+        // For GSD projects, use phase progress instead of brief checkboxes
+        let completedItems = checked;
+        let totalItems = checked + unchecked;
+        if (isGsdWithPlanning) {
+          try {
+            const roadmapPath = path.join(planningDir, "ROADMAP.md");
+            const phasesDir = path.join(planningDir, "phases");
+            if (fs.existsSync(roadmapPath)) {
+              const roadmap = fs.readFileSync(roadmapPath, "utf-8");
+              const gsdPhases = parseRoadmap(roadmap, phasesDir);
+              totalItems = gsdPhases.length;
+              completedItems = gsdPhases.filter((p) => p.status === "complete").length;
+            }
+          } catch { /* fall back to brief checkboxes */ }
+        }
+
+        // Include if: has active board tasks OR is a GSD project with .planning/
+        if (taskCountRow.count > 0 || isGsdWithPlanning) {
+          activeProjects.push({
+            name,
+            slug: entry.name,
+            level,
+            goal,
+            completedItems,
+            totalItems,
+            boardTaskCount: taskCountRow.count,
+            hasPlanning: isGsdWithPlanning,
+          });
+        }
       }
     }
 

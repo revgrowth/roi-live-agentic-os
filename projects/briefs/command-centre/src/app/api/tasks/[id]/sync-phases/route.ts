@@ -146,6 +146,9 @@ export async function POST(
           contextSources: null,
           cronJobSlug: null,
           claudeSessionId: null,
+          permissionMode: "default",
+          lastReplyAt: null,
+          goalGroup: null,
         };
 
         db.prepare(

@@ -345,9 +345,10 @@ function UserReplyEntry({ entry }: { entry: LogEntry }) {
       <div
         style={{
           maxWidth: "70%",
-          backgroundColor: "#93452A",
-          color: "#FFFFFF",
-          borderRadius: "0.75rem",
+          backgroundColor: "rgba(147, 69, 42, 0.06)",
+          border: "1px solid rgba(218, 193, 185, 0.3)",
+          color: "#1B1C1B",
+          borderRadius: "0.75rem 0.75rem 0.25rem 0.75rem",
           padding: "10px 14px",
         }}
       >

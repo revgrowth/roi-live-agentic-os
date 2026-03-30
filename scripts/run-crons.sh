@@ -459,6 +459,34 @@ catch_up_missed_jobs() {
     done
 
     if [[ "$missed" == "true" ]]; then
+      # Check if the job already ran after the missed time (prevents re-triggering
+      # catch-up on every dispatch cycle while a previous catch-up is still running)
+      local job_status_file="${STATUS_DIR}/${job_basename}.json"
+      local job_last_run
+      job_last_run=$(read_status_field "$job_status_file" "last_run")
+      if [[ -n "$job_last_run" ]]; then
+        local job_last_epoch=0
+        if date -j -f "%Y-%m-%dT%H:%M:%SZ" "$job_last_run" +%s &>/dev/null 2>&1; then
+          job_last_epoch=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$job_last_run" +%s 2>/dev/null)
+        elif date -d "$job_last_run" +%s &>/dev/null 2>&1; then
+          job_last_epoch=$(date -d "$job_last_run" +%s 2>/dev/null)
+        fi
+        # If the job ran after the effective_start of the gap, it's already been caught up
+        if (( job_last_epoch > effective_start )); then
+          continue
+        fi
+      fi
+
+      # Also skip if a PID file exists (job is currently running from a prior catch-up)
+      local pid_file="${STATUS_DIR}/${job_basename}.pid"
+      if [[ -f "$pid_file" ]]; then
+        local running_pid
+        running_pid=$(cat "$pid_file" 2>/dev/null)
+        if [[ -n "$running_pid" ]] && kill -0 "$running_pid" 2>/dev/null; then
+          continue
+        fi
+      fi
+
       caught_up_jobs="${caught_up_jobs}|${job_basename}|"
 
       local JOB_NAME

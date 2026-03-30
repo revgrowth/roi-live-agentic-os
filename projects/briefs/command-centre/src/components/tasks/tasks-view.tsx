@@ -11,9 +11,10 @@ import {
   MessageSquare,
   ExternalLink,
   Eye,
+  Layers,
 } from "lucide-react";
 import { useTaskStore } from "@/store/task-store";
-import type { Task, LogEntry } from "@/types/task";
+import type { Task, LogEntry, TaskLevel } from "@/types/task";
 import { LevelBadge } from "@/components/board/level-badge";
 
 // ─── Formatters ──────────────────────────────────────────────────────────────
@@ -50,20 +51,21 @@ function getActionSummary(task: Task, logEntries: LogEntry[]): string | null {
     return `Error: ${task.errorMessage.length > 120 ? task.errorMessage.slice(0, 120) + "..." : task.errorMessage}`;
   }
 
-  // Find the last question Claude asked
-  const lastQuestion = [...logEntries]
-    .reverse()
-    .find((e) => e.type === "question");
-  if (lastQuestion) {
-    const content = lastQuestion.content.trim();
-    return content.length > 160 ? content.slice(0, 160).trimEnd() + "..." : content;
-  }
-
+  // Review tasks are completed — show completion message.
+  // Only show question text for tasks genuinely waiting for input (running + needsInput).
   if (task.status === "review") {
     return "Claude has finished — review the outputs and mark as done.";
   }
 
-  if (task.needsInput) {
+  if (task.status === "running" && task.needsInput) {
+    // Find the last question Claude asked
+    const lastQuestion = [...logEntries]
+      .reverse()
+      .find((e) => e.type === "question");
+    if (lastQuestion) {
+      const content = lastQuestion.content.trim();
+      return content.length > 160 ? content.slice(0, 160).trimEnd() + "..." : content;
+    }
     return "Claude is waiting for your input to continue.";
   }
 
@@ -176,6 +178,7 @@ function TaskDetail({ task, parentTask }: { task: Task; parentTask: Task | null 
   const allLogEntries = useTaskStore((s) => s.logEntries);
   const fetchLogEntries = useTaskStore((s) => s.fetchLogEntries);
   const openPanel = useTaskStore((s) => s.openPanel);
+  const updateTask = useTaskStore((s) => s.updateTask);
   const logEntries = allLogEntries[task.id] ?? [];
 
   useEffect(() => {
@@ -186,7 +189,8 @@ function TaskDetail({ task, parentTask }: { task: Task; parentTask: Task | null 
     .filter((e) => ["text", "question", "user_reply"].includes(e.type))
     .slice(-5);
 
-  const needsHuman = task.status === "review" || task.needsInput === true;
+  const isWaitingForInput = task.status === "running" && task.needsInput === true;
+  const needsHuman = task.status === "review" || isWaitingForInput;
   const actionSummary = getActionSummary(task, logEntries);
 
   return (
@@ -291,34 +295,60 @@ function TaskDetail({ task, parentTask }: { task: Task; parentTask: Task | null 
         </div>
       )}
 
-      {/* Reply input for tasks needing human action */}
-      {needsHuman && <InlineReply taskId={task.id} />}
+      {/* Reply input — only for tasks genuinely waiting for input (running + needsInput) */}
+      {isWaitingForInput && <InlineReply taskId={task.id} />}
 
-      {/* Open full detail */}
-      <button
-        onClick={() => openPanel(task.id)}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-          marginTop: 16,
-          padding: "8px 16px",
-          borderRadius: 8,
-          border: "1px solid rgba(147, 69, 42, 0.2)",
-          backgroundColor: "#FFFFFF",
-          color: "#93452A",
-          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-          fontSize: 13,
-          fontWeight: 500,
-          cursor: "pointer",
-          transition: "all 150ms ease",
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#FFF5F0"; e.currentTarget.style.borderColor = "#93452A"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FFFFFF"; e.currentTarget.style.borderColor = "rgba(147, 69, 42, 0.2)"; }}
-      >
-        <ExternalLink size={13} />
-        Open full detail
-      </button>
+      {/* Action buttons row */}
+      <div style={{ display: "flex", gap: 10, marginTop: 16, alignItems: "center" }}>
+        {task.status === "review" && (
+          <button
+            onClick={() => updateTask(task.id, { status: "done" })}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 16px",
+              borderRadius: 8,
+              border: "none",
+              backgroundColor: "#6B8E6B",
+              color: "#FFFFFF",
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: "pointer",
+              transition: "all 150ms ease",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#5A7A5A"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#6B8E6B"; }}
+          >
+            <CheckCircle2 size={13} />
+            Mark as done
+          </button>
+        )}
+        <button
+          onClick={() => openPanel(task.id)}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "8px 16px",
+            borderRadius: 8,
+            border: "1px solid rgba(147, 69, 42, 0.2)",
+            backgroundColor: "#FFFFFF",
+            color: "#93452A",
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+            fontSize: 13,
+            fontWeight: 500,
+            cursor: "pointer",
+            transition: "all 150ms ease",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#FFF5F0"; e.currentTarget.style.borderColor = "#93452A"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#FFFFFF"; e.currentTarget.style.borderColor = "rgba(147, 69, 42, 0.2)"; }}
+        >
+          <ExternalLink size={13} />
+          Open full detail
+        </button>
+      </div>
     </div>
   );
 }
@@ -339,9 +369,12 @@ function TaskRow({ task, parentTask }: { task: Task; parentTask: Task | null }) 
   const [, setTick] = useState(0);
   const allLogEntries = useTaskStore((s) => s.logEntries);
   const fetchLogEntries = useTaskStore((s) => s.fetchLogEntries);
+  const updateTask = useTaskStore((s) => s.updateTask);
 
   const isRunning = task.status === "running" && !task.needsInput;
-  const needsHuman = task.status === "review" || task.needsInput === true;
+  const isWaitingForInput = task.status === "running" && task.needsInput === true;
+  const isReview = task.status === "review";
+  const needsHuman = isReview || isWaitingForInput;
   const hasError = task.errorMessage !== null;
 
   // Pre-fetch logs for action summary even when collapsed
@@ -472,21 +505,55 @@ function TaskRow({ task, parentTask }: { task: Task; parentTask: Task | null }) 
             fontSize: 12,
             fontWeight: 500,
             fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-            color: needsHuman ? "#D2783C" : isRunning ? "#93452A" : hasError ? "#C04030" : "#6B8E6B",
+            color: isWaitingForInput ? "#D2783C" : isReview ? "#B25D3F" : isRunning ? "#93452A" : hasError ? "#C04030" : "#6B8E6B",
             flexShrink: 0,
             whiteSpace: "nowrap",
           }}
         >
-          {needsHuman
+          {isWaitingForInput
             ? "Awaiting input"
-            : isRunning
-              ? task.activityLabel || "Working..."
-              : hasError
-                ? "Error"
-                : "Done"}
+            : isReview
+              ? "Ready for review"
+              : isRunning
+                ? task.activityLabel || "Working..."
+                : hasError
+                  ? "Error"
+                  : "Done"}
         </span>
 
-        {/* Time */}
+        {/* Mark as done — quick action for review tasks */}
+        {task.status === "review" && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              updateTask(task.id, { status: "done" });
+            }}
+            title="Mark as done"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "4px 12px",
+              borderRadius: 6,
+              border: "none",
+              backgroundColor: "rgba(107, 142, 107, 0.1)",
+              color: "#6B8E6B",
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: "pointer",
+              flexShrink: 0,
+              transition: "all 150ms ease",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#6B8E6B"; e.currentTarget.style.color = "#FFFFFF"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(107, 142, 107, 0.1)"; e.currentTarget.style.color = "#6B8E6B"; }}
+          >
+            <CheckCircle2 size={12} />
+            Done
+          </button>
+        )}
+
+        {/* Time — show last reply time when available, otherwise updated time */}
         <span
           style={{
             fontSize: 11,
@@ -498,13 +565,471 @@ function TaskRow({ task, parentTask }: { task: Task; parentTask: Task | null }) 
             gap: 4,
           }}
         >
-          <Clock size={11} />
-          {isRunning ? formatElapsedLive(task.startedAt) : timeAgo(task.updatedAt)}
+          {task.lastReplyAt ? (
+            <>
+              <MessageSquare size={10} />
+              You · {timeAgo(task.lastReplyAt)}
+            </>
+          ) : (
+            <>
+              <Clock size={11} />
+              {isRunning ? formatElapsedLive(task.startedAt) : timeAgo(task.updatedAt)}
+            </>
+          )}
         </span>
       </div>
 
       {/* Expanded detail */}
       {expanded && <TaskDetail task={task} parentTask={parentTask} />}
+    </div>
+  );
+}
+
+// ─── Task grouping ──────────────────────────────────────────────────────────
+
+interface TaskGroup {
+  key: string;
+  parent: Task | null;
+  children: Task[];
+}
+
+const QUICK_TASKS_KEY = "__quick_tasks__";
+
+function groupTasksByProject(
+  tasks: Task[],
+  taskById: Map<string, Task>
+): TaskGroup[] {
+  const groups = new Map<string, TaskGroup>();
+
+  // First pass: identify parent tasks (project/gsd level) and seed groups
+  for (const t of tasks) {
+    if (t.level === "project" || t.level === "gsd") {
+      if (!groups.has(t.id)) {
+        groups.set(t.id, { key: t.id, parent: t, children: [] });
+      } else {
+        groups.get(t.id)!.parent = t;
+      }
+    }
+  }
+
+  // Second pass: assign children by parentId
+  for (const t of tasks) {
+    if (t.parentId) {
+      const parentKey = t.parentId;
+      if (!groups.has(parentKey)) {
+        const parent = taskById.get(parentKey) ?? null;
+        groups.set(parentKey, { key: parentKey, parent, children: [] });
+      }
+      groups.get(parentKey)!.children.push(t);
+    } else if (t.projectSlug && t.level === "task") {
+      // Task with projectSlug but no parentId — find parent by projectSlug
+      const parentEntry = tasks.find(
+        (p) => p.projectSlug === t.projectSlug && (p.level === "project" || p.level === "gsd")
+      );
+      if (parentEntry) {
+        if (!groups.has(parentEntry.id)) {
+          groups.set(parentEntry.id, { key: parentEntry.id, parent: parentEntry, children: [] });
+        }
+        groups.get(parentEntry.id)!.children.push(t);
+      }
+    }
+  }
+
+  // Collect unassigned tasks
+  const assignedIds = new Set<string>();
+  for (const g of groups.values()) {
+    if (g.parent) assignedIds.add(g.parent.id);
+    for (const c of g.children) assignedIds.add(c.id);
+  }
+
+  // Group unassigned tasks by goalGroup (semantic AI clustering)
+  const goalBuckets = new Map<string, Task[]>();
+  const orphans: Task[] = [];
+  for (const t of tasks) {
+    if (assignedIds.has(t.id)) continue;
+    if (t.goalGroup) {
+      if (!goalBuckets.has(t.goalGroup)) goalBuckets.set(t.goalGroup, []);
+      goalBuckets.get(t.goalGroup)!.push(t);
+    } else {
+      orphans.push(t);
+    }
+  }
+
+  const result = Array.from(groups.values());
+
+  // Add goal groups as virtual groups (no parent task — label comes from goalGroup)
+  for (const [goal, goalTasks] of goalBuckets) {
+    // Create a virtual parent-like task for the header display
+    const virtualParent: Task = {
+      ...goalTasks[0],
+      id: `goal:${goal}`,
+      title: goal,
+      level: "task",
+      parentId: null,
+      status: "running",
+    };
+    result.push({ key: `goal:${goal}`, parent: virtualParent, children: goalTasks });
+  }
+
+  if (orphans.length > 0) {
+    result.push({ key: QUICK_TASKS_KEY, parent: null, children: orphans });
+  }
+
+  return result;
+}
+
+/** Compute urgency score for a group (lower = more urgent) */
+function groupUrgency(group: TaskGroup): number {
+  const allTasks = group.parent ? [group.parent, ...group.children] : group.children;
+  let hasError = false;
+  let hasInput = false;
+  let hasReview = false;
+  let hasRunning = false;
+
+  for (const t of allTasks) {
+    if (t.errorMessage) hasError = true;
+    if (t.status === "running" && t.needsInput) hasInput = true;
+    if (t.status === "review") hasReview = true;
+    if (t.status === "running" && !t.needsInput) hasRunning = true;
+  }
+
+  if (hasError) return 0;
+  if (hasInput) return 1;
+  if (hasReview) return 2;
+  if (hasRunning) return 3;
+  return 4;
+}
+
+function groupLatestTime(group: TaskGroup): number {
+  const allTasks = group.parent ? [group.parent, ...group.children] : group.children;
+  let latest = 0;
+  for (const t of allTasks) {
+    const time = new Date(t.lastReplyAt || t.updatedAt).getTime();
+    if (time > latest) latest = time;
+  }
+  return latest;
+}
+
+function sortGroups(groups: TaskGroup[]): TaskGroup[] {
+  // Quick tasks always last
+  const quickTasks = groups.find((g) => g.key === QUICK_TASKS_KEY);
+  const projectGroups = groups.filter((g) => g.key !== QUICK_TASKS_KEY);
+
+  projectGroups.sort((a, b) => {
+    const ua = groupUrgency(a);
+    const ub = groupUrgency(b);
+    if (ua !== ub) return ua - ub;
+    return groupLatestTime(b) - groupLatestTime(a);
+  });
+
+  if (quickTasks) projectGroups.push(quickTasks);
+  return projectGroups;
+}
+
+// ─── Project group header ───────────────────────────────────────────────────
+
+const LEVEL_ACCENT: Record<string, string> = {
+  gsd: "#6D28D9",    // purple for GSD
+  project: "#1D4ED8", // blue for project
+};
+
+function ProjectGroupHeader({
+  group,
+  isExpanded,
+  onToggle,
+}: {
+  group: TaskGroup;
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
+  const openPanel = useTaskStore((s) => s.openPanel);
+  const parent = group.parent;
+  const isQuickTasks = group.key === QUICK_TASKS_KEY;
+  const isGoalGroup = group.key.startsWith("goal:");
+
+  if (isQuickTasks) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "8px 0",
+          marginTop: 8,
+          cursor: "pointer",
+        }}
+        onClick={onToggle}
+      >
+        <span style={{ flexShrink: 0, color: "#9C9CA0" }}>
+          {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        </span>
+        <Layers size={14} color="#9C9CA0" />
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+            color: "#5E5E65",
+          }}
+        >
+          Quick Tasks
+        </span>
+        <span
+          style={{
+            fontSize: 11,
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+            color: "#5E5E65",
+            backgroundColor: "#EAE8E6",
+            padding: "2px 10px",
+            borderRadius: 10,
+            fontWeight: 500,
+          }}
+        >
+          {group.children.length}
+        </span>
+      </div>
+    );
+  }
+
+  const level: TaskLevel = parent?.level ?? "project";
+  const accent = isGoalGroup ? "#93452A" : (LEVEL_ACCENT[level] ?? "#5E5E65");
+  const allTasks = parent ? [parent, ...group.children] : group.children;
+  const doneCount = allTasks.filter((t) => t.status === "done").length;
+  const totalCount = allTasks.length;
+  const progressPct = totalCount > 0 ? (doneCount / totalCount) * 100 : 0;
+
+  // GSD phase context
+  const phaseLabel =
+    parent?.level === "gsd" && parent.phaseNumber != null
+      ? `Phase ${parent.phaseNumber}${parent.gsdStep ? ` — ${parent.gsdStep.charAt(0).toUpperCase() + parent.gsdStep.slice(1)}` : ""}`
+      : null;
+
+  return (
+    <div
+      style={{
+        backgroundColor: "rgba(39, 39, 42, 0.03)",
+        borderRadius: 10,
+        borderLeft: `3px solid ${accent}`,
+        overflow: "hidden",
+        marginBottom: 2,
+      }}
+    >
+      <div
+        onClick={onToggle}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "10px 16px",
+          cursor: "pointer",
+          transition: "background 100ms ease",
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(39, 39, 42, 0.05)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
+      >
+        {/* Collapse toggle */}
+        <span style={{ flexShrink: 0, color: "#9C9CA0" }}>
+          {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        </span>
+
+        {/* Left: name, badge, phase */}
+        <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8 }}>
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              color: "#1B1C1B",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {parent?.title ?? "Project"}
+          </span>
+          {isGoalGroup ? (
+            <span
+              style={{
+                display: "inline-block",
+                fontSize: 9,
+                fontWeight: 600,
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                padding: "2px 6px",
+                borderRadius: 3,
+                backgroundColor: "rgba(147, 69, 42, 0.08)",
+                color: "#93452A",
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+              }}
+            >
+              Goal
+            </span>
+          ) : (
+            <LevelBadge level={level} />
+          )}
+          {!isGoalGroup && phaseLabel && (
+            <span
+              style={{
+                fontSize: 11,
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                color: "#9C9CA0",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {phaseLabel}
+            </span>
+          )}
+        </div>
+
+        {/* Right: progress pill */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            flexShrink: 0,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 500,
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+              color: "#5E5E65",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {doneCount}/{totalCount} done
+          </span>
+          <div
+            style={{
+              width: 60,
+              height: 4,
+              borderRadius: 2,
+              backgroundColor: "#EAE8E6",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                width: `${progressPct}%`,
+                height: "100%",
+                borderRadius: 2,
+                backgroundColor: "#6B8E6B",
+                transition: "width 300ms ease",
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Open parent panel — not for goal groups (virtual parent) */}
+        {parent && !isGoalGroup && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openPanel(parent.id);
+            }}
+            title="Open project detail"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 24,
+              height: 24,
+              borderRadius: 6,
+              border: "none",
+              backgroundColor: "transparent",
+              color: "#9C9CA0",
+              cursor: "pointer",
+              flexShrink: 0,
+              transition: "all 150ms ease",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = accent; e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.04)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "#9C9CA0"; e.currentTarget.style.backgroundColor = "transparent"; }}
+          >
+            <ExternalLink size={13} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Grouped task list ──────────────────────────────────────────────────────
+
+function GroupedTaskList({
+  tasks,
+  taskById,
+}: {
+  tasks: Task[];
+  taskById: Map<string, Task>;
+}) {
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+
+  const groups = sortGroups(groupTasksByProject(tasks, taskById));
+
+  // If there are no project groups (only quick tasks or empty), render flat
+  const hasProjectGroups = groups.some((g) => g.key !== QUICK_TASKS_KEY);
+  if (!hasProjectGroups && groups.length <= 1) {
+    // All orphans, no grouping needed — render flat
+    const orphans = groups[0]?.children ?? [];
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {orphans.map((task) => (
+          <TaskRow
+            key={task.id}
+            task={task}
+            parentTask={task.parentId ? taskById.get(task.parentId) ?? null : null}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  const toggleGroup = (key: string) => {
+    setCollapsedGroups((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      {groups.map((group) => {
+        const isExpanded = collapsedGroups[group.key] !== true; // default expanded
+        // For project groups, show children (not the parent as a row — it's in the header)
+        // For quick tasks, show all children
+        const visibleTasks = group.children;
+
+        return (
+          <div key={group.key}>
+            <ProjectGroupHeader
+              group={group}
+              isExpanded={isExpanded}
+              onToggle={() => toggleGroup(group.key)}
+            />
+            {isExpanded && visibleTasks.length > 0 && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 6,
+                  paddingLeft: group.key !== QUICK_TASKS_KEY ? 16 : 0,
+                  marginTop: 4,
+                  marginBottom: 8,
+                }}
+              >
+                {visibleTasks.map((task) => (
+                  <TaskRow
+                    key={task.id}
+                    task={task}
+                    parentTask={task.parentId ? taskById.get(task.parentId) ?? null : null}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -562,24 +1087,37 @@ function SectionHeader({ label, count, color }: { label: string; count: number; 
 
 // ─── Main view ───────────────────────────────────────────────────────────────
 
+/** Check if a task needs human attention */
+function isWaitingTask(t: Task): boolean {
+  return t.status === "review" || (t.status === "running" && t.needsInput === true) || t.errorMessage !== null;
+}
+
+/** Check if a task is actively running (Claude's turn) */
+function isRunningTask(t: Task): boolean {
+  return t.status === "running" && !t.needsInput && !t.errorMessage;
+}
+
 export function TasksView() {
   const tasks = useTaskStore((s) => s.tasks);
 
   const taskById = new Map(tasks.map((t) => [t.id, t]));
 
-  // Waiting on you: review, needsInput, or errors
+  // Filter tasks into "Your Turn" and "Claude's Turn" categories
   const waitingTasks = tasks
-    .filter((t) => t.status === "review" || t.needsInput === true || t.errorMessage !== null)
+    .filter(isWaitingTask)
     .sort((a, b) => {
-      const aWeight = a.errorMessage ? 0 : (a.status === "review" || a.needsInput) ? 1 : 2;
-      const bWeight = b.errorMessage ? 0 : (b.status === "review" || b.needsInput) ? 1 : 2;
+      const aIsInput = a.status === "running" && a.needsInput;
+      const bIsInput = b.status === "running" && b.needsInput;
+      const aWeight = a.errorMessage ? 0 : (aIsInput) ? 1 : (a.status === "review") ? 2 : 3;
+      const bWeight = b.errorMessage ? 0 : (bIsInput) ? 1 : (b.status === "review") ? 2 : 3;
       if (aWeight !== bWeight) return aWeight - bWeight;
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      const aTime = new Date(a.lastReplyAt || a.updatedAt).getTime();
+      const bTime = new Date(b.lastReplyAt || b.updatedAt).getTime();
+      return bTime - aTime;
     });
 
-  // Running in background: actively running (not needing input), exclude backlog
   const runningTasks = tasks
-    .filter((t) => t.status === "running" && !t.needsInput && !t.errorMessage)
+    .filter(isRunningTask)
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
   const isEmpty = waitingTasks.length === 0 && runningTasks.length === 0;
@@ -603,35 +1141,19 @@ export function TasksView() {
         </div>
       ) : (
         <>
-          {/* Waiting on you */}
+          {/* Waiting on you — grouped by project */}
           {waitingTasks.length > 0 && (
             <div style={{ marginBottom: runningTasks.length > 0 ? 24 : 0 }}>
               <SectionHeader label="Waiting on you" count={waitingTasks.length} color="#D2783C" />
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {waitingTasks.map((task) => (
-                  <TaskRow
-                    key={task.id}
-                    task={task}
-                    parentTask={task.parentId ? taskById.get(task.parentId) ?? null : null}
-                  />
-                ))}
-              </div>
+              <GroupedTaskList tasks={waitingTasks} taskById={taskById} />
             </div>
           )}
 
-          {/* Running in background */}
+          {/* Running in background — grouped by project */}
           {runningTasks.length > 0 && (
             <div>
               <SectionHeader label="Running" count={runningTasks.length} color="#93452A" />
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {runningTasks.map((task) => (
-                  <TaskRow
-                    key={task.id}
-                    task={task}
-                    parentTask={task.parentId ? taskById.get(task.parentId) ?? null : null}
-                  />
-                ))}
-              </div>
+              <GroupedTaskList tasks={runningTasks} taskById={taskById} />
             </div>
           )}
         </>

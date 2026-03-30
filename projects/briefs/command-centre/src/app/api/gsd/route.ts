@@ -63,6 +63,22 @@ export async function GET() {
 
     const completedPhases = phases.filter((p) => p.status === "complete").length;
 
+    // Find the brief slug for the active GSD project (level: 3 + status: active)
+    let briefSlug: string | null = null;
+    const briefsDir = path.join(agenticOsDir, "projects", "briefs");
+    if (fs.existsSync(briefsDir)) {
+      for (const entry of fs.readdirSync(briefsDir, { withFileTypes: true })) {
+        if (!entry.isDirectory()) continue;
+        const briefPath = path.join(briefsDir, entry.name, "brief.md");
+        if (!fs.existsSync(briefPath)) continue;
+        const content = fs.readFileSync(briefPath, "utf-8");
+        if (content.includes("level: 3") && content.includes("status: active")) {
+          briefSlug = entry.name;
+          break;
+        }
+      }
+    }
+
     const project: GsdProject = {
       name,
       coreValue,
@@ -73,6 +89,7 @@ export async function GET() {
       lastUpdated,
       phases,
       hasPlanning: true,
+      briefSlug,
     };
 
     return NextResponse.json(project);

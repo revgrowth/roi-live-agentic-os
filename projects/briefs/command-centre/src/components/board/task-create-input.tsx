@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Paperclip, X, Image, FileType, FileText, Sunrise, Moon } from "lucide-react";
-import type { TaskLevel } from "@/types/task";
+import { Paperclip, X, Image, FileType, FileText, Sunrise, Moon, AlertTriangle, MessageSquare, Layers, Hammer } from "lucide-react";
+import type { TaskLevel, PermissionMode } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 
 import { SlashCommandMenu } from "@/components/shared/slash-command-menu";
@@ -29,7 +29,7 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-import { LEVEL_LABELS, LEVEL_HINTS } from "@/types/task";
+import { LEVEL_LABELS, LEVEL_HINTS, PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS } from "@/types/task";
 
 const levels: { value: TaskLevel; label: string; hint: string }[] = [
   { value: "task", label: LEVEL_LABELS.task, hint: LEVEL_HINTS.task },
@@ -37,9 +37,41 @@ const levels: { value: TaskLevel; label: string; hint: string }[] = [
   { value: "gsd", label: LEVEL_LABELS.gsd, hint: LEVEL_HINTS.gsd },
 ];
 
+const permissionModes: { value: PermissionMode; label: string; hint: string }[] = [
+  { value: "plan", label: PERMISSION_MODE_LABELS.plan, hint: PERMISSION_MODE_HINTS.plan },
+  { value: "default", label: PERMISSION_MODE_LABELS.default, hint: PERMISSION_MODE_HINTS.default },
+  { value: "acceptEdits", label: PERMISSION_MODE_LABELS.acceptEdits, hint: PERMISSION_MODE_HINTS.acceptEdits },
+  { value: "auto", label: PERMISSION_MODE_LABELS.auto, hint: PERMISSION_MODE_HINTS.auto },
+  { value: "bypassPermissions", label: PERMISSION_MODE_LABELS.bypassPermissions, hint: PERMISSION_MODE_HINTS.bypassPermissions },
+];
+
+const MODE_BG: Record<PermissionMode, string> = {
+  plan: "#E0E7FF",
+  default: "#F3F4F6",
+  acceptEdits: "#FEF3C7",
+  auto: "#D1FAE5",
+  bypassPermissions: "#FEE2E2",
+};
+
+const MODE_TEXT: Record<PermissionMode, string> = {
+  plan: "#3730A3",
+  default: "#374151",
+  acceptEdits: "#92400E",
+  auto: "#065F46",
+  bypassPermissions: "#991B1B",
+};
+
+interface GsdStatus {
+  exists: boolean;
+  projectName?: string;
+  currentPhase?: number | null;
+  totalPhases?: number | null;
+}
+
 export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }) {
   const [description, setDescription] = useState("");
   const [level, setLevel] = useState<TaskLevel>("task");
+  const [permissionMode, setPermissionMode] = useState<PermissionMode>("default");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -47,6 +79,9 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // GSD conflict state
+  const [gsdStatus, setGsdStatus] = useState<GsdStatus | null>(null);
 
   const createTask = useTaskStore((s) => s.createTask);
   const updateTask = useTaskStore((s) => s.updateTask);
@@ -56,6 +91,16 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
 
   const descRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
+
+  // Fetch GSD status when Deep build is selected
+  useEffect(() => {
+    if (level === "gsd" && isExpanded) {
+      fetch("/api/gsd/status")
+        .then((res) => res.json())
+        .then(setGsdStatus)
+        .catch(() => setGsdStatus(null));
+    }
+  }, [level, isExpanded]);
 
   // Auto-grow textarea
   const adjustTextareaHeight = useCallback(() => {
@@ -140,7 +185,7 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
     setIsExpanded(false);
 
     // Create with fallback title right away
-    await createTask(fallbackTitle, fullDescription, level, projectSlug || null);
+    await createTask(fallbackTitle, fullDescription, level, projectSlug || null, undefined, permissionMode);
 
     // AI title generation in the background
     fetch("/api/tasks/generate-title", {
@@ -162,8 +207,23 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
       })
       .catch(() => { /* fallback title is fine */ });
 
+    // Semantic goal clustering in the background (debounced — only for quick tasks)
+    if (level === "task") {
+      setTimeout(() => {
+        fetch("/api/tasks/cluster-goals", { method: "POST" })
+          .then((res) => res.ok ? res.json() : null)
+          .then((data) => {
+            if (data?.grouped > 0) {
+              // Refresh tasks to pick up new goalGroup assignments
+              useTaskStore.getState().fetchTasks();
+            }
+          })
+          .catch(() => { /* clustering is best-effort */ });
+      }, 2000); // Small delay to let title generation finish first
+    }
+
     setIsSubmitting(false);
-  }, [description, attachments, level, isSubmitting, createTask, updateTask, projectSlug]);
+  }, [description, attachments, level, permissionMode, isSubmitting, createTask, updateTask, projectSlug]);
 
   const handleQuickStart = useCallback(async (type: "start-here" | "wrap-up") => {
     if (quickStarting) return;
@@ -219,6 +279,9 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
 
   const shouldExpand = isExpanded || description.trim().length > 0 || attachments.length > 0;
 
+  // Whether to show the GSD conflict warning
+  const hasGsdConflict = level === "gsd" && gsdStatus?.exists === true;
+
   return (
     <div
       ref={formRef}
@@ -254,7 +317,13 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
             }
           }}
           disabled={isSubmitting}
-          placeholder="What would you like Claude to do?  Type / for commands"
+          placeholder={
+            level === "project"
+              ? "Describe your campaign — what do you need to launch?"
+              : level === "gsd"
+                ? "Describe what you want to build — app, system, workflow..."
+                : "What would you like Claude to do?  Type / for commands"
+          }
           style={{
             width: "100%",
             padding: shouldExpand ? "0" : "8px 16px",
@@ -435,6 +504,74 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
           </div>
         )}
 
+        {/* ── Level-specific guidance panels ── */}
+        {level === "project" && (
+          <div style={guidancePanelStyle}>
+            <div style={guidanceHeaderStyle}>
+              <MessageSquare size={14} color="#93452A" />
+              <span style={guidanceTitleStyle}>How campaigns work</span>
+            </div>
+            <div style={guidanceStepsStyle}>
+              <div style={guidanceStepStyle}>
+                <span style={stepNumberStyle}>1</span>
+                <span style={stepTextStyle}>Describe your campaign goal and what you need delivered</span>
+              </div>
+              <div style={guidanceStepStyle}>
+                <span style={stepNumberStyle}>2</span>
+                <span style={stepTextStyle}>Claude will ask scoping questions — deliverables, audience, timeline, constraints</span>
+              </div>
+              <div style={guidanceStepStyle}>
+                <span style={stepNumberStyle}>3</span>
+                <span style={stepTextStyle}>A project brief is created and broken into subtasks on this board</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {level === "gsd" && !hasGsdConflict && (
+          <div style={guidancePanelStyle}>
+            <div style={guidanceHeaderStyle}>
+              <Hammer size={14} color="#3B82F6" />
+              <span style={{ ...guidanceTitleStyle, color: "#3B82F6" }}>How deep builds work</span>
+            </div>
+            <div style={guidanceStepsStyle}>
+              <div style={guidanceStepStyle}>
+                <span style={{ ...stepNumberStyle, backgroundColor: "rgba(59, 130, 246, 0.1)", color: "#3B82F6" }}>1</span>
+                <span style={stepTextStyle}>Describe what you want to build — Claude will ask questions to understand the full scope</span>
+              </div>
+              <div style={guidanceStepStyle}>
+                <span style={{ ...stepNumberStyle, backgroundColor: "rgba(59, 130, 246, 0.1)", color: "#3B82F6" }}>2</span>
+                <span style={stepTextStyle}>A phased roadmap is created — each phase is discussed, planned, then built</span>
+              </div>
+              <div style={guidanceStepStyle}>
+                <span style={{ ...stepNumberStyle, backgroundColor: "rgba(59, 130, 246, 0.1)", color: "#3B82F6" }}>3</span>
+                <span style={stepTextStyle}>Phases appear as subtasks here so you can track progress and verify each stage</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── GSD conflict warning ── */}
+        {hasGsdConflict && (
+          <div style={conflictPanelStyle}>
+            <div style={guidanceHeaderStyle}>
+              <AlertTriangle size={14} color="#D97706" />
+              <span style={{ ...guidanceTitleStyle, color: "#92400E" }}>Active deep build detected</span>
+            </div>
+            <p style={conflictTextStyle}>
+              <strong>{gsdStatus?.projectName}</strong> is currently in progress
+              {gsdStatus?.currentPhase && gsdStatus?.totalPhases
+                ? ` (phase ${gsdStatus.currentPhase} of ${gsdStatus.totalPhases})`
+                : ""
+              }.
+              Only one deep build can run at a time.
+            </p>
+            <p style={{ ...conflictTextStyle, marginTop: 6 }}>
+              To start a new deep build, first archive the current one. You can do this by asking Claude to run <code style={codeStyle}>/archive-gsd</code>, or complete the remaining phases.
+            </p>
+          </div>
+        )}
+
         {/* Bottom bar: level chips + hint + submit button */}
         <div style={{ marginTop: 8 }}>
           <div
@@ -473,12 +610,60 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
                       borderRadius: 4,
                       height: 28,
                       backgroundColor:
-                        level === l.value ? "#FFDBCF" : "transparent",
-                      color: level === l.value ? "#390C00" : "#5E5E65",
+                        level === l.value
+                          ? l.value === "gsd"
+                            ? "#DBEAFE"
+                            : "#FFDBCF"
+                          : "transparent",
+                      color: level === l.value
+                        ? l.value === "gsd"
+                          ? "#1E40AF"
+                          : "#390C00"
+                        : "#5E5E65",
                       transition: "all 150ms ease",
                     }}
                   >
                     {l.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Permission mode selector */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: 2,
+                  backgroundColor: "#EAE8E6",
+                  borderRadius: 6,
+                  padding: 2,
+                  height: 32,
+                  alignItems: "center",
+                }}
+              >
+                {permissionModes.map((m) => (
+                  <button
+                    key={m.value}
+                    onClick={() => setPermissionMode(m.value)}
+                    title={m.hint}
+                    style={{
+                      padding: "0 10px",
+                      fontSize: 11,
+                      fontWeight: 500,
+                      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                      border: "none",
+                      cursor: "pointer",
+                      borderRadius: 4,
+                      height: 28,
+                      backgroundColor: permissionMode === m.value
+                        ? MODE_BG[m.value]
+                        : "transparent",
+                      color: permissionMode === m.value
+                        ? MODE_TEXT[m.value]
+                        : "#9C9CA0",
+                      transition: "all 150ms ease",
+                    }}
+                  >
+                    {m.label}
                   </button>
                 ))}
               </div>
@@ -539,10 +724,12 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
           {/* Submit button */}
           <button
             onClick={handleSubmit}
-            disabled={!description.trim() || isSubmitting}
+            disabled={!description.trim() || isSubmitting || hasGsdConflict}
             style={{
-              background: description.trim()
-                ? "linear-gradient(135deg, #93452A, #B25D3F)"
+              background: description.trim() && !hasGsdConflict
+                ? level === "gsd"
+                  ? "linear-gradient(135deg, #3B82F6, #2563EB)"
+                  : "linear-gradient(135deg, #93452A, #B25D3F)"
                 : "#D1C7C2",
               color: "#FFFFFF",
               border: "none",
@@ -552,18 +739,20 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
               fontWeight: 600,
               fontFamily:
                 "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              cursor: description.trim() ? "pointer" : "default",
+              cursor: description.trim() && !hasGsdConflict ? "pointer" : "default",
               opacity: isSubmitting ? 0.6 : 1,
               transition: "all 150ms ease",
             }}
           >
-            Send to Claude
+            {hasGsdConflict ? "Archive current build first" : "Send to Claude"}
           </button>
           </div>
 
-          {/* Active level hint */}
+          {/* Active level + permission mode hints */}
           <div
             style={{
+              display: "flex",
+              gap: 16,
               fontSize: 11,
               fontFamily: "var(--font-inter), Inter, sans-serif",
               color: "#9C9CA0",
@@ -572,10 +761,98 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
               minHeight: 16,
             }}
           >
-            {levels.find((l) => l.value === level)?.hint}
+            <span>{levels.find((l) => l.value === level)?.hint}</span>
+            {permissionMode !== "default" && (
+              <span style={{ color: MODE_TEXT[permissionMode] }}>
+                {permissionModes.find((m) => m.value === permissionMode)?.hint}
+              </span>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+// ── Guidance panel styles ──
+
+const guidancePanelStyle: React.CSSProperties = {
+  marginTop: 10,
+  padding: "12px 14px",
+  backgroundColor: "#FAFAF9",
+  borderRadius: 8,
+  border: "1px solid rgba(218, 193, 185, 0.2)",
+};
+
+const conflictPanelStyle: React.CSSProperties = {
+  marginTop: 10,
+  padding: "12px 14px",
+  backgroundColor: "#FFFBEB",
+  borderRadius: 8,
+  border: "1px solid rgba(217, 119, 6, 0.2)",
+};
+
+const guidanceHeaderStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+  marginBottom: 10,
+};
+
+const guidanceTitleStyle: React.CSSProperties = {
+  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+  fontSize: 12,
+  fontWeight: 600,
+  color: "#93452A",
+};
+
+const guidanceStepsStyle: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 8,
+};
+
+const guidanceStepStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: 8,
+};
+
+const stepNumberStyle: React.CSSProperties = {
+  flexShrink: 0,
+  width: 20,
+  height: 20,
+  borderRadius: "50%",
+  backgroundColor: "rgba(147, 69, 42, 0.1)",
+  color: "#93452A",
+  fontSize: 11,
+  fontWeight: 700,
+  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const stepTextStyle: React.CSSProperties = {
+  fontFamily: "var(--font-inter), Inter, sans-serif",
+  fontSize: 12,
+  color: "#5E5E65",
+  lineHeight: 1.5,
+  paddingTop: 1,
+};
+
+const conflictTextStyle: React.CSSProperties = {
+  fontFamily: "var(--font-inter), Inter, sans-serif",
+  fontSize: 12,
+  color: "#78350F",
+  lineHeight: 1.5,
+  margin: 0,
+};
+
+const codeStyle: React.CSSProperties = {
+  fontFamily: "var(--font-mono, monospace)",
+  fontSize: 11,
+  backgroundColor: "rgba(217, 119, 6, 0.1)",
+  padding: "1px 5px",
+  borderRadius: 3,
+};

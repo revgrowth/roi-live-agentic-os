@@ -46,9 +46,8 @@ process.stdin.on("end", () => {
       `
     const http = require("http");
 
-    // 1. Update activity label
+    // 1. Update activity label (do NOT set status — avoids race with Stop hook)
     const statusPayload = JSON.stringify({
-      status: "running",
       activityLabel: ${JSON.stringify(label)},
     });
 

@@ -4,6 +4,7 @@
   "description": "Turn Claude Code into your Agentic Operating System.",
   "private": true,
   "scripts": {
+    "predev": "lsof -ti :3000 | xargs kill -9 2>/dev/null || true",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",

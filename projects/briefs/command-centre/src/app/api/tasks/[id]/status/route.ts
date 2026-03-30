@@ -3,6 +3,23 @@ import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
 import type { Task } from "@/types/task";
 
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const db = getDb();
+  const task = db.prepare("SELECT id, status, activityLabel, errorMessage FROM tasks WHERE id = ?").get(id) as
+    | Pick<Task, "id" | "status" | "activityLabel" | "errorMessage">
+    | undefined;
+
+  if (!task) {
+    return NextResponse.json({ error: "Task not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(task);
+}
+
 interface StatusUpdateInput {
   status: string;
   title?: string;
@@ -29,20 +46,25 @@ export async function PATCH(
 
     const body = (await request.json()) as StatusUpdateInput;
 
-    // Validate status
+    // Validate status if provided
     const validStatuses = ["backlog", "queued", "running", "review", "done"];
-    if (!body.status || !validStatuses.includes(body.status)) {
+    if (body.status && !validStatuses.includes(body.status)) {
       return NextResponse.json(
         {
-          error: `status is required and must be one of: ${validStatuses.join(", ")}`,
+          error: `status must be one of: ${validStatuses.join(", ")}`,
         },
         { status: 400 }
       );
     }
 
     const now = new Date().toISOString();
-    const updates: string[] = ["status = ?", "updatedAt = ?"];
-    const values: unknown[] = [body.status, now];
+    const updates: string[] = ["updatedAt = ?"];
+    const values: unknown[] = [now];
+
+    if (body.status) {
+      updates.push("status = ?");
+      values.push(body.status);
+    }
 
     // Set startedAt when transitioning to running
     if (body.status === "running" && !existing.startedAt) {

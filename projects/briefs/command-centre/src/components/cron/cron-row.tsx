@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Play, Pause, Trash2, ChevronDown, ChevronRight } from "lucide-react";
+import { Play, Pause, Trash2, ChevronDown, ChevronRight, Zap, Loader2, Pin } from "lucide-react";
 import { useCronStore } from "@/store/cron-store";
 import { RunHistory } from "./run-history";
 import type { CronJob } from "@/types/cron";
@@ -39,6 +39,7 @@ function formatSchedule(days: string, time: string): string {
 function formatRelativeTime(iso: string | null): string {
   if (!iso) return "--";
   const date = new Date(iso);
+  if (isNaN(date.getTime())) return "--";
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const future = diffMs < 0;
@@ -79,16 +80,29 @@ export function CronRow({
   const expandJob = useCronStore((s) => s.expandJob);
   const toggleJob = useCronStore((s) => s.toggleJob);
   const deleteJob = useCronStore((s) => s.deleteJob);
+  const runJobNow = useCronStore((s) => s.runJobNow);
+  const togglePin = useCronStore((s) => s.togglePin);
+  const isPinned = useCronStore((s) => s.pinnedSlugs.includes(job.slug));
+  const activeRun = useCronStore((s) => s.activeRuns[job.slug]);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
+  const isActiveRun = !!activeRun;
   const isExpanded = expandedJob === job.slug;
   const runs = runHistory[job.slug] || [];
+
+  // Derive a human-friendly status label for the active run
+  const runStatusLabel =
+    activeRun?.status === "queued"
+      ? "Queued..."
+      : activeRun?.status === "running"
+        ? activeRun.activityLabel || "Running..."
+        : null;
 
   return (
     <div
       style={{ marginBottom: 10 }}
-      draggable
-      onDragStart={(e) => onDragStart(e, index)}
+      draggable={!isPinned}
+      onDragStart={(e) => { if (isPinned) { e.preventDefault(); return; } onDragStart(e, index); }}
       onDragOver={(e) => onDragOver(e, index)}
       onDrop={(e) => onDrop(e, index)}
       onDragEnd={onDragEnd}
@@ -98,23 +112,24 @@ export function CronRow({
         onClick={() => expandJob(isExpanded ? null : job.slug)}
         style={{
           display: "grid",
-          gridTemplateColumns: "1.5fr 1fr 0.8fr 0.8fr 0.7fr 90px 80px",
+          gridTemplateColumns: "1.5fr 1fr 0.8fr 0.8fr 0.7fr 90px 110px",
           gap: 12,
           alignItems: "center",
           padding: "14px 16px",
-          backgroundColor: "#FFFFFF",
+          backgroundColor: isActiveRun ? "#FFFAF8" : isPinned ? "#FDFCFB" : "#FFFFFF",
           borderRadius: isExpanded ? "0.5rem 0.5rem 0 0" : "0.5rem",
-          cursor: "grab",
+          cursor: isPinned ? "default" : "grab",
           transition: "background-color 150ms ease, opacity 150ms ease",
           fontFamily: "var(--font-inter), Inter, sans-serif",
           opacity: isDragging ? 0.4 : 1,
           borderTop: isDragOver ? "2px solid #93452A" : "2px solid transparent",
+          borderLeft: isPinned ? "3px solid #93452A" : "3px solid transparent",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = "#F6F3F1";
+          e.currentTarget.style.backgroundColor = isActiveRun ? "#FFF5F0" : "#F6F3F1";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = "#FFFFFF";
+          e.currentTarget.style.backgroundColor = isActiveRun ? "#FFFAF8" : "#FFFFFF";
         }}
       >
         {/* Name */}
@@ -128,20 +143,48 @@ export function CronRow({
             <div style={{ fontSize: 14, fontWeight: 500, color: "#1B1C1B" }}>
               {job.name}
             </div>
-            {job.description && (
+            {/* Show activity label when running, otherwise show description */}
+            {isActiveRun && runStatusLabel ? (
               <div
                 style={{
                   fontSize: 12,
-                  color: "#5E5E65",
+                  color: "#93452A",
                   marginTop: 2,
+                  fontStyle: "italic",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                   maxWidth: 280,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
                 }}
               >
-                {job.description}
+                <Loader2
+                  size={11}
+                  style={{
+                    animation: "spin 1s linear infinite",
+                    flexShrink: 0,
+                  }}
+                />
+                {runStatusLabel}
               </div>
+            ) : (
+              job.description && (
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "#5E5E65",
+                    marginTop: 2,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    maxWidth: 280,
+                  }}
+                >
+                  {job.description}
+                </div>
+              )
             )}
           </div>
         </div>
@@ -205,19 +248,48 @@ export function CronRow({
 
         {/* Status chip */}
         <div>
-          <span
-            style={{
-              display: "inline-block",
-              padding: "4px 10px",
-              borderRadius: "0.375rem",
-              fontSize: 12,
-              fontWeight: 500,
-              backgroundColor: job.active ? "#FFDBCF" : "#EAE8E6",
-              color: job.active ? "#390C00" : "#5E5E65",
-            }}
-          >
-            {job.active ? "Active" : "Paused"}
-          </span>
+          {isActiveRun ? (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                padding: "4px 10px",
+                borderRadius: "0.375rem",
+                fontSize: 12,
+                fontWeight: 500,
+                backgroundColor: "#FEF3CD",
+                color: "#856404",
+              }}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  backgroundColor: "#93452A",
+                  animation: "pulse-dot 2s ease-in-out infinite",
+                  flexShrink: 0,
+                }}
+              />
+              Running
+            </span>
+          ) : (
+            <span
+              style={{
+                display: "inline-block",
+                padding: "4px 10px",
+                borderRadius: "0.375rem",
+                fontSize: 12,
+                fontWeight: 500,
+                backgroundColor: job.active ? "#FFDBCF" : "#EAE8E6",
+                color: job.active ? "#390C00" : "#5E5E65",
+              }}
+            >
+              {job.active ? "Active" : "Paused"}
+            </span>
+          )}
         </div>
 
         {/* Actions */}
@@ -225,6 +297,55 @@ export function CronRow({
           style={{ display: "flex", gap: 4 }}
           onClick={(e) => e.stopPropagation()}
         >
+          <button
+            onClick={() => runJobNow(job.slug)}
+            disabled={isActiveRun}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: isActiveRun ? "not-allowed" : "pointer",
+              padding: 6,
+              borderRadius: 6,
+              display: "flex",
+              alignItems: "center",
+              color: isActiveRun ? "#B25D3F" : "#5E5E65",
+              transition: "color 150ms ease",
+              opacity: isActiveRun ? 0.5 : 1,
+            }}
+            title={isActiveRun ? "Job is running..." : "Run now"}
+            onMouseEnter={(e) => {
+              if (!isActiveRun) e.currentTarget.style.color = "#93452A";
+            }}
+            onMouseLeave={(e) => {
+              if (!isActiveRun) e.currentTarget.style.color = "#5E5E65";
+            }}
+          >
+            <Zap size={16} />
+          </button>
+          <button
+            onClick={() => togglePin(job.slug)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 6,
+              borderRadius: 6,
+              display: "flex",
+              alignItems: "center",
+              color: isPinned ? "#93452A" : "#5E5E65",
+              transition: "color 150ms ease",
+              transform: isPinned ? "rotate(-45deg)" : "none",
+            }}
+            title={isPinned ? "Unpin from top" : "Pin to top"}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#93452A";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = isPinned ? "#93452A" : "#5E5E65";
+            }}
+          >
+            <Pin size={14} />
+          </button>
           <button
             onClick={() => toggleJob(job.slug)}
             style={{
@@ -315,7 +436,15 @@ export function CronRow({
       </div>
 
       {/* Expanded run history */}
-      {isExpanded && <RunHistory runs={runs} jobSlug={job.slug} />}
+      {isExpanded && <RunHistory runs={runs} jobSlug={job.slug} prompt={job.prompt} />}
+
+      {/* CSS for spinner animation */}
+      <style jsx global>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

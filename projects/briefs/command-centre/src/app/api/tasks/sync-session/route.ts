@@ -7,10 +7,11 @@ export async function POST(request: NextRequest) {
   try {
     const db = getDb();
     const body = await request.json();
-    const { sessionId, cwd, projectSlug } = body as {
+    const { sessionId, cwd, projectSlug, claudePid } = body as {
       sessionId: string;
       cwd?: string;
       projectSlug?: string | null;
+      claudePid?: number | null;
     };
 
     if (!sessionId || typeof sessionId !== "string") {
@@ -30,8 +31,8 @@ export async function POST(request: NextRequest) {
     if (existing) {
       // Resume — update status back to running
       db.prepare(
-        "UPDATE tasks SET status = 'running', updatedAt = ?, startedAt = COALESCE(startedAt, ?) WHERE id = ?"
-      ).run(now, now, existing.id);
+        "UPDATE tasks SET status = 'running', updatedAt = ?, startedAt = COALESCE(startedAt, ?), claudePid = COALESCE(?, claudePid) WHERE id = ?"
+      ).run(now, now, claudePid ?? null, existing.id);
 
       const updated = db
         .prepare("SELECT * FROM tasks WHERE id = ?")
@@ -45,7 +46,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ taskId: existing.id, isNew: false });
     }
 
-    // Create new task
+    // Check for a recently-started running task without a claudeSessionId
+    // (created by the board/dashboard, picked up by queue-watcher before the hook fires)
+    const recentRunning = db
+      .prepare(
+        `SELECT * FROM tasks
+         WHERE status = 'running'
+           AND claudeSessionId IS NULL
+           AND startedAt IS NOT NULL
+           AND (julianday(?) - julianday(startedAt)) * 86400 < 30
+         ORDER BY startedAt DESC
+         LIMIT 1`
+      )
+      .get(now) as Task | undefined;
+
+    if (recentRunning) {
+      // Attach the session ID to the existing task instead of creating a duplicate
+      db.prepare(
+        "UPDATE tasks SET claudeSessionId = ?, claudePid = COALESCE(?, claudePid), updatedAt = ? WHERE id = ?"
+      ).run(sessionId, claudePid ?? null, now, recentRunning.id);
+
+      const updated = db
+        .prepare("SELECT * FROM tasks WHERE id = ?")
+        .get(recentRunning.id) as Task;
+      emitTaskEvent({
+        type: "task:status",
+        task: { ...updated, needsInput: Boolean(updated.needsInput) },
+        timestamp: now,
+      });
+
+      return NextResponse.json({ taskId: recentRunning.id, isNew: false });
+    }
+
+    // Create new task (genuinely new terminal session, not spawned by the board)
     const title = projectSlug
       ? `${projectSlug} session`
       : cwd
@@ -85,18 +118,22 @@ export async function POST(request: NextRequest) {
       contextSources: null,
       cronJobSlug: null,
       claudeSessionId: sessionId,
+      claudePid: claudePid ?? null,
+      permissionMode: "default",
+      lastReplyAt: null,
+      goalGroup: null,
     };
 
     db.prepare(
-      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, contextSources, cronJobSlug, claudeSessionId)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, contextSources, cronJobSlug, claudeSessionId, claudePid)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       task.id, task.title, task.description, task.status, task.level,
       task.parentId, task.projectSlug, task.columnOrder, task.createdAt,
       task.updatedAt, task.costUsd, task.tokensUsed, task.durationMs,
       task.activityLabel, task.errorMessage, task.startedAt, task.completedAt,
       task.clientId, task.needsInput ? 1 : 0, task.phaseNumber, task.gsdStep,
-      task.contextSources, task.cronJobSlug, task.claudeSessionId
+      task.contextSources, task.cronJobSlug, task.claudeSessionId, task.claudePid
     );
 
     emitTaskEvent({ type: "task:created", task, timestamp: now });

@@ -1,5 +1,5 @@
-import { onTaskEvent, offTaskEvent } from "@/lib/event-bus";
-import type { TaskEvent } from "@/lib/event-bus";
+import { onTaskEvent, offTaskEvent, onChatEvent, offChatEvent } from "@/lib/event-bus";
+import type { TaskEvent, ChatEvent } from "@/lib/event-bus";
 import { startCronTaskSync } from "@/lib/cron-task-sync";
 
 export const dynamic = "force-dynamic";
@@ -17,17 +17,30 @@ export async function GET() {
       controller.enqueue(encoder.encode(connectMsg));
 
       // Subscribe to task events
-      const handler = (event: TaskEvent) => {
+      const taskHandler = (event: TaskEvent) => {
         try {
           const msg = `event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`;
           controller.enqueue(encoder.encode(msg));
         } catch {
           // Client disconnected, clean up
-          offTaskEvent(handler);
+          offTaskEvent(taskHandler);
+          offChatEvent(chatHandler);
         }
       };
 
-      onTaskEvent(handler);
+      // Subscribe to chat events
+      const chatHandler = (event: ChatEvent) => {
+        try {
+          const msg = `event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`;
+          controller.enqueue(encoder.encode(msg));
+        } catch {
+          offTaskEvent(taskHandler);
+          offChatEvent(chatHandler);
+        }
+      };
+
+      onTaskEvent(taskHandler);
+      onChatEvent(chatHandler);
 
       // Clean up on cancel (client disconnect)
       const checkClosed = setInterval(() => {
@@ -36,14 +49,16 @@ export async function GET() {
           controller.enqueue(encoder.encode(": keep-alive\n\n"));
         } catch {
           clearInterval(checkClosed);
-          offTaskEvent(handler);
+          offTaskEvent(taskHandler);
+          offChatEvent(chatHandler);
         }
       }, 30000);
 
       // Store cleanup references for when the stream is cancelled
       (controller as unknown as Record<string, unknown>)._cleanup = () => {
         clearInterval(checkClosed);
-        offTaskEvent(handler);
+        offTaskEvent(taskHandler);
+        offChatEvent(chatHandler);
       };
     },
     cancel(controller) {

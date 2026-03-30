@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate input
-    const { title, description, level, projectSlug: bodyProjectSlug, clientId: bodyClientId, parentId: bodyParentId, phaseNumber: bodyPhaseNumber, gsdStep: bodyGsdStep, cronJobSlug: bodyCronJobSlug } = body as TaskCreateInput & { cronJobSlug?: string };
+    const { title, description, level, projectSlug: bodyProjectSlug, clientId: bodyClientId, parentId: bodyParentId, phaseNumber: bodyPhaseNumber, gsdStep: bodyGsdStep, cronJobSlug: bodyCronJobSlug, permissionMode: bodyPermissionMode } = body as TaskCreateInput & { cronJobSlug?: string };
     if (!title || typeof title !== "string" || title.trim().length === 0) {
       return NextResponse.json(
         { error: "title is required and must be a non-empty string" },
@@ -64,10 +64,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get min columnOrder in backlog — new tasks get lowest value to sort to top
+    // Get min columnOrder in queued — new tasks get lowest value to sort to top
     const minOrder = db
       .prepare(
-        "SELECT COALESCE(MIN(columnOrder), 1) as minOrder FROM tasks WHERE status = 'backlog'"
+        "SELECT COALESCE(MIN(columnOrder), 1) as minOrder FROM tasks WHERE status = 'queued'"
       )
       .get() as { minOrder: number };
 
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       id: crypto.randomUUID(),
       title: title.trim(),
       description: description?.trim() || null,
-      status: "backlog",
+      status: "queued",
       level,
       parentId: bodyParentId || null,
       projectSlug: bodyProjectSlug || null,
@@ -97,11 +97,14 @@ export async function POST(request: NextRequest) {
       contextSources: null,
       cronJobSlug: bodyCronJobSlug || null,
       claudeSessionId: null,
+      permissionMode: bodyPermissionMode || "default",
+      lastReplyAt: null,
+      goalGroup: null,
     };
 
     db.prepare(
-      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       task.id,
       task.title,
@@ -124,7 +127,8 @@ export async function POST(request: NextRequest) {
       0,
       task.phaseNumber,
       task.gsdStep,
-      task.cronJobSlug
+      task.cronJobSlug,
+      task.permissionMode
     );
 
     emitTaskEvent({

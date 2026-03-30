@@ -53,10 +53,24 @@ export async function POST(
     "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
   ).run(entryId, id, "user_reply", now, trimmed, null, null, null, 0);
 
-  // Reactivate the task to running (set startedAt if not already set)
+  // Auto-update title to reflect the latest conversation direction.
+  // Extract the first sentence as a clean title, not the raw reply text.
+  const shortAffirmation = /^(yes|no|ok|okay|sure|go\s*ahead|looks?\s*good|that'?s?\s*(fine|great|it)|perfect|great|thanks|y|n|approve|continue|proceed|done|ship\s*it|lgtm)\s*[.!?]*$/i;
+  if (trimmed.length > 25 && !shortAffirmation.test(trimmed)) {
+    // Take the first sentence or first line — whichever is shorter
+    const firstLine = trimmed.split("\n")[0].trim();
+    const sentenceMatch = firstLine.match(/^[^.!?]+[.!?]?/);
+    const sentence = sentenceMatch ? sentenceMatch[0].trim() : firstLine;
+    const newTitle = sentence.length > 60 ? sentence.slice(0, 57) + "..." : sentence;
+    if (newTitle.length > 10) {
+      db.prepare("UPDATE tasks SET title = ? WHERE id = ?").run(newTitle, id);
+    }
+  }
+
+  // Reactivate the task to running (set startedAt if not already set, track lastReplyAt)
   db.prepare(
-    "UPDATE tasks SET status = 'running', updatedAt = ?, activityLabel = ?, needsInput = 0, errorMessage = NULL, startedAt = COALESCE(startedAt, ?) WHERE id = ?"
-  ).run(now, "Processing reply...", now, id);
+    "UPDATE tasks SET status = 'running', updatedAt = ?, lastReplyAt = ?, activityLabel = ?, needsInput = 0, errorMessage = NULL, startedAt = COALESCE(startedAt, ?) WHERE id = ?"
+  ).run(now, now, "Processing reply...", now, id);
 
   const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id) as Task;
   emitTaskEvent({

@@ -27,7 +27,13 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { type, content } = body as { type: string; content: string };
+    const { type, content, toolName, toolArgs, toolResult } = body as {
+      type: string;
+      content: string;
+      toolName?: string;
+      toolArgs?: string;
+      toolResult?: string;
+    };
 
     if (!type || !content) {
       return NextResponse.json({ error: "type and content are required" }, { status: 400 });
@@ -38,11 +44,14 @@ export async function POST(
       type: type as LogEntry["type"],
       timestamp: new Date().toISOString(),
       content,
+      ...(toolName ? { toolName } : {}),
+      ...(toolArgs ? { toolArgs } : {}),
+      ...(toolResult ? { toolResult } : {}),
     };
 
     db.prepare(
       "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-    ).run(entry.id, id, entry.type, entry.timestamp, entry.content, null, null, null, 0);
+    ).run(entry.id, id, entry.type, entry.timestamp, entry.content, toolName ?? null, toolArgs ?? null, toolResult ?? null, 0);
 
     emitTaskEvent({
       type: "task:log",

@@ -1,8 +1,10 @@
 "use client";
 
-import { X } from "lucide-react";
-import type { Task } from "@/types/task";
-import { LevelBadge } from "../board/level-badge";
+import { useState, useRef, useEffect } from "react";
+import { X, ChevronDown, Trash2 } from "lucide-react";
+import type { Task, TaskStatus, PermissionMode } from "@/types/task";
+import { PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS } from "@/types/task";
+import { useTaskStore } from "@/store/task-store";
 
 const statusColorMap: Record<string, string> = {
   backlog: "#5E5E65",
@@ -12,6 +14,34 @@ const statusColorMap: Record<string, string> = {
   done: "#6B8E6B",
 };
 
+const MODE_BG: Record<PermissionMode, string> = {
+  plan: "#E0E7FF",
+  default: "#F3F4F6",
+  acceptEdits: "#FEF3C7",
+  auto: "#D1FAE5",
+  bypassPermissions: "#FEE2E2",
+};
+
+const MODE_TEXT: Record<PermissionMode, string> = {
+  plan: "#3730A3",
+  default: "#374151",
+  acceptEdits: "#92400E",
+  auto: "#065F46",
+  bypassPermissions: "#991B1B",
+};
+
+const ALL_MODES: PermissionMode[] = ["plan", "default", "acceptEdits", "auto", "bypassPermissions"];
+
+const ALL_STATUSES: TaskStatus[] = ["backlog", "queued", "running", "review", "done"];
+
+const STATUS_LABELS: Record<TaskStatus, string> = {
+  backlog: "Backlog",
+  queued: "Queued",
+  running: "Running",
+  review: "Review",
+  done: "Done",
+};
+
 export function ModalHeader({
   task,
   onClose,
@@ -19,7 +49,26 @@ export function ModalHeader({
   task: Task;
   onClose: () => void;
 }) {
+  const updateTask = useTaskStore((s) => s.updateTask);
+  const deleteTask = useTaskStore((s) => s.deleteTask);
   const statusColor = statusColorMap[task.status] || "#5E5E65";
+  // Can change mode anytime except while actively running — next turn picks it up
+  const canChangeMode = task.status !== "running";
+
+  const [statusOpen, setStatusOpen] = useState(false);
+  const statusRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!statusOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (statusRef.current && !statusRef.current.contains(e.target as Node)) {
+        setStatusOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [statusOpen]);
 
   return (
     <div style={{ flexShrink: 0 }}>
@@ -28,97 +77,269 @@ export function ModalHeader({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          height: 56,
-          padding: "0 24px",
+          minHeight: 56,
+          padding: "12px 24px",
         }}
       >
-        {/* Left: title + status + level */}
+        {/* Left: title + metadata */}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            gap: 12,
+            flexDirection: "column",
+            gap: 6,
             flex: 1,
             minWidth: 0,
           }}
         >
-          <span
-            style={{
-              fontSize: 16,
-              fontWeight: 600,
-              fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
-              color: "#1B1C1B",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {task.title}
-          </span>
-
-          {/* Status badge */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              flexShrink: 0,
-            }}
-          >
+          {/* Title row */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span
               style={{
-                display: "inline-block",
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                backgroundColor: statusColor,
-                animation:
-                  task.status === "running"
-                    ? "pulse-dot 2s ease-in-out infinite"
-                    : undefined,
-              }}
-            />
-            <span
-              style={{
-                fontSize: 12,
-                fontFamily:
-                  "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                color: "#5E5E65",
+                fontSize: 16,
+                fontWeight: 600,
+                fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+                color: "#1B1C1B",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
               }}
             >
-              {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+              {task.title}
             </span>
+
+            {/* Status selector */}
+            <div ref={statusRef} style={{ position: "relative", flexShrink: 0 }}>
+              <button
+                onClick={() => setStatusOpen(!statusOpen)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  padding: "3px 8px 3px 6px",
+                  border: "1px solid transparent",
+                  borderRadius: 6,
+                  background: "transparent",
+                  cursor: "pointer",
+                  transition: "all 120ms ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(218, 193, 185, 0.12)";
+                  e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  if (!statusOpen) {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.borderColor = "transparent";
+                  }
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    backgroundColor: statusColor,
+                    animation: task.status === "running" ? "pulse-dot 2s ease-in-out infinite" : undefined,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    color: "#5E5E65",
+                  }}
+                >
+                  {STATUS_LABELS[task.status]}
+                </span>
+                <ChevronDown size={12} style={{ color: "#9C9CA0" }} />
+              </button>
+
+              {statusOpen && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 4px)",
+                    left: 0,
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #EAE8E6",
+                    borderRadius: 8,
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+                    zIndex: 200,
+                    minWidth: 140,
+                    overflow: "hidden",
+                  }}
+                >
+                  {ALL_STATUSES.map((s) => {
+                    const isActive = task.status === s;
+                    return (
+                      <button
+                        key={s}
+                        onClick={() => {
+                          if (!isActive) {
+                            updateTask(task.id, { status: s });
+                          }
+                          setStatusOpen(false);
+                        }}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          width: "100%",
+                          padding: "8px 12px",
+                          border: "none",
+                          background: isActive ? "rgba(218, 193, 185, 0.12)" : "transparent",
+                          cursor: isActive ? "default" : "pointer",
+                          fontSize: 12,
+                          fontWeight: isActive ? 600 : 400,
+                          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                          color: isActive ? "#1B1C1B" : "#5E5E65",
+                          transition: "background 100ms ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isActive) e.currentTarget.style.backgroundColor = "rgba(218, 193, 185, 0.08)";
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isActive) e.currentTarget.style.backgroundColor = "transparent";
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "inline-block",
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            backgroundColor: statusColorMap[s],
+                            flexShrink: 0,
+                          }}
+                        />
+                        {STATUS_LABELS[s]}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
           </div>
 
-          <LevelBadge level={task.level} />
+          {/* Permission mode row */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span
+              style={{
+                fontSize: 10,
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontWeight: 600,
+                color: "#9C9CA0",
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+              }}
+            >
+              Mode
+            </span>
+            <div
+              style={{
+                display: "flex",
+                gap: 2,
+                backgroundColor: "#EAE8E6",
+                borderRadius: 4,
+                padding: 2,
+                height: 24,
+                alignItems: "center",
+              }}
+            >
+              {ALL_MODES.map((mode) => {
+                const isActive = (task.permissionMode || "default") === mode;
+                return (
+                  <button
+                    key={mode}
+                    onClick={() => {
+                      if (canChangeMode) {
+                        updateTask(task.id, { permissionMode: mode });
+                      }
+                    }}
+                    disabled={!canChangeMode}
+                    title={
+                      canChangeMode
+                        ? PERMISSION_MODE_HINTS[mode]
+                        : "Mode locked while running — takes effect on next turn"
+                    }
+                    style={{
+                      padding: "0 8px",
+                      fontSize: 10,
+                      fontWeight: 600,
+                      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                      border: "none",
+                      cursor: canChangeMode ? "pointer" : "default",
+                      borderRadius: 3,
+                      height: 20,
+                      backgroundColor: isActive ? MODE_BG[mode] : "transparent",
+                      color: isActive ? MODE_TEXT[mode] : "#9C9CA0",
+                      opacity: canChangeMode ? 1 : 0.5,
+                      transition: "all 150ms ease",
+                    }}
+                  >
+                    {PERMISSION_MODE_LABELS[mode]}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
-        {/* Right: close button */}
-        <button
-          onClick={onClose}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: 6,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "0.25rem",
-            color: "#5E5E65",
-            flexShrink: 0,
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-              "#F6F3F1";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-              "transparent";
-          }}
-        >
-          <X size={20} />
-        </button>
+        {/* Right: delete + close */}
+        <div style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0, alignSelf: "flex-start" }}>
+          <button
+            onClick={() => {
+              deleteTask(task.id);
+              onClose();
+            }}
+            title="Delete task"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 6,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "0.25rem",
+              color: "#9C9CA0",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(192, 64, 48, 0.08)";
+              (e.currentTarget as HTMLButtonElement).style.color = "#C04030";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+              (e.currentTarget as HTMLButtonElement).style.color = "#9C9CA0";
+            }}
+          >
+            <Trash2 size={16} />
+          </button>
+          <button
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 6,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "0.25rem",
+              color: "#5E5E65",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#F6F3F1";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+            }}
+          >
+            <X size={20} />
+          </button>
+        </div>
       </div>
 
       {/* Bottom separator */}

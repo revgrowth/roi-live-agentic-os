@@ -81,6 +81,7 @@ process.stdin.on("end", () => {
       sessionId: ${JSON.stringify(sessionId)},
       cwd: ${JSON.stringify(cwd)},
       projectSlug: ${JSON.stringify(projectSlug)},
+      claudePid: ${process.ppid || "null"},
     });
 
     const req = http.request(

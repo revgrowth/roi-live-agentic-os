@@ -19,19 +19,6 @@ const statusConfig: Record<string, { icon: typeof CheckCircle2; color: string; b
   done: { icon: CheckCircle2, color: "#6B8E6B", bg: "#F0F7F0", label: "Complete" },
 };
 
-function formatDuration(ms: number): string {
-  const sec = Math.floor(ms / 1000);
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  if (m === 0) return `${s}s`;
-  return `${m}m ${s.toString().padStart(2, "0")}s`;
-}
-
-function formatTokens(tokens: number): string {
-  if (tokens >= 1000) return `${(tokens / 1000).toFixed(1)}k`;
-  return tokens.toString();
-}
-
 /** Extract a condensed chat log: text messages + tool summaries + skill invocations */
 function buildChatDigest(logEntries: LogEntry[]): { type: "text" | "tools" | "question" | "reply" | "skill"; label: string; time: string }[] {
   const digest: { type: "text" | "tools" | "question" | "reply" | "skill"; label: string; time: string }[] = [];
@@ -341,29 +328,176 @@ export function ModalSummaryTab({
         </div>
       )}
 
-      {/* Stats grid */}
+      {/* Chat log digest — Activity first */}
+      <div style={{ padding: "20px 24px 0 24px" }}>
+        <SectionHeader
+          label="Activity"
+          count={logEntries.length > 0 ? logEntries.length : undefined}
+          onClick={logEntries.length > 0 ? onDrillChat : undefined}
+        />
+
+        {chatDigest.length === 0 ? (
+          <div
+            style={{
+              padding: "16px 0",
+              textAlign: "center",
+              color: "#9C9CA0",
+              fontSize: 13,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+            }}
+          >
+            {isRunning ? "Activity will appear here..." : "No activity yet"}
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {chatDigest.slice(-8).map((item, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 8,
+                  padding: "6px 0",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    color: "#9C9CA0",
+                    minWidth: 40,
+                    flexShrink: 0,
+                    marginTop: 2,
+                  }}
+                >
+                  {formatTime(item.time)}
+                </span>
+                <DigestIcon type={item.type} />
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontFamily: "var(--font-inter), Inter, sans-serif",
+                    color: item.type === "tools" ? "#5E5E65" : item.type === "reply" || item.type === "skill" ? "#93452A" : "#1B1C1B",
+                    fontWeight: item.type === "question" || item.type === "skill" ? 500 : 400,
+                    lineHeight: 1.4,
+                    flex: 1,
+                    overflow: "hidden",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical" as const,
+                  }}
+                >
+                  {item.label}
+                </span>
+              </div>
+            ))}
+            {chatDigest.length > 8 && (
+              <button
+                onClick={onDrillChat}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 12,
+                  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                  color: "#93452A",
+                  fontWeight: 500,
+                  padding: "6px 0",
+                  textAlign: "center",
+                }}
+              >
+                View full conversation
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Output files (parent + aggregated child outputs) — under activity */}
       <div style={{ padding: "16px 24px 0 24px" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 12,
-          }}
-        >
-          <StatChip label="Status" value={cfg.label} color={cfg.color} />
-          <StatChip
-            label="Duration"
-            value={task.durationMs !== null ? formatDuration(task.durationMs) : "--"}
-          />
-          <StatChip
-            label="Cost"
-            value={task.costUsd !== null ? `$${task.costUsd.toFixed(2)}` : "$0.00"}
-          />
-          <StatChip
-            label="Tokens"
-            value={task.tokensUsed !== null ? formatTokens(task.tokensUsed) : "--"}
-          />
-        </div>
+        <SectionHeader
+          label="Output Files"
+          count={totalOutputCount}
+          onClick={totalOutputCount > 0 ? onDrillOutputs : undefined}
+        />
+
+        {totalOutputCount === 0 ? (
+          <div
+            style={{
+              padding: "16px 0",
+              textAlign: "center",
+              color: "#9C9CA0",
+              fontSize: 13,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+            }}
+          >
+            {isRunning ? "Files will appear here as they're created..." : "No output files"}
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {/* Parent's own outputs */}
+            {outputFiles.slice(0, 4).map((file) => (
+              <OutputFileRow key={file.id} file={file} onFileClick={onFileClick} />
+            ))}
+            {outputFiles.length > 4 && (
+              <button
+                onClick={onDrillOutputs}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 12,
+                  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                  color: "#93452A",
+                  fontWeight: 500,
+                  padding: "6px 0",
+                  textAlign: "center",
+                }}
+              >
+                +{outputFiles.length - 4} more files
+              </button>
+            )}
+
+            {/* Child task output groups */}
+            {childOutputGroups.map(({ child, files }) => (
+              <div key={`child-outputs-${child.id}`} style={{ marginTop: outputFiles.length > 0 ? 8 : 0 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    color: "#9C9CA0",
+                    fontWeight: 500,
+                    marginBottom: 4,
+                    paddingLeft: 2,
+                  }}
+                >
+                  From: {child.title}
+                </div>
+                {files.slice(0, 3).map((file) => (
+                  <OutputFileRow key={file.id} file={file} onFileClick={onFileClick} />
+                ))}
+                {files.length > 3 && (
+                  <button
+                    onClick={onDrillOutputs}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: 11,
+                      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                      color: "#93452A",
+                      fontWeight: 500,
+                      padding: "4px 0",
+                      textAlign: "center",
+                    }}
+                  >
+                    +{files.length - 3} more
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Project brief link */}
@@ -510,177 +644,6 @@ export function ModalSummaryTab({
         </div>
       )}
 
-      {/* Output files (parent + aggregated child outputs) */}
-      <div style={{ padding: "20px 24px 0 24px" }}>
-        <SectionHeader
-          label="Output Files"
-          count={totalOutputCount}
-          onClick={totalOutputCount > 0 ? onDrillOutputs : undefined}
-        />
-
-        {totalOutputCount === 0 ? (
-          <div
-            style={{
-              padding: "16px 0",
-              textAlign: "center",
-              color: "#9C9CA0",
-              fontSize: 13,
-              fontFamily: "var(--font-inter), Inter, sans-serif",
-            }}
-          >
-            {isRunning ? "Files will appear here as they're created..." : "No output files"}
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {/* Parent's own outputs */}
-            {outputFiles.slice(0, 4).map((file) => (
-              <OutputFileRow key={file.id} file={file} onFileClick={onFileClick} />
-            ))}
-            {outputFiles.length > 4 && (
-              <button
-                onClick={onDrillOutputs}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 12,
-                  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                  color: "#93452A",
-                  fontWeight: 500,
-                  padding: "6px 0",
-                  textAlign: "center",
-                }}
-              >
-                +{outputFiles.length - 4} more files
-              </button>
-            )}
-
-            {/* Child task output groups */}
-            {childOutputGroups.map(({ child, files }) => (
-              <div key={`child-outputs-${child.id}`} style={{ marginTop: outputFiles.length > 0 ? 8 : 0 }}>
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                    color: "#9C9CA0",
-                    fontWeight: 500,
-                    marginBottom: 4,
-                    paddingLeft: 2,
-                  }}
-                >
-                  From: {child.title}
-                </div>
-                {files.slice(0, 3).map((file) => (
-                  <OutputFileRow key={file.id} file={file} onFileClick={onFileClick} />
-                ))}
-                {files.length > 3 && (
-                  <button
-                    onClick={onDrillOutputs}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      fontSize: 11,
-                      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                      color: "#93452A",
-                      fontWeight: 500,
-                      padding: "4px 0",
-                      textAlign: "center",
-                    }}
-                  >
-                    +{files.length - 3} more
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Chat log digest */}
-      <div style={{ padding: "20px 24px 0 24px" }}>
-        <SectionHeader
-          label="Activity"
-          count={logEntries.length > 0 ? logEntries.length : undefined}
-          onClick={logEntries.length > 0 ? onDrillChat : undefined}
-        />
-
-        {chatDigest.length === 0 ? (
-          <div
-            style={{
-              padding: "16px 0",
-              textAlign: "center",
-              color: "#9C9CA0",
-              fontSize: 13,
-              fontFamily: "var(--font-inter), Inter, sans-serif",
-            }}
-          >
-            {isRunning ? "Activity will appear here..." : "No activity yet"}
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {chatDigest.slice(-8).map((item, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 8,
-                  padding: "6px 0",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                    color: "#9C9CA0",
-                    minWidth: 40,
-                    flexShrink: 0,
-                    marginTop: 2,
-                  }}
-                >
-                  {formatTime(item.time)}
-                </span>
-                <DigestIcon type={item.type} />
-                <span
-                  style={{
-                    fontSize: 13,
-                    fontFamily: "var(--font-inter), Inter, sans-serif",
-                    color: item.type === "tools" ? "#5E5E65" : item.type === "reply" || item.type === "skill" ? "#93452A" : "#1B1C1B",
-                    fontWeight: item.type === "question" || item.type === "skill" ? 500 : 400,
-                    lineHeight: 1.4,
-                    flex: 1,
-                    overflow: "hidden",
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical" as const,
-                  }}
-                >
-                  {item.label}
-                </span>
-              </div>
-            ))}
-            {chatDigest.length > 8 && (
-              <button
-                onClick={onDrillChat}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 12,
-                  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                  color: "#93452A",
-                  fontWeight: 500,
-                  padding: "6px 0",
-                  textAlign: "center",
-                }}
-              >
-                View full conversation
-              </button>
-            )}
-          </div>
-        )}
-      </div>
 
       {/* Description (collapsed at bottom) */}
       {task.description && (
@@ -796,40 +759,6 @@ function ResumeSessionButton({ sessionId }: { sessionId: string }) {
   );
 }
 
-function StatChip({ label, value, color }: { label: string; value: string; color?: string }) {
-  return (
-    <div
-      style={{
-        backgroundColor: "#F6F3F1",
-        borderRadius: 8,
-        padding: "10px 12px",
-      }}
-    >
-      <div
-        style={{
-          fontSize: 10,
-          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-          textTransform: "uppercase",
-          letterSpacing: "0.06em",
-          color: "#9C9CA0",
-          marginBottom: 4,
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          fontSize: 16,
-          fontWeight: 700,
-          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-          color: color || "#1B1C1B",
-        }}
-      >
-        {value}
-      </div>
-    </div>
-  );
-}
 
 function DigestIcon({ type }: { type: "text" | "tools" | "question" | "reply" | "skill" }) {
   const size = 14;

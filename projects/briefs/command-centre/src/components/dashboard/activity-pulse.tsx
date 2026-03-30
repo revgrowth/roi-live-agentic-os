@@ -137,11 +137,6 @@ export function ActivityPulse({ weekStats, claudeUsage }: ActivityPulseProps) {
                 Last synced: {claudeUsage.lastUpdated === new Date().toISOString().slice(0, 10) ? "today" : claudeUsage.lastUpdated}
               </span>
             )}
-            {!hasBudget && (
-              <span style={subtextStyle}>
-                Set <code style={{ fontSize: 10, backgroundColor: "rgba(218, 193, 185, 0.3)", padding: "1px 4px", borderRadius: 3 }}>CLAUDE_DAILY_TOKEN_BUDGET</code> in .env.local for daily % bar
-              </span>
-            )}
           </div>
 
           <Link href="/history" style={viewAllStyle}>

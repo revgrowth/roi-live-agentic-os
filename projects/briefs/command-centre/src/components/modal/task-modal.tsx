@@ -1,22 +1,24 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useTaskStore } from "@/store/task-store";
 import type { LogEntry, OutputFile } from "@/types/task";
 import { ModalHeader } from "./modal-header";
 import { ModalChat } from "./modal-chat";
 import { ReplyInput } from "./reply-input";
 import { ModalFilePreview } from "./modal-file-preview";
-import { ModalSummaryTab } from "./modal-summary-tab";
 import { ModalNewTaskForm } from "./modal-new-task-form";
-import { TaskProgress } from "./task-progress";
 import { PanelOutputs } from "../panel/panel-outputs";
 
 // Stable reference to avoid infinite re-render loop in Zustand selector
 const EMPTY_LOG_ENTRIES: LogEntry[] = [];
 
-/** Which drilldown view is active, or null for the dashboard */
-type DrillView = "chat" | "outputs" | null;
+type ModalTab = "activity" | "files";
+
+const TAB_CONFIG: { key: ModalTab; label: string }[] = [
+  { key: "activity", label: "Activity" },
+  { key: "files", label: "Files" },
+];
 
 export function TaskModal() {
   const selectedTaskId = useTaskStore((s) => s.selectedTaskId);
@@ -26,8 +28,41 @@ export function TaskModal() {
 
   const [isVisible, setIsVisible] = useState(false);
   const [activeFile, setActiveFile] = useState<OutputFile | null>(null);
-  const [drillView, setDrillView] = useState<DrillView>(null);
+  const [activeTab, setActiveTab] = useState<ModalTab>("activity");
   const [newTaskAttachment, setNewTaskAttachment] = useState<{ fileName: string; relativePath: string } | null>(null);
+
+  // Resizable panel
+  const [panelWidth, setPanelWidth] = useState(580);
+  const isResizing = useRef(false);
+  const startX = useRef(0);
+  const startWidth = useRef(580);
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isResizing.current = true;
+    startX.current = e.clientX;
+    startWidth.current = panelWidth;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+
+    const handleMouseMove = (ev: MouseEvent) => {
+      if (!isResizing.current) return;
+      const delta = startX.current - ev.clientX;
+      const newWidth = Math.min(Math.max(startWidth.current + delta, 360), window.innerWidth - 40);
+      setPanelWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      isResizing.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  }, [panelWidth]);
 
   // Navigation stack for viewing subtasks within the modal
   const [navStack, setNavStack] = useState<string[]>([]);
@@ -47,14 +82,14 @@ export function TaskModal() {
   const navigateToChild = useCallback((childId: string) => {
     setNavStack((prev) => [...prev, childId]);
     setActiveFile(null);
-    setDrillView(null);
+    setActiveTab("activity");
   }, []);
 
   // Navigate back to parent
   const navigateBack = useCallback(() => {
     setNavStack((prev) => prev.slice(0, -1));
     setActiveFile(null);
-    setDrillView(null);
+    setActiveTab("activity");
   }, []);
 
   const hasNavHistory = navStack.length > 0;
@@ -64,14 +99,14 @@ export function TaskModal() {
     if (!selectedTaskId) {
       setIsVisible(false);
       setActiveFile(null);
-      setDrillView(null);
+      setActiveTab("activity");
       setNewTaskAttachment(null);
       setNavStack([]);
       return;
     }
 
     setActiveFile(null);
-    setDrillView(null);
+    setActiveTab("activity");
     setNewTaskAttachment(null);
     setNavStack([]);
 
@@ -121,8 +156,6 @@ export function TaskModal() {
           setActiveFile(null);
         } else if (newTaskAttachment) {
           setNewTaskAttachment(null);
-        } else if (drillView) {
-          setDrillView(null);
         } else if (hasNavHistory) {
           navigateBack();
         } else {
@@ -132,7 +165,7 @@ export function TaskModal() {
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [selectedTaskId, closePanel, activeFile, newTaskAttachment, drillView, hasNavHistory, navigateBack]);
+  }, [selectedTaskId, closePanel, activeFile, newTaskAttachment, hasNavHistory, navigateBack]);
 
   // Optimistic reply handler
   const appendLogEntry = useTaskStore((s) => s.appendLogEntry);
@@ -163,22 +196,16 @@ export function TaskModal() {
     closePanel();
   }, [closePanel]);
 
-  const handleBack = useCallback(() => {
-    setDrillView(null);
-  }, []);
-
   if (!selectedTaskId || !task) return null;
 
   const isRunning = task.status === "running";
-  // Show the input whenever the task has been executed at least once,
-  // or when it's waiting for user input (e.g. question asked during creation)
   const hasBeenExecuted = task.status === "running" || task.status === "review" || task.status === "done";
   const showReplyInput = hasBeenExecuted || task.needsInput === true;
 
-  // Determine what's showing
-  const showDashboard = !activeFile && !newTaskAttachment && !drillView;
-  const showChat = !activeFile && !newTaskAttachment && drillView === "chat";
-  const showOutputs = !activeFile && !newTaskAttachment && drillView === "outputs";
+  // Filter "Working directory:" from description
+  const displayDescription = task.description
+    ? task.description.replace(/^Working directory:\s*.+$/m, "").trim() || null
+    : null;
 
   return (
     <>
@@ -188,36 +215,71 @@ export function TaskModal() {
         style={{
           position: "fixed",
           inset: 0,
-          backgroundColor: "rgba(252, 249, 247, 0.8)",
-          backdropFilter: "blur(12px)",
+          backgroundColor: "rgba(0, 0, 0, 0.15)",
           zIndex: 100,
           opacity: isVisible ? 1 : 0,
-          transition: "opacity 200ms ease-out",
+          pointerEvents: isVisible ? "auto" : "none",
+          transition: "opacity 250ms ease-out",
         }}
       />
 
-      {/* Modal */}
+      {/* Side panel */}
       <div
         style={{
           position: "fixed",
-          inset: "24px",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: panelWidth,
+          maxWidth: "100vw",
           backgroundColor: "#FFFFFF",
-          borderRadius: "0.75rem",
+          borderRadius: "0.75rem 0 0 0.75rem",
           boxShadow: "0px 12px 32px rgba(147, 69, 42, 0.06)",
           zIndex: 101,
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "row",
           overflow: "hidden",
-          transform: isVisible ? "scale(1)" : "scale(0.98)",
-          opacity: isVisible ? 1 : 0,
-          transition: "transform 200ms ease-out, opacity 200ms ease-out",
+          transform: isVisible ? "translateX(0)" : "translateX(100%)",
+          transition: isResizing.current ? "none" : "transform 250ms ease-out",
         }}
       >
+        {/* Resize handle */}
+        <div
+          onMouseDown={handleResizeStart}
+          style={{
+            width: 6,
+            cursor: "col-resize",
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget.firstChild as HTMLElement).style.backgroundColor = "#93452A";
+            (e.currentTarget.firstChild as HTMLElement).style.opacity = "0.4";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget.firstChild as HTMLElement).style.backgroundColor = "#D1D5DB";
+            (e.currentTarget.firstChild as HTMLElement).style.opacity = "0";
+          }}
+        >
+          <div style={{
+            width: 3,
+            height: 40,
+            borderRadius: 2,
+            backgroundColor: "#D1D5DB",
+            opacity: 0,
+            transition: "opacity 150ms ease, background-color 150ms ease",
+          }} />
+        </div>
+
+        {/* Panel content */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
         {/* Header */}
         <ModalHeader task={task} onClose={closePanel} />
 
         {/* Back bar for nav stack (subtask → parent) */}
-        {hasNavHistory && !showChat && !showOutputs && (
+        {hasNavHistory && !activeFile && !newTaskAttachment && (
           <button
             onClick={navigateBack}
             style={{
@@ -239,40 +301,62 @@ export function TaskModal() {
             onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(147, 69, 42, 0.04)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
-            ← Back to parent task
+            &larr; Back to parent task
           </button>
         )}
 
-        {/* Back bar for drill-in views */}
-        {(showChat || showOutputs) && (
-          <button
-            onClick={handleBack}
+        {/* Description (if exists and not just working directory) */}
+        {displayDescription && !activeFile && !newTaskAttachment && (
+          <div
+            style={{
+              padding: "10px 24px",
+              borderBottom: "1px solid #EAE8E6",
+              fontSize: 13,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              color: "#5E5E65",
+              lineHeight: 1.5,
+            }}
+          >
+            {displayDescription}
+          </div>
+        )}
+
+        {/* Tab bar */}
+        {!activeFile && !newTaskAttachment && (
+          <div
             style={{
               display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "10px 24px",
-              border: "none",
+              gap: 0,
+              padding: "0 24px",
               borderBottom: "1px solid #EAE8E6",
-              background: "transparent",
-              color: "#93452A",
-              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              fontSize: 13,
-              fontWeight: 500,
-              cursor: "pointer",
               flexShrink: 0,
-              transition: "background 150ms ease",
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(147, 69, 42, 0.04)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
-            ← Back to Summary
-          </button>
-        )}
-
-        {/* Progress bar — visible on chat drill-in */}
-        {showChat && (
-          <TaskProgress logEntries={logEntries} status={task.status} startedAt={task.startedAt} />
+            {TAB_CONFIG.map((tab) => {
+              const isActive = activeTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  style={{
+                    padding: "10px 16px",
+                    fontSize: 12,
+                    fontWeight: isActive ? 600 : 500,
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    border: "none",
+                    borderBottom: isActive ? "2px solid #93452A" : "2px solid transparent",
+                    backgroundColor: "transparent",
+                    color: isActive ? "#93452A" : "#9C9CA0",
+                    cursor: "pointer",
+                    transition: "all 120ms ease",
+                    marginBottom: -1,
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
         )}
 
         {/* Content area */}
@@ -298,7 +382,7 @@ export function TaskModal() {
               onBack={() => setActiveFile(null)}
               onNewTask={handleNewTaskFromOutput}
             />
-          ) : showChat ? (
+          ) : activeTab === "activity" ? (
             <>
               <ModalChat
                 taskId={task.id}
@@ -317,30 +401,12 @@ export function TaskModal() {
                 onOptimisticReply={handleOptimisticReply}
               />
             </>
-          ) : showOutputs ? (
+          ) : activeTab === "files" ? (
             <div style={{ flex: 1, overflowY: "auto" }}>
               <PanelOutputs taskId={task.id} onFileClick={handleFileClick} />
             </div>
-          ) : (
-            /* Dashboard — the default view */
-            <>
-              <ModalSummaryTab
-                task={task}
-                logEntries={logEntries}
-                onDrillChat={() => setDrillView("chat")}
-                onDrillOutputs={() => setDrillView("outputs")}
-                onFileClick={handleFileClick}
-                onViewSubtask={navigateToChild}
-              />
-              <ReplyInput
-                taskId={task.id}
-                isVisible={showReplyInput}
-                needsInput={task.needsInput === true}
-                taskStatus={task.status}
-                onOptimisticReply={handleOptimisticReply}
-              />
-            </>
-          )}
+          ) : null}
+        </div>
         </div>
       </div>
     </>

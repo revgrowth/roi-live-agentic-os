@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { CheckCircle2, Circle, FileText, ChevronDown, ChevronRight } from "lucide-react";
+import { useState, useCallback } from "react";
+import { CheckCircle2, Circle, FileText, ChevronDown, ChevronRight, MessageSquare, FileEdit, Rocket, ShieldCheck, Check } from "lucide-react";
 import type { GsdPhase, GsdPlan } from "@/types/gsd";
+import { useTaskStore } from "@/store/task-store";
 
 interface PhaseDetailProps {
   phase: GsdPhase;
   onViewFile: (path: string) => void;
+  onPhaseUpdated?: () => void;
 }
 
 function PlanRow({ plan, phaseDir, onViewFile }: { plan: GsdPlan; phaseDir: string; onViewFile: (p: string) => void }) {
@@ -101,8 +103,59 @@ function PlanRow({ plan, phaseDir, onViewFile }: { plan: GsdPlan; phaseDir: stri
   );
 }
 
-export function PhaseDetail({ phase, onViewFile }: PhaseDetailProps) {
+const gsdActions: ReadonlyArray<{
+  key: string; label: string; icon: typeof MessageSquare; command: string;
+  color: string; bg: string; optional?: boolean;
+}> = [
+  { key: "discuss", label: "Discuss", icon: MessageSquare, command: "discuss-phase", color: "#5E5E65", bg: "#F6F3F1", optional: true },
+  { key: "plan", label: "Plan", icon: FileEdit, command: "plan-phase", color: "#93452A", bg: "rgba(147, 69, 42, 0.08)" },
+  { key: "execute", label: "Execute", icon: Rocket, command: "execute-phase", color: "#3B82F6", bg: "rgba(59, 130, 246, 0.08)" },
+  { key: "verify", label: "Verify", icon: ShieldCheck, command: "verify-work", color: "#6B8E6B", bg: "rgba(107, 142, 107, 0.08)" },
+];
+
+export function PhaseDetail({ phase, onViewFile, onPhaseUpdated }: PhaseDetailProps) {
   const [criteriaExpanded, setCriteriaExpanded] = useState(false);
+  const [launchingAction, setLaunchingAction] = useState<string | null>(null);
+  const [markingComplete, setMarkingComplete] = useState(false);
+  const createTask = useTaskStore((s) => s.createTask);
+  const updateTask = useTaskStore((s) => s.updateTask);
+
+  const handleMarkComplete = useCallback(async () => {
+    if (markingComplete) return;
+    setMarkingComplete(true);
+    try {
+      const res = await fetch("/api/gsd/phase-status", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phaseNumber: phase.number, status: "complete" }),
+      });
+      if (res.ok) {
+        onPhaseUpdated?.();
+      }
+    } finally {
+      setMarkingComplete(false);
+    }
+  }, [phase.number, markingComplete, onPhaseUpdated]);
+
+  const handleGsdAction = useCallback(async (action: (typeof gsdActions)[number]) => {
+    if (launchingAction) return;
+    setLaunchingAction(action.key);
+    try {
+      const phaseNum = phase.number;
+      const command = `/gsd:${action.command}`;
+      const title = `${action.label} Phase ${phaseNum}: ${phase.name}`;
+      const description = `${command} ${phaseNum}`;
+      await createTask(title, description, "task");
+      // Find the just-created task and queue it
+      const tasks = useTaskStore.getState().tasks;
+      const newTask = tasks.find((t) => t.title === title && t.status === "backlog");
+      if (newTask) {
+        await updateTask(newTask.id, { status: "queued" });
+      }
+    } finally {
+      setLaunchingAction(null);
+    }
+  }, [phase.number, phase.name, createTask, updateTask, launchingAction]);
 
   const statusLabel = phase.status === "complete" ? "Complete" : phase.status === "in-progress" ? "In Progress" : "Not Started";
   const statusColor = phase.status === "complete" ? "#6B8E6B" : phase.status === "in-progress" ? "#93452A" : "#9C9CA0";
@@ -170,9 +223,9 @@ export function PhaseDetail({ phase, onViewFile }: PhaseDetailProps) {
           </h3>
         </div>
 
-        {/* Phase file links */}
-        {phase.phaseDir && (
-          <div style={{ display: "flex", gap: 6 }}>
+        {/* Phase file links + mark complete */}
+        <div style={{ display: "flex", gap: 6 }}>
+          {phase.phaseDir && (
             <button
               onClick={() => onViewFile(`${phase.phaseDir}/${String(phase.number).padStart(2, "0")}-CONTEXT.md`)}
               style={{
@@ -194,9 +247,74 @@ export function PhaseDetail({ phase, onViewFile }: PhaseDetailProps) {
             >
               <FileText size={12} /> Context
             </button>
-          </div>
-        )}
+          )}
+          {phase.status !== "complete" && (
+            <button
+              onClick={handleMarkComplete}
+              disabled={markingComplete}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                padding: "6px 10px",
+                border: "none",
+                borderRadius: 6,
+                backgroundColor: "rgba(107, 142, 107, 0.1)",
+                color: "#6B8E6B",
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontSize: 11,
+                cursor: markingComplete ? "not-allowed" : "pointer",
+                opacity: markingComplete ? 0.6 : 1,
+                transition: "all 150ms ease",
+              }}
+              onMouseEnter={(e) => { if (!markingComplete) { e.currentTarget.style.backgroundColor = "rgba(107, 142, 107, 0.2)"; } }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(107, 142, 107, 0.1)"; }}
+            >
+              <Check size={12} />
+              {markingComplete ? "Saving..." : "Mark Complete"}
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* GSD Actions */}
+      {phase.status !== "complete" && (
+        <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+          {gsdActions.map((action) => {
+            const Icon = action.icon;
+            const isLaunching = launchingAction === action.key;
+            return (
+              <button
+                key={action.key}
+                onClick={() => handleGsdAction(action)}
+                disabled={isLaunching || launchingAction !== null}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "7px 14px",
+                  fontSize: 12,
+                  fontWeight: 500,
+                  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                  border: `1px solid ${action.color}25`,
+                  borderRadius: 6,
+                  backgroundColor: action.bg,
+                  color: action.color,
+                  cursor: isLaunching || launchingAction !== null ? "not-allowed" : "pointer",
+                  opacity: launchingAction !== null && !isLaunching ? 0.4 : 1,
+                  transition: "all 150ms ease",
+                }}
+              >
+                <Icon size={13} />
+                {isLaunching ? "Queued..." : action.label}
+                {action.optional && (
+                  <span style={{ fontSize: 10, opacity: 0.6, fontWeight: 400 }}>(optional)</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Goal */}
       <div style={{ marginBottom: 20 }}>

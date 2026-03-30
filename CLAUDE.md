@@ -286,6 +286,7 @@ Every skill and its output folder uses a category prefix. This keeps skills, out
 | Skill | Triggers on |
 |-------|------------|
 | `viz-stitch-design` | "design a UI", "create a screen", "stitch design", "UI mockup", "app design", "landing page design", "mobile screen", "web layout", "wireframe to UI", "design this page" |
+| `viz-interface-design` | "dashboard", "admin panel", "SaaS UI", "data interface", "metrics display", "control panel", "monitoring UI", "analytics view", "settings page", "interactive tool interface" |
 
 ### Utility Skills
 
@@ -312,6 +313,7 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 | `str-ai-seo` | tone only | summary | full | — | — | `## str-ai-seo` |
 | `tool-stitch` | — | — | — | — | — | `## tool-stitch` |
 | `viz-stitch-design` | tone only | summary | language section | — | — | `## viz-stitch-design` |
+| `viz-interface-design` | tone only | summary | language section | — | — | `## viz-interface-design` |
 
 *Optional skills auto-add their row here via Heartbeat reconciliation when installed. New skills declare their own row when added.*
 
@@ -344,7 +346,7 @@ Work scopes into three levels. The level determines where output goes and how mu
 
 **Level 1 (single tasks):** Just ask Claude. Output goes to category folders — `projects/{category}-{type}/{name}_{date}.md`. Use Shift+Tab twice for plan mode if upfront thinking helps, but output still goes to category folders.
 
-**Level 2 (planned projects):** The project gets its own folder under `projects/briefs/` with a `brief.md`. Run an interactive scoping conversation to define the project: goal, deliverables, acceptance criteria, timeline, constraints. Save as `brief.md` inside the project folder. ALL outputs for that project go inside the project folder, not in category folders. Projects are listed most-recent-first (by `created` date in frontmatter) when reporting to the user.
+**Level 2 (planned projects):** The project gets its own folder under `projects/briefs/` with a `brief.md`. Run an interactive scoping conversation to define the project: goal, deliverables, acceptance criteria, constraints. Save as `brief.md` inside the project folder. ALL outputs for that project go inside the project folder, not in category folders. Projects are listed most-recent-first (by `created` date in frontmatter) when reporting to the user.
 
 ```
 projects/briefs/kanban-dashboard/
@@ -354,7 +356,7 @@ projects/briefs/kanban-dashboard/
 └── competitor-scan_2026-03-22.md
 ```
 
-When creating a Level 2 brief, cover: project goal (one sentence), deliverables (checklist), acceptance criteria (how you'll know it's done), timeline/constraints, and any dependencies. Keep it to one page — this is a working document, not a formal PRD.
+When creating a Level 2 brief, cover: project goal (one sentence), deliverables (checklist), acceptance criteria (how you'll know it's done), constraints, and any dependencies. Keep it to one page — this is a working document, not a formal PRD.
 
 **Level 3 (GSD projects):** Same as Level 2 (project folder under `projects/briefs/` with `brief.md` + outputs), but GSD's `.planning/` directory lives at the project root (hardcoded across 50+ references). The brief links to `.planning/`. **All source code, configs, dependencies, and build artifacts go inside the project folder** — never at the agentic-os root.
 

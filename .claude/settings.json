@@ -101,6 +101,14 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-sync-tool.js\""
+          }
+        ]
       }
     ],
     "PreToolUse": [

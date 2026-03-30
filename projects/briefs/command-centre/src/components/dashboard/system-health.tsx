@@ -21,9 +21,9 @@ export function SystemHealth({ system }: SystemHealthProps) {
           <Clock size={14} color="#5E5E65" style={{ flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={statValueStyle}>
-              {system.cronTotal > 0
-                ? `${system.cronActive}/${system.cronTotal} cron jobs active`
-                : "No cron jobs configured"}
+              {system.cronActive > 0
+                ? `${system.cronActive} scheduled task${system.cronActive !== 1 ? "s" : ""} active`
+                : "No scheduled tasks configured"}
             </div>
             {system.cronLastRun && (
               <div style={statDetailStyle}>
@@ -50,13 +50,8 @@ export function SystemHealth({ system }: SystemHealthProps) {
           <Palette size={14} color="#5E5E65" style={{ flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={statValueStyle}>
-              {system.brandContextFiles}/5 brand context files
+              {system.brandContextFiles} brand context file{system.brandContextFiles !== 1 ? "s" : ""}
             </div>
-            {system.brandContextFiles < 5 && (
-              <div style={statDetailStyle}>
-                {5 - system.brandContextFiles} remaining to build
-              </div>
-            )}
           </div>
           <ArrowRight size={12} color="#9C9CA0" style={{ flexShrink: 0 }} />
         </Link>

@@ -9,7 +9,9 @@ export type TaskEventType =
   | "task:progress"
   | "task:output"
   | "task:question"
-  | "task:log";
+  | "task:log"
+  | "chat:message"
+  | "chat:decision";
 
 export interface TaskEvent {
   type: TaskEventType;
@@ -45,4 +47,30 @@ export function onTaskEvent(callback: TaskEventCallback): void {
 
 export function offTaskEvent(callback: TaskEventCallback): void {
   emitter.off("task-event", callback);
+}
+
+// --------------- Chat events ---------------
+
+export interface ChatEvent {
+  type: "chat:message" | "chat:decision" | "chat:typing";
+  conversationId: string;
+  message?: import("@/types/chat").Message;
+  decision?: import("@/types/chat").AgentDecision;
+  timestamp: string;
+}
+
+type ChatEventCallback = (event: ChatEvent) => void;
+
+export function emitChatEvent(event: ChatEvent): void {
+  const count = emitter.listenerCount("chat-event");
+  console.log(`[event-bus] Emitting ${event.type} for conversation ${event.conversationId.slice(0, 8)} (${count} listeners)`);
+  emitter.emit("chat-event", event);
+}
+
+export function onChatEvent(callback: ChatEventCallback): void {
+  emitter.on("chat-event", callback);
+}
+
+export function offChatEvent(callback: ChatEventCallback): void {
+  emitter.off("chat-event", callback);
 }

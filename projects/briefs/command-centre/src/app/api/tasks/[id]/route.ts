@@ -113,6 +113,7 @@ export async function PATCH(
       "completedAt",
       "phaseNumber",
       "gsdStep",
+      "permissionMode",
     ];
 
     for (const field of allowedFields) {

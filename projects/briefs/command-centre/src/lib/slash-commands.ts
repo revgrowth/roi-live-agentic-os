@@ -30,6 +30,13 @@ export const SLASH_COMMANDS: SlashCommand[] = [
   { command: "/gsd:review-backlog", label: "Review Backlog", description: "Review and promote backlog items", category: "gsd" },
   { command: "/gsd:debug", label: "Debug", description: "Systematic debugging with persistent state", category: "gsd" },
   { command: "/gsd:ship", label: "Ship", description: "Create PR, run review, prepare for merge", category: "gsd" },
+  { command: "/archive-gsd", label: "Archive GSD", description: "Archive completed GSD project and clear .planning/", category: "gsd" },
+  { command: "/gsd:complete-milestone", label: "Complete Milestone", description: "Archive completed milestone and prepare for next", category: "gsd" },
+  { command: "/gsd:pause-work", label: "Pause Work", description: "Create context handoff when pausing mid-phase", category: "gsd" },
+  { command: "/gsd:resume-work", label: "Resume Work", description: "Resume work from previous session", category: "gsd" },
+  { command: "/gsd:health", label: "Health Check", description: "Diagnose planning directory and repair issues", category: "gsd" },
+  { command: "/gsd:session-report", label: "Session Report", description: "Token usage, work summary, and outcomes", category: "gsd" },
+  { command: "/gsd:map-codebase", label: "Map Codebase", description: "Analyze codebase with parallel mapper agents", category: "gsd" },
   { command: "/gsd:help", label: "Help", description: "Show available GSD commands", category: "gsd" },
 
   // Skills
@@ -44,7 +51,7 @@ export const SLASH_COMMANDS: SlashCommand[] = [
   { command: "/viz-stitch-design", label: "Stitch Design", description: "Design UI screens using Stitch", category: "skill" },
   { command: "/viz-nano-banana", label: "Image Gen", description: "Generate images via Gemini", category: "skill" },
   { command: "/viz-excalidraw-diagram", label: "Diagram", description: "Generate Excalidraw diagrams", category: "skill" },
-  { command: "/ops-cron", label: "Cron", description: "Schedule recurring tasks", category: "skill" },
+  { command: "/ops-cron", label: "Schedule", description: "Schedule recurring tasks", category: "skill" },
 
   // System
   { command: "/meta-skill-creator", label: "Skill Creator", description: "Build or modify skills", category: "system" },
