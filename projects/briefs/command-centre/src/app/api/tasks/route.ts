@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate input
-    const { title, description, level, projectSlug: bodyProjectSlug, clientId: bodyClientId, parentId: bodyParentId, phaseNumber: bodyPhaseNumber, gsdStep: bodyGsdStep, cronJobSlug: bodyCronJobSlug, permissionMode: bodyPermissionMode } = body as TaskCreateInput & { cronJobSlug?: string };
+    const { title, description, level, projectSlug: bodyProjectSlug, clientId: bodyClientId, parentId: bodyParentId, phaseNumber: bodyPhaseNumber, gsdStep: bodyGsdStep, cronJobSlug: bodyCronJobSlug, permissionMode: bodyPermissionMode, status: bodyStatus } = body as TaskCreateInput & { cronJobSlug?: string; status?: string };
     if (!title || typeof title !== "string" || title.trim().length === 0) {
       return NextResponse.json(
         { error: "title is required and must be a non-empty string" },
@@ -72,11 +72,19 @@ export async function POST(request: NextRequest) {
       .get() as { minOrder: number };
 
     const now = new Date().toISOString();
+    // Child tasks (with parentId) start as backlog — the auto-progression
+    // system queues them when their turn comes. Top-level tasks start as queued
+    // so the queue watcher picks them up immediately.
+    // Allow explicit status override (e.g., "review" for scoping flow).
+    const validStatuses = ["backlog", "queued", "review"];
+    const initialStatus = bodyStatus && validStatuses.includes(bodyStatus)
+      ? bodyStatus
+      : bodyParentId ? "backlog" : "queued";
     const task: Task = {
       id: crypto.randomUUID(),
       title: title.trim(),
       description: description?.trim() || null,
-      status: "queued",
+      status: initialStatus,
       level,
       parentId: bodyParentId || null,
       projectSlug: bodyProjectSlug || null,

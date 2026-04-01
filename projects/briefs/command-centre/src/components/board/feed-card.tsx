@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Trash2, CheckCircle2 } from "lucide-react";
+import { GripVertical, Trash2, CheckCircle2, Square } from "lucide-react";
 import type { Task } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 
@@ -121,10 +121,30 @@ export function FeedCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
   const openPanel = useTaskStore((s) => s.openPanel);
   const updateTask = useTaskStore((s) => s.updateTask);
   const deleteTask = useTaskStore((s) => s.deleteTask);
+  const cancelTask = useTaskStore((s) => s.cancelTask);
+  const fetchOutputFiles = useTaskStore((s) => s.fetchOutputFiles);
+  const allOutputFiles = useTaskStore((s) => s.outputFiles);
+  const outputFiles = allOutputFiles[task.id] ?? [];
   const [isHovered, setIsHovered] = useState(false);
   const [, setTick] = useState(0);
   const variant = getVariant(task);
   const config = statusConfig[variant];
+
+  // Fetch outputs for running/review tasks too (not just done)
+  useEffect(() => {
+    if (variant === "running" || variant === "review" || variant === "needsInput") {
+      fetchOutputFiles(task.id);
+    }
+  }, [task.id, variant, fetchOutputFiles]);
+
+  // Parse context sources
+  const contextTags: string[] = [];
+  if (task.contextSources) {
+    try {
+      const sources = JSON.parse(task.contextSources) as { label: string }[];
+      for (const s of sources) contextTags.push(s.label);
+    } catch { /* ignore */ }
+  }
 
   const {
     attributes,
@@ -178,10 +198,10 @@ export function FeedCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
         borderRadius: 8,
         padding: "10px 12px",
         border: isQueued
-          ? "1px solid rgba(218, 193, 185, 0.12)"
+          ? "1px solid rgba(218, 193, 185, 0.08)"
           : variant === "error"
-            ? "1px solid rgba(192, 64, 48, 0.15)"
-            : "1px solid rgba(218, 193, 185, 0.2)",
+            ? "1px solid rgba(192, 64, 48, 0.1)"
+            : "1px solid rgba(218, 193, 185, 0.12)",
         cursor: isDragging ? "grabbing" : "pointer",
         transition: transition || "all 120ms ease",
         marginBottom: 8,
@@ -200,7 +220,7 @@ export function FeedCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
           gap: 8,
         }}
       >
-        {/* Drag handle + delete */}
+        {/* Drag handle + done + kill */}
         <div
           style={{
             display: "flex",
@@ -249,7 +269,11 @@ export function FeedCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
           <button
             onClick={(e) => {
               e.stopPropagation();
-              deleteTask(task.id);
+              if (task.status === "running") {
+                cancelTask(task.id);
+              } else {
+                deleteTask(task.id);
+              }
             }}
             style={{
               display: "flex",
@@ -263,9 +287,9 @@ export function FeedCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
               transition: "color 120ms ease",
               borderRadius: 3,
             }}
-            title="Delete task"
+            title={task.status === "running" ? "Kill session" : "Delete task"}
           >
-            <Trash2 size={10} />
+            {task.status === "running" ? <Square size={10} /> : <Trash2 size={10} />}
           </button>
         </div>
 
@@ -284,6 +308,25 @@ export function FeedCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
             }}
           >
             {task.title}
+            {task.projectSlug && (
+              <span style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+                fontSize: 9,
+                fontWeight: 600,
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                color: task.level === "gsd" ? "#93452A" : "#5E5E65",
+                backgroundColor: task.level === "gsd" ? "rgba(147, 69, 42, 0.08)" : "rgba(218, 193, 185, 0.15)",
+                padding: "1px 5px",
+                borderRadius: 3,
+                textTransform: "uppercase" as const,
+                letterSpacing: "0.04em",
+                marginLeft: 4,
+              }}>
+                {task.projectSlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
+              </span>
+            )}
           </div>
           {narrativeText && (
             <div
@@ -375,6 +418,49 @@ export function FeedCard({ task, isOverlay }: { task: Task; isOverlay?: boolean 
           </span>
         </div>
       </div>
+
+      {/* Output file chips */}
+      {outputFiles.length > 0 && (
+        <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
+          {outputFiles.slice(0, 3).map((f) => (
+            <span key={f.id} style={{
+              fontSize: 10,
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+              color: "#93452A",
+              backgroundColor: "rgba(147, 69, 42, 0.06)",
+              padding: "1px 6px",
+              borderRadius: 3,
+              whiteSpace: "nowrap",
+            }}>
+              {f.fileName}
+            </span>
+          ))}
+          {outputFiles.length > 3 && (
+            <span style={{ fontSize: 10, fontFamily: "var(--font-space-grotesk)", color: "#9C9CA0" }}>
+              +{outputFiles.length - 3}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Context source tags */}
+      {contextTags.length > 0 && variant === "running" && (
+        <div style={{ display: "flex", gap: 3, flexWrap: "wrap", marginTop: 4 }}>
+          {contextTags.slice(0, 4).map((tag) => (
+            <span key={tag} style={{
+              fontSize: 9,
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+              color: "#9C9CA0",
+              backgroundColor: "rgba(218, 193, 185, 0.12)",
+              padding: "0 4px",
+              borderRadius: 2,
+              whiteSpace: "nowrap",
+            }}>
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

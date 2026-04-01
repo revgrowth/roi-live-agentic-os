@@ -205,18 +205,44 @@ function detectQuestion(text: string): string | null {
   const lines = trimmed.split("\n").filter((l) => l.trim());
   const lastLine = lines[lines.length - 1]?.trim() || "";
 
+  // Check last line for literal question mark
   if (lastLine.endsWith("?")) return lastLine;
 
-  // Check for common Claude question patterns
+  // Check last few lines for question patterns (Claude sometimes puts the
+  // question a line or two before the final line)
+  const lastFewLines = lines.slice(-4).map((l) => l.trim());
+  for (const line of lastFewLines) {
+    if (line.endsWith("?") && line.length > 10) return line;
+  }
+
+  // Check for common Claude question/action-request patterns in last few lines
   const questionPatterns = [
     /would you like me to/i,
     /shall I/i,
     /do you want me to/i,
     /please (confirm|choose|select|specify|provide)/i,
     /which (one|option|approach)/i,
+    /let me know (if|when|what|which|how)/i,
+    /needs? your (approval|input|confirmation|permission|review)/i,
+    /you should be seeing a prompt/i,
+    /waiting for (your|you to)/i,
+    /paste (it |.{0,20} )here/i,
+    /if you'd (rather|like to|prefer)/i,
+    /alternatively,? (you can|if you)/i,
+    /approve (it|the|this)/i,
+    /ready when you are/i,
+    /once you (approve|confirm|provide|add|set)/i,
   ];
+
+  const searchText = lastFewLines.join(" ");
   for (const pattern of questionPatterns) {
-    if (pattern.test(lastLine)) return lastLine;
+    if (pattern.test(searchText)) {
+      // Return the most relevant line
+      for (const line of lastFewLines.reverse()) {
+        if (pattern.test(line)) return line;
+      }
+      return lastFewLines[lastFewLines.length - 1] || lastLine;
+    }
   }
   return null;
 }

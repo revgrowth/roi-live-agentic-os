@@ -18,15 +18,17 @@ interface TaskStore {
 
   // Actions
   fetchTasks: () => Promise<void>;
-  createTask: (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null, permissionMode?: string) => Promise<void>;
+  createTask: (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null, permissionMode?: string, initialStatus?: string) => Promise<void>;
   updateTask: (id: string, updates: TaskUpdateInput) => Promise<void>;
   moveTask: (id: string, newStatus: string, newOrder: number) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
+  cancelTask: (id: string) => Promise<void>;
   applySSEEvent: (event: TaskEvent) => void;
   fetchOutputFiles: (taskId: string) => Promise<void>;
   fetchLogEntries: (taskId: string) => Promise<void>;
   appendLogEntry: (taskId: string, entry: LogEntry) => void;
   syncPhases: (parentTaskId: string) => Promise<void>;
+  syncProjects: () => Promise<void>;
   openPanel: (taskId: string) => void;
   closePanel: () => void;
 
@@ -62,7 +64,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }
   },
 
-  createTask: async (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null, permissionMode?: string) => {
+  createTask: async (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null, permissionMode?: string, initialStatus?: string) => {
     const tempId = "temp-" + crypto.randomUUID();
     const now = new Date().toISOString();
     const currentClientId = useClientStore.getState().selectedClientId;
@@ -70,7 +72,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       id: tempId,
       title,
       description: description || null,
-      status: "queued",
+      status: (initialStatus as Task["status"]) || "queued",
       level,
       parentId: parentId || null,
       projectSlug: projectSlug || null,
@@ -107,7 +109,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, level, projectSlug, clientId, parentId, permissionMode: permissionMode || "default" }),
+        body: JSON.stringify({ title, description, level, projectSlug, clientId, parentId, permissionMode: permissionMode || "default", status: initialStatus }),
       });
       if (!res.ok) throw new Error("Failed to create task");
       const realTask = await res.json();
@@ -261,6 +263,20 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }
   },
 
+  cancelTask: async (id: string) => {
+    try {
+      const res = await fetch(`/api/tasks/${id}/cancel`, { method: "POST" });
+      if (res.ok) {
+        const updated = await res.json();
+        set((state) => ({
+          tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updated } : t)),
+        }));
+      }
+    } catch (err) {
+      set({ error: err instanceof Error ? err.message : "Failed to cancel task" });
+    }
+  },
+
   applySSEEvent: (event: TaskEvent) => {
     switch (event.type) {
       case "task:created":
@@ -384,6 +400,23 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       set({
         error: err instanceof Error ? err.message : "Unknown error",
       });
+    }
+  },
+
+  syncProjects: async () => {
+    try {
+      const clientId = useClientStore.getState().selectedClientId;
+      const url = clientId
+        ? `/api/tasks/sync-projects?clientId=${encodeURIComponent(clientId)}`
+        : "/api/tasks/sync-projects";
+      const res = await fetch(url, { method: "POST" });
+      if (!res.ok) return;
+      const { synced } = await res.json();
+      if (synced > 0) {
+        await get().fetchTasks();
+      }
+    } catch {
+      // Non-critical — silently fail
     }
   },
 

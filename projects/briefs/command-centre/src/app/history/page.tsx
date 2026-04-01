@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import { AppShell } from "@/components/layout/app-shell";
+import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
   Timer, CheckCircle2, AlertCircle, Clock, ChevronLeft, ChevronRight,
   ChevronDown, MessageSquare, Wrench, FileText, ExternalLink, Eye,
-  ArrowUpDown, ArrowUp, ArrowDown, Filter, X, GripVertical,
+  ArrowUpDown, ArrowUp, ArrowDown, Filter, X, GripVertical, ArrowLeft, Layers,
+  Activity, Cpu, Settings,
 } from "lucide-react";
 import type { Task, TaskLevel, LogEntry, OutputFile } from "@/types/task";
 import { LEVEL_LABELS } from "@/types/task";
@@ -86,6 +87,7 @@ type SortDir = "asc" | "desc";
 type DateRange = "" | "today" | "week" | "month" | "90days";
 type TypeFilter = "" | "task" | "project" | "gsd";
 type StatusFilter = "" | "done" | "review" | "failed";
+type GroupMode = "flat" | "project" | "day";
 
 const DATE_RANGE_LABELS: Record<DateRange, string> = {
   "": "All time",
@@ -108,6 +110,40 @@ const STATUS_LABELS: Record<StatusFilter, string> = {
   review: "Review",
   failed: "Failed",
 };
+
+const GROUP_LABELS: Record<GroupMode, string> = {
+  flat: "No grouping",
+  project: "By project",
+  day: "By day",
+};
+
+function groupTasks(tasks: Task[], mode: GroupMode): { key: string; label: string; tasks: Task[] }[] {
+  if (mode === "flat") return [{ key: "__all__", label: "", tasks }];
+
+  const groups = new Map<string, Task[]>();
+
+  for (const task of tasks) {
+    let key: string;
+    if (mode === "project") {
+      key = task.projectSlug || "__ungrouped__";
+    } else {
+      // day
+      const dateStr = task.completedAt || task.updatedAt;
+      const d = new Date(dateStr);
+      key = isNaN(d.getTime()) ? "__unknown__" : d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+    }
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(task);
+  }
+
+  return Array.from(groups.entries()).map(([key, tasks]) => ({
+    key,
+    label: mode === "project"
+      ? (key === "__ungrouped__" ? "Ungrouped tasks" : key)
+      : key === "__unknown__" ? "Unknown date" : key,
+    tasks,
+  }));
+}
 
 // ─── Formatters ──────────────────────────────────────────────────────────────
 
@@ -553,6 +589,7 @@ function StatPill({ label, value }: { label: string; value: string }) {
 // ─── Main page ───────────────────────────────────────────────────────────────
 
 export default function HistoryPage() {
+  const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
@@ -563,9 +600,12 @@ export default function HistoryPage() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("");
   const [dateRange, setDateRange] = useState<DateRange>("");
+  const [projectFilter, setProjectFilter] = useState<string>("");
+  const [groupMode, setGroupMode] = useState<GroupMode>("flat");
+  const [projectSlugs, setProjectSlugs] = useState<string[]>([]);
 
   // Sort
-  const [sortBy, setSortBy] = useState<SortField>("completedAt");
+  const [sortBy, setSortBy] = useState<SortField>("startedAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   // Column prefs (order + widths)
@@ -669,7 +709,21 @@ export default function HistoryPage() {
     fetchStoreTasks();
   }, [fetchStoreTasks]);
 
-  const hasActiveFilters = typeFilter !== "" || statusFilter !== "" || dateRange !== "";
+  // Fetch distinct project slugs for the project filter
+  useEffect(() => {
+    fetch("/api/tasks/history?limit=500&offset=0&sortBy=startedAt&sortDir=desc")
+      .then((r) => r.ok ? r.json() : { tasks: [] })
+      .then((data) => {
+        const slugs = new Set<string>();
+        for (const t of (data.tasks || []) as Task[]) {
+          if (t.projectSlug) slugs.add(t.projectSlug);
+        }
+        setProjectSlugs(Array.from(slugs).sort());
+      })
+      .catch(() => {});
+  }, []);
+
+  const hasActiveFilters = typeFilter !== "" || statusFilter !== "" || dateRange !== "" || projectFilter !== "";
 
   const fetchHistory = useCallback(async (pageNum: number) => {
     setIsLoading(true);
@@ -683,6 +737,7 @@ export default function HistoryPage() {
       if (typeFilter) params.set("type", typeFilter);
       if (statusFilter) params.set("status", statusFilter);
       if (dateRange) params.set("dateRange", dateRange);
+      if (projectFilter) params.set("projectSlug", projectFilter);
 
       const res = await fetch(`/api/tasks/history?${params}`);
       if (!res.ok) throw new Error("Failed to fetch history");
@@ -694,11 +749,11 @@ export default function HistoryPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [sortBy, sortDir, typeFilter, statusFilter, dateRange]);
+  }, [sortBy, sortDir, typeFilter, statusFilter, dateRange, projectFilter]);
 
   useEffect(() => {
     setPage(0);
-  }, [typeFilter, statusFilter, dateRange, sortBy, sortDir]);
+  }, [typeFilter, statusFilter, dateRange, projectFilter, sortBy, sortDir]);
 
   useEffect(() => {
     fetchHistory(page);
@@ -717,6 +772,7 @@ export default function HistoryPage() {
     setTypeFilter("");
     setStatusFilter("");
     setDateRange("");
+    setProjectFilter("");
   };
 
   const resetColumns = () => {
@@ -728,15 +784,89 @@ export default function HistoryPage() {
   const isCustomised = JSON.stringify(columnOrder) !== JSON.stringify(DEFAULT_ORDER)
     || JSON.stringify(columnWidths) !== JSON.stringify(DEFAULT_WIDTHS);
 
+  const taskGroups = useMemo(() => groupTasks(tasks, groupMode), [tasks, groupMode]);
+
+  const tabs: { key: string; label: string; icon: typeof Activity; href: string }[] = [
+    { key: "feed", label: "Feed", icon: Activity, href: "/" },
+    { key: "scheduled", label: "Scheduled", icon: Clock, href: "/" },
+    { key: "skills", label: "Skills", icon: Cpu, href: "/" },
+    { key: "docs", label: "Docs", icon: FileText, href: "/" },
+    { key: "settings", label: "Settings", icon: Settings, href: "/" },
+    { key: "history", label: "History", icon: Layers, href: "/history" },
+  ];
+
   return (
-    <AppShell title="History">
-      <div style={{ padding: "32px 40px", width: "100%", boxSizing: "border-box" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "#FCF9F7" }}>
+      {/* Top bar — same as main page */}
+      <header style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "0 24px",
+        height: 52,
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        backgroundColor: "rgba(252, 249, 247, 0.92)",
+        backdropFilter: "blur(12px)",
+        borderBottom: "1px solid rgba(218, 193, 185, 0.1)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <h1 style={{
+            fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+            fontWeight: 700,
+            fontSize: 18,
+            color: "#93452A",
+            letterSpacing: "-0.02em",
+            margin: 0,
+            whiteSpace: "nowrap",
+          }}>
+            Agentic OS
+          </h1>
+          <div style={{ width: 1, height: 20, backgroundColor: "rgba(218, 193, 185, 0.3)" }} />
+          <nav style={{ display: "flex", alignItems: "center", gap: 0 }}>
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = tab.key === "history";
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => router.push(tab.href)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
+                    padding: "6px 12px",
+                    fontSize: 12,
+                    fontWeight: isActive ? 600 : 500,
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    border: "none",
+                    borderRadius: 6,
+                    backgroundColor: isActive ? "rgba(147, 69, 42, 0.08)" : "transparent",
+                    color: isActive ? "#93452A" : "#5E5E65",
+                    cursor: "pointer",
+                    transition: "all 120ms ease",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <Icon size={13} />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+        <div />
+      </header>
+
+      <main style={{ padding: "16px 24px 24px" }}>
+      <div style={{ width: "100%", boxSizing: "border-box" }}>
         {/* Header */}
         <div style={{ marginBottom: 24 }}>
           <h1
             style={{
               fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
-              fontSize: 28, fontWeight: 700, color: "#1B1C1B",
+              fontSize: 24, fontWeight: 700, color: "#1B1C1B",
               letterSpacing: "-0.02em", margin: 0,
             }}
           >
@@ -745,7 +875,7 @@ export default function HistoryPage() {
           <p
             style={{
               fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              fontSize: 14, color: "#5E5E65", marginTop: 8,
+              fontSize: 13, color: "#9C9CA0", marginTop: 6,
             }}
           >
             {total} task{total !== 1 ? "s" : ""}{hasActiveFilters ? " (filtered)" : ""}
@@ -766,6 +896,19 @@ export default function HistoryPage() {
           <FilterSelect value={dateRange} onChange={setDateRange} options={DATE_RANGE_LABELS} />
           <FilterSelect value={typeFilter} onChange={setTypeFilter} options={TYPE_LABELS} />
           <FilterSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_LABELS} />
+          {projectSlugs.length > 0 && (
+            <FilterSelect
+              value={projectFilter}
+              onChange={setProjectFilter}
+              options={Object.fromEntries([
+                ["", "All projects"],
+                ["__none__", "Ungrouped"],
+                ...projectSlugs.map((s) => [s, s]),
+              ]) as Record<string, string>}
+            />
+          )}
+          <span style={{ width: 1, height: 20, backgroundColor: "rgba(218, 193, 185, 0.3)", flexShrink: 0 }} />
+          <FilterSelect value={groupMode} onChange={setGroupMode as (v: string) => void} options={GROUP_LABELS} />
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
@@ -906,13 +1049,47 @@ export default function HistoryPage() {
                   </td>
                 </tr>
               ) : (
-                tasks.map((task) => (
-                  <HistoryRow
-                    key={task.id}
-                    task={task}
-                    columnOrder={columnOrder}
-                    columnWidths={columnWidths}
-                  />
+                taskGroups.map((group) => (
+                  <React.Fragment key={group.key}>
+                    {groupMode !== "flat" && (
+                      <tr>
+                        <td
+                          colSpan={columnOrder.length}
+                          style={{
+                            padding: "12px 16px 6px",
+                            backgroundColor: "#FAFAF9",
+                            borderBottom: "1px solid rgba(218, 193, 185, 0.2)",
+                          }}
+                        >
+                          <div style={{
+                            display: "flex", alignItems: "center", gap: 8,
+                          }}>
+                            <Layers size={12} color="#93452A" />
+                            <span style={{
+                              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                              fontSize: 13, fontWeight: 700, color: "#1B1C1B",
+                            }}>
+                              {group.label}
+                            </span>
+                            <span style={{
+                              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                              fontSize: 11, color: "#9C9CA0",
+                            }}>
+                              {group.tasks.length} task{group.tasks.length !== 1 ? "s" : ""}
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    {group.tasks.map((task) => (
+                      <HistoryRow
+                        key={task.id}
+                        task={task}
+                        columnOrder={columnOrder}
+                        columnWidths={columnWidths}
+                      />
+                    ))}
+                  </React.Fragment>
                 ))
               )}
             </tbody>
@@ -947,7 +1124,8 @@ export default function HistoryPage() {
           </div>
         )}
       </div>
-    </AppShell>
+      </main>
+    </div>
   );
 }
 

@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     const clientId = searchParams.get("clientId");
     const type = searchParams.get("type"); // task level: task, project, gsd
     const status = searchParams.get("status"); // done, review, failed
+    const projectSlug = searchParams.get("projectSlug"); // filter by project
     const dateRange = searchParams.get("dateRange"); // today, week, month, 90days
     const sortBy = searchParams.get("sortBy") || "completedAt"; // completedAt, startedAt, durationMs, tokensUsed, costUsd, level
     const sortDir = searchParams.get("sortDir") || "desc"; // asc, desc
@@ -24,6 +25,14 @@ export async function GET(request: NextRequest) {
     if (clientId && clientId !== "root") {
       conditions.push("clientId = ?");
       params.push(clientId);
+    }
+
+    // Project filter
+    if (projectSlug === "__none__") {
+      conditions.push("(projectSlug IS NULL OR projectSlug = '')");
+    } else if (projectSlug) {
+      conditions.push("projectSlug = ?");
+      params.push(projectSlug);
     }
 
     // Type filter (task level)

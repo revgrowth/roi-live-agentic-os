@@ -20,17 +20,17 @@ export type PermissionMode = "plan" | "default" | "acceptEdits" | "auto" | "bypa
 export const PERMISSION_MODE_LABELS: Record<PermissionMode, string> = {
   plan: "Plan",
   default: "Default",
-  acceptEdits: "Accept edits",
+  acceptEdits: "Auto-edit",
   auto: "Auto",
-  bypassPermissions: "YOLO",
+  bypassPermissions: "Full auto",
 };
 
 export const PERMISSION_MODE_HINTS: Record<PermissionMode, string> = {
-  plan: "Claude plans first, then asks to execute",
-  default: "Claude asks before risky actions",
-  acceptEdits: "Auto-approve file edits, ask for commands",
-  auto: "Claude acts autonomously with minimal prompts",
-  bypassPermissions: "Skip all permission checks — no guardrails",
+  plan: "Claude plans first, then asks you to approve",
+  default: "Claude asks before making big changes — set up in settings.json",
+  acceptEdits: "File edits happen automatically, commands still need approval",
+  auto: "Claude works independently with minimal check-ins",
+  bypassPermissions: "Everything runs without asking — no safety net",
 };
 
 export type LogEntryType = "text" | "tool_use" | "tool_result" | "question" | "user_reply" | "system";

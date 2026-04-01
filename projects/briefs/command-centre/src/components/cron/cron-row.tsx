@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Play, Pause, Trash2, ChevronDown, ChevronRight, Zap, Loader2, Pin } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Play, Pause, Trash2, ChevronDown, ChevronRight, Zap, Loader2, FileText, Clock } from "lucide-react";
 import { useCronStore } from "@/store/cron-store";
 import { RunHistory } from "./run-history";
 import type { CronJob } from "@/types/cron";
@@ -81,13 +81,26 @@ export function CronRow({
   const toggleJob = useCronStore((s) => s.toggleJob);
   const deleteJob = useCronStore((s) => s.deleteJob);
   const runJobNow = useCronStore((s) => s.runJobNow);
-  const togglePin = useCronStore((s) => s.togglePin);
   const isPinned = useCronStore((s) => s.pinnedSlugs.includes(job.slug));
   const activeRun = useCronStore((s) => s.activeRuns[job.slug]);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [expandedTab, setExpandedTab] = useState<"file" | "history">("history");
+  const [rawFile, setRawFile] = useState<string | null>(null);
+  const [loadingFile, setLoadingFile] = useState(false);
 
   const isActiveRun = !!activeRun;
   const isExpanded = expandedJob === job.slug;
+
+  // Auto-fetch job file when expanded
+  useEffect(() => {
+    if (isExpanded && rawFile === null && !loadingFile) {
+      setLoadingFile(true);
+      fetch(`/api/cron/${job.slug}/source`)
+        .then((r) => r.json())
+        .then((d) => setRawFile(d.content || "(empty)"))
+        .catch(() => setRawFile("(failed to load file)"))
+        .finally(() => setLoadingFile(false));
+    }
+  }, [isExpanded, job.slug, rawFile, loadingFile]);
   const runs = runHistory[job.slug] || [];
 
   // Derive a human-friendly status label for the active run
@@ -112,7 +125,7 @@ export function CronRow({
         onClick={() => expandJob(isExpanded ? null : job.slug)}
         style={{
           display: "grid",
-          gridTemplateColumns: "1.5fr 1fr 0.8fr 0.8fr 0.7fr 90px 110px",
+          gridTemplateColumns: "1.5fr 1fr 0.8fr 0.8fr 0.7fr 90px auto",
           gap: 12,
           alignItems: "center",
           padding: "14px 16px",
@@ -294,7 +307,7 @@ export function CronRow({
 
         {/* Actions */}
         <div
-          style={{ display: "flex", gap: 4 }}
+          style={{ display: "flex", gap: 2 }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -304,15 +317,18 @@ export function CronRow({
               background: "none",
               border: "none",
               cursor: isActiveRun ? "not-allowed" : "pointer",
-              padding: 6,
+              padding: "4px 8px",
               borderRadius: 6,
               display: "flex",
               alignItems: "center",
+              gap: 4,
               color: isActiveRun ? "#B25D3F" : "#5E5E65",
+              fontSize: 11,
+              fontWeight: 500,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
               transition: "color 150ms ease",
               opacity: isActiveRun ? 0.5 : 1,
             }}
-            title={isActiveRun ? "Job is running..." : "Run now"}
             onMouseEnter={(e) => {
               if (!isActiveRun) e.currentTarget.style.color = "#93452A";
             }}
@@ -320,31 +336,8 @@ export function CronRow({
               if (!isActiveRun) e.currentTarget.style.color = "#5E5E65";
             }}
           >
-            <Zap size={16} />
-          </button>
-          <button
-            onClick={() => togglePin(job.slug)}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: 6,
-              borderRadius: 6,
-              display: "flex",
-              alignItems: "center",
-              color: isPinned ? "#93452A" : "#5E5E65",
-              transition: "color 150ms ease",
-              transform: isPinned ? "rotate(-45deg)" : "none",
-            }}
-            title={isPinned ? "Unpin from top" : "Pin to top"}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#93452A";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = isPinned ? "#93452A" : "#5E5E65";
-            }}
-          >
-            <Pin size={14} />
+            <Zap size={13} />
+            Run
           </button>
           <button
             onClick={() => toggleJob(job.slug)}
@@ -352,14 +345,17 @@ export function CronRow({
               background: "none",
               border: "none",
               cursor: "pointer",
-              padding: 6,
+              padding: "4px 8px",
               borderRadius: 6,
               display: "flex",
               alignItems: "center",
+              gap: 4,
               color: "#5E5E65",
+              fontSize: 11,
+              fontWeight: 500,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
               transition: "color 150ms ease",
             }}
-            title={job.active ? "Pause" : "Play"}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = "#93452A";
             }}
@@ -367,76 +363,169 @@ export function CronRow({
               e.currentTarget.style.color = "#5E5E65";
             }}
           >
-            {job.active ? <Pause size={16} /> : <Play size={16} />}
+            {job.active ? <Pause size={13} /> : <Play size={13} />}
+            {job.active ? "Pause" : "Resume"}
           </button>
-          {confirmingDelete ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <button
-                onClick={() => {
-                  deleteJob(job.slug);
-                  setConfirmingDelete(false);
-                }}
-                style={{
-                  background: "#EF4444",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "3px 8px",
-                  borderRadius: 4,
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: "#FFFFFF",
-                  fontFamily: "var(--font-inter), Inter, sans-serif",
-                }}
-              >
-                Delete
-              </button>
-              <button
-                onClick={() => setConfirmingDelete(false)}
-                style={{
-                  background: "none",
-                  border: "1px solid #D1D1D6",
-                  cursor: "pointer",
-                  padding: "3px 8px",
-                  borderRadius: 4,
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: "#5E5E65",
-                  fontFamily: "var(--font-inter), Inter, sans-serif",
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setConfirmingDelete(true)}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: 6,
-                borderRadius: 6,
-                display: "flex",
-                alignItems: "center",
-                color: "#5E5E65",
-                transition: "color 150ms ease",
-              }}
-              title="Delete"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "#EF4444";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = "#5E5E65";
-              }}
-            >
-              <Trash2 size={16} />
-            </button>
-          )}
+          <button
+            onClick={() => deleteJob(job.slug)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "4px 8px",
+              borderRadius: 6,
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              color: "#5E5E65",
+              fontSize: 11,
+              fontWeight: 500,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              transition: "color 150ms ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#EF4444";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#5E5E65";
+            }}
+          >
+            <Trash2 size={13} />
+            Delete
+          </button>
         </div>
       </div>
 
-      {/* Expanded run history */}
-      {isExpanded && <RunHistory runs={runs} jobSlug={job.slug} prompt={job.prompt} />}
+      {/* Expanded panel with tabs */}
+      {isExpanded && (
+        <div
+          style={{
+            backgroundColor: "#F6F3F1",
+            borderRadius: "0 0 0.5rem 0.5rem",
+          }}
+        >
+          {/* Tab bar */}
+          <div
+            style={{
+              display: "flex",
+              gap: 0,
+              borderBottom: "1px solid #EAE8E6",
+              padding: "0 16px",
+            }}
+          >
+            <button
+              onClick={() => setExpandedTab("history")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "10px 16px",
+                background: "none",
+                border: "none",
+                borderBottom: expandedTab === "history" ? "2px solid #93452A" : "2px solid transparent",
+                cursor: "pointer",
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                fontSize: 13,
+                fontWeight: expandedTab === "history" ? 600 : 400,
+                color: expandedTab === "history" ? "#93452A" : "#5E5E65",
+                transition: "color 150ms ease",
+              }}
+            >
+              <Clock size={14} />
+              Run History
+              {runs.length > 0 && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 500,
+                    backgroundColor: "#EAE8E6",
+                    color: "#5E5E65",
+                    padding: "1px 6px",
+                    borderRadius: 10,
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                  }}
+                >
+                  {runs.length}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setExpandedTab("file")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "10px 16px",
+                background: "none",
+                border: "none",
+                borderBottom: expandedTab === "file" ? "2px solid #93452A" : "2px solid transparent",
+                cursor: "pointer",
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                fontSize: 13,
+                fontWeight: expandedTab === "file" ? 600 : 400,
+                color: expandedTab === "file" ? "#93452A" : "#5E5E65",
+                transition: "color 150ms ease",
+              }}
+            >
+              <FileText size={14} />
+              Job File
+            </button>
+          </div>
+
+          {/* Tab content */}
+          {expandedTab === "file" ? (
+            <div style={{ padding: 16 }}>
+              {loadingFile ? (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: 24,
+                    fontSize: 13,
+                    color: "#5E5E65",
+                    fontFamily: "var(--font-inter), Inter, sans-serif",
+                  }}
+                >
+                  Loading...
+                </div>
+              ) : rawFile ? (
+                <pre
+                  style={{
+                    padding: 16,
+                    backgroundColor: "#FFFFFF",
+                    color: "#1B1C1B",
+                    border: "1px solid #EAE8E6",
+                    borderRadius: "0.375rem",
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace",
+                    fontSize: 12,
+                    lineHeight: 1.6,
+                    maxHeight: 500,
+                    overflowY: "auto",
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
+                    margin: 0,
+                  }}
+                >
+                  {rawFile}
+                </pre>
+              ) : (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: 24,
+                    fontSize: 13,
+                    color: "#5E5E65",
+                    fontFamily: "var(--font-inter), Inter, sans-serif",
+                  }}
+                >
+                  No job file found
+                </div>
+              )}
+            </div>
+          ) : (
+            <RunHistory runs={runs} jobSlug={job.slug} prompt={job.prompt} />
+          )}
+        </div>
+      )}
 
       {/* CSS for spinner animation */}
       <style jsx global>{`

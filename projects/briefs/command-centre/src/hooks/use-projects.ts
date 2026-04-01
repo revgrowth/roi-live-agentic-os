@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useClientStore } from "@/store/client-store";
-import type { ProjectBrief } from "@/types/project";
+import type { Project } from "@/types/project";
 
 export function useProjects() {
-  const [projects, setProjects] = useState<ProjectBrief[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const selectedClientId = useClientStore((s) => s.selectedClientId);
 

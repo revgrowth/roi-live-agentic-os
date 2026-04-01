@@ -1,13 +1,51 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { AlertCircle, Check, Save } from "lucide-react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { AlertCircle, Check, Save, Eye, EyeOff } from "lucide-react";
 
 interface JsonEditorProps {
   apiEndpoint: string;
   title: string;
   description: string;
   emptyMessage: string;
+  /** When true, mask values that look like API keys/secrets in the display */
+  maskSecrets?: boolean;
+}
+
+/** Patterns that indicate a value is a secret */
+const SECRET_KEY_PATTERNS = /(?:api[_-]?key|secret|token|password|credential|auth)/i;
+
+/** Mask secret values in JSON text for display. Only masks string values whose key looks secret. */
+function maskJsonSecrets(json: string): string {
+  try {
+    const obj = JSON.parse(json);
+    const masked = maskObject(obj);
+    return JSON.stringify(masked, null, 2);
+  } catch {
+    // If not valid JSON, do a regex-based mask on common patterns
+    return json.replace(
+      /("(?:[^"]*(?:api[_-]?key|secret|token|password|credential|auth)[^"]*)":\s*")([^"]{4,})(")/gi,
+      (_, pre, val, post) => `${pre}${"•".repeat(Math.min(val.length, 20))}${post}`
+    );
+  }
+}
+
+function maskObject(obj: unknown): unknown {
+  if (Array.isArray(obj)) return obj.map(maskObject);
+  if (obj && typeof obj === "object") {
+    const result: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(obj as Record<string, unknown>)) {
+      if (typeof val === "string" && val.length >= 4 && SECRET_KEY_PATTERNS.test(key)) {
+        result[key] = "•".repeat(Math.min(val.length, 20));
+      } else if (typeof val === "object" && val !== null) {
+        result[key] = maskObject(val);
+      } else {
+        result[key] = val;
+      }
+    }
+    return result;
+  }
+  return obj;
 }
 
 function validateJson(text: string): string | null {
@@ -26,7 +64,7 @@ function validateJson(text: string): string | null {
   }
 }
 
-export function JsonEditor({ apiEndpoint, title, description, emptyMessage }: JsonEditorProps) {
+export function JsonEditor({ apiEndpoint, title, description, emptyMessage, maskSecrets }: JsonEditorProps) {
   const [content, setContent] = useState("");
   const [originalContent, setOriginalContent] = useState("");
   const [lastModified, setLastModified] = useState<string | null>(null);
@@ -36,6 +74,13 @@ export function JsonEditor({ apiEndpoint, title, description, emptyMessage }: Js
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [exists, setExists] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [secretsRevealed, setSecretsRevealed] = useState(false);
+
+  // Masked display value — only used when maskSecrets is on and secrets aren't revealed
+  const displayContent = useMemo(() => {
+    if (!maskSecrets || secretsRevealed || focused) return content;
+    return maskJsonSecrets(content);
+  }, [content, maskSecrets, secretsRevealed, focused]);
 
   const loadContent = useCallback(async () => {
     try {
@@ -278,8 +323,27 @@ export function JsonEditor({ apiEndpoint, title, description, emptyMessage }: Js
 
       {/* Editor */}
       <div style={{ padding: 20 }}>
+        {maskSecrets && (
+          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
+            <button
+              onClick={() => setSecretsRevealed(!secretsRevealed)}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 5,
+                background: "none", border: "1px solid #e0dcd6", borderRadius: 6,
+                padding: "4px 10px", fontSize: 11, color: "#999",
+                fontFamily: "'DM Mono', monospace", cursor: "pointer",
+                transition: "all 150ms ease",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#93452A"; e.currentTarget.style.color = "#93452A"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#e0dcd6"; e.currentTarget.style.color = "#999"; }}
+            >
+              {secretsRevealed ? <EyeOff size={12} /> : <Eye size={12} />}
+              {secretsRevealed ? "hide secrets" : "reveal secrets"}
+            </button>
+          </div>
+        )}
         <textarea
-          value={content}
+          value={focused ? content : displayContent}
           onChange={(e) => handleChange(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}

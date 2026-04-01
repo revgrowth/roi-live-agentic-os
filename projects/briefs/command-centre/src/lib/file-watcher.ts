@@ -14,24 +14,43 @@ import type { Task } from "@/types/task";
  */
 class FileWatcher {
   private watchers = new Map<string, FSWatcher>();
+  private taskWatchDirs = new Map<string, string>();
 
   /**
-   * Start watching the projects/ directory for a given task.
-   * New files (not initial) are recorded as task outputs.
+   * Start watching for output files created by a task.
+   * Each task gets its own scoped watcher to prevent misattribution.
    */
-  async startWatching(taskId: string): Promise<void> {
+  async startWatching(taskId: string, projectSlug?: string | null, clientId?: string | null): Promise<void> {
     if (this.watchers.has(taskId)) {
       return;
     }
 
     const config = getConfig();
-    const watchDir = path.join(config.agenticOsDir, "projects");
+    const baseDir = clientId
+      ? path.join(config.agenticOsDir, "clients", clientId)
+      : config.agenticOsDir;
+
+    // Scope the watch directory: if the task belongs to a project, watch only that project's folder.
+    // Otherwise watch the general projects/ directory.
+    let watchDir: string;
+    if (projectSlug) {
+      watchDir = path.join(baseDir, "projects", "briefs", projectSlug);
+    } else {
+      watchDir = path.join(baseDir, "projects");
+    }
 
     // Ensure the directory exists before watching
     if (!fs.existsSync(watchDir)) {
-      console.warn(`[file-watcher] Projects directory does not exist: ${watchDir}`);
-      return;
+      // Fall back to general projects/ if scoped dir doesn't exist
+      watchDir = path.join(baseDir, "projects");
+      if (!fs.existsSync(watchDir)) {
+        console.warn(`[file-watcher] Projects directory does not exist: ${watchDir}`);
+        return;
+      }
     }
+
+    // Track this task's watch directory to prevent cross-task attribution
+    this.taskWatchDirs.set(taskId, watchDir);
 
     const watcher = watch(watchDir, {
       ignoreInitial: true,
@@ -48,6 +67,11 @@ class FileWatcher {
     });
 
     watcher.on("add", (filePath: string) => {
+      // Only attribute files inside this task's scoped directory
+      const normalizedPath = path.resolve(filePath);
+      const normalizedWatch = path.resolve(watchDir);
+      if (!normalizedPath.startsWith(normalizedWatch)) return;
+
       this.handleNewFile(taskId, filePath, config.agenticOsDir);
     });
 
@@ -68,6 +92,7 @@ class FileWatcher {
       await watcher.close();
       this.watchers.delete(taskId);
     }
+    this.taskWatchDirs.delete(taskId);
   }
 
   /**

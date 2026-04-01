@@ -206,7 +206,7 @@ export function StatusSidebar({ conversationId }: StatusSidebarProps) {
       <div style={{ flex: 1, overflowY: "auto", padding: "8px 0" }}>
         <StatusGroup label="Running" tasks={running} color="#93452A" onTaskClick={openPanel} />
         <StatusGroup label="Needs Your Input" tasks={needsInput} color="#D4A574" onTaskClick={openPanel} />
-        <StatusGroup label="Recently Done" tasks={done} color="#6B8E6B" onTaskClick={openPanel} />
+        <StatusGroup label="History" tasks={done} color="#6B8E6B" onTaskClick={openPanel} />
 
         {running.length === 0 && needsInput.length === 0 && done.length === 0 && (
           <div style={{

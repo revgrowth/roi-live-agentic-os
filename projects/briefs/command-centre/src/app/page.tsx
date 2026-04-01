@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  Activity, Clock, History, Cpu, FileText, Settings,
+  Activity, Clock, Cpu, FileText, Settings,
 } from "lucide-react";
 import { useTaskStore } from "@/store/task-store";
 import { useGsdSync } from "@/hooks/use-gsd-sync";
@@ -19,234 +19,8 @@ import { SettingsTabs } from "@/components/settings/settings-tabs";
 import { ScriptList } from "@/components/settings/script-list";
 import { EnvEditor } from "@/components/settings/env-editor";
 import { JsonEditor } from "@/components/settings/json-editor";
-import type { DashboardSummary } from "@/types/dashboard";
-import type { Task } from "@/types/task";
-
-type Tab = "feed" | "scheduled" | "history" | "skills" | "docs" | "settings";
-
-function formatTokens(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${Math.round(n / 1_000)}K`;
-  return String(n);
-}
-
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
-/** Token usage badge for the top bar */
-function TokenBadge({ usage, weekCost }: {
-  usage: DashboardSummary["claudeUsage"];
-  weekCost: number;
-}) {
-  return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 12,
-      fontSize: 11,
-      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-      color: "#5E5E65",
-    }}>
-      <span>
-        Today <strong style={{ color: "#1B1C1B", fontWeight: 600 }}>{formatTokens(usage.todayTokens)}</strong>
-      </span>
-      <span style={{ width: 1, height: 12, backgroundColor: "rgba(218, 193, 185, 0.3)" }} />
-      <span>
-        Week <strong style={{ color: "#1B1C1B", fontWeight: 600 }}>{formatTokens(usage.weekTokens)}</strong>
-      </span>
-      {weekCost > 0 && (
-        <>
-          <span style={{ width: 1, height: 12, backgroundColor: "rgba(218, 193, 185, 0.3)" }} />
-          <span>
-            <strong style={{ color: "#1B1C1B", fontWeight: 600 }}>${weekCost.toFixed(2)}</strong>
-          </span>
-        </>
-      )}
-    </div>
-  );
-}
-
-/** History tab content */
-function HistoryTab() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const openTaskPanel = useTaskStore((s) => s.openPanel);
-
-  useEffect(() => {
-    setIsLoading(true);
-    fetch("/api/tasks/history?limit=50&offset=0&sortBy=completedAt&sortDir=desc")
-      .then((r) => r.ok ? r.json() : { tasks: [] })
-      .then((data) => { setTasks(data.tasks || []); setIsLoading(false); })
-      .catch(() => setIsLoading(false));
-  }, []);
-
-  if (isLoading) {
-    return <div style={{ padding: 40, textAlign: "center", color: "#9C9CA0", fontSize: 13 }}>Loading...</div>;
-  }
-
-  if (tasks.length === 0) {
-    return <div style={{ padding: 40, textAlign: "center", color: "#9C9CA0", fontSize: 13 }}>No completed tasks yet</div>;
-  }
-
-  return (
-    <div style={{ maxWidth: 720 }}>
-      {tasks.map((task) => (
-        <HistoryCard key={task.id} task={task} onOpen={openTaskPanel} />
-      ))}
-    </div>
-  );
-}
-
-function HistoryCard({ task, onOpen }: { task: Task; onOpen: (id: string) => void }) {
-  const [outputFiles, setOutputFiles] = useState<{ id: string; fileName: string; extension: string }[]>([]);
-
-  useEffect(() => {
-    fetch(`/api/tasks/${task.id}/outputs`)
-      .then((r) => r.ok ? r.json() : [])
-      .then((files) => setOutputFiles(files || []))
-      .catch(() => {});
-  }, [task.id]);
-
-  // Filter "Working directory:" from description
-  const desc = task.description
-    ? task.description.replace(/^Working directory:\s*.+$/m, "").trim() || null
-    : null;
-
-  return (
-    <div
-      onClick={() => onOpen(task.id)}
-      style={{
-        padding: "10px 12px",
-        borderRadius: 8,
-        cursor: "pointer",
-        border: "1px solid rgba(218, 193, 185, 0.15)",
-        marginBottom: 8,
-        transition: "all 120ms ease",
-        backgroundColor: task.errorMessage ? "rgba(192, 64, 48, 0.02)" : "transparent",
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = task.errorMessage ? "rgba(192, 64, 48, 0.05)" : "rgba(218, 193, 185, 0.06)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = task.errorMessage ? "rgba(192, 64, 48, 0.02)" : "transparent"; }}
-    >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{
-            fontSize: 13,
-            fontWeight: 600,
-            fontFamily: "var(--font-inter), Inter, sans-serif",
-            color: "#1B1C1B",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}>
-            {task.title}
-          </div>
-          {desc && (
-            <div style={{
-              fontSize: 12,
-              color: "#5E5E65",
-              fontFamily: "var(--font-inter), Inter, sans-serif",
-              marginTop: 2,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}>
-              {desc}
-            </div>
-          )}
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, marginTop: 1 }}>
-          <span style={{
-            fontSize: 10,
-            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-            color: "#9C9CA0",
-            whiteSpace: "nowrap",
-          }}>
-            {task.completedAt ? timeAgo(task.completedAt) : timeAgo(task.updatedAt)}
-          </span>
-          <span style={{
-            display: "inline-flex",
-            alignItems: "center",
-            fontSize: 10,
-            fontWeight: 500,
-            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-            padding: "2px 7px",
-            borderRadius: 4,
-            backgroundColor: task.errorMessage ? "#C04030" : "#6B8E6B",
-            color: "#FFFFFF",
-            lineHeight: "14px",
-          }}>
-            {task.errorMessage ? "Failed" : "Done"}
-          </span>
-        </div>
-      </div>
-
-      {/* Stats row */}
-      <div style={{
-        display: "flex",
-        gap: 12,
-        marginTop: 4,
-        fontSize: 11,
-        fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-        color: "#9C9CA0",
-      }}>
-        {task.durationMs != null && task.durationMs > 0 && (
-          <span>{Math.floor(task.durationMs / 1000)}s</span>
-        )}
-        {task.tokensUsed != null && task.tokensUsed > 0 && (
-          <span>{formatTokens(task.tokensUsed)} tokens</span>
-        )}
-        {task.costUsd != null && task.costUsd > 0 && (
-          <span>${task.costUsd.toFixed(2)}</span>
-        )}
-      </div>
-
-      {/* Output files */}
-      {outputFiles.length > 0 && (
-        <div style={{
-          display: "flex",
-          gap: 4,
-          flexWrap: "wrap",
-          marginTop: 6,
-        }}>
-          {outputFiles.slice(0, 4).map((f) => (
-            <span
-              key={f.id}
-              style={{
-                fontSize: 10,
-                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                color: "#93452A",
-                backgroundColor: "rgba(147, 69, 42, 0.06)",
-                padding: "2px 8px",
-                borderRadius: 3,
-                whiteSpace: "nowrap",
-              }}
-            >
-              {f.fileName}
-            </span>
-          ))}
-          {outputFiles.length > 4 && (
-            <span style={{
-              fontSize: 10,
-              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              color: "#9C9CA0",
-              padding: "2px 4px",
-            }}>
-              +{outputFiles.length - 4} more
-            </span>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
+import { useClientStore } from "@/store/client-store";
+type Tab = "feed" | "scheduled" | "skills" | "docs" | "settings";
 
 /** Skills tab content */
 function SkillsTab() {
@@ -374,6 +148,7 @@ function SettingsTab() {
             title="MCP Configuration"
             description="Edit .mcp.json \u2014 MCP server connections and their environment variables"
             emptyMessage="No .mcp.json file found. Create one to configure MCP servers."
+            maskSecrets
           />
         )}
         {activeSubTab === "claude" && (
@@ -393,24 +168,10 @@ function SettingsTab() {
 export default function CommandCentrePage() {
   useGsdSync();
   const fetchTasks = useTaskStore((s) => s.fetchTasks);
+  const selectedClientId = useClientStore((s) => s.selectedClientId);
   const [activeTab, setActiveTab] = useState<Tab>("feed");
-  const [usage, setUsage] = useState<DashboardSummary["claudeUsage"] | null>(null);
-  const [weekCost, setWeekCost] = useState(0);
 
   useEffect(() => { fetchTasks(); }, [fetchTasks]);
-
-  // Fetch token usage
-  useEffect(() => {
-    fetch("/api/dashboard/summary")
-      .then((r) => r.ok ? r.json() : null)
-      .then((data: DashboardSummary | null) => {
-        if (data) {
-          setUsage(data.claudeUsage);
-          setWeekCost(data.weekStats.totalCostUsd);
-        }
-      })
-      .catch(() => {});
-  }, []);
 
   const switchTab = useCallback((tab: string) => {
     setActiveTab(tab as Tab);
@@ -419,7 +180,6 @@ export default function CommandCentrePage() {
   const tabs: { key: Tab; label: string; icon: typeof Activity }[] = [
     { key: "feed", label: "Feed", icon: Activity },
     { key: "scheduled", label: "Scheduled", icon: Clock },
-    { key: "history", label: "History", icon: History },
     { key: "skills", label: "Skills", icon: Cpu },
     { key: "docs", label: "Docs", icon: FileText },
     { key: "settings", label: "Settings", icon: Settings },
@@ -439,7 +199,7 @@ export default function CommandCentrePage() {
         zIndex: 50,
         backgroundColor: "rgba(252, 249, 247, 0.92)",
         backdropFilter: "blur(12px)",
-        borderBottom: "1px solid rgba(218, 193, 185, 0.15)",
+        borderBottom: "1px solid rgba(218, 193, 185, 0.1)",
       }}>
         {/* Left: branding + tabs */}
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
@@ -494,8 +254,8 @@ export default function CommandCentrePage() {
           </nav>
         </div>
 
-        {/* Right: token usage */}
-        {usage && <TokenBadge usage={usage} weekCost={weekCost} />}
+        {/* Right: spacer */}
+        <div />
       </header>
 
       <ScopeBar />
@@ -504,10 +264,9 @@ export default function CommandCentrePage() {
       {/* Content */}
       <main style={{ padding: "16px 24px 24px" }}>
         {activeTab === "feed" && (
-          <FeedView clientFilter={null} onSwitchTab={switchTab} />
+          <FeedView clientFilter={selectedClientId} onSwitchTab={switchTab} />
         )}
         {activeTab === "scheduled" && <CronJobsView />}
-        {activeTab === "history" && <HistoryTab />}
         {activeTab === "skills" && <SkillsTab />}
         {activeTab === "docs" && <DocsTab />}
         {activeTab === "settings" && <SettingsTab />}

@@ -23,6 +23,7 @@ export default function SettingsPage() {
             title="MCP Configuration"
             description="Edit .mcp.json — MCP server connections and their environment variables"
             emptyMessage="No .mcp.json file found. Create one to configure MCP servers."
+            maskSecrets
           />
         )}
         {activeTab === "claude" && (

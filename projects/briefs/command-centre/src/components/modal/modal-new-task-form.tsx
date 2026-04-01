@@ -79,7 +79,7 @@ export function ModalNewTaskForm({
             const created = tasks.find(
               (t) => t.title === fallbackTitle && t.description === fullDescription
             );
-            if (created) {
+            if (created && (Date.now() - new Date(created.createdAt).getTime()) < 30000) {
               updateTask(created.id, { title: data.title });
             }
           }

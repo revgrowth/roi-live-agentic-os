@@ -7,9 +7,10 @@ import { useTaskStore } from "@/store/task-store";
 
 interface ClientSwitcherProps {
   collapsed?: boolean;
+  direction?: "up" | "down";
 }
 
-export function ClientSwitcher({ collapsed = false }: ClientSwitcherProps) {
+export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -213,11 +214,12 @@ export function ClientSwitcher({ collapsed = false }: ClientSwitcherProps) {
         <div
           style={{
             position: "absolute",
-            bottom: "100%",
+            ...(direction === "up"
+              ? { bottom: "100%", marginBottom: 4 }
+              : { top: "100%", marginTop: 4 }),
             left: 0,
             right: collapsed ? "auto" : 0,
             width: collapsed ? 240 : undefined,
-            marginBottom: 4,
             backgroundColor: "#FFFFFF",
             borderRadius: 8,
             boxShadow: "0 4px 12px rgba(147, 69, 42, 0.08)",

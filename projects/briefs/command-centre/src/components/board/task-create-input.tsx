@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Paperclip, X, Image, FileType, FileText, Sunrise, Moon, AlertTriangle, MessageSquare, Layers, Hammer } from "lucide-react";
+import { Paperclip, X, Image, FileType, FileText, Sunrise, Moon, AlertTriangle, ChevronDown, Zap, ClipboardList, Layers } from "lucide-react";
 import type { TaskLevel, PermissionMode } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 
@@ -29,19 +29,10 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-import { LEVEL_LABELS, LEVEL_HINTS, PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS } from "@/types/task";
-
-const levels: { value: TaskLevel; label: string; hint: string }[] = [
-  { value: "task", label: LEVEL_LABELS.task, hint: LEVEL_HINTS.task },
-  { value: "project", label: LEVEL_LABELS.project, hint: LEVEL_HINTS.project },
-  { value: "gsd", label: LEVEL_LABELS.gsd, hint: LEVEL_HINTS.gsd },
-];
+import { PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS, LEVEL_LABELS } from "@/types/task";
 
 const permissionModes: { value: PermissionMode; label: string; hint: string }[] = [
-  { value: "plan", label: PERMISSION_MODE_LABELS.plan, hint: PERMISSION_MODE_HINTS.plan },
   { value: "default", label: PERMISSION_MODE_LABELS.default, hint: PERMISSION_MODE_HINTS.default },
-  { value: "acceptEdits", label: PERMISSION_MODE_LABELS.acceptEdits, hint: PERMISSION_MODE_HINTS.acceptEdits },
-  { value: "auto", label: PERMISSION_MODE_LABELS.auto, hint: PERMISSION_MODE_HINTS.auto },
   { value: "bypassPermissions", label: PERMISSION_MODE_LABELS.bypassPermissions, hint: PERMISSION_MODE_HINTS.bypassPermissions },
 ];
 
@@ -61,6 +52,12 @@ const MODE_TEXT: Record<PermissionMode, string> = {
   bypassPermissions: "#991B1B",
 };
 
+const LEVEL_COLORS: Record<TaskLevel, { bg: string; text: string }> = {
+  task: { bg: "#E8E6E4", text: "#5E5E65" },
+  project: { bg: "#FFDBCF", text: "#390C00" },
+  gsd: { bg: "#DBEAFE", text: "#1E40AF" },
+};
+
 interface GsdStatus {
   exists: boolean;
   projectName?: string;
@@ -68,12 +65,27 @@ interface GsdStatus {
   totalPhases?: number | null;
 }
 
+type ScopingState =
+  | { phase: "idle" }
+  | { phase: "picking"; description: string }
+  | { phase: "error"; message: string };
+
 export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }) {
   const [description, setDescription] = useState("");
-  const [level, setLevel] = useState<TaskLevel>("task");
   const [permissionMode, setPermissionMode] = useState<PermissionMode>("default");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Scoping state
+  const [scopingState, setScopingState] = useState<ScopingState>({ phase: "idle" });
+  const [levelOverride, setLevelOverride] = useState<TaskLevel | null>(null);
+  const [showLevelOverride, setShowLevelOverride] = useState(false);
+  const [confirmationBadge, setConfirmationBadge] = useState<string | null>(null);
+
+  // Level picker modal state
+  const [pickedLevel, setPickedLevel] = useState<TaskLevel | null>(null);
+  const [notes, setNotes] = useState("");
+  const notesRef = useRef<HTMLTextAreaElement>(null);
 
   // Attachments state
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -92,16 +104,6 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
   const descRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
 
-  // Fetch GSD status when Deep build is selected
-  useEffect(() => {
-    if (level === "gsd" && isExpanded) {
-      fetch("/api/gsd/status")
-        .then((res) => res.json())
-        .then(setGsdStatus)
-        .catch(() => setGsdStatus(null));
-    }
-  }, [level, isExpanded]);
-
   // Auto-grow textarea
   const adjustTextareaHeight = useCallback(() => {
     const el = descRef.current;
@@ -118,14 +120,22 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
         formRef.current &&
         !formRef.current.contains(e.target as Node) &&
         !description.trim() &&
-        attachments.length === 0
+        attachments.length === 0 &&
+        scopingState.phase === "idle"
       ) {
         setIsExpanded(false);
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [description, attachments.length]);
+  }, [description, attachments.length, scopingState.phase]);
+
+  // Clear confirmation badge after 3s
+  useEffect(() => {
+    if (!confirmationBadge) return;
+    const timer = setTimeout(() => setConfirmationBadge(null), 3000);
+    return () => clearTimeout(timer);
+  }, [confirmationBadge]);
 
   const handleFileUpload = useCallback(async (file: File) => {
     setIsUploading(true);
@@ -146,7 +156,6 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
 
       const result: Attachment = await res.json();
       setAttachments((prev) => [...prev, result]);
-      // Auto-expand if not already
       setIsExpanded(true);
     } catch {
       // Silently fail — user can retry
@@ -159,19 +168,11 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
     setAttachments((prev) => prev.filter((a) => a.relativePath !== relativePath));
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    const trimmedDesc = description.trim();
-    if (!trimmedDesc || isSubmitting) return;
-    setIsSubmitting(true);
-
-    // Build description with attachment paths
-    let fullDescription = trimmedDesc;
-    if (attachments.length > 0) {
-      const attachmentLines = attachments.map((a) => `- ${a.relativePath}`).join("\n");
-      const attachmentBlock = `\n\nAttached files:\n${attachmentLines}`;
-      fullDescription = fullDescription + attachmentBlock;
-    }
-
+  /** Create the task (and project if needed) with the determined level */
+  const createWithLevel = useCallback(async (
+    fullDescription: string,
+    level: TaskLevel,
+  ) => {
     // Quick fallback title from first line
     const firstLine = fullDescription.split("\n")[0];
     const firstSentence = firstLine.match(/^[^.!?]+[.!?]?/)?.[0] || firstLine;
@@ -179,15 +180,47 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
       ? firstSentence
       : firstSentence.slice(0, 57).replace(/\s+\S*$/, "") + "...";
 
-    // Clear form immediately
-    setDescription("");
-    setAttachments([]);
-    setIsExpanded(false);
+    // For project/gsd levels, create a project row
+    let taskProjectSlug = projectSlug || null;
+    if ((level === "project" || level === "gsd") && !taskProjectSlug) {
+      const slug = fallbackTitle
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 40);
+      taskProjectSlug = slug;
 
-    // Create with fallback title right away
-    await createTask(fallbackTitle, fullDescription, level, projectSlug || null, undefined, permissionMode);
+      // Check for GSD conflicts
+      if (level === "gsd") {
+        try {
+          const gsdRes = await fetch("/api/gsd/status");
+          const gsdData = await gsdRes.json();
+          if (gsdData?.exists) {
+            setGsdStatus(gsdData);
+            return; // Block — show conflict
+          }
+        } catch { /* proceed */ }
+      }
 
-    // AI title generation in the background
+      // Create project brief (projects/briefs/{slug}/brief.md)
+      try {
+        await fetch("/api/projects", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slug,
+            name: fallbackTitle,
+            level: level === "gsd" ? 3 : 2,
+            goal: fullDescription.slice(0, 200),
+          }),
+        });
+      } catch { /* non-critical */ }
+    }
+
+    // Create task as "queued" — goes straight to Claude's Turn
+    await createTask(fallbackTitle, fullDescription, level, taskProjectSlug, undefined, permissionMode);
+
+    // AI title generation in background
     fetch("/api/tasks/generate-title", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -200,41 +233,93 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
           const created = tasks.find(
             (t) => t.title === fallbackTitle && t.description === fullDescription
           );
-          if (created) {
+          // Only update title within 30s of creation — after that, lock the title
+          if (created && (Date.now() - new Date(created.createdAt).getTime()) < 30000) {
             updateTask(created.id, { title: data.title });
           }
         }
       })
       .catch(() => { /* fallback title is fine */ });
+  }, [createTask, updateTask, permissionMode, projectSlug]);
 
-    // Semantic goal clustering in the background (debounced — only for quick tasks)
-    if (level === "task") {
-      setTimeout(() => {
-        fetch("/api/tasks/cluster-goals", { method: "POST" })
-          .then((res) => res.ok ? res.json() : null)
-          .then((data) => {
-            if (data?.grouped > 0) {
-              // Refresh tasks to pick up new goalGroup assignments
-              useTaskStore.getState().fetchTasks();
-            }
-          })
-          .catch(() => { /* clustering is best-effort */ });
-      }, 2000); // Small delay to let title generation finish first
+  /** Handle level selection from the modal */
+  const handleLevelSelect = useCallback(async (level: TaskLevel) => {
+    if (scopingState.phase !== "picking") return;
+    let desc = scopingState.description;
+    if (notes.trim()) {
+      desc += `\n\nNotes: ${notes.trim()}`;
     }
 
+    setScopingState({ phase: "idle" });
+    setIsExpanded(false);
+    setNotes("");
+    setPickedLevel(null);
+    setConfirmationBadge(`Queued — ${LEVEL_LABELS[level]}`);
+    setIsSubmitting(true);
+    await createWithLevel(desc, level);
     setIsSubmitting(false);
-  }, [description, attachments, level, permissionMode, isSubmitting, createTask, updateTask, projectSlug]);
+  }, [scopingState, notes, createWithLevel]);
+
+  // Keyboard shortcuts for level picker modal
+  useEffect(() => {
+    if (scopingState.phase !== "picking") return;
+    const handler = (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in notes textarea
+      if (document.activeElement === notesRef.current) return;
+      if (e.key === "1") handleLevelSelect("task");
+      else if (e.key === "2") handleLevelSelect("project");
+      else if (e.key === "3") handleLevelSelect("gsd");
+      else if (e.key === "Escape") {
+        setScopingState({ phase: "idle" });
+        setPickedLevel(null);
+        setNotes("");
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [scopingState.phase, handleLevelSelect]);
+
+  const handleSubmit = useCallback(async () => {
+    const trimmedDesc = description.trim();
+    if (!trimmedDesc || isSubmitting) return;
+    setGsdStatus(null);
+
+    // Build description with attachment paths
+    let fullDescription = trimmedDesc;
+    if (attachments.length > 0) {
+      const attachmentLines = attachments.map((a) => `- ${a.relativePath}`).join("\n");
+      const attachmentBlock = `\n\nAttached files:\n${attachmentLines}`;
+      fullDescription = fullDescription + attachmentBlock;
+    }
+
+    // Clear form immediately
+    setDescription("");
+    setAttachments([]);
+
+    // If user has overridden the level, skip the modal
+    if (levelOverride) {
+      setIsExpanded(false);
+      const level = levelOverride;
+      setLevelOverride(null);
+      setShowLevelOverride(false);
+      setConfirmationBadge(`Queued — ${LEVEL_LABELS[level]}`);
+      setIsSubmitting(true);
+      await createWithLevel(fullDescription, level);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Show level picker modal
+    setScopingState({ phase: "picking", description: fullDescription });
+  }, [description, attachments, isSubmitting, levelOverride, createWithLevel]);
 
   const handleQuickStart = useCallback(async (type: "start-here" | "wrap-up") => {
     if (quickStarting) return;
     setQuickStarting(type);
     try {
       const taskTitle = type === "start-here" ? "Start Here" : "Wrap Up";
-      const taskDesc = type === "start-here"
-        ? "Run /start-here"
-        : "Run /wrap-up";
+      const taskDesc = type === "start-here" ? "Run /start-here" : "Run /wrap-up";
       await createTask(taskTitle, taskDesc, "task");
-      // Find the just-created task and queue it
       const tasks = useTaskStore.getState().tasks;
       const newTask = tasks.find(
         (t) => t.title === taskTitle && t.status === "backlog"
@@ -253,7 +338,6 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
     setDescription("");
     setIsExpanded(false);
 
-    // Create task and auto-queue it
     const taskTitle = cmd.label;
     const taskDesc = `Run ${cmd.command}`;
     await createTask(taskTitle, taskDesc, "task");
@@ -278,9 +362,7 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
   }, []);
 
   const shouldExpand = isExpanded || description.trim().length > 0 || attachments.length > 0;
-
-  // Whether to show the GSD conflict warning
-  const hasGsdConflict = level === "gsd" && gsdStatus?.exists === true;
+  const hasGsdConflict = gsdStatus?.exists === true && scopingState.phase === "idle" && levelOverride === "gsd";
 
   return (
     <div
@@ -289,16 +371,32 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
         marginBottom: 16,
         backgroundColor: "#FFFFFF",
         borderRadius: shouldExpand ? "0.5rem" : "0.375rem",
-        boxShadow: shouldExpand
-          ? "0px 12px 32px rgba(147, 69, 42, 0.06)"
-          : "none",
+        boxShadow: shouldExpand ? "0px 12px 32px rgba(147, 69, 42, 0.06)" : "none",
         padding: shouldExpand ? 16 : 0,
-        outline: shouldExpand
-          ? "none"
-          : "1px solid rgba(218, 193, 185, 0.2)",
+        outline: shouldExpand ? "none" : "1px solid rgba(218, 193, 185, 0.2)",
         transition: "all 200ms ease",
       }}
     >
+      {/* Confirmation badge */}
+      {confirmationBadge && (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "6px 12px",
+          marginBottom: 8,
+          backgroundColor: "rgba(107, 142, 107, 0.08)",
+          borderRadius: 6,
+          fontSize: 12,
+          fontWeight: 500,
+          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+          color: "#6B8E6B",
+          animation: "fadeIn 200ms ease",
+        }}>
+          {confirmationBadge}
+        </div>
+      )}
+
       {/* Single textarea input + slash command menu */}
       <div style={{ position: "relative" }}>
         <textarea
@@ -317,13 +415,7 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
             }
           }}
           disabled={isSubmitting}
-          placeholder={
-            level === "project"
-              ? "Describe your campaign — what do you need to launch?"
-              : level === "gsd"
-                ? "Describe what you want to build — app, system, workflow..."
-                : "What would you like Claude to do?  Type / for commands"
-          }
+          placeholder="What's your goal?  Type / for commands"
           style={{
             width: "100%",
             padding: shouldExpand ? "0" : "8px 16px",
@@ -357,13 +449,7 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
 
       {/* Quick-start buttons — visible when collapsed */}
       {!shouldExpand && (
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            padding: "6px 16px 10px",
-          }}
-        >
+        <div style={{ display: "flex", gap: 8, padding: "6px 16px 10px" }}>
           <button
             onClick={() => handleQuickStart("start-here")}
             disabled={quickStarting !== null}
@@ -420,8 +506,8 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
       {/* Expandable bottom section */}
       <div
         style={{
-          maxHeight: shouldExpand ? 600 : 0,
-          overflow: "hidden",
+          maxHeight: shouldExpand ? 800 : 0,
+          overflow: shouldExpand ? "visible" : "hidden",
           transition: "max-height 200ms ease",
         }}
       >
@@ -504,59 +590,27 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
           </div>
         )}
 
-        {/* ── Level-specific guidance panels ── */}
-        {level === "project" && (
-          <div style={guidancePanelStyle}>
-            <div style={guidanceHeaderStyle}>
-              <MessageSquare size={14} color="#93452A" />
-              <span style={guidanceTitleStyle}>How campaigns work</span>
-            </div>
-            <div style={guidanceStepsStyle}>
-              <div style={guidanceStepStyle}>
-                <span style={stepNumberStyle}>1</span>
-                <span style={stepTextStyle}>Describe your campaign goal and what you need delivered</span>
-              </div>
-              <div style={guidanceStepStyle}>
-                <span style={stepNumberStyle}>2</span>
-                <span style={stepTextStyle}>Claude will ask scoping questions — deliverables, audience, timeline, constraints</span>
-              </div>
-              <div style={guidanceStepStyle}>
-                <span style={stepNumberStyle}>3</span>
-                <span style={stepTextStyle}>A project brief is created and broken into subtasks on this board</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {level === "gsd" && !hasGsdConflict && (
-          <div style={guidancePanelStyle}>
-            <div style={guidanceHeaderStyle}>
-              <Hammer size={14} color="#3B82F6" />
-              <span style={{ ...guidanceTitleStyle, color: "#3B82F6" }}>How deep builds work</span>
-            </div>
-            <div style={guidanceStepsStyle}>
-              <div style={guidanceStepStyle}>
-                <span style={{ ...stepNumberStyle, backgroundColor: "rgba(59, 130, 246, 0.1)", color: "#3B82F6" }}>1</span>
-                <span style={stepTextStyle}>Describe what you want to build — Claude will ask questions to understand the full scope</span>
-              </div>
-              <div style={guidanceStepStyle}>
-                <span style={{ ...stepNumberStyle, backgroundColor: "rgba(59, 130, 246, 0.1)", color: "#3B82F6" }}>2</span>
-                <span style={stepTextStyle}>A phased roadmap is created — each phase is discussed, planned, then built</span>
-              </div>
-              <div style={guidanceStepStyle}>
-                <span style={{ ...stepNumberStyle, backgroundColor: "rgba(59, 130, 246, 0.1)", color: "#3B82F6" }}>3</span>
-                <span style={stepTextStyle}>Phases appear as subtasks here so you can track progress and verify each stage</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── GSD conflict warning ── */}
+        {/* GSD conflict warning */}
         {hasGsdConflict && (
           <div style={conflictPanelStyle}>
-            <div style={guidanceHeaderStyle}>
-              <AlertTriangle size={14} color="#D97706" />
-              <span style={{ ...guidanceTitleStyle, color: "#92400E" }}>Active deep build detected</span>
+            <div style={{ ...guidanceHeaderStyle, justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <AlertTriangle size={14} color="#D97706" />
+                <span style={{ ...guidanceTitleStyle, color: "#92400E" }}>Active deep build detected</span>
+              </div>
+              <button
+                onClick={() => setGsdStatus(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 2,
+                  color: "#9C9CA0",
+                  display: "flex",
+                }}
+              >
+                <X size={14} />
+              </button>
             </div>
             <p style={conflictTextStyle}>
               <strong>{gsdStatus?.projectName}</strong> is currently in progress
@@ -572,7 +626,7 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
           </div>
         )}
 
-        {/* Bottom bar: level chips + hint + submit button */}
+        {/* Bottom bar: permission mode + level override + submit button */}
         <div style={{ marginTop: 8 }}>
           <div
             style={{
@@ -581,53 +635,8 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
               alignItems: "center",
             }}
           >
-            {/* Level selector chips + attach button */}
+            {/* Left: permission mode + attach + level override */}
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div
-                style={{
-                  display: "flex",
-                  gap: 2,
-                  backgroundColor: "#EAE8E6",
-                  borderRadius: 6,
-                  padding: 2,
-                  height: 32,
-                  alignItems: "center",
-                }}
-              >
-                {levels.map((l) => (
-                  <button
-                    key={l.value}
-                    onClick={() => setLevel(l.value)}
-                    title={l.hint}
-                    style={{
-                      padding: "0 14px",
-                      fontSize: 12,
-                      fontWeight: 500,
-                      fontFamily:
-                        "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                      border: "none",
-                      cursor: "pointer",
-                      borderRadius: 4,
-                      height: 28,
-                      backgroundColor:
-                        level === l.value
-                          ? l.value === "gsd"
-                            ? "#DBEAFE"
-                            : "#FFDBCF"
-                          : "transparent",
-                      color: level === l.value
-                        ? l.value === "gsd"
-                          ? "#1E40AF"
-                          : "#390C00"
-                        : "#5E5E65",
-                      transition: "all 150ms ease",
-                    }}
-                  >
-                    {l.label}
-                  </button>
-                ))}
-              </div>
-
               {/* Permission mode selector */}
               <div
                 style={{
@@ -669,86 +678,179 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
               </div>
 
               {/* Attach file button */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-              title="Attach file"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 32,
-                height: 32,
-                border: "none",
-                borderRadius: 6,
-                backgroundColor: attachments.length > 0 ? "#FFDBCF" : "transparent",
-                color: attachments.length > 0 ? "#93452A" : "#5E5E65",
-                cursor: isUploading ? "wait" : "pointer",
-                opacity: isUploading ? 0.5 : 1,
-                transition: "all 150ms ease",
-                position: "relative",
-              }}
-              onMouseEnter={(e) => {
-                if (!attachments.length) e.currentTarget.style.backgroundColor = "#F6F3F1";
-              }}
-              onMouseLeave={(e) => {
-                if (!attachments.length) e.currentTarget.style.backgroundColor = "transparent";
-              }}
-            >
-              <Paperclip size={16} />
-              {attachments.length > 0 && (
-                <span
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                title="Attach file"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 32,
+                  height: 32,
+                  border: "none",
+                  borderRadius: 6,
+                  backgroundColor: attachments.length > 0 ? "#FFDBCF" : "transparent",
+                  color: attachments.length > 0 ? "#93452A" : "#5E5E65",
+                  cursor: isUploading ? "wait" : "pointer",
+                  opacity: isUploading ? 0.5 : 1,
+                  transition: "all 150ms ease",
+                  position: "relative",
+                }}
+                onMouseEnter={(e) => {
+                  if (!attachments.length) e.currentTarget.style.backgroundColor = "#F6F3F1";
+                }}
+                onMouseLeave={(e) => {
+                  if (!attachments.length) e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                <Paperclip size={16} />
+                {attachments.length > 0 && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: -2,
+                      right: -2,
+                      width: 14,
+                      height: 14,
+                      borderRadius: "50%",
+                      backgroundColor: "#93452A",
+                      color: "#FFFFFF",
+                      fontSize: 9,
+                      fontWeight: 700,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    }}
+                  >
+                    {attachments.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Level override dropdown */}
+              <div style={{ position: "relative" }}>
+                <button
+                  onClick={() => setShowLevelOverride(!showLevelOverride)}
                   style={{
-                    position: "absolute",
-                    top: -2,
-                    right: -2,
-                    width: 14,
-                    height: 14,
-                    borderRadius: "50%",
-                    backgroundColor: "#93452A",
-                    color: "#FFFFFF",
-                    fontSize: 9,
-                    fontWeight: 700,
-                    display: "flex",
+                    display: "inline-flex",
                     alignItems: "center",
-                    justifyContent: "center",
+                    gap: 4,
+                    padding: "4px 8px",
+                    fontSize: 11,
                     fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    border: "none",
+                    borderRadius: 4,
+                    backgroundColor: levelOverride ? LEVEL_COLORS[levelOverride].bg : "#F6F3F1",
+                    color: levelOverride ? LEVEL_COLORS[levelOverride].text : "#9C9CA0",
+                    cursor: "pointer",
+                    fontWeight: 500,
                   }}
                 >
-                  {attachments.length}
-                </span>
-              )}
+                  {levelOverride ? LEVEL_LABELS[levelOverride] : "Level"}
+                  <ChevronDown size={10} />
+                </button>
+                {showLevelOverride && (
+                  <div style={{
+                    position: "absolute",
+                    bottom: "100%",
+                    left: 0,
+                    marginBottom: 4,
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: 8,
+                    boxShadow: "0 4px 16px rgba(147, 69, 42, 0.12)",
+                    border: "1px solid rgba(218, 193, 185, 0.2)",
+                    padding: 6,
+                    zIndex: 100,
+                    width: 260,
+                  }}>
+                    <div style={{
+                      fontSize: 10,
+                      color: "#9C9CA0",
+                      fontFamily: "var(--font-inter), Inter, sans-serif",
+                      padding: "4px 8px 6px",
+                    }}>
+                      Optional — skip to pick after submit
+                    </div>
+                    {([
+                      { level: "task" as TaskLevel, desc: "One-off deliverable, no planning" },
+                      { level: "project" as TaskLevel, desc: "Multi-deliverable with a brief and scope" },
+                      { level: "gsd" as TaskLevel, desc: "Phased build with milestones and verification" },
+                    ]).map((opt) => (
+                      <button
+                        key={opt.level}
+                        onClick={async () => {
+                          const newLevel = levelOverride === opt.level ? null : opt.level;
+                          setLevelOverride(newLevel);
+                          setShowLevelOverride(false);
+                          if (newLevel === "gsd") {
+                            try {
+                              const res = await fetch("/api/gsd/status");
+                              const data = await res.json();
+                              if (data?.exists) setGsdStatus(data);
+                            } catch { /* ignore */ }
+                          } else {
+                            setGsdStatus(null);
+                          }
+                        }}
+                        style={{
+                          display: "block",
+                          width: "100%",
+                          padding: "8px 10px",
+                          fontSize: 12,
+                          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                          border: "none",
+                          borderRadius: 5,
+                          backgroundColor: levelOverride === opt.level ? LEVEL_COLORS[opt.level].bg : "transparent",
+                          color: LEVEL_COLORS[opt.level].text,
+                          cursor: "pointer",
+                          textAlign: "left",
+                          fontWeight: 500,
+                        }}
+                      >
+                        <div>{LEVEL_LABELS[opt.level]}</div>
+                        <div style={{
+                          fontSize: 10,
+                          fontWeight: 400,
+                          color: "#9C9CA0",
+                          fontFamily: "var(--font-inter), Inter, sans-serif",
+                          marginTop: 1,
+                        }}>
+                          {opt.desc}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Submit button */}
+            <button
+              onClick={handleSubmit}
+              disabled={!description.trim() || isSubmitting}
+              style={{
+                background: description.trim()
+                  ? "linear-gradient(135deg, #93452A, #B25D3F)"
+                  : "#D1C7C2",
+                color: "#FFFFFF",
+                border: "none",
+                borderRadius: "0.375rem",
+                padding: "6px 16px",
+                fontSize: 13,
+                fontWeight: 600,
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                cursor: description.trim() ? "pointer" : "default",
+                opacity: isSubmitting ? 0.6 : 1,
+                transition: "all 150ms ease",
+              }}
+            >
+              Send to Claude
             </button>
           </div>
 
-          {/* Submit button */}
-          <button
-            onClick={handleSubmit}
-            disabled={!description.trim() || isSubmitting || hasGsdConflict}
-            style={{
-              background: description.trim() && !hasGsdConflict
-                ? level === "gsd"
-                  ? "linear-gradient(135deg, #3B82F6, #2563EB)"
-                  : "linear-gradient(135deg, #93452A, #B25D3F)"
-                : "#D1C7C2",
-              color: "#FFFFFF",
-              border: "none",
-              borderRadius: "0.375rem",
-              padding: "6px 16px",
-              fontSize: 13,
-              fontWeight: 600,
-              fontFamily:
-                "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              cursor: description.trim() && !hasGsdConflict ? "pointer" : "default",
-              opacity: isSubmitting ? 0.6 : 1,
-              transition: "all 150ms ease",
-            }}
-          >
-            {hasGsdConflict ? "Archive current build first" : "Send to Claude"}
-          </button>
-          </div>
-
-          {/* Active level + permission mode hints */}
+          {/* Permission mode hint */}
           <div
             style={{
               display: "flex",
@@ -761,28 +863,282 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
               minHeight: 16,
             }}
           >
-            <span>{levels.find((l) => l.value === level)?.hint}</span>
-            {permissionMode !== "default" && (
-              <span style={{ color: MODE_TEXT[permissionMode] }}>
-                {permissionModes.find((m) => m.value === permissionMode)?.hint}
-              </span>
-            )}
+            <span />
+            <span style={{ color: MODE_TEXT[permissionMode] }}>
+              {permissionModes.find((m) => m.value === permissionMode)?.hint}
+            </span>
           </div>
         </div>
       </div>
+
+      {/* Level picker modal */}
+      {scopingState.phase === "picking" && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => {
+            setScopingState({ phase: "idle" });
+            setPickedLevel(null);
+            setNotes("");
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 12,
+              padding: 24,
+              maxWidth: 420,
+              width: "90%",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3
+              style={{
+                fontSize: 16,
+                fontWeight: 700,
+                fontFamily: "var(--font-space-grotesk)",
+                color: "#1B1C1B",
+                marginBottom: 16,
+                marginTop: 0,
+              }}
+            >
+              How structured do you want this?
+            </h3>
+
+            {/* Goal preview */}
+            <div
+              style={{
+                fontSize: 12,
+                color: "#5E5E65",
+                fontFamily: "var(--font-inter)",
+                padding: "8px 12px",
+                backgroundColor: "rgba(218, 193, 185, 0.08)",
+                borderRadius: 6,
+                marginBottom: 16,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {scopingState.description.slice(0, 100)}
+              {scopingState.description.length > 100 ? "..." : ""}
+            </div>
+
+            {/* Three level options */}
+            {([
+              {
+                level: "task" as TaskLevel,
+                icon: Zap,
+                title: "Single task",
+                desc: "I'll just get it done. Best for one-off deliverables.",
+                key: "1",
+              },
+              {
+                level: "project" as TaskLevel,
+                icon: ClipboardList,
+                title: "Planned project",
+                desc: "I'll scope it first — goal, deliverables, what 'done' looks like. Best for multi-deliverable work.",
+                key: "2",
+              },
+              {
+                level: "gsd" as TaskLevel,
+                icon: Layers,
+                title: "GSD project",
+                desc: "Full structured planning with phases, milestones, and verification. Best for complex builds.",
+                key: "3",
+              },
+            ]).map((opt) => (
+              <div key={opt.level}>
+                <button
+                  onClick={() => {
+                    setPickedLevel(opt.level);
+                    setTimeout(() => notesRef.current?.focus(), 50);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                    width: "100%",
+                    padding: "12px 14px",
+                    border: pickedLevel === opt.level
+                      ? "1px solid rgba(147, 69, 42, 0.4)"
+                      : "1px solid rgba(218, 193, 185, 0.2)",
+                    borderRadius: 8,
+                    marginBottom: pickedLevel === opt.level ? 0 : 8,
+                    backgroundColor: pickedLevel === opt.level
+                      ? "rgba(147, 69, 42, 0.04)"
+                      : "transparent",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    transition: "all 100ms ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (pickedLevel !== opt.level) {
+                      e.currentTarget.style.backgroundColor = "rgba(147, 69, 42, 0.04)";
+                      e.currentTarget.style.borderColor = "rgba(147, 69, 42, 0.3)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (pickedLevel !== opt.level) {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.2)";
+                    }
+                  }}
+                >
+                  <opt.icon size={18} color="#93452A" style={{ flexShrink: 0, marginTop: 1 }} />
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        fontFamily: "var(--font-space-grotesk)",
+                        color: "#1B1C1B",
+                      }}
+                    >
+                      {opt.title}
+                      <span style={{ fontSize: 10, color: "#B0B0B5", marginLeft: 6 }}>
+                        ({opt.key})
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: "#9C9CA0",
+                        fontFamily: "var(--font-inter)",
+                        marginTop: 2,
+                        lineHeight: "1.4",
+                      }}
+                    >
+                      {opt.desc}
+                    </div>
+                  </div>
+                </button>
+
+                {/* Notes area — shown when this level is selected */}
+                {pickedLevel === opt.level && (
+                  <div
+                    style={{
+                      padding: "10px 14px 14px",
+                      marginBottom: 8,
+                      borderLeft: "1px solid rgba(147, 69, 42, 0.2)",
+                      borderRight: "1px solid rgba(147, 69, 42, 0.2)",
+                      borderBottom: "1px solid rgba(147, 69, 42, 0.2)",
+                      borderRadius: "0 0 8px 8px",
+                      backgroundColor: "rgba(147, 69, 42, 0.02)",
+                    }}
+                  >
+                    <textarea
+                      ref={notesRef}
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Add notes or context (optional)"
+                      style={{
+                        width: "100%",
+                        fontSize: 12,
+                        fontFamily: "var(--font-inter)",
+                        border: "1px solid rgba(218, 193, 185, 0.3)",
+                        borderRadius: 6,
+                        padding: "8px 10px",
+                        minHeight: 60,
+                        maxHeight: 120,
+                        resize: "vertical",
+                        outline: "none",
+                        backgroundColor: "#FAFAF9",
+                        boxSizing: "border-box",
+                      }}
+                      onKeyDown={(e) => {
+                        if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                          e.preventDefault();
+                          handleLevelSelect(opt.level);
+                        }
+                      }}
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        marginTop: 8,
+                        gap: 8,
+                      }}
+                    >
+                      <button
+                        onClick={() => {
+                          setPickedLevel(null);
+                          setNotes("");
+                        }}
+                        style={{
+                          fontSize: 12,
+                          color: "#9C9CA0",
+                          fontFamily: "var(--font-space-grotesk)",
+                          background: "none",
+                          border: "1px solid rgba(218, 193, 185, 0.3)",
+                          borderRadius: 6,
+                          padding: "6px 12px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Back
+                      </button>
+                      <button
+                        onClick={() => handleLevelSelect(opt.level)}
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          fontFamily: "var(--font-space-grotesk)",
+                          color: "#FFFFFF",
+                          background: "linear-gradient(135deg, #93452A, #B25D3F)",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "6px 16px",
+                          cursor: "pointer",
+                          transition: "opacity 150ms ease",
+                        }}
+                      >
+                        Go
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            <button
+              onClick={() => {
+                setScopingState({ phase: "idle" });
+                setPickedLevel(null);
+                setNotes("");
+              }}
+              style={{
+                fontSize: 12,
+                color: "#9C9CA0",
+                fontFamily: "var(--font-space-grotesk)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "8px 0 0",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-// ── Guidance panel styles ──
-
-const guidancePanelStyle: React.CSSProperties = {
-  marginTop: 10,
-  padding: "12px 14px",
-  backgroundColor: "#FAFAF9",
-  borderRadius: 8,
-  border: "1px solid rgba(218, 193, 185, 0.2)",
-};
+// ── Styles ──
 
 const conflictPanelStyle: React.CSSProperties = {
   marginTop: 10,
@@ -804,41 +1160,6 @@ const guidanceTitleStyle: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
   color: "#93452A",
-};
-
-const guidanceStepsStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 8,
-};
-
-const guidanceStepStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "flex-start",
-  gap: 8,
-};
-
-const stepNumberStyle: React.CSSProperties = {
-  flexShrink: 0,
-  width: 20,
-  height: 20,
-  borderRadius: "50%",
-  backgroundColor: "rgba(147, 69, 42, 0.1)",
-  color: "#93452A",
-  fontSize: 11,
-  fontWeight: 700,
-  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const stepTextStyle: React.CSSProperties = {
-  fontFamily: "var(--font-inter), Inter, sans-serif",
-  fontSize: 12,
-  color: "#5E5E65",
-  lineHeight: 1.5,
-  paddingTop: 1,
 };
 
 const conflictTextStyle: React.CSSProperties = {

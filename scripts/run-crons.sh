@@ -211,11 +211,9 @@ run_job() {
   task_uuid=$(uuidgen 2>/dev/null || cat /proc/sys/kernel/random/uuid 2>/dev/null || echo "cron-${db_slug}-${job_start_epoch}")
   task_uuid=$(echo "$task_uuid" | tr '[:upper:]' '[:lower:]')
   local started_iso
-  if [[ "$(uname)" == "Darwin" ]]; then
-    started_iso=$(date -j -f "%s" "$job_start_epoch" -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "")
-  else
-    started_iso=$(date -u -d "@${job_start_epoch}" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "")
-  fi
+  started_iso=$(date -u -r "$job_start_epoch" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+    || date -u -d "@${job_start_epoch}" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+    || echo "")
   local cron_run_id=""
   if command -v sqlite3 &>/dev/null && [[ -f "$db_path" ]] && [[ -n "$started_iso" ]]; then
     # Insert running cron_run
@@ -296,11 +294,9 @@ run_job() {
 
   # Update cron_run and task in SQLite
   local completed_iso
-  if [[ "$(uname)" == "Darwin" ]]; then
-    completed_iso=$(date -j -f "%s" "$job_end_epoch" -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "")
-  else
-    completed_iso=$(date -u -d "@${job_end_epoch}" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "")
-  fi
+  completed_iso=$(date -u -r "$job_end_epoch" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+    || date -u -d "@${job_end_epoch}" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+    || echo "")
   local db_result="failure"
   [[ "$final_result" == "success" ]] && db_result="success"
   if command -v sqlite3 &>/dev/null && [[ -f "$db_path" ]] && [[ -n "$completed_iso" ]]; then
@@ -319,6 +315,59 @@ run_job() {
     fi
     local duration_ms=$((total_duration * 1000))
     sqlite3 "$db_path" "UPDATE tasks SET status='${task_status}', completedAt='${completed_iso}', updatedAt='${completed_iso}', durationMs=${duration_ms}, errorMessage=${error_val} WHERE id='${task_uuid}';" 2>/dev/null || true
+  fi
+
+  # Record output files created during this job's execution window
+  if command -v sqlite3 &>/dev/null && [[ -f "$db_path" ]] && [[ -n "$task_uuid" ]]; then
+    local projects_dir="${PROJECT_DIR}/projects"
+    if [[ -d "$projects_dir" ]]; then
+      # Find files modified during the job window (with 2s buffer either side)
+      local find_start=$((job_start_epoch - 2))
+      local find_end=$((job_end_epoch + 2))
+      # Deliverable extensions only — skip source code, configs, lock files
+      while IFS= read -r fpath; do
+        [[ -z "$fpath" ]] && continue
+        # Skip command-centre source, dotfiles, node_modules
+        [[ "$fpath" == *"/briefs/command-centre/"* ]] && continue
+        [[ "$fpath" == *"/node_modules/"* ]] && continue
+        [[ "$fpath" == */\.* ]] && continue
+
+        local fname ext rel_path fsize mod_epoch
+        fname=$(basename "$fpath")
+        ext="${fname##*.}"
+        ext=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
+        rel_path="${fpath#"${PROJECT_DIR}/"}"
+        fsize=$(stat -f%z "$fpath" 2>/dev/null || stat -c%s "$fpath" 2>/dev/null || echo "0")
+
+        # Check modification time is within the job window
+        mod_epoch=$(stat -f%m "$fpath" 2>/dev/null || stat -c%Y "$fpath" 2>/dev/null || echo "0")
+        (( mod_epoch < find_start || mod_epoch > find_end )) && continue
+
+        # Only deliverable types
+        case "$ext" in
+          md|txt|pdf|csv|json|png|jpg|jpeg|gif|svg|webp|mp4|mp3|wav|html|xml) ;;
+          *) continue ;;
+        esac
+
+        # Deduplicate: skip if already tracked for any task
+        local exists
+        exists=$(sqlite3 "$db_path" "SELECT COUNT(*) FROM task_outputs WHERE filePath='${fpath}';" 2>/dev/null || echo "0")
+        [[ "$exists" != "0" ]] && continue
+
+        local output_id
+        output_id=$(uuidgen 2>/dev/null || cat /proc/sys/kernel/random/uuid 2>/dev/null || echo "out-${RANDOM}-${RANDOM}")
+        output_id=$(echo "$output_id" | tr '[:upper:]' '[:lower:]')
+        local safe_fname
+        safe_fname=$(echo "$fname" | sed "s/'/''/g")
+        local safe_fpath
+        safe_fpath=$(echo "$fpath" | sed "s/'/''/g")
+        local safe_rel
+        safe_rel=$(echo "$rel_path" | sed "s/'/''/g")
+
+        sqlite3 "$db_path" "INSERT INTO task_outputs (id, taskId, fileName, filePath, relativePath, extension, sizeBytes, createdAt) VALUES ('${output_id}', '${task_uuid}', '${safe_fname}', '${safe_fpath}', '${safe_rel}', '${ext}', ${fsize}, '${completed_iso}');" 2>/dev/null || true
+        echo "[dispatcher] Recorded output: ${rel_path}"
+      done < <(find "$projects_dir" -type f -maxdepth 4 2>/dev/null)
+    fi
   fi
 
   # Check for [SILENT] marker in output (job signals nothing to report)
@@ -367,10 +416,14 @@ catch_up_missed_jobs() {
   last_dispatch=$(read_status_field "$dispatcher_status" "last_dispatch")
   [[ -z "$last_dispatch" ]] && return 0
 
-  # Convert ISO timestamp to epoch. macOS date -j vs GNU date.
+  # Convert ISO timestamp to epoch. The timestamp is UTC (written with date -u),
+  # so we must parse it in UTC context. macOS date -j treats input as local time
+  # by default, which inflates the gap by the timezone offset — causing catch-up
+  # to re-trigger on every cycle.
   local last_epoch
-  if date -j -f "%Y-%m-%dT%H:%M:%SZ" "$last_dispatch" +%s &>/dev/null 2>&1; then
-    last_epoch=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$last_dispatch" +%s 2>/dev/null)
+  local ts_no_z="${last_dispatch%Z}"  # Strip trailing Z for format parsing
+  if TZ=UTC date -j -f "%Y-%m-%dT%H:%M:%S" "$ts_no_z" +%s &>/dev/null 2>&1; then
+    last_epoch=$(TZ=UTC date -j -f "%Y-%m-%dT%H:%M:%S" "$ts_no_z" +%s 2>/dev/null)
   elif date -d "$last_dispatch" +%s &>/dev/null 2>&1; then
     last_epoch=$(date -d "$last_dispatch" +%s 2>/dev/null)
   else
@@ -459,22 +512,13 @@ catch_up_missed_jobs() {
     done
 
     if [[ "$missed" == "true" ]]; then
-      # Check if the job already ran after the missed time (prevents re-triggering
-      # catch-up on every dispatch cycle while a previous catch-up is still running)
-      local job_status_file="${STATUS_DIR}/${job_basename}.json"
-      local job_last_run
-      job_last_run=$(read_status_field "$job_status_file" "last_run")
-      if [[ -n "$job_last_run" ]]; then
-        local job_last_epoch=0
-        if date -j -f "%Y-%m-%dT%H:%M:%SZ" "$job_last_run" +%s &>/dev/null 2>&1; then
-          job_last_epoch=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$job_last_run" +%s 2>/dev/null)
-        elif date -d "$job_last_run" +%s &>/dev/null 2>&1; then
-          job_last_epoch=$(date -d "$job_last_run" +%s 2>/dev/null)
-        fi
-        # If the job ran after the effective_start of the gap, it's already been caught up
-        if (( job_last_epoch > effective_start )); then
-          continue
-        fi
+      # Definitive guard: one catch-up per job per day. A marker file is written
+      # the moment catch-up fires and checked before every subsequent attempt.
+      local catchup_marker="${STATUS_DIR}/${job_basename}.catchup"
+      local today_date
+      today_date=$(date +%Y-%m-%d)
+      if [[ -f "$catchup_marker" ]] && [[ "$(cat "$catchup_marker" 2>/dev/null)" == "$today_date" ]]; then
+        continue
       fi
 
       # Also skip if a PID file exists (job is currently running from a prior catch-up)
@@ -486,6 +530,9 @@ catch_up_missed_jobs() {
           continue
         fi
       fi
+
+      # Write the catch-up marker BEFORE launching, so concurrent dispatchers see it
+      echo "$today_date" > "$catchup_marker"
 
       caught_up_jobs="${caught_up_jobs}|${job_basename}|"
 
@@ -538,7 +585,19 @@ for file in "${CRONS_DIR}"/*.md; do
     *) echo "$SCHED_DAYS" | tr ',' ' ' | grep -qw "$NOW_DAY" || continue ;;
   esac
 
-  LOG_FILE="${LOGS_DIR}/$(basename "$file" .md).log"
+  # For fixed-time jobs, skip if catch-up already fired this job today
+  local job_slug
+  job_slug=$(basename "$file" .md)
+  if is_fixed_time "$SCHED_TIME"; then
+    local catchup_marker="${STATUS_DIR}/${job_slug}.catchup"
+    local today_date
+    today_date=$(date +%Y-%m-%d)
+    if [[ -f "$catchup_marker" ]] && [[ "$(cat "$catchup_marker" 2>/dev/null)" == "$today_date" ]]; then
+      continue
+    fi
+  fi
+
+  LOG_FILE="${LOGS_DIR}/${job_slug}.log"
 
   # Fire job in background subshell with full lifecycle management
   {

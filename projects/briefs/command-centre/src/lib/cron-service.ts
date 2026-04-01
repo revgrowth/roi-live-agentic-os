@@ -339,6 +339,21 @@ export function getCronRunHistory(slug: string): CronRun[] {
   ];
 }
 
+export function getRawJobFile(slug: string): string | null {
+  const config = getConfig();
+  const filePath = path.join(
+    config.agenticOsDir,
+    "cron",
+    "jobs",
+    `${slug}.md`
+  );
+  try {
+    return fs.readFileSync(filePath, "utf-8");
+  } catch {
+    return null;
+  }
+}
+
 export function getCronJobLog(slug: string): string {
   const config = getConfig();
   const logPath = path.join(config.agenticOsDir, "cron", "logs", `${slug}.log`);

@@ -1,24 +1,69 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
+import { processManager } from "@/lib/process-manager";
 import type { Task, TaskUpdateInput } from "@/types/task";
 import type Database from "better-sqlite3";
 
-/** When a child task completes, auto-queue the next backlog sibling for user go-ahead */
-function autoQueueNextSibling(db: Database.Database, completedChild: Task, now: string): void {
+/**
+ * Parse dependsOn metadata from task description.
+ * Format: [depends_on: 0,2,3] at end of description.
+ */
+function parseDependsOn(description: string | null): number[] {
+  if (!description) return [];
+  const match = description.match(/\[depends_on:\s*([\d,\s]+)\]\s*$/);
+  if (!match) return [];
+  return match[1].split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+}
+
+/**
+ * Check if a sibling's dependencies are all satisfied (done).
+ * Dependencies are stored as indices in the original creation order (columnOrder).
+ */
+function areDependenciesSatisfied(
+  db: Database.Database,
+  sibling: Task,
+  parentId: string
+): boolean {
+  const deps = parseDependsOn(sibling.description);
+  if (deps.length === 0) return true; // No dependencies = independent
+
+  // Get all siblings sorted by columnOrder to map indices
+  const allSiblings = db.prepare(
+    `SELECT id, status, columnOrder FROM tasks WHERE parentId = ? ORDER BY columnOrder ASC`
+  ).all(parentId) as { id: string; status: string; columnOrder: number }[];
+
+  for (const depIdx of deps) {
+    if (depIdx >= 0 && depIdx < allSiblings.length) {
+      if (allSiblings[depIdx].status !== "done") return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * When a child task completes, auto-queue unblocked siblings.
+ * Supports dependency-aware parallel execution:
+ * - If siblings have dependsOn metadata: queue all whose deps are satisfied
+ * - If no dependsOn metadata (legacy): sequential — queue next backlog sibling
+ */
+function autoQueueUnblockedSiblings(db: Database.Database, completedChild: Task, now: string): void {
   if (!completedChild.parentId) return;
 
-  const nextSibling = db.prepare(
-    `SELECT * FROM tasks WHERE parentId = ? AND status = 'backlog' ORDER BY columnOrder ASC LIMIT 1`
-  ).get(completedChild.parentId) as Task | undefined;
+  const backlogSiblings = db.prepare(
+    `SELECT * FROM tasks WHERE parentId = ? AND status = 'backlog' ORDER BY columnOrder ASC`
+  ).all(completedChild.parentId) as Task[];
 
-  if (!nextSibling) {
+  if (backlogSiblings.length === 0) {
     // Check if all siblings are done
     const remaining = db.prepare(
       `SELECT COUNT(*) as count FROM tasks WHERE parentId = ? AND status != 'done'`
     ).get(completedChild.parentId) as { count: number };
 
     if (remaining.count === 0) {
+      // All done — check if this is a GSD verify completion that should trigger next phase
+      autoQueueNextPhase(db, completedChild, now);
+
       db.prepare(
         "UPDATE tasks SET status = 'review', updatedAt = ?, activityLabel = NULL, needsInput = 0 WHERE id = ?"
       ).run(now, completedChild.parentId);
@@ -28,25 +73,136 @@ function autoQueueNextSibling(db: Database.Database, completedChild: Task, now: 
     return;
   }
 
-  // Queue the next sibling — needs user go-ahead
-  db.prepare(
-    "UPDATE tasks SET status = 'review', updatedAt = ?, needsInput = 1, activityLabel = ? WHERE id = ?"
-  ).run(now, "Ready to start — waiting for go-ahead", nextSibling.id);
-  const updatedSibling = db.prepare("SELECT * FROM tasks WHERE id = ?").get(nextSibling.id) as Task;
-  emitTaskEvent({ type: "task:status", task: { ...updatedSibling, needsInput: Boolean(updatedSibling.needsInput) }, timestamp: now });
+  // Check if any siblings have dependsOn metadata
+  const hasDependencyMetadata = backlogSiblings.some(s => parseDependsOn(s.description).length > 0);
 
-  // Update parent progress
-  const completedCount = db.prepare(
-    `SELECT COUNT(*) as count FROM tasks WHERE parentId = ? AND status = 'done'`
-  ).get(completedChild.parentId) as { count: number };
-  const totalCount = db.prepare(
-    `SELECT COUNT(*) as count FROM tasks WHERE parentId = ?`
-  ).get(completedChild.parentId) as { count: number };
+  if (hasDependencyMetadata) {
+    // Dependency-aware: queue ALL siblings whose dependencies are satisfied
+    let queuedCount = 0;
+    for (const sibling of backlogSiblings) {
+      if (areDependenciesSatisfied(db, sibling, completedChild.parentId)) {
+        // Auto-queue — no user gate for parallel execution
+        db.prepare(
+          "UPDATE tasks SET status = 'queued', updatedAt = ?, activityLabel = NULL WHERE id = ?"
+        ).run(now, sibling.id);
+        const updatedSibling = db.prepare("SELECT * FROM tasks WHERE id = ?").get(sibling.id) as Task;
+        emitTaskEvent({ type: "task:status", task: { ...updatedSibling, needsInput: Boolean(updatedSibling.needsInput) }, timestamp: now });
+        queuedCount++;
+      }
+    }
+
+    // Update parent progress
+    const completedCount = db.prepare(
+      `SELECT COUNT(*) as count FROM tasks WHERE parentId = ? AND status = 'done'`
+    ).get(completedChild.parentId) as { count: number };
+    const totalCount = db.prepare(
+      `SELECT COUNT(*) as count FROM tasks WHERE parentId = ?`
+    ).get(completedChild.parentId) as { count: number };
+
+    const label = queuedCount > 1
+      ? `${completedCount.count}/${totalCount.count} done — ${queuedCount} tasks running in parallel`
+      : `${completedCount.count}/${totalCount.count} tasks done — next task queued`;
+
+    db.prepare(
+      "UPDATE tasks SET status = 'running', updatedAt = ?, activityLabel = ?, startedAt = COALESCE(startedAt, ?) WHERE id = ?"
+    ).run(now, label, now, completedChild.parentId);
+    const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(completedChild.parentId) as Task;
+    emitTaskEvent({ type: "task:status", task: { ...updatedParent, needsInput: Boolean(updatedParent.needsInput) }, timestamp: now });
+  } else {
+    // Legacy sequential: queue next backlog sibling with user gate
+    const nextSibling = backlogSiblings[0];
+
+    db.prepare(
+      "UPDATE tasks SET status = 'review', updatedAt = ?, needsInput = 1, activityLabel = ? WHERE id = ?"
+    ).run(now, "Ready to start — waiting for go-ahead", nextSibling.id);
+    const updatedSibling = db.prepare("SELECT * FROM tasks WHERE id = ?").get(nextSibling.id) as Task;
+    emitTaskEvent({ type: "task:status", task: { ...updatedSibling, needsInput: Boolean(updatedSibling.needsInput) }, timestamp: now });
+
+    // Update parent progress
+    const completedCount = db.prepare(
+      `SELECT COUNT(*) as count FROM tasks WHERE parentId = ? AND status = 'done'`
+    ).get(completedChild.parentId) as { count: number };
+    const totalCount = db.prepare(
+      `SELECT COUNT(*) as count FROM tasks WHERE parentId = ?`
+    ).get(completedChild.parentId) as { count: number };
+
+    db.prepare(
+      "UPDATE tasks SET status = 'running', updatedAt = ?, activityLabel = ?, startedAt = COALESCE(startedAt, ?) WHERE id = ?"
+    ).run(now, `${completedCount.count}/${totalCount.count} tasks done — next task queued`, now, completedChild.parentId);
+    const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(completedChild.parentId) as Task;
+    emitTaskEvent({ type: "task:status", task: { ...updatedParent, needsInput: Boolean(updatedParent.needsInput) }, timestamp: now });
+  }
+}
+
+/**
+ * Step 5b: GSD phase auto-progression.
+ * When a GSD subtask with gsdStep "verify" completes, create the next phase's subtask.
+ */
+function autoQueueNextPhase(db: Database.Database, completedChild: Task, now: string): void {
+  // Only applies to GSD verify steps
+  if (completedChild.gsdStep !== "verify" || !completedChild.parentId) return;
+
+  const parent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(completedChild.parentId) as Task | undefined;
+  if (!parent || parent.level !== "gsd") return;
+
+  const currentPhase = completedChild.phaseNumber;
+  if (currentPhase == null) return;
+
+  // Try to read total phases from .planning/ROADMAP.md
+  let totalPhases = 0;
+  try {
+    const fs = require("fs") as typeof import("fs");
+    const path = require("path") as typeof import("path");
+    const config = require("@/lib/config").getConfig();
+    const roadmapPath = path.join(config.agenticOsDir, ".planning", "ROADMAP.md");
+    if (fs.existsSync(roadmapPath)) {
+      const content = fs.readFileSync(roadmapPath, "utf-8");
+      // Count phase headings (## Phase N or ### Phase N)
+      const phaseMatches = content.match(/^#{2,3}\s+Phase\s+\d+/gm);
+      totalPhases = phaseMatches ? phaseMatches.length : 0;
+    }
+  } catch { /* proceed without roadmap info */ }
+
+  const nextPhase = currentPhase + 1;
+
+  if (totalPhases > 0 && nextPhase > totalPhases) {
+    // Final phase verified — mark parent as review (project complete)
+    db.prepare(
+      "UPDATE tasks SET status = 'review', updatedAt = ?, activityLabel = ? WHERE id = ?"
+    ).run(now, `All ${totalPhases} phases verified — project complete`, parent.id);
+    const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(parent.id) as Task;
+    emitTaskEvent({ type: "task:status", task: { ...updatedParent, needsInput: Boolean(updatedParent.needsInput) }, timestamp: now });
+    return;
+  }
+
+  // Create next phase subtask
+  const nextPhaseId = crypto.randomUUID();
+  const nextTitle = `Phase ${nextPhase}: discuss`;
 
   db.prepare(
-    "UPDATE tasks SET status = 'running', updatedAt = ?, activityLabel = ?, startedAt = COALESCE(startedAt, ?) WHERE id = ?"
-  ).run(now, `${completedCount.count}/${totalCount.count} tasks done — next task queued`, now, completedChild.parentId);
-  const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(completedChild.parentId) as Task;
+    `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, phaseNumber, gsdStep, permissionMode)
+     VALUES (?, ?, ?, 'queued', 'gsd', ?, ?, ?, ?, ?, ?, 'discuss', ?)`
+  ).run(
+    nextPhaseId,
+    nextTitle,
+    `Phase ${nextPhase} discussion — auto-started after Phase ${currentPhase} verification`,
+    parent.id,
+    parent.projectSlug,
+    Date.now(),
+    now,
+    now,
+    nextPhase,
+    parent.permissionMode || "default"
+  );
+
+  const newPhaseTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(nextPhaseId) as Task;
+  emitTaskEvent({ type: "task:created", task: { ...newPhaseTask, needsInput: Boolean(newPhaseTask.needsInput) }, timestamp: now });
+
+  // Update parent activity
+  db.prepare(
+    "UPDATE tasks SET updatedAt = ?, activityLabel = ? WHERE id = ?"
+  ).run(now, `Phase ${currentPhase} verified — Phase ${nextPhase} starting`, parent.id);
+  const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(parent.id) as Task;
   emitTaskEvent({ type: "task:status", task: { ...updatedParent, needsInput: Boolean(updatedParent.needsInput) }, timestamp: now });
 }
 
@@ -109,6 +265,7 @@ export async function PATCH(
       "durationMs",
       "activityLabel",
       "errorMessage",
+      "needsInput",
       "startedAt",
       "completedAt",
       "phaseNumber",
@@ -119,7 +276,9 @@ export async function PATCH(
     for (const field of allowedFields) {
       if (field in body) {
         updates.push(`${field} = ?`);
-        values.push(body[field] ?? null);
+        // Convert boolean needsInput to integer for SQLite
+        const val = body[field];
+        values.push(field === "needsInput" ? (val ? 1 : 0) : (val ?? null));
       }
     }
 
@@ -147,23 +306,47 @@ export async function PATCH(
       timestamp: now,
     });
 
-    // Auto-queue next sibling when a child task is manually marked done
-    if (body.status === "done" && updated.parentId) {
-      autoQueueNextSibling(db, updated, now);
+    // Kill running process when task is manually marked done
+    if (body.status === "done" && processManager.hasActiveSession(id)) {
+      processManager.cancelTask(id).catch(() => {});
+      // Re-set status to done since cancelTask sets it to review
+      db.prepare("UPDATE tasks SET status = 'done', completedAt = COALESCE(completedAt, ?) WHERE id = ?").run(now, id);
     }
 
-    // When a parent task is moved to "queued", auto-queue its first backlog child
-    if (body.status === "queued" && !updated.parentId) {
-      const firstChild = db.prepare(
-        `SELECT * FROM tasks WHERE parentId = ? AND status = 'backlog' ORDER BY columnOrder ASC LIMIT 1`
-      ).get(id) as Task | undefined;
+    // Auto-queue unblocked siblings when a child task is marked done
+    if (body.status === "done" && updated.parentId) {
+      autoQueueUnblockedSiblings(db, updated, now);
+    }
 
-      if (firstChild) {
-        db.prepare(
-          "UPDATE tasks SET status = 'queued', updatedAt = ? WHERE id = ?"
-        ).run(now, firstChild.id);
-        const updatedChild = db.prepare("SELECT * FROM tasks WHERE id = ?").get(firstChild.id) as Task;
-        emitTaskEvent({ type: "task:status", task: { ...updatedChild, needsInput: Boolean(updatedChild.needsInput) }, timestamp: now });
+    // When a parent task is moved to "queued", auto-queue independent children in parallel
+    if (body.status === "queued" && !updated.parentId) {
+      const backlogChildren = db.prepare(
+        `SELECT * FROM tasks WHERE parentId = ? AND status = 'backlog' ORDER BY columnOrder ASC`
+      ).all(id) as Task[];
+
+      if (backlogChildren.length > 0) {
+        const hasDeps = backlogChildren.some(c => parseDependsOn(c.description).length > 0);
+
+        if (hasDeps) {
+          // Queue all independent children (no dependencies) simultaneously
+          for (const child of backlogChildren) {
+            if (parseDependsOn(child.description).length === 0) {
+              db.prepare(
+                "UPDATE tasks SET status = 'queued', updatedAt = ? WHERE id = ?"
+              ).run(now, child.id);
+              const updatedChild = db.prepare("SELECT * FROM tasks WHERE id = ?").get(child.id) as Task;
+              emitTaskEvent({ type: "task:status", task: { ...updatedChild, needsInput: Boolean(updatedChild.needsInput) }, timestamp: now });
+            }
+          }
+        } else {
+          // Sequential: queue first child only
+          const firstChild = backlogChildren[0];
+          db.prepare(
+            "UPDATE tasks SET status = 'queued', updatedAt = ? WHERE id = ?"
+          ).run(now, firstChild.id);
+          const updatedChild = db.prepare("SELECT * FROM tasks WHERE id = ?").get(firstChild.id) as Task;
+          emitTaskEvent({ type: "task:status", task: { ...updatedChild, needsInput: Boolean(updatedChild.needsInput) }, timestamp: now });
+        }
       }
     }
 

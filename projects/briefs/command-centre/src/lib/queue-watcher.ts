@@ -35,9 +35,16 @@ export function initQueueWatcher(): void {
     const db = getDb();
     const now = new Date().toISOString();
 
-    // Tasks that were actively running (no pending question) → back to backlog
+    // Tasks that were actively running (no pending question) — re-queue them
+    // so they restart on this server session. Parent tasks with children
+    // stay as-is (container tasks, not executed directly).
     const orphanedRunning = db
-      .prepare("SELECT * FROM tasks WHERE status = 'running' AND needsInput = 0 ORDER BY columnOrder ASC")
+      .prepare(
+        `SELECT t.* FROM tasks t
+         WHERE t.status = 'running' AND t.needsInput = 0
+         AND NOT EXISTS (SELECT 1 FROM tasks c WHERE c.parentId = t.id)
+         ORDER BY t.columnOrder ASC`
+      )
       .all() as Task[];
 
     // Tasks that were waiting for input → move to review (work was done, just can't continue the conversation)
@@ -45,16 +52,16 @@ export function initQueueWatcher(): void {
       .prepare("SELECT * FROM tasks WHERE status = 'running' AND needsInput = 1 ORDER BY columnOrder ASC")
       .all() as Task[];
 
-    // Queued tasks that never started → back to backlog
+    // Queued tasks that never started → re-queue (they'll execute immediately)
     const orphanedQueued = db
       .prepare("SELECT * FROM tasks WHERE status = 'queued' ORDER BY columnOrder ASC")
       .all() as Task[];
 
     if (orphanedRunning.length > 0) {
-      console.log(`[queue-watcher] Resetting ${orphanedRunning.length} orphaned running task(s) to backlog`);
+      console.log(`[queue-watcher] Re-queuing ${orphanedRunning.length} orphaned running task(s)`);
       for (const task of orphanedRunning) {
         db.prepare(
-          "UPDATE tasks SET status = 'backlog', updatedAt = ?, activityLabel = NULL, startedAt = NULL, errorMessage = NULL, needsInput = 0 WHERE id = ?"
+          "UPDATE tasks SET status = 'queued', updatedAt = ?, activityLabel = NULL, startedAt = NULL, errorMessage = NULL, needsInput = 0 WHERE id = ?"
         ).run(now, task.id);
         const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(task.id) as Task;
         emitTaskEvent({ type: "task:status", task: updated, timestamp: now });
@@ -72,14 +79,12 @@ export function initQueueWatcher(): void {
       }
     }
 
+    // Orphaned queued tasks will be picked up by the event listener above
+    // since they're already in 'queued' status — no action needed.
     if (orphanedQueued.length > 0) {
-      console.log(`[queue-watcher] Resetting ${orphanedQueued.length} queued task(s) to backlog`);
+      console.log(`[queue-watcher] Found ${orphanedQueued.length} queued task(s) — re-triggering execution`);
       for (const task of orphanedQueued) {
-        db.prepare(
-          "UPDATE tasks SET status = 'backlog', updatedAt = ?, activityLabel = NULL, startedAt = NULL, errorMessage = NULL WHERE id = ?"
-        ).run(now, task.id);
-        const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(task.id) as Task;
-        emitTaskEvent({ type: "task:status", task: updated, timestamp: now });
+        emitTaskEvent({ type: "task:status", task: { ...task, needsInput: Boolean(task.needsInput) }, timestamp: now });
       }
     }
 
@@ -153,17 +158,21 @@ export function initQueueWatcher(): void {
         }
 
         if (!alive) {
+          // Cron tasks go to "done" (no one to review). Interactive tasks go to
+          // "review" so the user can check the work before marking it done.
+          const isCronTask = !!task.cronJobSlug;
+          const reaperStatus = isCronTask ? "done" : "review";
           console.log(
-            `[queue-watcher] Reaper: Claude PID ${task.claudePid} for task ${task.id} is dead — marking done`
+            `[queue-watcher] Reaper: Claude PID ${task.claudePid} for task ${task.id} is dead — marking ${reaperStatus}`
           );
           db.prepare(
-            `UPDATE tasks SET status = 'done', completedAt = COALESCE(completedAt, ?), updatedAt = ?,
-             activityLabel = 'Session ended', claudePid = NULL,
+            `UPDATE tasks SET status = ?, completedAt = COALESCE(completedAt, ?), updatedAt = ?,
+             activityLabel = 'Session ended — review output', claudePid = NULL,
              durationMs = CASE WHEN startedAt IS NOT NULL
                THEN CAST((julianday(?) - julianday(startedAt)) * 86400000 AS INTEGER)
                ELSE durationMs END
              WHERE id = ?`
-          ).run(now, now, now, task.id);
+          ).run(reaperStatus, now, now, now, task.id);
           const updated = db
             .prepare("SELECT * FROM tasks WHERE id = ?")
             .get(task.id) as Task;
@@ -181,7 +190,66 @@ export function initQueueWatcher(): void {
          WHERE status IN ('review', 'done') AND claudePid IS NOT NULL`
       ).run();
 
-      // 2. Stuck needsInput reaping: tasks in "running" + needsInput=1 with no active
+      // 2. Null-PID reaping: tasks in "running" with claudePid=NULL, needsInput=0,
+      //    and no active in-memory session. These lost their process reference
+      //    (e.g. server restarted but recovery didn't catch them because they're
+      //    parent/container tasks, or PID was never written).
+      const nullPidRunning = db
+        .prepare(
+          `SELECT * FROM tasks
+           WHERE status = 'running'
+             AND claudePid IS NULL
+             AND needsInput = 0`
+        )
+        .all() as Task[];
+
+      for (const task of nullPidRunning) {
+        if (processManager.hasActiveSession(task.id)) continue;
+
+        // Check if this is a parent task with active children — if so, it's
+        // legitimately "running" as a container. Only reap if all children are terminal.
+        const activeChildren = db
+          .prepare(
+            `SELECT COUNT(*) as count FROM tasks
+             WHERE parentId = ? AND status IN ('running', 'queued')`
+          )
+          .get(task.id) as { count: number };
+
+        if (activeChildren.count > 0) continue; // Container still has active work
+
+        // Check if it has any children at all — if so, it's a completed container
+        const totalChildren = db
+          .prepare("SELECT COUNT(*) as count FROM tasks WHERE parentId = ?")
+          .get(task.id) as { count: number };
+
+        const isCronTask = !!task.cronJobSlug;
+        const reaperStatus = isCronTask ? "done" : "review";
+        const label = totalChildren.count > 0
+          ? "All subtasks finished — review output"
+          : "Session ended — review output";
+
+        console.log(
+          `[queue-watcher] Reaper: Task ${task.id.slice(0, 8)} "${task.title}" stuck in running with null PID and no active session — marking ${reaperStatus}`
+        );
+        db.prepare(
+          `UPDATE tasks SET status = ?, completedAt = COALESCE(completedAt, ?), updatedAt = ?,
+           activityLabel = ?, claudePid = NULL,
+           durationMs = CASE WHEN startedAt IS NOT NULL
+             THEN CAST((julianday(?) - julianday(startedAt)) * 86400000 AS INTEGER)
+             ELSE durationMs END
+           WHERE id = ?`
+        ).run(reaperStatus, now, now, label, now, task.id);
+        const updated = db
+          .prepare("SELECT * FROM tasks WHERE id = ?")
+          .get(task.id) as Task;
+        emitTaskEvent({
+          type: "task:status",
+          task: { ...updated, needsInput: Boolean(updated.needsInput) },
+          timestamp: now,
+        });
+      }
+
+      // 3. Stuck needsInput reaping: tasks in "running" + needsInput=1 with no active
       //    process-manager session. These are tasks where the Claude process exited but
       //    the task was left in "running" due to question detection. If no process is
       //    managing them, move to "review" so they're actionable.

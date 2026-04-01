@@ -266,6 +266,7 @@ Every skill and its output folder uses a category prefix. This keeps skills, out
 |-------|------------|
 | `meta-skill-creator` | "create a skill", "build a skill", "new skill", "make a skill", "optimize skill description" |
 | `meta-wrap-up` | "wrap up", "close session", "end session", "we're done", "session done" |
+| `meta-goal-breakdown` | "break this down", "plan this out", "subtasks", "scope this work", "task breakdown", goal bar submissions |
 
 ### Foundation Skills (build first — these write brand_context/)
 
@@ -310,6 +311,7 @@ Which `brand_context/` files each skill reads. Load only what's listed — no sk
 | `mkt-positioning` | — | **writes** | full | — | — | `## mkt-positioning` |
 | `mkt-icp` | — | summary | **writes** | — | — | `## mkt-icp` |
 | `meta-wrap-up` | — | — | — | — | — | `## meta-wrap-up` |
+| `meta-goal-breakdown` | — | summary | summary | — | — | `## meta-goal-breakdown` |
 | `str-ai-seo` | tone only | summary | full | — | — | `## str-ai-seo` |
 | `tool-stitch` | — | — | — | — | — | `## tool-stitch` |
 | `viz-stitch-design` | tone only | summary | language section | — | — | `## viz-stitch-design` |

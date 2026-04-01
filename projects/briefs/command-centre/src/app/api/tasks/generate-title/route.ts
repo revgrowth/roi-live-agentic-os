@@ -45,7 +45,7 @@ function generateTitle(description: string): Promise<string | null> {
     const cleanEnv = { ...process.env };
     delete cleanEnv.CLAUDECODE;
 
-    const prompt = `Generate a short task title (max 6 words) for this task description. Return ONLY the title, nothing else.\n\n${description.slice(0, 500)}`;
+    const prompt = `Summarise this task as a short label (max 6 words, lowercase). Write it like a human would say it casually — e.g. "skool post about pricing", "linkedin carousel for launch", "fix header alignment bug". Do NOT prefix with "Task:", "Write:", or any label. Return ONLY the summary, nothing else.\n\n${description.slice(0, 500)}`;
 
     const proc = spawn("claude", ["-p", prompt, "--output-format", "text"], {
       stdio: ["pipe", "pipe", "pipe"],
@@ -62,8 +62,10 @@ function generateTitle(description: string): Promise<string | null> {
     proc.on("close", (code) => {
       clearTimeout(timeout);
       if (code === 0 && stdout.trim()) {
-        // Clean up the response — remove quotes, trim
+        // Clean up the response — remove quotes, prefixes, trim
         let title = stdout.trim().replace(/^["']|["']$/g, "");
+        // Strip common AI-generated prefixes
+        title = title.replace(/^(task|title|summary|label)\s*:\s*/i, "");
         if (title.length > 60) {
           title = title.slice(0, 57).replace(/\s+\S*$/, "") + "...";
         }

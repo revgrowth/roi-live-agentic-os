@@ -9,7 +9,65 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const entries = processManager.getLogEntries(id);
+
+  // First try direct logs for this task
+  let entries = processManager.getLogEntries(id);
+
+  // If no logs and this is a parent/container task, aggregate child task logs
+  if (entries.length === 0) {
+    const db = getDb();
+    const childCount = db.prepare(
+      "SELECT COUNT(*) as count FROM tasks WHERE parentId = ?"
+    ).get(id) as { count: number };
+
+    if (childCount.count > 0) {
+      // Fetch logs from all child tasks, ordered by timestamp
+      const childLogs = db.prepare(
+        `SELECT tl.id, tl.type, tl.timestamp, tl.content, tl.toolName, tl.toolArgs,
+                tl.toolResult, tl.isCollapsed, t.title as taskTitle, t.phaseNumber, t.gsdStep
+         FROM task_logs tl
+         JOIN tasks t ON tl.taskId = t.id
+         WHERE t.parentId = ?
+         ORDER BY tl.timestamp ASC`
+      ).all(id) as Array<{
+        id: string; type: string; timestamp: string; content: string;
+        toolName: string | null; toolArgs: string | null; toolResult: string | null;
+        isCollapsed: number; taskTitle: string; phaseNumber: number | null; gsdStep: string | null;
+      }>;
+
+      // Group by child task and insert header entries so the user knows
+      // which subtask each block of logs came from
+      let lastTaskTitle = "";
+      entries = [];
+      for (const row of childLogs) {
+        // Insert a divider when switching between child tasks
+        if (row.taskTitle !== lastTaskTitle) {
+          lastTaskTitle = row.taskTitle;
+          const label = row.phaseNumber != null
+            ? `Phase ${row.phaseNumber}${row.gsdStep ? ` (${row.gsdStep})` : ""}: ${row.taskTitle}`
+            : row.taskTitle;
+          entries.push({
+            id: `header-${row.id}`,
+            type: "text" as LogEntry["type"],
+            timestamp: row.timestamp,
+            content: `--- ${label} ---`,
+          });
+        }
+
+        entries.push({
+          id: row.id,
+          type: row.type as LogEntry["type"],
+          timestamp: row.timestamp,
+          content: row.content,
+          ...(row.toolName ? { toolName: row.toolName } : {}),
+          ...(row.toolArgs ? { toolArgs: row.toolArgs } : {}),
+          ...(row.toolResult ? { toolResult: row.toolResult } : {}),
+          ...(row.isCollapsed ? { isCollapsed: true } : {}),
+        });
+      }
+    }
+  }
+
   return NextResponse.json(entries);
 }
 

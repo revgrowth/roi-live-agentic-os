@@ -110,3 +110,19 @@ CREATE TABLE IF NOT EXISTS agent_decisions (
   FOREIGN KEY (messageId) REFERENCES messages(id) ON DELETE SET NULL
 );
 CREATE INDEX IF NOT EXISTS idx_agent_decisions_conversationId ON agent_decisions(conversationId);
+
+-- First-class projects — tracks project status and links to tasks via slug
+CREATE TABLE IF NOT EXISTS projects (
+  id TEXT PRIMARY KEY,
+  slug TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'paused', 'complete', 'archived')),
+  level INTEGER NOT NULL DEFAULT 2,
+  briefPath TEXT,
+  goal TEXT,
+  clientId TEXT,
+  createdAt TEXT NOT NULL,
+  updatedAt TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_projects_slug ON projects(slug);
+CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
