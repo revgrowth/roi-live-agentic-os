@@ -105,11 +105,14 @@ if [[ -z "${__SELF_UPDATED:-}" ]]; then
     LOCAL_HASH=$(md5 -q "$SCRIPT_DIR/update.sh" 2>/dev/null || md5sum "$SCRIPT_DIR/update.sh" 2>/dev/null | awk '{print $1}' || echo "")
     if [[ -n "$REMOTE_HASH" ]] && [[ -n "$LOCAL_HASH" ]] && [[ "$REMOTE_HASH" != "$LOCAL_HASH" ]]; then
         ok "Update script has changed — reloading with latest version..."
+        echo ""
         git checkout origin/main -- scripts/update.sh 2>/dev/null || true
         __SELF_UPDATED=1 exec bash "$SCRIPT_DIR/update.sh" "$@"
     else
         ok "Update script is current"
     fi
+else
+    ok "Running latest update script"
 fi
 
 echo ""
