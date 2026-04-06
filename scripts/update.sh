@@ -287,6 +287,7 @@ CONFLICT_BACKED_UP=()
 # Fetch first so we can compare against origin/main
 git fetch origin 2>/dev/null || true
 
+# --- Handle protected paths that changed upstream ---
 for protected in "${PROTECTED_PATHS[@]}"; do
     # Skip directory paths
     [[ "$protected" == */ ]] && continue
@@ -309,13 +310,66 @@ for protected in "${PROTECTED_PATHS[@]}"; do
     fi
 done
 
+# --- Auto-detect ALL files deleted upstream but still tracked locally ---
+# Prevents modify/delete merge conflicts for ANY file removed upstream
+# (e.g. cron jobs, old scripts), not just protected paths.
+MERGE_BASE=$(git merge-base HEAD origin/main 2>/dev/null || echo "")
+if [[ -n "$MERGE_BASE" ]]; then
+    DELETED_COUNT=0
+    while IFS= read -r del_file; do
+        [[ -z "$del_file" ]] && continue
+        if git ls-files --error-unmatch "$del_file" &>/dev/null 2>&1; then
+            git rm --cached "$del_file" 2>/dev/null || true
+            DELETED_COUNT=$((DELETED_COUNT + 1))
+        fi
+    done < <(git diff --name-only --diff-filter=D "$MERGE_BASE" origin/main 2>/dev/null)
+    if [[ $DELETED_COUNT -gt 0 ]]; then
+        ok "Cleaned up ${DELETED_COUNT} file(s) removed in latest update"
+    fi
+fi
+
 # =========================================================
 # Step 6: Pull upstream changes
 # =========================================================
 info "Checking for updates..."
 echo ""
 
-PULL_OUTPUT=$(git pull origin main 2>&1) || {
+MERGE_FAILED=false
+PULL_OUTPUT=$(git pull origin main 2>&1) || MERGE_FAILED=true
+
+# --- Auto-recover from modify/delete conflicts ---
+# If the pull failed because files were deleted upstream but modified
+# locally (e.g. cron jobs the user edited), resolve automatically by
+# accepting the upstream deletion. Local copies stay on disk as untracked.
+if $MERGE_FAILED && echo "$PULL_OUTPUT" | grep -q "CONFLICT (modify/delete)"; then
+    warn "Resolving file conflicts from removed features..."
+    CONFLICT_FILES=$(echo "$PULL_OUTPUT" | grep "CONFLICT (modify/delete)" | sed 's/.*): //' | sed 's/ deleted in.*//')
+    while IFS= read -r cfile; do
+        [[ -z "$cfile" ]] && continue
+        git rm -f "$cfile" 2>/dev/null || true
+    done <<< "$CONFLICT_FILES"
+
+    # Resolve any remaining conflicts by accepting upstream
+    REMAINING=$(git diff --name-only --diff-filter=U 2>/dev/null || true)
+    if [[ -n "$REMAINING" ]]; then
+        while IFS= read -r ufile; do
+            [[ -z "$ufile" ]] && continue
+            git checkout --theirs "$ufile" 2>/dev/null || true
+            git add "$ufile" 2>/dev/null || true
+        done <<< "$REMAINING"
+    fi
+
+    if git commit --no-edit 2>/dev/null; then
+        ok "Conflicts auto-resolved — update continues"
+        MERGE_FAILED=false
+        PULL_OUTPUT="auto-resolved"
+    fi
+fi
+
+if $MERGE_FAILED; then
+    # Abort the failed merge so the repo is clean
+    git merge --abort 2>/dev/null || true
+
     # Restore protected files
     if $STASHED; then
         git stash pop --quiet 2>/dev/null || true
@@ -365,7 +419,7 @@ PULL_OUTPUT=$(git pull origin main 2>&1) || {
         echo "  Pull failed. Your files are safe — nothing was changed."
     fi
     exit 1
-}
+fi
 
 # =========================================================
 # Determine if anything changed
