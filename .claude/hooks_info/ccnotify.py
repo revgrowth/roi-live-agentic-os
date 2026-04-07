@@ -4,55 +4,57 @@ Claude Code Notify
 https://github.com/dazuiba/CCNotify
 """
 
-import os
-import sys
 import json
+import logging
+import os
+import platform
 import sqlite3
 import subprocess
-import logging
-from logging.handlers import TimedRotatingFileHandler
+import sys
 from datetime import datetime
+from logging.handlers import TimedRotatingFileHandler
 
 
 class ClaudePromptTracker:
     def __init__(self):
-        """Initialize the prompt tracker with database setup"""
+        """Initialize the prompt tracker with database and paths."""
         script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.script_dir = script_dir
+        self.project_dir = os.path.dirname(os.path.dirname(script_dir))
         self.db_path = os.path.join(script_dir, "ccnotify.db")
+        self.windows_notify_script = os.path.join(
+            self.project_dir, "scripts", "windows-notify.ps1"
+        )
         self.setup_logging()
         self.init_database()
 
     def setup_logging(self):
-        """Setup logging to file with daily rotation"""
+        """Setup logging to file with daily rotation."""
+        log_path = os.path.join(self.script_dir, "ccnotify.log")
 
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        log_path = os.path.join(script_dir, "ccnotify.log")
-
-        # Create a timed rotating file handler
         handler = TimedRotatingFileHandler(
             log_path,
-            when="midnight",  # Rotate at midnight
-            interval=1,  # Every 1 day
-            backupCount=1,  # Keep 1 days of logs
+            when="midnight",
+            interval=1,
+            backupCount=1,
             encoding="utf-8",
         )
 
-        # Set the log format
         formatter = logging.Formatter(
             "%(asctime)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
         )
         handler.setFormatter(formatter)
 
-        # Configure the root logger
         logger = logging.getLogger()
         logger.setLevel(logging.INFO)
-        logger.addHandler(handler)
+        if not logger.handlers:
+            logger.addHandler(handler)
 
     def init_database(self):
-        """Create tables and triggers if they don't exist"""
+        """Create tables and triggers if they don't exist."""
         with sqlite3.connect(self.db_path) as conn:
-            # Create main table
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS prompt (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     session_id TEXT NOT NULL,
@@ -63,10 +65,11 @@ class ClaudePromptTracker:
                     stoped_at DATETIME,
                     lastWaitUserAt DATETIME
                 )
-            """)
+            """
+            )
 
-            # Create trigger for auto-incrementing seq
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE TRIGGER IF NOT EXISTS auto_increment_seq
                 AFTER INSERT ON prompt
                 FOR EACH ROW
@@ -79,12 +82,13 @@ class ClaudePromptTracker:
                     )
                     WHERE id = NEW.id;
                 END
-            """)
+            """
+            )
 
             conn.commit()
 
     def handle_user_prompt_submit(self, data):
-        """Handle UserPromptSubmit event - insert new prompt record"""
+        """Handle UserPromptSubmit event by inserting a new prompt row."""
         session_id = data.get("session_id")
         prompt = data.get("prompt", "")
         cwd = data.get("cwd", "")
@@ -99,125 +103,152 @@ class ClaudePromptTracker:
             )
             conn.commit()
 
-        logging.info(f"Recorded prompt for session {session_id}")
+        logging.info("Recorded prompt for session %s", session_id)
 
     def handle_stop(self, data):
-        """Handle Stop event - update completion time and send notification"""
+        """Handle Stop event by closing the latest prompt and notifying."""
         session_id = data.get("session_id")
+        record = self.get_latest_prompt_record(session_id, unfinished_only=True)
+        if not record:
+            logging.info("Stop received for session %s with no unfinished prompt", session_id)
+            return
 
         with sqlite3.connect(self.db_path) as conn:
-            # Find the latest unfinished record for this session
+            conn.execute(
+                """
+                UPDATE prompt
+                SET stoped_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            """,
+                (record["id"],),
+            )
+            conn.commit()
+
+        duration = self.calculate_duration_from_db(record["id"])
+        seq = record["seq"] or 1
+        project_label = self.project_label(record.get("cwd"))
+        if duration == "Unknown":
+            body = f"Job #{seq} finished."
+        else:
+            body = f"Job #{seq} finished in {duration}."
+
+        self.send_notification(
+            title=project_label,
+            subtitle="Task complete",
+            message=body,
+            variant="success",
+            duration="short",
+        )
+
+        logging.info(
+            "Task completed for session %s, job#%s, duration: %s",
+            session_id,
+            seq,
+            duration,
+        )
+
+    def handle_notification(self, data):
+        """Handle Notification event with Windows-aware dedupe and mapping."""
+        session_id = data.get("session_id")
+        raw_message = data.get("message", "")
+        message = self.normalize_message(raw_message)
+        record = self.get_latest_prompt_record(session_id)
+        cwd = data.get("cwd") or (record.get("cwd") if record else "")
+
+        logging.info("[NOTIFICATION] session=%s, message='%s'", session_id, message)
+
+        message_lower = message.lower()
+        subtitle = "Notification"
+        body = message or "Claude sent an update."
+        variant = "info"
+        duration = "short"
+
+        if "waiting for your input" in message_lower or "waiting for input" in message_lower:
+            if not self.mark_wait_notification(session_id):
+                logging.info(
+                    "Duplicate waiting notification suppressed for session %s",
+                    session_id,
+                )
+                return
+            subtitle = "Waiting for input"
+            body = "Claude is paused until you reply."
+            variant = "info"
+            duration = "long"
+        elif "permission" in message_lower:
+            subtitle = "Permission required"
+            variant = "warning"
+            duration = "long"
+        elif "approval" in message_lower or "choose an option" in message_lower:
+            subtitle = "Action required"
+            variant = "warning"
+            duration = "long"
+
+        self.send_notification(
+            title=self.project_label(cwd),
+            subtitle=subtitle,
+            message=body,
+            variant=variant,
+            duration=duration,
+        )
+
+        logging.info(
+            "Notification processed for session %s: %s (%s)",
+            session_id,
+            subtitle,
+            variant,
+        )
+
+    def get_latest_prompt_record(self, session_id, unfinished_only=False):
+        """Return the latest prompt row for a session."""
+        query = """
+            SELECT id, created_at, prompt, cwd, seq, stoped_at, lastWaitUserAt
+            FROM prompt
+            WHERE session_id = ?
+        """
+        if unfinished_only:
+            query += " AND stoped_at IS NULL"
+        query += " ORDER BY created_at DESC LIMIT 1"
+
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute(query, (session_id,))
+            row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return {
+            "id": row[0],
+            "created_at": row[1],
+            "prompt": row[2],
+            "cwd": row[3],
+            "seq": row[4],
+            "stoped_at": row[5],
+            "lastWaitUserAt": row[6],
+        }
+
+    def mark_wait_notification(self, session_id):
+        """Mark the current prompt as waiting. Returns False if already marked."""
+        with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute(
                 """
-                SELECT id, created_at, cwd
-                FROM prompt
-                WHERE session_id = ? AND stoped_at IS NULL
-                ORDER BY created_at DESC
-                LIMIT 1
+                UPDATE prompt
+                SET lastWaitUserAt = CURRENT_TIMESTAMP
+                WHERE id = (
+                    SELECT id
+                    FROM prompt
+                    WHERE session_id = ? AND stoped_at IS NULL
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                )
+                AND lastWaitUserAt IS NULL
             """,
                 (session_id,),
             )
-
-            row = cursor.fetchone()
-            if row:
-                record_id, created_at, cwd = row
-
-                # Update completion time
-                conn.execute(
-                    """
-                    UPDATE prompt
-                    SET stoped_at = CURRENT_TIMESTAMP
-                    WHERE id = ?
-                """,
-                    (record_id,),
-                )
-                conn.commit()
-
-                # Get seq number and calculate duration
-                cursor = conn.execute(
-                    "SELECT seq FROM prompt WHERE id = ?", (record_id,)
-                )
-                seq_row = cursor.fetchone()
-                seq = seq_row[0] if seq_row else 1
-
-                duration = self.calculate_duration_from_db(record_id)
-                self.send_notification(
-                    title=os.path.basename(cwd) if cwd else "Claude Task",
-                    subtitle=f"job#{seq} done, duration: {duration}",
-                    cwd=cwd,
-                )
-
-                logging.info(
-                    f"Task completed for session {session_id}, job#{seq}, duration: {duration}"
-                )
-
-    def handle_notification(self, data):
-        """Handle Notification event - check for various notification types and send notifications"""
-        session_id = data.get("session_id")
-        message = data.get("message", "")
-        cwd = data.get("cwd", "")
-
-        # Log all notifications for debugging
-        logging.info(f"[NOTIFICATION] session={session_id}, message='{message}'")
-
-        # Determine notification type and subtitle
-        message_lower = message.lower()
-        subtitle = None
-        should_update_db = False
-        should_notify = True
-
-        if (
-            "waiting for your input" in message_lower
-            or "waiting for input" in message_lower
-        ):
-            subtitle = "Waiting for input"
-            should_update_db = True
-            should_notify = (
-                False  # Suppress notification - Stop handler will send "job done"
-            )
-        elif "permission" in message_lower:
-            subtitle = "Permission Required"
-        elif "approval" in message_lower or "choose an option" in message_lower:
-            subtitle = "Action Required"
-        else:
-            # For other notifications, use a generic subtitle
-            subtitle = "Notification"
-
-        # Update database for waiting notifications
-        if should_update_db:
-            with sqlite3.connect(self.db_path) as conn:
-                # Fix: Use subquery instead of ORDER BY/LIMIT in UPDATE
-                conn.execute(
-                    """
-                    UPDATE prompt
-                    SET lastWaitUserAt = CURRENT_TIMESTAMP
-                    WHERE id = (
-                        SELECT id FROM prompt
-                        WHERE session_id = ?
-                        ORDER BY created_at DESC
-                        LIMIT 1
-                    )
-                """,
-                    (session_id,),
-                )
-                conn.commit()
-            logging.info(f"Updated lastWaitUserAt for session {session_id}")
-
-        # Send notification only if should_notify is True
-        if should_notify:
-            self.send_notification(
-                title=os.path.basename(cwd) if cwd else "Claude Task",
-                subtitle=subtitle,
-                cwd=cwd,
-            )
-            logging.info(f"Notification sent for session {session_id}: {subtitle}")
-        else:
-            logging.info(
-                f"Notification suppressed for session {session_id}: {subtitle}"
-            )
+            conn.commit()
+            return cursor.rowcount > 0
 
     def calculate_duration_from_db(self, record_id):
-        """Calculate duration for a completed record"""
+        """Calculate duration for a completed record."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute(
                 """
@@ -227,15 +258,15 @@ class ClaudePromptTracker:
             """,
                 (record_id,),
             )
-
             row = cursor.fetchone()
-            if row and row[1]:
-                return self.calculate_duration(row[0], row[1])
+
+        if row and row[1]:
+            return self.calculate_duration(row[0], row[1])
 
         return "Unknown"
 
     def calculate_duration(self, start_time, end_time):
-        """Calculate human-readable duration between two timestamps"""
+        """Calculate human-readable duration between two timestamps."""
         try:
             if isinstance(start_time, str):
                 start_dt = datetime.fromisoformat(start_time.replace("Z", "+00:00"))
@@ -252,87 +283,143 @@ class ClaudePromptTracker:
 
             if total_seconds < 60:
                 return f"{total_seconds}s"
-            elif total_seconds < 3600:
+            if total_seconds < 3600:
                 minutes = total_seconds // 60
                 seconds = total_seconds % 60
-                if seconds > 0:
-                    return f"{minutes}m{seconds}s"
-                else:
-                    return f"{minutes}m"
-            else:
-                hours = total_seconds // 3600
-                minutes = (total_seconds % 3600) // 60
-                if minutes > 0:
-                    return f"{hours}h{minutes}m"
-                else:
-                    return f"{hours}h"
-        except Exception as e:
-            logging.error(f"Error calculating duration: {e}")
+                return f"{minutes}m{seconds}s" if seconds > 0 else f"{minutes}m"
+
+            hours = total_seconds // 3600
+            minutes = (total_seconds % 3600) // 60
+            return f"{hours}h{minutes}m" if minutes > 0 else f"{hours}h"
+        except Exception as error:
+            logging.error("Error calculating duration: %s", error)
             return "Unknown"
 
-    def send_notification(self, title, subtitle, cwd=None):
-        """Send native OS notification (macOS via osascript, Windows via PowerShell)"""
-        import platform
-
-        current_time = datetime.now().strftime("%B %d, %Y at %H:%M")
+    def send_notification(self, title, subtitle, message, variant="info", duration="short"):
+        """Send a native notification and log the real delivery channel."""
         system = platform.system()
 
         try:
             if system == "Darwin":
-                self._notify_macos(title, subtitle, current_time)
-            elif system == "Windows":
-                self._notify_windows(title, subtitle, current_time)
-            else:
-                logging.warning(f"Notifications not supported on {system}")
+                self._notify_macos(title, subtitle, message)
+                logging.info("Notification sent: %s - %s", title, subtitle)
                 return
 
-            logging.info(f"Notification sent: {title} - {subtitle}")
-        except Exception as e:
-            logging.error(f"Error sending notification: {e}")
+            if system == "Windows":
+                result = self._notify_windows(title, subtitle, message, variant, duration)
+                delivery = result.get("delivery", "unknown")
+                if delivery != "toast":
+                    logging.warning(
+                        "Windows notification used %s fallback for %s - %s: %s",
+                        delivery,
+                        title,
+                        subtitle,
+                        result.get("toast_error", "unknown toast error"),
+                    )
+                logging.info(
+                    "Notification sent: %s - %s via %s",
+                    title,
+                    subtitle,
+                    delivery,
+                )
+                return
+
+            logging.warning("Notifications not supported on %s", system)
+        except Exception as error:
+            logging.error("Error sending notification: %s", error)
 
     def _notify_macos(self, title, subtitle, message):
-        """Send notification via osascript (built into macOS)"""
+        """Send notification via osascript (built into macOS)."""
         script = (
-            f'display notification "{message}" '
-            f'with title "{title}" '
-            f'subtitle "{subtitle}" '
+            f'display notification "{self.escape_applescript(message)}" '
+            f'with title "{self.escape_applescript(title)}" '
+            f'subtitle "{self.escape_applescript(subtitle)}" '
             f'sound name "default"'
         )
-        subprocess.run(
+        result = subprocess.run(
             ["osascript", "-e", script],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(result.stderr.strip() or "osascript failed")
+
+    def _notify_windows(self, title, subtitle, message, variant, duration):
+        """Send a Windows notification through the shared PowerShell helper."""
+        if not os.path.exists(self.windows_notify_script):
+            raise FileNotFoundError(
+                f"windows-notify.ps1 not found at {self.windows_notify_script}"
+            )
+
+        command = [
+            "powershell.exe",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            self.windows_notify_script,
+            "-Variant",
+            variant,
+            "-Title",
+            title,
+            "-Subtitle",
+            subtitle,
+            "-Message",
+            message,
+            "-Attribution",
+            "Agentic OS",
+            "-Duration",
+            duration,
+        ]
+
+        result = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
         )
 
-    def _notify_windows(self, title, subtitle, message):
-        """Send toast notification via PowerShell (built into Windows 10+)"""
-        ps_script = f"""
-[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
-[Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom, ContentType = WindowsRuntime] | Out-Null
-$template = @"
-<toast>
-  <visual>
-    <binding template="ToastGeneric">
-      <text>{title}</text>
-      <text>{subtitle}</text>
-      <text>{message}</text>
-    </binding>
-  </visual>
-  <audio src="ms-winsoundevent:Notification.Default"/>
-</toast>
-"@
-$xml = New-Object Windows.Data.Xml.Dom.XmlDocument
-$xml.LoadXml($template)
-$toast = [Windows.UI.Notifications.ToastNotification]::new($xml)
-[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("Claude Code").Show($toast)
-"""
-        subprocess.run(
-            ["powershell", "-NoProfile", "-Command", ps_script],
-            check=False, capture_output=True,
-        )
+        stdout = result.stdout.strip()
+        stderr = result.stderr.strip()
+
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"windows-notify exited {result.returncode}: {stderr or stdout or 'no output'}"
+            )
+
+        parsed = {}
+        if stdout:
+            try:
+                parsed = json.loads(stdout)
+            except json.JSONDecodeError:
+                parsed = {"ok": True, "delivery": "unknown", "raw_stdout": stdout}
+
+        if stderr:
+            logging.warning("windows-notify stderr: %s", stderr)
+
+        return parsed
+
+    @staticmethod
+    def project_label(cwd):
+        """Build the first-line title from the current project/worktree name."""
+        if not cwd:
+            return "Claude Task"
+        return os.path.basename(os.path.normpath(cwd)) or "Claude Task"
+
+    @staticmethod
+    def normalize_message(message):
+        """Collapse whitespace so notification bodies stay compact."""
+        return " ".join((message or "").split()).strip()
+
+    @staticmethod
+    def escape_applescript(value):
+        """Escape text for inline AppleScript strings."""
+        return (value or "").replace("\\", "\\\\").replace('"', '\\"')
 
 
 def validate_input_data(data, expected_event_name):
-    """Validate input data matches design specification"""
+    """Validate input data matches design specification."""
     required_fields = {
         "UserPromptSubmit": ["session_id", "prompt", "cwd", "hook_event_name"],
         "Stop": ["session_id", "hook_event_name"],
@@ -342,13 +429,11 @@ def validate_input_data(data, expected_event_name):
     if expected_event_name not in required_fields:
         raise ValueError(f"Unknown event type: {expected_event_name}")
 
-    # Check hook_event_name matches expected
     if data.get("hook_event_name") != expected_event_name:
         raise ValueError(
             f"Event name mismatch: expected {expected_event_name}, got {data.get('hook_event_name')}"
         )
 
-    # Check required fields
     missing_fields = []
     for field in required_fields[expected_event_name]:
         if field not in data or data[field] is None:
@@ -363,9 +448,8 @@ def validate_input_data(data, expected_event_name):
 
 
 def main():
-    """Main entry point - read JSON from stdin and process event"""
+    """Main entry point - read JSON from stdin and process event."""
     try:
-        # Check if hook type is provided as command line argument
         if len(sys.argv) < 2:
             print("ok")
             return
@@ -374,19 +458,16 @@ def main():
         valid_events = ["UserPromptSubmit", "Stop", "Notification"]
 
         if expected_event_name not in valid_events:
-            logging.error(f"Invalid hook type: {expected_event_name}")
-            logging.error(f"Valid hook types: {', '.join(valid_events)}")
+            logging.error("Invalid hook type: %s", expected_event_name)
+            logging.error("Valid hook types: %s", ", ".join(valid_events))
             sys.exit(1)
 
-        # Read JSON data from stdin
         input_data = sys.stdin.read().strip()
         if not input_data:
             logging.warning("No input data received")
             return
 
         data = json.loads(input_data)
-
-        # Validate input data
         validate_input_data(data, expected_event_name)
 
         tracker = ClaudePromptTracker()
@@ -398,14 +479,14 @@ def main():
         elif expected_event_name == "Notification":
             tracker.handle_notification(data)
 
-    except json.JSONDecodeError as e:
-        logging.error(f"JSON decode error: {e}")
+    except json.JSONDecodeError as error:
+        logging.error("JSON decode error: %s", error)
         sys.exit(1)
-    except ValueError as e:
-        logging.error(f"Validation error: {e}")
+    except ValueError as error:
+        logging.error("Validation error: %s", error)
         sys.exit(1)
-    except Exception as e:
-        logging.error(f"Unexpected error: {e}")
+    except Exception as error:
+        logging.error("Unexpected error: %s", error)
         sys.exit(1)
 
 
