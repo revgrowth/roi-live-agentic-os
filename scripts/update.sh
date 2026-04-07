@@ -355,13 +355,14 @@ if $MERGE_FAILED && echo "$PULL_OUTPUT" | grep -q "would be overwritten by merge
     while IFS= read -r ofile; do
         ofile=$(echo "$ofile" | xargs)  # trim whitespace
         [[ -z "$ofile" ]] && continue
-        # Back up the file
+        # Back up the file then remove from disk so merge can proceed
         if [[ -f "$REPO_ROOT/$ofile" ]]; then
             mkdir -p "$OVERWRITE_BACKUP/$(dirname "$ofile")"
             cp "$REPO_ROOT/$ofile" "$OVERWRITE_BACKUP/$ofile"
+            rm -f "$REPO_ROOT/$ofile"
         fi
-        # Reset it so the merge can proceed
-        git checkout HEAD -- "$ofile" 2>/dev/null || git rm -f "$ofile" 2>/dev/null || true
+        # Also clean from index if still tracked
+        git rm -f --cached "$ofile" 2>/dev/null || true
     done <<< "$OVERWRITE_FILES"
 
     # Retry the merge
