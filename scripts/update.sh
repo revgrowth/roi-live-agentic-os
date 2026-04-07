@@ -337,6 +337,52 @@ echo ""
 MERGE_FAILED=false
 PULL_OUTPUT=$(git pull origin main 2>&1) || MERGE_FAILED=true
 
+# --- Auto-recover from "would be overwritten by merge" ---
+# This happens when files in the working tree differ from HEAD — often
+# caused by the auto-detect step (git rm --cached leaves files on disk)
+# or by committed divergences the stash couldn't catch.
+# Fix: back up the files, reset them so merge can proceed, then restore.
+if $MERGE_FAILED && echo "$PULL_OUTPUT" | grep -q "would be overwritten by merge"; then
+    warn "Cleaning up files that would block the merge..."
+    OVERWRITE_BACKUP="$BACKUP_DIR/overwrite-prevention-$(date +%s)"
+    # Parse the file list from the error message
+    OVERWRITE_FILES=$(echo "$PULL_OUTPUT" | sed -n '/would be overwritten by merge/,/Please commit.*or stash\|Merge with strategy/{ /^\t/s/^\t//p }')
+    # Also try single-line format (all files on one error line)
+    if [[ -z "$OVERWRITE_FILES" ]]; then
+        OVERWRITE_FILES=$(echo "$PULL_OUTPUT" | grep "error: Your local changes" | sed 's/error: Your local changes to the following files would be overwritten by merge://' | tr ' ' '\n' | sed '/^$/d')
+    fi
+
+    while IFS= read -r ofile; do
+        ofile=$(echo "$ofile" | xargs)  # trim whitespace
+        [[ -z "$ofile" ]] && continue
+        # Back up the file
+        if [[ -f "$REPO_ROOT/$ofile" ]]; then
+            mkdir -p "$OVERWRITE_BACKUP/$(dirname "$ofile")"
+            cp "$REPO_ROOT/$ofile" "$OVERWRITE_BACKUP/$ofile"
+        fi
+        # Reset it so the merge can proceed
+        git checkout HEAD -- "$ofile" 2>/dev/null || git rm -f "$ofile" 2>/dev/null || true
+    done <<< "$OVERWRITE_FILES"
+
+    # Retry the merge
+    PULL_OUTPUT=$(git pull origin main 2>&1) && MERGE_FAILED=false || true
+
+    # Restore backed up files that are user data (not system files)
+    if [[ -d "$OVERWRITE_BACKUP" ]]; then
+        for protected in "${PROTECTED_PATHS[@]}"; do
+            [[ "$protected" == */ ]] && continue
+            if [[ -f "$OVERWRITE_BACKUP/$protected" ]]; then
+                mkdir -p "$(dirname "$REPO_ROOT/$protected")"
+                cp "$OVERWRITE_BACKUP/$protected" "$REPO_ROOT/$protected"
+            fi
+        done
+    fi
+
+    if ! $MERGE_FAILED; then
+        ok "Merge succeeded after cleanup"
+    fi
+fi
+
 # --- Auto-recover from modify/delete conflicts ---
 # If the pull failed because files were deleted upstream but modified
 # locally (e.g. cron jobs the user edited), resolve automatically by
