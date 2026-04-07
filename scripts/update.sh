@@ -26,7 +26,11 @@ bullet(){ printf "    ${DIM}•${NC} %b\n" "$1"; }
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) REPO_ROOT="$(cygpath -m "$REPO_ROOT")" ;; esac
-PYTHON_CMD="python3"; command -v python3 &>/dev/null || PYTHON_CMD="python"
+source "$SCRIPT_DIR/lib/python.sh"
+if ! resolve_python_cmd; then
+    printf "  ${RED}Python 3 is required for update.sh.${NC}\n"
+    exit 1
+fi
 cd "$REPO_ROOT"
 
 CATALOG="$REPO_ROOT/.claude/skills/_catalog/catalog.json"
@@ -1075,7 +1079,7 @@ if $HAVE_INSTALLED_JSON && [[ -f "$INSTALLED" ]] && [[ -f "$CATALOG" ]]; then
     # 1. Skills in removed_skills (user previously declined)
     # 2. NEW catalog skills that arrived via pull but aren't in installed_skills
     #    (user hasn't chosen them yet — offer in Step 3 instead)
-    SKILLS_TO_REMOVE=$($PYTHON_CMD -c "
+    SKILLS_TO_REMOVE=$("${PYTHON_CMD[@]}" -c "
 import json, sys, os
 try:
     with open('$INSTALLED') as f:
@@ -1118,7 +1122,7 @@ except Exception:
     fi
 elif $HAVE_INSTALLED_JSON && [[ -f "$INSTALLED" ]]; then
     # Fallback: no catalog, just re-remove previously removed skills
-    REMOVED_SKILLS=$($PYTHON_CMD -c "
+    REMOVED_SKILLS=$("${PYTHON_CMD[@]}" -c "
 import json, sys
 try:
     with open('$INSTALLED') as f:
@@ -1155,7 +1159,7 @@ if [[ -f "$CATALOG" ]]; then
     # Python outputs two sections separated by "---":
     #   Section 1: NEW skills (never seen before) — name|category|desc|services|deps
     #   Section 2: AVAILABLE skills (previously removed, not installed) — same format
-    CATALOG_OUTPUT=$($PYTHON_CMD -c "
+    CATALOG_OUTPUT=$("${PYTHON_CMD[@]}" -c "
 import json, sys, os
 
 catalog_path = '$CATALOG'

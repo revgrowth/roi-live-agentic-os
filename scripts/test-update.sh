@@ -29,6 +29,12 @@ TEST_ROOT="/tmp/agentic-os-test"
 MAIN_REPO="$TEST_ROOT/main-repo"          # bare upstream repo
 DEMO_REPO="$TEST_ROOT/demo-repo"          # user's clone
 MAIN_WORK="$TEST_ROOT/main-worktree"      # working copy for pushing changes
+source "$REAL_REPO/scripts/lib/python.sh"
+
+if ! resolve_python_cmd; then
+    err "Python 3 is required for scripts/test-update.sh"
+    exit 1
+fi
 
 # ---------- Helpers ----------
 info()   { printf "  ${CYAN}%b${NC}\n" "$1"; }
@@ -304,7 +310,7 @@ trigger: email sequence, drip campaign, nurture emails, onboarding emails, email
 SKILL
 
     # Add to catalog.json
-    python3 -c "
+    "${PYTHON_CMD[@]}" -c "
 import json
 with open('.claude/skills/_catalog/catalog.json') as f:
     data = json.load(f)
@@ -502,7 +508,7 @@ setup_scenario_17() {
 
     # Install ALL skills so nothing is "available"
     cd "$DEMO_REPO"
-    python3 -c "
+    "${PYTHON_CMD[@]}" -c "
 import json
 with open('.claude/skills/_catalog/installed.json') as f:
     data = json.load(f)
@@ -752,8 +758,8 @@ run_scenario() {
         echo ""
         if [[ -f .claude/skills/_catalog/installed.json ]]; then
             info "installed.json exists ✓"
-            INST_COUNT=$(python3 -c "import json; d=json.load(open('.claude/skills/_catalog/installed.json')); print(len(d.get('installed_skills',[])))" 2>/dev/null || echo "?")
-            REM_COUNT=$(python3 -c "import json; d=json.load(open('.claude/skills/_catalog/installed.json')); print(len(d.get('removed_skills',[])))" 2>/dev/null || echo "?")
+            INST_COUNT=$("${PYTHON_CMD[@]}" -c "import json; d=json.load(open('.claude/skills/_catalog/installed.json')); print(len(d.get('installed_skills',[])))" 2>/dev/null || echo "?")
+            REM_COUNT=$("${PYTHON_CMD[@]}" -c "import json; d=json.load(open('.claude/skills/_catalog/installed.json')); print(len(d.get('removed_skills',[])))" 2>/dev/null || echo "?")
             info "  Installed: $INST_COUNT skills, Removed: $REM_COUNT skills"
         else
             warn "installed.json missing"

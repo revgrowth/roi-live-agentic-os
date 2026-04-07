@@ -40,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks_info/ccnotify.py\" UserPromptSubmit"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-ccnotify.sh\" UserPromptSubmit"
           },
           {
             "type": "command",
@@ -54,7 +54,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks_info/ccnotify.py\" Stop"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-ccnotify.sh\" Stop"
           },
           {
             "type": "command",
@@ -68,7 +68,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks_info/ccnotify.py\" Notification"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-ccnotify.sh\" Notification"
           },
           {
             "type": "command",

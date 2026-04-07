@@ -3,14 +3,17 @@
 Skill selector with two modes:
 
 1. Interactive (default when run in a real terminal):
-   python3 scripts/select-skills.py
+   python3 scripts/select-skills.py           # macOS/Linux
+   py -3 scripts/select-skills.py             # Windows
    → Checkbox UI: arrow keys to navigate, Space to toggle, Enter to confirm
 
 2. CLI mode (for Claude Code or scripts — non-interactive):
-   python3 scripts/select-skills.py --remove "viz-nano-banana,viz-ugc-heygen,ops-cron"
+   python3 scripts/select-skills.py --remove "viz-nano-banana,viz-ugc-heygen,ops-cron"   # macOS/Linux
+   py -3 scripts/select-skills.py --remove "viz-nano-banana,viz-ugc-heygen,ops-cron"     # Windows
    python3 scripts/select-skills.py --keep "mkt-copywriting,tool-humanizer,str-trending-research"
+   py -3 scripts/select-skills.py --keep "mkt-copywriting,tool-humanizer,str-trending-research"
    python3 scripts/select-skills.py --keep all
-   python3 scripts/select-skills.py --remove none
+   py -3 scripts/select-skills.py --remove none
 
 Auto-detects which mode to use based on whether stdin is a TTY.
 Resolves dependencies, removes unselected folders, writes installed.json.

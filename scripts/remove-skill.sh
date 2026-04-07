@@ -3,7 +3,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) REPO_ROOT="$(cygpath -m "$REPO_ROOT")" ;; esac
-PYTHON_CMD="python3"; command -v python3 &>/dev/null || PYTHON_CMD="python"
+source "$REPO_ROOT/scripts/lib/python.sh"
 CATALOG="$REPO_ROOT/.claude/skills/_catalog/catalog.json"
 INSTALLED_JSON="$REPO_ROOT/.claude/skills/_catalog/installed.json"
 SKILLS_DIR="$REPO_ROOT/.claude/skills"
@@ -20,6 +20,11 @@ if [[ ! -f "$CATALOG" ]]; then
   exit 1
 fi
 
+if ! resolve_python_cmd; then
+  echo -e "${RED}Error:${NC} Python 3 is required to remove skills." >&2
+  exit 1
+fi
+
 # Validate argument
 if [[ -z "${1:-}" ]]; then
   echo -e "${RED}Usage:${NC} bash scripts/remove-skill.sh <skill-name>"
@@ -29,7 +34,7 @@ fi
 SKILL_NAME="$1"
 
 # Phase 1: validate and check deps, outputs action or exits
-DEPENDENTS=$($PYTHON_CMD -c "
+DEPENDENTS=$("${PYTHON_CMD[@]}" -c "
 import json, sys, os
 
 skill_name = sys.argv[1]
@@ -112,7 +117,7 @@ rm -rf "$SKILLS_DIR/$SKILL_NAME/"
 echo -e "${GREEN}✓${NC} Removed $SKILL_NAME"
 
 # Update installed.json
-$PYTHON_CMD -c "
+"${PYTHON_CMD[@]}" -c "
 import json, sys, os
 
 skill_name = sys.argv[1]
