@@ -337,110 +337,33 @@ echo ""
 MERGE_FAILED=false
 PULL_OUTPUT=$(git pull origin main 2>&1) || MERGE_FAILED=true
 
-# --- Auto-recover from "would be overwritten by merge" ---
-# This happens when files in the working tree differ from HEAD — often
-# caused by the auto-detect step (git rm --cached leaves files on disk)
-# or by committed divergences the stash couldn't catch.
-# Fix: back up the files, reset them so merge can proceed, then restore.
-if $MERGE_FAILED && echo "$PULL_OUTPUT" | grep -q "would be overwritten by merge"; then
-    warn "Cleaning up files that would block the merge..."
-    OVERWRITE_BACKUP="$BACKUP_DIR/overwrite-prevention-$(date +%s)"
-    # Parse the file list from the error message
-    OVERWRITE_FILES=$(echo "$PULL_OUTPUT" | sed -n '/would be overwritten by merge/,/Please commit.*or stash\|Merge with strategy/{ /^\t/s/^\t//p }')
-    # Also try single-line format (all files on one error line)
-    if [[ -z "$OVERWRITE_FILES" ]]; then
-        OVERWRITE_FILES=$(echo "$PULL_OUTPUT" | grep "error: Your local changes" | sed 's/error: Your local changes to the following files would be overwritten by merge://' | tr ' ' '\n' | sed '/^$/d')
-    fi
-
-    while IFS= read -r ofile; do
-        ofile=$(echo "$ofile" | xargs)  # trim whitespace
-        [[ -z "$ofile" ]] && continue
-        # Back up the file then remove from disk so merge can proceed
-        if [[ -f "$REPO_ROOT/$ofile" ]]; then
-            mkdir -p "$OVERWRITE_BACKUP/$(dirname "$ofile")"
-            cp "$REPO_ROOT/$ofile" "$OVERWRITE_BACKUP/$ofile"
-            rm -f "$REPO_ROOT/$ofile"
+# --- Nuclear fallback: if merge fails for ANY reason, force-reset ---
+# Instead of trying to handle every edge case (modify/delete conflicts,
+# "would be overwritten", template divergences, etc.), just force the
+# repo to match origin/main and restore user data from backups.
+if $MERGE_FAILED; then
+    # Check for auth failures first — those can't be fixed by force-reset
+    if echo "$PULL_OUTPUT" | grep -qi "authentication\|403\|could not read\|repository not found\|invalid credentials"; then
+        git merge --abort 2>/dev/null || true
+        if $STASHED; then
+            git stash pop --quiet 2>/dev/null || true
         fi
-        # Also clean from index if still tracked
-        git rm -f --cached "$ofile" 2>/dev/null || true
-    done <<< "$OVERWRITE_FILES"
-
-    # Retry the merge
-    PULL_OUTPUT=$(git pull origin main 2>&1) && MERGE_FAILED=false || true
-
-    # Restore backed up files that are user data (not system files)
-    if [[ -d "$OVERWRITE_BACKUP" ]]; then
-        for protected in "${PROTECTED_PATHS[@]}"; do
-            [[ "$protected" == */ ]] && continue
-            if [[ -f "$OVERWRITE_BACKUP/$protected" ]]; then
+        for protected in "${CONFLICT_BACKED_UP[@]:-}"; do
+            [[ -z "$protected" ]] && continue
+            if [[ -f "$CONFLICT_BACKUP_DIR/$protected" ]]; then
                 mkdir -p "$(dirname "$REPO_ROOT/$protected")"
-                cp "$OVERWRITE_BACKUP/$protected" "$REPO_ROOT/$protected"
+                cp "$CONFLICT_BACKUP_DIR/$protected" "$REPO_ROOT/$protected"
             fi
         done
-    fi
+        for skill_name in "${MODIFIED_SKILLS[@]:-}"; do
+            [[ -z "$skill_name" ]] && continue
+            cp -r "$SKILL_BACKUP_DIR/$skill_name"/* "$REPO_ROOT/.claude/skills/$skill_name/" 2>/dev/null || true
+        done
+        for file in "${OTHER_MODIFIED_FILES[@]:-}"; do
+            [[ -z "$file" ]] && continue
+            cp "$OTHER_BACKUP_DIR/$file" "$REPO_ROOT/$file" 2>/dev/null || true
+        done
 
-    if ! $MERGE_FAILED; then
-        ok "Merge succeeded after cleanup"
-    fi
-fi
-
-# --- Auto-recover from modify/delete conflicts ---
-# If the pull failed because files were deleted upstream but modified
-# locally (e.g. cron jobs the user edited), resolve automatically by
-# accepting the upstream deletion. Local copies stay on disk as untracked.
-if $MERGE_FAILED && echo "$PULL_OUTPUT" | grep -q "CONFLICT (modify/delete)"; then
-    warn "Resolving file conflicts from removed features..."
-    CONFLICT_FILES=$(echo "$PULL_OUTPUT" | grep "CONFLICT (modify/delete)" | sed 's/.*): //' | sed 's/ deleted in.*//')
-    while IFS= read -r cfile; do
-        [[ -z "$cfile" ]] && continue
-        git rm -f "$cfile" 2>/dev/null || true
-    done <<< "$CONFLICT_FILES"
-
-    # Resolve any remaining conflicts by accepting upstream
-    REMAINING=$(git diff --name-only --diff-filter=U 2>/dev/null || true)
-    if [[ -n "$REMAINING" ]]; then
-        while IFS= read -r ufile; do
-            [[ -z "$ufile" ]] && continue
-            git checkout --theirs "$ufile" 2>/dev/null || true
-            git add "$ufile" 2>/dev/null || true
-        done <<< "$REMAINING"
-    fi
-
-    if git commit --no-edit 2>/dev/null; then
-        ok "Conflicts auto-resolved — update continues"
-        MERGE_FAILED=false
-        PULL_OUTPUT="auto-resolved"
-    fi
-fi
-
-if $MERGE_FAILED; then
-    # Abort the failed merge so the repo is clean
-    git merge --abort 2>/dev/null || true
-
-    # Restore protected files
-    if $STASHED; then
-        git stash pop --quiet 2>/dev/null || true
-    fi
-    # Restore conflict-prevented files
-    for protected in "${CONFLICT_BACKED_UP[@]:-}"; do
-        [[ -z "$protected" ]] && continue
-        if [[ -f "$CONFLICT_BACKUP_DIR/$protected" ]]; then
-            mkdir -p "$(dirname "$REPO_ROOT/$protected")"
-            cp "$CONFLICT_BACKUP_DIR/$protected" "$REPO_ROOT/$protected"
-        fi
-    done
-    # Restore modified skill files from backup
-    for skill_name in "${MODIFIED_SKILLS[@]:-}"; do
-        [[ -z "$skill_name" ]] && continue
-        cp -r "$SKILL_BACKUP_DIR/$skill_name"/* "$REPO_ROOT/.claude/skills/$skill_name/" 2>/dev/null || true
-    done
-    # Restore other modified files from backup
-    for file in "${OTHER_MODIFIED_FILES[@]:-}"; do
-        [[ -z "$file" ]] && continue
-        cp "$OTHER_BACKUP_DIR/$file" "$REPO_ROOT/$file" 2>/dev/null || true
-    done
-
-    if echo "$PULL_OUTPUT" | grep -qi "authentication\|403\|could not read\|repository not found\|invalid credentials"; then
         echo ""
         printf "${YELLOW}${BOLD}═══════════════════════════════════════════════${NC}\n"
         printf "${YELLOW}${BOLD}  Authentication Failed${NC}\n"
@@ -460,12 +383,39 @@ if $MERGE_FAILED; then
         printf "     ${BOLD}bash scripts/update.sh${NC}\n"
         echo ""
         info "Nothing was changed — your local files are untouched."
-    else
-        echo "$PULL_OUTPUT"
-        echo ""
-        echo "  Pull failed. Your files are safe — nothing was changed."
+        exit 1
     fi
-    exit 1
+
+    # Not an auth issue — force-reset to match origin/main
+    warn "Merge had conflicts — force-syncing to latest version..."
+    git merge --abort 2>/dev/null || true
+    git reset --hard origin/main 2>/dev/null || true
+    ok "Synced to latest version"
+
+    # Restore user data from backups
+    if $STASHED; then
+        git stash pop --quiet 2>/dev/null || true
+    fi
+    for protected in "${CONFLICT_BACKED_UP[@]:-}"; do
+        [[ -z "$protected" ]] && continue
+        if [[ -f "$CONFLICT_BACKUP_DIR/$protected" ]]; then
+            mkdir -p "$(dirname "$REPO_ROOT/$protected")"
+            cp "$CONFLICT_BACKUP_DIR/$protected" "$REPO_ROOT/$protected"
+        fi
+    done
+    for skill_name in "${MODIFIED_SKILLS[@]:-}"; do
+        [[ -z "$skill_name" ]] && continue
+        if [[ -d "$SKILL_BACKUP_DIR/$skill_name" ]]; then
+            mkdir -p "$REPO_ROOT/.claude/skills/$skill_name"
+            cp -r "$SKILL_BACKUP_DIR/$skill_name"/* "$REPO_ROOT/.claude/skills/$skill_name/" 2>/dev/null || true
+        fi
+    done
+    for file in "${OTHER_MODIFIED_FILES[@]:-}"; do
+        [[ -z "$file" ]] && continue
+        cp "$OTHER_BACKUP_DIR/$file" "$REPO_ROOT/$file" 2>/dev/null || true
+    done
+    MERGE_FAILED=false
+    PULL_OUTPUT="force-synced"
 fi
 
 # =========================================================
