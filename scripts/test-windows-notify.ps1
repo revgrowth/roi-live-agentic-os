@@ -1,11 +1,15 @@
 param(
     [ValidateSet("success", "info", "warning", "error")]
     [string]$Variant = "info",
-    [string]$Title = "Agentic OS",
+    [string]$Title = "",
     [string]$Subtitle = "Windows notification test",
     [string]$Message = "",
-    [ValidateSet("short", "long")]
-    [string]$Duration = "short"
+    [string]$Duration = "",
+    [ValidateSet("", "interactive", "cron")]
+    [string]$Channel = "",
+    [ValidateSet("", "waiting", "permission", "actionRequired", "complete", "success", "timeout", "failure")]
+    [string]$Event = "",
+    [string]$ContextJson = ""
 )
 
 Set-StrictMode -Version Latest
@@ -19,16 +23,32 @@ $projectDir = Split-Path -Parent $PSScriptRoot
 $helperPath = Join-Path $projectDir "scripts\windows-notify.ps1"
 $powershellExe = Join-Path $env:WINDIR "System32\WindowsPowerShell\v1.0\powershell.exe"
 
-$args = @(
-    "-NoProfile",
-    "-ExecutionPolicy", "Bypass",
-    "-File", $helperPath,
-    "-Variant", $Variant,
-    "-Title", $Title,
-    "-Subtitle", $Subtitle,
-    "-Message", $Message,
-    "-Duration", $Duration
-)
+$args = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $helperPath)
+
+if (-not [string]::IsNullOrWhiteSpace($Channel) -or -not [string]::IsNullOrWhiteSpace($Event)) {
+    if ([string]::IsNullOrWhiteSpace($Channel) -or [string]::IsNullOrWhiteSpace($Event)) {
+        throw "Channel and Event must be provided together."
+    }
+
+    if ([string]::IsNullOrWhiteSpace($ContextJson)) {
+        $ContextJson = "{}"
+    }
+
+    $args += @(
+        "-Channel", $Channel,
+        "-Event", $Event,
+        "-ContextBase64", [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($ContextJson))
+    )
+} else {
+    $args += @("-Variant", $Variant)
+    if (-not [string]::IsNullOrWhiteSpace($Title)) { $args += @("-Title", $Title) }
+    if (-not [string]::IsNullOrWhiteSpace($Subtitle)) { $args += @("-Subtitle", $Subtitle) }
+    if (-not [string]::IsNullOrWhiteSpace($Message)) { $args += @("-Message", $Message) }
+
+    if (-not [string]::IsNullOrWhiteSpace($Duration)) {
+        $args += @("-Duration", $Duration)
+    }
+}
 
 $output = & $powershellExe @args 2>&1
 $exitCode = $LASTEXITCODE

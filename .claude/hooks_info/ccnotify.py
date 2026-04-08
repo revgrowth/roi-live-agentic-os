@@ -11,6 +11,7 @@ import platform
 import sqlite3
 import subprocess
 import sys
+import base64
 from datetime import datetime
 from logging.handlers import TimedRotatingFileHandler
 
@@ -138,6 +139,14 @@ class ClaudePromptTracker:
             message=body,
             variant="success",
             duration="short",
+            windows_channel="interactive",
+            windows_event="complete",
+            windows_context={
+                "project": project_label,
+                "seq": seq,
+                "duration": duration if duration != "Unknown" else "unknown time",
+                "rawMessage": "",
+            },
         )
 
         logging.info(
@@ -162,6 +171,7 @@ class ClaudePromptTracker:
         body = message or "Claude sent an update."
         variant = "info"
         duration = "short"
+        windows_event = "actionRequired"
 
         if "waiting for your input" in message_lower or "waiting for input" in message_lower:
             if not self.mark_wait_notification(session_id):
@@ -174,14 +184,17 @@ class ClaudePromptTracker:
             body = "Claude is paused until you reply."
             variant = "info"
             duration = "long"
+            windows_event = "waiting"
         elif "permission" in message_lower:
             subtitle = "Permission required"
             variant = "warning"
             duration = "long"
+            windows_event = "permission"
         elif "approval" in message_lower or "choose an option" in message_lower:
             subtitle = "Action required"
             variant = "warning"
             duration = "long"
+            windows_event = "actionRequired"
 
         self.send_notification(
             title=self.project_label(cwd),
@@ -189,6 +202,14 @@ class ClaudePromptTracker:
             message=body,
             variant=variant,
             duration=duration,
+            windows_channel="interactive",
+            windows_event=windows_event,
+            windows_context={
+                "project": self.project_label(cwd),
+                "seq": record.get("seq") if record else "",
+                "duration": "",
+                "rawMessage": body,
+            },
         )
 
         logging.info(
@@ -295,7 +316,17 @@ class ClaudePromptTracker:
             logging.error("Error calculating duration: %s", error)
             return "Unknown"
 
-    def send_notification(self, title, subtitle, message, variant="info", duration="short"):
+    def send_notification(
+        self,
+        title,
+        subtitle,
+        message,
+        variant="info",
+        duration="short",
+        windows_channel=None,
+        windows_event=None,
+        windows_context=None,
+    ):
         """Send a native notification and log the real delivery channel."""
         system = platform.system()
 
@@ -306,20 +337,31 @@ class ClaudePromptTracker:
                 return
 
             if system == "Windows":
-                result = self._notify_windows(title, subtitle, message, variant, duration)
+                result = self._notify_windows(
+                    title,
+                    subtitle,
+                    message,
+                    variant,
+                    duration,
+                    channel=windows_channel,
+                    event=windows_event,
+                    context=windows_context,
+                )
                 delivery = result.get("delivery", "unknown")
+                effective_title = result.get("title", title)
+                effective_subtitle = result.get("subtitle", subtitle)
                 if delivery != "toast":
                     logging.warning(
                         "Windows notification used %s fallback for %s - %s: %s",
                         delivery,
-                        title,
-                        subtitle,
+                        effective_title,
+                        effective_subtitle,
                         result.get("toast_error", "unknown toast error"),
                     )
                 logging.info(
                     "Notification sent: %s - %s via %s",
-                    title,
-                    subtitle,
+                    effective_title,
+                    effective_subtitle,
                     delivery,
                 )
                 return
@@ -345,7 +387,17 @@ class ClaudePromptTracker:
         if result.returncode != 0:
             raise RuntimeError(result.stderr.strip() or "osascript failed")
 
-    def _notify_windows(self, title, subtitle, message, variant, duration):
+    def _notify_windows(
+        self,
+        title,
+        subtitle,
+        message,
+        variant,
+        duration,
+        channel=None,
+        event=None,
+        context=None,
+    ):
         """Send a Windows notification through the shared PowerShell helper."""
         if not os.path.exists(self.windows_notify_script):
             raise FileNotFoundError(
@@ -359,19 +411,39 @@ class ClaudePromptTracker:
             "Bypass",
             "-File",
             self.windows_notify_script,
-            "-Variant",
-            variant,
-            "-Title",
-            title,
-            "-Subtitle",
-            subtitle,
-            "-Message",
-            message,
-            "-Attribution",
-            "Agentic OS",
-            "-Duration",
-            duration,
         ]
+
+        if channel and event:
+            context_base64 = base64.b64encode(
+                json.dumps(context or {}, separators=(",", ":")).encode("utf-8")
+            ).decode("ascii")
+            command.extend(
+                [
+                    "-Channel",
+                    channel,
+                    "-Event",
+                    event,
+                    "-ContextBase64",
+                    context_base64,
+                ]
+            )
+        else:
+            command.extend(
+                [
+                    "-Variant",
+                    variant,
+                    "-Title",
+                    title,
+                    "-Subtitle",
+                    subtitle,
+                    "-Message",
+                    message,
+                    "-Attribution",
+                    "Agentic OS",
+                    "-Duration",
+                    duration,
+                ]
+            )
 
         result = subprocess.run(
             command,

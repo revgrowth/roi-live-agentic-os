@@ -1,0 +1,121 @@
+{
+  "app": {
+    "id": "AgenticOS.Notifications",
+    "displayName": "Agentic OS",
+    "shortcutName": "Agentic OS Notifications",
+    "assetVersion": "v2",
+    "attribution": "Agentic OS",
+    "defaultDuration": "short"
+  },
+  "assets": {
+    "logoPath": "",
+    "heroPaths": {
+      "success": "",
+      "info": "",
+      "warning": "",
+      "error": ""
+    },
+    "generatedLogo": {
+      "badgeText": "AO",
+      "startColor": "#0F172A",
+      "endColor": "#1D4ED8",
+      "overlayColor": "#FFFFFF",
+      "overlayOpacity": 52,
+      "borderColor": "#FFFFFF",
+      "borderOpacity": 140,
+      "textColor": "#F8FAFC"
+    },
+    "generatedHero": {
+      "subtitle": "Native desktop alerts that feel deliberate."
+    },
+    "variants": {
+      "success": {
+        "startColor": "#0F4D38",
+        "endColor": "#0AA36C",
+        "accentColor": "#DCFCE7",
+        "chipColor": "#064E3B",
+        "sound": "ms-winsoundevent:Notification.Default",
+        "heroLabel": "TASK COMPLETE"
+      },
+      "info": {
+        "startColor": "#102C63",
+        "endColor": "#2F6BFF",
+        "accentColor": "#DBEAFE",
+        "chipColor": "#172554",
+        "sound": "ms-winsoundevent:Notification.IM",
+        "heroLabel": "STAY IN FLOW"
+      },
+      "warning": {
+        "startColor": "#6B3B06",
+        "endColor": "#F59E0B",
+        "accentColor": "#FEF3C7",
+        "chipColor": "#78350F",
+        "sound": "ms-winsoundevent:Notification.Reminder",
+        "heroLabel": "ACTION NEEDED"
+      },
+      "error": {
+        "startColor": "#63171B",
+        "endColor": "#E11D48",
+        "accentColor": "#FFE4E6",
+        "chipColor": "#881337",
+        "sound": "ms-winsoundevent:Notification.Mail",
+        "heroLabel": "NEEDS ATTENTION"
+      }
+    }
+  },
+  "copy": {
+    "interactive": {
+      "waiting": {
+        "title": "{project}",
+        "subtitle": "Waiting for input",
+        "message": "Claude is paused until you reply.",
+        "variant": "info",
+        "duration": "long"
+      },
+      "permission": {
+        "title": "{project}",
+        "subtitle": "Permission required",
+        "message": "{rawMessage}",
+        "variant": "warning",
+        "duration": "long"
+      },
+      "actionRequired": {
+        "title": "{project}",
+        "subtitle": "Action required",
+        "message": "{rawMessage}",
+        "variant": "warning",
+        "duration": "long"
+      },
+      "complete": {
+        "title": "{project}",
+        "subtitle": "Task complete",
+        "message": "Job #{seq} finished in {duration}.",
+        "variant": "success",
+        "duration": "short"
+      }
+    },
+    "cron": {
+      "success": {
+        "title": "{jobName}{catchUpSuffix}",
+        "subtitle": "Completed",
+        "message": "Completed in {duration}.",
+        "variant": "success",
+        "duration": "short"
+      },
+      "timeout": {
+        "title": "{jobName}{catchUpSuffix}",
+        "subtitle": "Timed out",
+        "message": "Killed after the {timeout} limit.",
+        "variant": "warning",
+        "duration": "short"
+      },
+      "failure": {
+        "title": "{jobName}{catchUpSuffix}",
+        "subtitle": "Failed",
+        "message": "Exit code {exitCode} after {duration}.",
+        "variant": "error",
+        "duration": "short"
+      }
+    }
+  }
+}

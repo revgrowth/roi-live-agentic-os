@@ -241,6 +241,27 @@ Removing the dispatcher only stops the scheduler. Your job files in `cron/jobs/`
 
 ---
 
+## Windows Notification Theme
+
+Windows notification visuals and default copy live in `scripts/windows-notify.config.json`.
+
+- `app` controls the Windows app identity, display name, Start Menu shortcut name, generated asset cache version, attribution, and default toast duration.
+- `assets.logoPath` and `assets.heroPaths.*` can point to repo-relative files or absolute paths. Leave them blank to use generated artwork instead.
+- `assets.generatedLogo` and `assets.generatedHero` control the fallback artwork when a custom image is missing.
+- `assets.variants.*` controls the gradient palette, accent colors, sound, and hero label for each notification variant.
+- `copy.interactive.*` and `copy.cron.*` define the default title, subtitle, message, variant, and duration for each Windows notification event.
+- Supported template placeholders are `{project}`, `{seq}`, `{duration}`, `{rawMessage}`, `{jobName}`, `{timeout}`, `{exitCode}`, and `{catchUpSuffix}`.
+
+Preview a toast manually with:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-windows-notify.ps1 -Variant success
+```
+
+If you change generated colors, labels, or badge text, either bump `app.assetVersion` in `scripts/windows-notify.config.json` or delete the cached folder under `%LOCALAPPDATA%\AgenticOS\notifications\` so Windows rebuilds the generated assets.
+
+---
+
 ## Multiple Clients
 
 If you work with more than one client or brand, just tell Claude: **"add a client called [name]"**. It creates the workspace, and offers to switch you into it.

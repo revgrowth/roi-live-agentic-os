@@ -45,20 +45,19 @@ $prompt = ($parts[2..($parts.Count - 1)] -join '---').Trim()
 
 function Send-Notification {
     param(
-        [ValidateSet("success", "info", "warning", "error")]
-        [string]$Variant,
-        [string]$Title,
-        [string]$Subtitle,
-        [string]$Body,
+        [ValidateSet("success", "timeout", "failure")]
+        [string]$Event,
+        [hashtable]$Context,
         [string]$LogFile
     )
 
     try {
+        $contextJson = $Context | ConvertTo-Json -Compress
+        $contextBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($contextJson))
         $commandOutput = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $WindowsNotifyScript `
-            -Variant $Variant `
-            -Title $Title `
-            -Subtitle $Subtitle `
-            -Message $Body 2>&1
+            -Channel "cron" `
+            -Event $Event `
+            -ContextBase64 $contextBase64 2>&1
 
         $exitCode = $LASTEXITCODE
         $rawOutput = if ($commandOutput) { ($commandOutput | Out-String).Trim() } else { "" }
@@ -229,11 +228,29 @@ $notifySuccess = $notify -in @("on_finish", "on_success")
 $notifyFailure = $notify -in @("on_finish", "on_failure")
 
 if ($exitCode -eq 0 -and $notifySuccess) {
-    Send-Notification -Variant "success" -Title $JobDisplayName -Subtitle "Completed" -Body "Completed in $durationHuman." -LogFile $logFile
+    Send-Notification -Event "success" -Context @{
+        jobName = $JobDisplayName
+        duration = $durationHuman
+        timeout = $timeoutRaw
+        exitCode = $exitCode
+        catchUpSuffix = ""
+    } -LogFile $logFile
 } elseif ($result -eq "timeout" -and $notifyFailure) {
-    Send-Notification -Variant "warning" -Title $JobDisplayName -Subtitle "Timed out" -Body "Killed after the $timeoutRaw limit." -LogFile $logFile
+    Send-Notification -Event "timeout" -Context @{
+        jobName = $JobDisplayName
+        duration = $durationHuman
+        timeout = $timeoutRaw
+        exitCode = $exitCode
+        catchUpSuffix = ""
+    } -LogFile $logFile
 } elseif ($exitCode -ne 0 -and $notifyFailure) {
-    Send-Notification -Variant "error" -Title $JobDisplayName -Subtitle "Failed" -Body "Exit code $exitCode after $durationHuman." -LogFile $logFile
+    Send-Notification -Event "failure" -Context @{
+        jobName = $JobDisplayName
+        duration = $durationHuman
+        timeout = $timeoutRaw
+        exitCode = $exitCode
+        catchUpSuffix = ""
+    } -LogFile $logFile
 }
 
 exit $exitCode
