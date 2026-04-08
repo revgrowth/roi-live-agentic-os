@@ -3,7 +3,7 @@ import { readFile, writeFile, deleteFile, moveFile } from "@/lib/file-service";
 import { getClientAgenticOsDir } from "@/lib/config";
 
 const ALLOWED_ROOTS = ["context", "brand_context", "docs", "projects", ".planning", ".claude/skills"];
-const ALLOWED_ROOT_FILES = ["CLAUDE.md", "README.md"];
+const ALLOWED_ROOT_FILES = ["AGENTS.md", "CLAUDE.md", "README.md"];
 
 function validateFilePath(segments: string[]): string | null {
   const filePath = segments.join("/");

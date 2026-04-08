@@ -10,7 +10,7 @@ interface DocsFileTreeProps {
   selectedPath: string | null;
 }
 
-const ROOT_FILES = ["CLAUDE.md", "README.md"];
+const ROOT_FILES = ["AGENTS.md", "CLAUDE.md", "README.md"];
 
 const DOCS_ORDER_KEY = "docs-section-order";
 const DOCS_NODE_ORDER_PREFIX = "docs-node-order-";

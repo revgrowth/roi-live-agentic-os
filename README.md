@@ -20,6 +20,8 @@ The installer checks your system, sets up dependencies, and lets you pick which 
 
 When it finishes, open Claude Code. It automatically detects you're new and walks you through building your brand foundation -- voice, positioning, and ideal customer profile.
 
+Compatibility note: Agentic OS remains Claude-first, but the shared project instructions now live in `AGENTS.md`. Claude reads them through `CLAUDE.md`, and Codex can read `AGENTS.md` directly.
+
 ---
 
 ## What You Get
@@ -253,7 +255,7 @@ cd clients/client-name
 claude
 ```
 
-Each client has its own brand context, memory, and output. Methodology (CLAUDE.md, SOUL.md, USER.md) is shared automatically from the root — edit once, all clients see it. Skills and scripts sync automatically when you run `update.sh`.
+Each client has its own brand context, memory, and output. Shared methodology now lives in `AGENTS.md` at the root, with `CLAUDE.md` importing it for Claude Code. Skills and scripts sync automatically when you run `update.sh`.
 
 For the full setup guide, see [docs/multi-client-guide.md](docs/multi-client-guide.md).
 For how projects work (single tasks, planned projects, GSD), see [docs/projects-guide.md](docs/projects-guide.md).
@@ -278,7 +280,8 @@ For a quick reference, see [docs/cheat-sheet.md](docs/cheat-sheet.md).
 │       └── q2-launch/     <- Project folders with brief.md
 ├── .planning/             <- GSD project artifacts (Level 3, one at a time)
 ├── scripts/               <- Install, update, manage skills, watchdog
-└── CLAUDE.md              <- Agent orchestration (don't edit manually)
+├── AGENTS.md              <- Canonical shared instructions
+└── CLAUDE.md              <- Claude wrapper that imports AGENTS.md
 ```
 
 ---

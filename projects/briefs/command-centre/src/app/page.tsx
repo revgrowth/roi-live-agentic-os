@@ -101,7 +101,7 @@ function SkillsTab() {
 
 /** Docs tab content */
 function DocsTab() {
-  const [selectedPath, setSelectedPath] = useState<string | null>("CLAUDE.md");
+  const [selectedPath, setSelectedPath] = useState<string | null>("AGENTS.md");
   const [refreshKey, setRefreshKey] = useState(0);
 
   return (

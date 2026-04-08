@@ -8,6 +8,100 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 CLIENTS_DIR="${PROJECT_DIR}/clients"
 
+create_client_agents_file() {
+  local target="$1"
+  local client_name="$2"
+  cat > "$target" <<EOF
+# Client: ${client_name}
+
+Add client-specific instructions here. These layer on top of the root AGENTS.md instructions — they don't replace them.
+
+## Client-Specific Instructions
+
+-
+
+## Notes
+
+-
+EOF
+}
+
+create_client_claude_wrapper() {
+  local target="$1"
+  cat > "$target" <<'EOF'
+# CLAUDE.md
+
+This file keeps Claude Code compatible with the client-specific instructions in `AGENTS.md`.
+
+@AGENTS.md
+EOF
+}
+
+is_claude_wrapper() {
+  local file="$1"
+  [[ -f "$file" ]] || return 1
+  grep -qx '@AGENTS.md' "$file"
+}
+
+get_client_display_name() {
+  local file="$1"
+  head -n 1 "$file" | tr -d '\r' | sed 's/^# Client: //'
+}
+
+is_exact_legacy_client_claude() {
+  local file="$1"
+  [[ -f "$file" ]] || return 1
+  local first_line
+  local remainder
+  local expected
+
+  first_line="$(head -n 1 "$file" | tr -d '\r')"
+  [[ "$first_line" =~ ^#\ Client:\  ]] || return 1
+
+  remainder="$(tail -n +3 "$file" | tr -d '\r')"
+  expected="Add client-specific instructions here. These layer on top of the root CLAUDE.md methodology — they don't replace it.
+
+## Client-Specific Instructions
+
+-
+
+## Notes
+
+-"
+
+  [[ "$remainder" == "$expected" ]]
+}
+
+sync_client_instruction_files() {
+  local client_dir="$1"
+  local client_name="$2"
+  local agents_path="${client_dir}/AGENTS.md"
+  local claude_path="${client_dir}/CLAUDE.md"
+
+  if [[ ! -f "$agents_path" ]]; then
+    if [[ -f "$claude_path" ]] && ! is_claude_wrapper "$claude_path"; then
+      if is_exact_legacy_client_claude "$claude_path"; then
+        create_client_agents_file "$agents_path" "$(get_client_display_name "$claude_path")"
+        echo "  Created AGENTS.md from legacy client scaffold"
+        create_client_claude_wrapper "$claude_path"
+        echo "  Converted legacy CLAUDE.md to wrapper"
+      else
+        cp "$claude_path" "$agents_path"
+        echo "  Seeded AGENTS.md from existing CLAUDE.md"
+        echo "  Preserved existing CLAUDE.md (manual cleanup recommended)"
+      fi
+    else
+      create_client_agents_file "$agents_path" "$client_name"
+      echo "  Created AGENTS.md"
+    fi
+  fi
+
+  if [[ ! -f "$claude_path" ]]; then
+    create_client_claude_wrapper "$claude_path"
+    echo "  Created CLAUDE.md wrapper"
+  fi
+}
+
 if [[ ! -d "$CLIENTS_DIR" ]]; then
   echo "No clients/ directory found. Nothing to sync."
   echo "Create a client first: bash scripts/add-client.sh \"Client Name\""
@@ -24,6 +118,8 @@ for CLIENT_DIR in "${CLIENTS_DIR}"/*/; do
   CLIENT_COUNT=$((CLIENT_COUNT + 1))
 
   echo "Syncing ${CLIENT_NAME}..."
+
+  sync_client_instruction_files "$CLIENT_DIR" "$CLIENT_NAME"
 
   # Sync skills — copy root skills over, but preserve client-only skills
   if [[ -d "${PROJECT_DIR}/.claude/skills" ]]; then
@@ -103,6 +199,6 @@ if [[ $CLIENT_COUNT -eq 0 ]]; then
 else
   echo "Done. Synced ${SYNCED} client(s)."
   echo ""
-  echo "What was synced: skills, scripts, settings, hooks, cron templates."
+  echo "What was synced: client instruction files, skills, scripts, settings, hooks, cron templates."
   echo "What was NOT touched: brand_context, memory, learnings, projects, .env, cron jobs."
 fi

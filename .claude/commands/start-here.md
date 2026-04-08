@@ -28,7 +28,7 @@ Check what exists:
 - `context/USER.md` (populated or template?)
 - `.claude/skills/` (which skills are installed)
 
-**Detect if this is a client workspace:** Check if the current working directory is inside a `clients/` folder (path contains `/clients/`). If so, this is a client workspace — read the client CLAUDE.md to get the client name from the `# Client: {name}` header.
+**Detect if this is a client workspace:** Check if the current working directory is inside a `clients/` folder (path contains `/clients/`). If so, this is a client workspace — read the client `AGENTS.md` to get the client name from the `# Client: {name}` header.
 
 **Client workspace intro (if inside clients/):**
 Explain the multi-client setup and frame this as building brand context for this specific client:

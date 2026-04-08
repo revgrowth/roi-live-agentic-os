@@ -33,7 +33,7 @@ No brand_context files needed — this is a utility skill.
 
 Requires `FIRECRAWL_API_KEY` in `.env` (get one at https://www.firecrawl.dev/app).
 
-**Before any Firecrawl call**, check `.env` for the key. If missing, follow the External Services rules in CLAUDE.md:
+**Before any Firecrawl call**, check `.env` for the key. If missing, follow the External Services rules in AGENTS.md:
 1. Explain what Firecrawl would do for this specific task
 2. Tell them how to get it: "Add `FIRECRAWL_API_KEY=fc-your-key` to your `.env` file. Free tier at firecrawl.dev gives 500 credits/month."
 3. Offer the fallback: what can be done without it (WebFetch, manual paste, etc.)

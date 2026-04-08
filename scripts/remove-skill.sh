@@ -139,4 +139,4 @@ with open(installed_path, 'w') as f:
 " "$SKILL_NAME" "$INSTALLED_JSON"
 
 echo ""
-echo -e "Removed ${CYAN}$SKILL_NAME${NC}. Next Claude Code session will clean up CLAUDE.md references."
+echo -e "Removed ${CYAN}$SKILL_NAME${NC}. Next Claude Code session will clean up AGENTS.md references."

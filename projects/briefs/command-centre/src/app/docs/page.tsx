@@ -10,7 +10,7 @@ function DocsContent() {
   const searchParams = useSearchParams();
   const fileParam = searchParams.get("file");
 
-  const [selectedPath, setSelectedPath] = useState<string | null>(fileParam || "CLAUDE.md");
+  const [selectedPath, setSelectedPath] = useState<string | null>(fileParam || "AGENTS.md");
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Sync with URL query param when it changes

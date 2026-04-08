@@ -513,7 +513,7 @@ if ! $HAS_UPSTREAM_CHANGES; then
     info "Last updated: ${BOLD}${LAST_UPDATED}${NC}"
     echo ""
     info "Scripts:              ${GREEN}no changes${NC}"
-    info "System files:         ${GREEN}no changes${NC}  ${DIM}(CLAUDE.md, README.md, etc.)${NC}"
+    info "System files:         ${GREEN}no changes${NC}  ${DIM}(AGENTS.md, CLAUDE.md, README.md, etc.)${NC}"
     info "Skill catalog:        ${GREEN}no changes${NC}"
     info "Skills:               ${GREEN}no changes${NC}"
     echo ""
@@ -538,7 +538,7 @@ else
                     CHANGED_SCRIPTS="${CHANGED_SCRIPTS}${file}\n"
                     SCRIPT_COUNT=$((SCRIPT_COUNT + 1))
                     ;;
-                CLAUDE.md|PRD.md|README.md|.gitignore|.gitattributes)
+                AGENTS.md|CLAUDE.md|PRD.md|README.md|.gitignore|.gitattributes)
                     CHANGED_SYSTEM="${CHANGED_SYSTEM}${file}\n"
                     SYSTEM_COUNT=$((SYSTEM_COUNT + 1))
                     ;;
@@ -572,7 +572,7 @@ else
         printf "  ${BOLD}System files${NC} ${DIM}(%d updated)${NC}\n" "$SYSTEM_COUNT"
         printf "$CHANGED_SYSTEM" | while IFS= read -r f; do [[ -n "$f" ]] && bullet "$f"; done
     else
-        info "System files:         ${GREEN}no changes${NC}  ${DIM}(CLAUDE.md, README.md, etc.)${NC}"
+        info "System files:         ${GREEN}no changes${NC}  ${DIM}(AGENTS.md, CLAUDE.md, README.md, etc.)${NC}"
     fi
 
     if [[ $CATALOG_COUNT -gt 0 ]]; then

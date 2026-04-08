@@ -59,8 +59,9 @@ Level 1 output goes to category folders. Level 2/3 output goes inside the projec
 | GSD planning | `.planning/` (one at a time, at project root) |
 | API keys | `.env` |
 | Skills | `.claude/skills/` |
-| Client instructions | `CLAUDE.md` (in client folder) |
-| Shared methodology | `CLAUDE.md` (at agentic-os root — auto-inherited) |
+| Client instructions | `AGENTS.md` (in client folder) |
+| Claude compatibility wrapper | `CLAUDE.md` (in client folder) |
+| Shared methodology | `AGENTS.md` (at agentic-os root) |
 
 ## Where Skills Live
 
@@ -82,7 +83,7 @@ Add/remove/edit skills from the **root**. They sync to clients automatically on 
 - Onboarding runs automatically on first session per client
 - Edit skills at the **root** level — client copies are overwritten on update
 - Client-only skills are fine — create them in the client's `.claude/skills/` folder
-- Edit root CLAUDE.md → all clients see it automatically
+- Edit root AGENTS.md → all clients see the shared methodology automatically
 - Edit root SOUL.md / USER.md → all clients see it automatically
 - `update.sh` auto-syncs skills + scripts to all clients
 - Skills always have fallbacks — no API key required to start working
