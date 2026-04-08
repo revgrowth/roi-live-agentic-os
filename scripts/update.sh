@@ -133,11 +133,6 @@ echo ""
 # Step 2: Read installed.json for user's skill choices
 # =========================================================
 if [[ ! -f "$INSTALLED" ]]; then
-    warn "No installed.json found — looks like first setup."
-    info "Run ${BOLD}bash scripts/install.sh${NC} first to select your skills."
-    echo ""
-    info "Continuing with update (your files are still protected)."
-    echo ""
     HAVE_INSTALLED_JSON=false
 else
     HAVE_INSTALLED_JSON=true
