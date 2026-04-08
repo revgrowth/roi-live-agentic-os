@@ -3,12 +3,14 @@
     "id": "AgenticOS.Notifications",
     "displayName": "Agentic OS",
     "shortcutName": "Agentic OS Notifications",
-    "assetVersion": "v2",
+    "assetVersion": "v4",
     "attribution": "Agentic OS",
-    "defaultDuration": "short"
+    "defaultDuration": "short",
+    "defaultLayout": "compact"
   },
   "assets": {
-    "logoPath": "",
+    "logoPath": "assets/windows-notify/scrapes_logo.jpg",
+    "shortcutIconPath": "assets/windows-notify/scrapes_logo.ico",
     "heroPaths": {
       "success": "",
       "info": "",
@@ -25,96 +27,96 @@
       "borderOpacity": 140,
       "textColor": "#F8FAFC"
     },
-    "generatedHero": {
-      "subtitle": "Native desktop alerts that feel deliberate."
-    },
     "variants": {
       "success": {
         "startColor": "#0F4D38",
         "endColor": "#0AA36C",
         "accentColor": "#DCFCE7",
-        "chipColor": "#064E3B",
         "sound": "ms-winsoundevent:Notification.Default",
-        "heroLabel": "TASK COMPLETE"
+        "emoji": "✅"
       },
       "info": {
         "startColor": "#102C63",
         "endColor": "#2F6BFF",
         "accentColor": "#DBEAFE",
-        "chipColor": "#172554",
         "sound": "ms-winsoundevent:Notification.IM",
-        "heroLabel": "STAY IN FLOW"
+        "emoji": "💡"
       },
       "warning": {
         "startColor": "#6B3B06",
         "endColor": "#F59E0B",
         "accentColor": "#FEF3C7",
-        "chipColor": "#78350F",
         "sound": "ms-winsoundevent:Notification.Reminder",
-        "heroLabel": "ACTION NEEDED"
+        "emoji": "⚠️"
       },
       "error": {
         "startColor": "#63171B",
         "endColor": "#E11D48",
         "accentColor": "#FFE4E6",
-        "chipColor": "#881337",
         "sound": "ms-winsoundevent:Notification.Mail",
-        "heroLabel": "NEEDS ATTENTION"
+        "emoji": "🚨"
       }
     }
   },
   "copy": {
     "interactive": {
       "waiting": {
-        "title": "{project}",
-        "subtitle": "Waiting for input",
-        "message": "Claude is paused until you reply.",
+        "status": "Needs input",
+        "subject": "{project}",
+        "detail": "Claude is paused until you reply.",
         "variant": "info",
-        "duration": "long"
+        "duration": "long",
+        "layout": "compact"
       },
       "permission": {
-        "title": "{project}",
-        "subtitle": "Permission required",
-        "message": "{rawMessage}",
+        "status": "Permission required",
+        "subject": "{project}",
+        "detail": "{rawMessage}",
         "variant": "warning",
-        "duration": "long"
+        "duration": "long",
+        "layout": "compact"
       },
       "actionRequired": {
-        "title": "{project}",
-        "subtitle": "Action required",
-        "message": "{rawMessage}",
+        "status": "Needs attention",
+        "subject": "{project}",
+        "detail": "{rawMessage}",
         "variant": "warning",
-        "duration": "long"
+        "duration": "long",
+        "layout": "compact"
       },
       "complete": {
-        "title": "{project}",
-        "subtitle": "Task complete",
-        "message": "Job #{seq} finished in {duration}.",
+        "status": "Task complete",
+        "subject": "{project}",
+        "detail": "Job #{seq} finished in {duration}.",
         "variant": "success",
-        "duration": "short"
+        "duration": "short",
+        "layout": "compact"
       }
     },
     "cron": {
       "success": {
-        "title": "{jobName}{catchUpSuffix}",
-        "subtitle": "Completed",
-        "message": "Completed in {duration}.",
+        "status": "Task complete",
+        "subject": "{jobName}{catchUpSuffix}",
+        "detail": "Completed in {duration}.",
         "variant": "success",
-        "duration": "short"
+        "duration": "short",
+        "layout": "compact"
       },
       "timeout": {
-        "title": "{jobName}{catchUpSuffix}",
-        "subtitle": "Timed out",
-        "message": "Killed after the {timeout} limit.",
+        "status": "Timed out",
+        "subject": "{jobName}{catchUpSuffix}",
+        "detail": "Killed after the {timeout} limit.",
         "variant": "warning",
-        "duration": "short"
+        "duration": "short",
+        "layout": "compact"
       },
       "failure": {
-        "title": "{jobName}{catchUpSuffix}",
-        "subtitle": "Failed",
-        "message": "Exit code {exitCode} after {duration}.",
+        "status": "Needs attention",
+        "subject": "{jobName}{catchUpSuffix}",
+        "detail": "Exit code {exitCode} after {duration}.",
         "variant": "error",
-        "duration": "short"
+        "duration": "short",
+        "layout": "compact"
       }
     }
   }

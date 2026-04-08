@@ -1,10 +1,12 @@
 param(
     [ValidateSet("success", "info", "warning", "error")]
     [string]$Variant = "info",
-    [string]$Title = "",
-    [string]$Subtitle = "Windows notification test",
-    [string]$Message = "",
+    [string]$Status = "",
+    [string]$Subject = "Windows notification test",
+    [string]$Detail = "",
     [string]$Duration = "",
+    [ValidateSet("", "compact", "hero")]
+    [string]$Layout = "",
     [ValidateSet("", "interactive", "cron")]
     [string]$Channel = "",
     [ValidateSet("", "waiting", "permission", "actionRequired", "complete", "success", "timeout", "failure")]
@@ -15,8 +17,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-if ([string]::IsNullOrWhiteSpace($Message)) {
-    $Message = "This is a $Variant test for the shared Windows toast helper."
+if ([string]::IsNullOrWhiteSpace($Detail)) {
+    $Detail = "This is a $Variant test for the shared Windows toast helper."
 }
 
 $projectDir = Split-Path -Parent $PSScriptRoot
@@ -39,11 +41,15 @@ if (-not [string]::IsNullOrWhiteSpace($Channel) -or -not [string]::IsNullOrWhite
         "-Event", $Event,
         "-ContextBase64", [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($ContextJson))
     )
+    if (-not [string]::IsNullOrWhiteSpace($Layout)) {
+        $args += @("-Layout", $Layout)
+    }
 } else {
     $args += @("-Variant", $Variant)
-    if (-not [string]::IsNullOrWhiteSpace($Title)) { $args += @("-Title", $Title) }
-    if (-not [string]::IsNullOrWhiteSpace($Subtitle)) { $args += @("-Subtitle", $Subtitle) }
-    if (-not [string]::IsNullOrWhiteSpace($Message)) { $args += @("-Message", $Message) }
+    if (-not [string]::IsNullOrWhiteSpace($Status)) { $args += @("-Status", $Status) }
+    if (-not [string]::IsNullOrWhiteSpace($Subject)) { $args += @("-Subject", $Subject) }
+    if (-not [string]::IsNullOrWhiteSpace($Detail)) { $args += @("-Detail", $Detail) }
+    if (-not [string]::IsNullOrWhiteSpace($Layout)) { $args += @("-Layout", $Layout) }
 
     if (-not [string]::IsNullOrWhiteSpace($Duration)) {
         $args += @("-Duration", $Duration)

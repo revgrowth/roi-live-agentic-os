@@ -245,20 +245,28 @@ Removing the dispatcher only stops the scheduler. Your job files in `cron/jobs/`
 
 Windows notification visuals and default copy live in `scripts/windows-notify.config.json`.
 
-- `app` controls the Windows app identity, display name, Start Menu shortcut name, generated asset cache version, attribution, and default toast duration.
-- `assets.logoPath` and `assets.heroPaths.*` can point to repo-relative files or absolute paths. Leave them blank to use generated artwork instead.
-- `assets.generatedLogo` and `assets.generatedHero` control the fallback artwork when a custom image is missing.
-- `assets.variants.*` controls the gradient palette, accent colors, sound, and hero label for each notification variant.
-- `copy.interactive.*` and `copy.cron.*` define the default title, subtitle, message, variant, and duration for each Windows notification event.
+- `app` controls the Windows app identity, display name, Start Menu shortcut name, generated asset cache version, optional attribution, default toast duration, and the default layout (`compact` or `hero`).
+- `assets.logoPath` should point to the toast logo image. `assets.shortcutIconPath` should point to the Windows shortcut icon and must be an `.ico` file.
+- The repo-tracked asset folder for Windows branding is `scripts/assets/windows-notify/`.
+- `assets.heroPaths.*` can point to optional background images for hero mode. If blank or missing, the helper generates the hero background and overlays the event-specific text on top.
+- `assets.generatedLogo` controls the fallback logo artwork when the configured toast logo image is missing.
+- `assets.variants.*` controls the gradient palette, accent colors, sound, and emoji for each notification variant.
+- `copy.interactive.*` and `copy.cron.*` define the default `status`, `subject`, `detail`, `variant`, `duration`, and `layout` for each Windows notification event.
 - Supported template placeholders are `{project}`, `{seq}`, `{duration}`, `{rawMessage}`, `{jobName}`, `{timeout}`, `{exitCode}`, and `{catchUpSuffix}`.
 
-Preview a toast manually with:
+Preview the default compact toast with:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-windows-notify.ps1 -Variant success
 ```
 
-If you change generated colors, labels, or badge text, either bump `app.assetVersion` in `scripts/windows-notify.config.json` or delete the cached folder under `%LOCALAPPDATA%\AgenticOS\notifications\` so Windows rebuilds the generated assets.
+Preview hero mode explicitly with:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-windows-notify.ps1 -Variant success -Layout hero
+```
+
+If you change generated colors, layout, or badge text, either bump `app.assetVersion` in `scripts/windows-notify.config.json` or delete the cached folder under `%LOCALAPPDATA%\AgenticOS\notifications\` so Windows rebuilds the generated assets.
 
 ---
 
