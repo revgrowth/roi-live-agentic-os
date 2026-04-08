@@ -389,20 +389,50 @@ if $MERGE_FAILED; then
     # Not an auth issue — force-reset to match origin/main
     warn "Merge had conflicts — force-syncing to latest version..."
     git merge --abort 2>/dev/null || true
+
+    # Back up ALL protected paths before reset (reset deletes tracked files
+    # that don't exist on origin/main — including user data that was tracked
+    # in older versions but is now gitignored)
+    RESET_BACKUP="$BACKUP_DIR/pre-reset-$(date +%s)"
+    for protected in "${PROTECTED_PATHS[@]}"; do
+        local_path="$REPO_ROOT/$protected"
+        if [[ "$protected" == */ ]]; then
+            # Directory — copy entire tree if it exists and has content
+            if [[ -d "$local_path" ]] && [[ -n "$(ls -A "$local_path" 2>/dev/null)" ]]; then
+                mkdir -p "$RESET_BACKUP/$protected"
+                cp -r "$local_path"* "$RESET_BACKUP/$protected" 2>/dev/null || true
+            fi
+        else
+            # File — copy if it exists
+            if [[ -f "$local_path" ]]; then
+                mkdir -p "$RESET_BACKUP/$(dirname "$protected")"
+                cp "$local_path" "$RESET_BACKUP/$protected"
+            fi
+        fi
+    done
+
     git reset --hard origin/main 2>/dev/null || true
     ok "Synced to latest version"
 
-    # Restore user data from backups
+    # Restore ALL protected paths from backup
+    for protected in "${PROTECTED_PATHS[@]}"; do
+        if [[ "$protected" == */ ]]; then
+            if [[ -d "$RESET_BACKUP/$protected" ]]; then
+                mkdir -p "$REPO_ROOT/$protected"
+                cp -r "$RESET_BACKUP/$protected"* "$REPO_ROOT/$protected" 2>/dev/null || true
+            fi
+        else
+            if [[ -f "$RESET_BACKUP/$protected" ]]; then
+                mkdir -p "$(dirname "$REPO_ROOT/$protected")"
+                cp "$RESET_BACKUP/$protected" "$REPO_ROOT/$protected"
+            fi
+        fi
+    done
+
+    # Restore modified skills and other files from earlier backups
     if $STASHED; then
         git stash pop --quiet 2>/dev/null || true
     fi
-    for protected in "${CONFLICT_BACKED_UP[@]:-}"; do
-        [[ -z "$protected" ]] && continue
-        if [[ -f "$CONFLICT_BACKUP_DIR/$protected" ]]; then
-            mkdir -p "$(dirname "$REPO_ROOT/$protected")"
-            cp "$CONFLICT_BACKUP_DIR/$protected" "$REPO_ROOT/$protected"
-        fi
-    done
     for skill_name in "${MODIFIED_SKILLS[@]:-}"; do
         [[ -z "$skill_name" ]] && continue
         if [[ -d "$SKILL_BACKUP_DIR/$skill_name" ]]; then
