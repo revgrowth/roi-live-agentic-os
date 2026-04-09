@@ -8,10 +8,30 @@ interface Config {
 
 let cachedConfig: Config | null = null;
 
+function findAgenticOsRoot(startDir: string): string {
+  let currentDir = startDir;
+
+  for (let depth = 0; depth < 10; depth += 1) {
+    if (fs.existsSync(path.join(currentDir, "AGENTS.md"))) {
+      return currentDir;
+    }
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) {
+      break;
+    }
+
+    currentDir = parentDir;
+  }
+
+  return path.resolve(__dirname, "..", "..", "..", "..", "..");
+}
+
 export function getConfig(): Config {
   if (cachedConfig) return cachedConfig;
 
-  const agenticOsDir = process.env.AGENTIC_OS_DIR || process.cwd();
+  const agenticOsDir =
+    process.env.AGENTIC_OS_DIR || findAgenticOsRoot(__dirname);
   const dataDir = path.join(agenticOsDir, ".command-centre");
   const dbPath = path.join(dataDir, "data.db");
 
