@@ -1,5 +1,4 @@
 import matter from "gray-matter";
-import { Cron } from "croner";
 import fs from "fs";
 import path from "path";
 import { getConfig, getClientAgenticOsDir } from "./config";
@@ -11,6 +10,8 @@ import type {
   CronRun,
   CronJobCreateInput,
   CronJobUpdateInput,
+  CronResult,
+  CronRunResult,
 } from "@/types/cron";
 
 const DAY_MAP: Record<string, string> = {
@@ -26,42 +27,206 @@ const DAY_MAP: Record<string, string> = {
   sun: "0",
 };
 
+const WEEKDAY_TOKENS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+const WEEKDAY_SET = new Set<string>(WEEKDAY_TOKENS);
+const DAY_SHORTCUTS = new Set<string>(["daily", "weekdays", "weekends"]);
+const FIXED_TIME_RE = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+const INTERVAL_TIME_RE = /^every_([1-9]\d*)([mh])$/;
+const DEFAULT_TIMEOUT = "30m";
+
+function normalizeDayTokens(days: string): string[] {
+  return days
+    .split(",")
+    .map((token) => token.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function normalizeTimeTokens(time: string): string[] {
+  return time
+    .split(",")
+    .map((token) => token.trim())
+    .filter(Boolean);
+}
+
+export function isSupportedCronDays(days: string): boolean {
+  const tokens = normalizeDayTokens(days);
+  if (tokens.length === 0) return false;
+
+  if (tokens.length === 1) {
+    return DAY_SHORTCUTS.has(tokens[0]) || WEEKDAY_SET.has(tokens[0]);
+  }
+
+  return tokens.every((token) => WEEKDAY_SET.has(token));
+}
+
+export function isSupportedCronTime(time: string): boolean {
+  const trimmed = time.trim();
+  if (!trimmed) return false;
+
+  if (INTERVAL_TIME_RE.test(trimmed)) {
+    return true;
+  }
+
+  const parts = normalizeTimeTokens(trimmed);
+  return parts.length > 0 && parts.every((part) => FIXED_TIME_RE.test(part));
+}
+
+export function isSupportedCronSchedule(time: string, days: string): boolean {
+  return isSupportedCronTime(time) && isSupportedCronDays(days);
+}
+
+export function getCronScheduleValidationError(
+  time: string,
+  days: string
+): string | null {
+  if (!isSupportedCronTime(time)) {
+    return "Unsupported time schedule. Use HH:MM, comma-separated HH:MM values, every_Nm, or every_Nh.";
+  }
+
+  if (!isSupportedCronDays(days)) {
+    return "Unsupported day schedule. Use daily, weekdays, weekends, or comma-separated weekday tokens like mon,wed.";
+  }
+
+  return null;
+}
+
+function matchesDays(date: Date, days: string): boolean {
+  const tokens = normalizeDayTokens(days);
+  if (tokens.length === 0) return false;
+
+  const dayToken = WEEKDAY_TOKENS[date.getDay() === 0 ? 6 : date.getDay() - 1];
+  if (tokens.length === 1) {
+    switch (tokens[0]) {
+      case "daily":
+        return true;
+      case "weekdays":
+        return dayToken !== "sat" && dayToken !== "sun";
+      case "weekends":
+        return dayToken === "sat" || dayToken === "sun";
+      default:
+        return tokens[0] === dayToken;
+    }
+  }
+
+  return tokens.includes(dayToken);
+}
+
+function getNextFixedRun(time: string, days: string, now: Date): Date | null {
+  const times = normalizeTimeTokens(time);
+  if (times.length === 0) return null;
+
+  let earliest: Date | null = null;
+
+  for (let offset = 0; offset < 14; offset++) {
+    const day = new Date(now);
+    day.setDate(now.getDate() + offset);
+    day.setSeconds(0, 0);
+
+    if (!matchesDays(day, days)) {
+      continue;
+    }
+
+    for (const fixedTime of times) {
+      const [hours, minutes] = fixedTime.split(":").map(Number);
+      const candidate = new Date(day);
+      candidate.setHours(hours, minutes, 0, 0);
+
+      if (candidate <= now) {
+        continue;
+      }
+
+      if (!earliest || candidate < earliest) {
+        earliest = candidate;
+      }
+    }
+
+    if (earliest) {
+      return earliest;
+    }
+  }
+
+  return null;
+}
+
+function getNextIntervalRun(time: string, days: string, now: Date): Date | null {
+  const match = time.trim().match(INTERVAL_TIME_RE);
+  if (!match) return null;
+
+  const interval = Number(match[1]);
+  const unit = match[2];
+  const cursor = new Date(now);
+  cursor.setSeconds(0, 0);
+
+  if (unit === "m") {
+    cursor.setMinutes(cursor.getMinutes() + 1);
+    for (let i = 0; i < 60 * 24 * 14; i++) {
+      if (matchesDays(cursor, days) && cursor.getMinutes() % interval === 0) {
+        return new Date(cursor);
+      }
+      cursor.setMinutes(cursor.getMinutes() + 1);
+    }
+    return null;
+  }
+
+  cursor.setMinutes(0, 0, 0);
+  if (cursor <= now) {
+    cursor.setHours(cursor.getHours() + 1);
+  }
+
+  for (let i = 0; i < 24 * 14; i++) {
+    if (matchesDays(cursor, days) && cursor.getHours() % interval === 0) {
+      return new Date(cursor);
+    }
+    cursor.setHours(cursor.getHours() + 1);
+  }
+
+  return null;
+}
+
+function getNextRunForSchedule(time: string, days: string, active: boolean): string | null {
+  if (!active || !isSupportedCronSchedule(time, days)) {
+    return null;
+  }
+
+  const now = new Date();
+  const next =
+    INTERVAL_TIME_RE.test(time.trim())
+      ? getNextIntervalRun(time, days, now)
+      : getNextFixedRun(time, days, now);
+
+  return next ? next.toISOString() : null;
+}
+
 export function toCronExpression(
   time: string,
   days: string
 ): string | null {
-  // Interval formats like "every_5m" cannot map to standard cron
-  if (days.startsWith("every_") || time.startsWith("every_")) {
+  if (!isSupportedCronSchedule(time, days)) {
     return null;
   }
 
-  // Parse time — could be "09:00" or "09:00,17:00" (multi-time)
-  const times = time.split(",").map((t) => t.trim());
-  const firstTime = times[0];
-  const [hour, minute] = firstTime.split(":").map(Number);
-
-  if (isNaN(hour) || isNaN(minute)) return null;
-
-  // Parse days
-  const dayParts = days
-    .split(",")
-    .map((d) => d.trim().toLowerCase());
-  const cronDays = dayParts
-    .map((d) => DAY_MAP[d] ?? d)
+  const cronDays = normalizeDayTokens(days)
+    .map((token) => DAY_MAP[token] ?? token)
     .join(",");
 
-  // Multi-time: combine hours
-  if (times.length > 1) {
-    const hours = times
-      .map((t) => {
-        const [h] = t.split(":").map(Number);
-        return h;
-      })
-      .join(",");
-    return `${minute} ${hours} * * ${cronDays}`;
+  const intervalMatch = time.trim().match(INTERVAL_TIME_RE);
+  if (intervalMatch) {
+    const interval = Number(intervalMatch[1]);
+    const unit = intervalMatch[2];
+    return unit === "m"
+      ? `*/${interval} * * * ${cronDays}`
+      : `0 */${interval} * * ${cronDays}`;
   }
 
-  return `${minute} ${hour} * * ${cronDays}`;
+  const times = normalizeTimeTokens(time);
+  const uniqueMinutes = [...new Set(times.map((token) => token.split(":")[1]))];
+  if (uniqueMinutes.length !== 1) {
+    return null;
+  }
+
+  const minute = uniqueMinutes[0];
+  const hours = times.map((token) => token.split(":")[0]).join(",");
+  return `${minute} ${hours} * * ${cronDays}`;
 }
 
 function readRunStatus(slug: string): CronRunStatus | null {
@@ -75,14 +240,26 @@ function readRunStatus(slug: string): CronRunStatus | null {
 
   try {
     const raw = fs.readFileSync(statusPath, "utf-8");
-    const data = JSON.parse(raw);
+    const data = JSON.parse(raw) as {
+      last_run?: string;
+      result?: CronResult;
+      duration?: number;
+      exit_code?: number;
+      run_count?: number;
+      fail_count?: number;
+    };
+
+    if (!data.last_run || !data.result) {
+      return null;
+    }
+
     return {
       lastRun: data.last_run,
-      result: data.result as "success" | "failure",
-      duration: data.duration,
-      exitCode: data.exit_code,
-      runCount: data.run_count,
-      failCount: data.fail_count,
+      result: data.result,
+      duration: data.duration ?? 0,
+      exitCode: data.exit_code ?? 0,
+      runCount: data.run_count ?? 0,
+      failCount: data.fail_count ?? 0,
     };
   } catch {
     return null;
@@ -96,28 +273,14 @@ function parseJobFile(
   const raw = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(raw);
 
-  const active = String(data.active).toLowerCase() === "true";
+  const active = String(data.active ?? "true").toLowerCase() === "true";
   const retry = parseInt(String(data.retry || "0"), 10);
+  const time = String(data.time || "00:00");
+  const days = String(data.days || "daily");
 
-  const cronExpr = toCronExpression(
-    data.time || "00:00",
-    data.days || "daily"
-  );
-
-  let nextRun: string | null = null;
-  if (cronExpr && active) {
-    try {
-      const cron = new Cron(cronExpr);
-      const next = cron.nextRun();
-      nextRun = next ? next.toISOString() : null;
-    } catch {
-      nextRun = null;
-    }
-  }
-
+  const nextRun = getNextRunForSchedule(time, days, active);
   const lastRun = readRunStatus(slug);
 
-  // Calculate stats from SQLite run history
   const db = getDb();
   const statsRow = db
     .prepare(
@@ -137,16 +300,16 @@ function parseJobFile(
   };
 
   return {
-    name: data.name || slug,
+    name: String(data.name || slug),
     slug,
-    description: data.description || "",
-    time: data.time || "00:00",
-    days: data.days || "daily",
+    description: String(data.description || ""),
+    time,
+    days,
     active,
-    model: data.model || "sonnet",
-    notify: data.notify || "on_finish",
-    timeout: data.timeout || "5m",
-    retry,
+    model: String(data.model || "sonnet"),
+    notify: String(data.notify || "on_finish"),
+    timeout: String(data.timeout || DEFAULT_TIMEOUT),
+    retry: Number.isFinite(retry) ? retry : 0,
     nextRun,
     lastRun,
     stats,
@@ -200,7 +363,6 @@ export function createCronJob(input: CronJobCreateInput): CronJob {
   const slug = toSlug(input.name);
   const jobsDir = path.join(config.agenticOsDir, "cron", "jobs");
 
-  // Ensure directory exists
   fs.mkdirSync(jobsDir, { recursive: true });
 
   const frontmatter: Record<string, string> = {
@@ -211,13 +373,11 @@ export function createCronJob(input: CronJobCreateInput): CronJob {
     model: input.model || "sonnet",
     notify: input.notify || "on_finish",
     description: input.description,
-    timeout: input.timeout || "5m",
+    timeout: input.timeout || DEFAULT_TIMEOUT,
     retry: String(input.retry ?? 0),
   };
 
   const fileContent = matter.stringify(input.prompt, frontmatter);
-
-  // Atomic write: write to temp file then rename
   const tmpPath = path.join(jobsDir, `${slug}.tmp`);
   const finalPath = path.join(jobsDir, `${slug}.md`);
   fs.writeFileSync(tmpPath, fileContent, "utf-8");
@@ -237,7 +397,6 @@ export function updateCronJob(
   const raw = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(raw);
 
-  // Merge updates into frontmatter
   if (input.name !== undefined) data.name = input.name;
   if (input.description !== undefined) data.description = input.description;
   if (input.time !== undefined) data.time = input.time;
@@ -251,7 +410,6 @@ export function updateCronJob(
   const newPrompt = input.prompt !== undefined ? input.prompt : content.trim();
   const fileContent = matter.stringify(newPrompt, data);
 
-  // Atomic write
   const tmpPath = path.join(jobsDir, `${slug}.tmp`);
   fs.writeFileSync(tmpPath, fileContent, "utf-8");
   fs.renameSync(tmpPath, filePath);
@@ -279,7 +437,7 @@ export function getCronRunHistory(slug: string): CronRun[] {
     taskId: string | null;
     startedAt: string;
     completedAt: string | null;
-    result: "success" | "failure" | "running";
+    result: CronRunResult;
     durationSec: number | null;
     costUsd: number | null;
     exitCode: number | null;
@@ -297,7 +455,6 @@ export function getCronRunHistory(slug: string): CronRun[] {
     .all(slug) as CronRunRow[];
 
   if (rows.length > 0) {
-    // Fetch outputs for each run that has a taskId
     return rows.map((row) => {
       let outputs: CronRun["outputs"] = [];
       if (row.taskId) {
@@ -311,8 +468,6 @@ export function getCronRunHistory(slug: string): CronRun[] {
     });
   }
 
-  // Fallback: synthesize a single entry from the status JSON file
-  // (covers runs that happened before SQLite recording was added)
   const status = readRunStatus(slug);
   if (!status || !status.lastRun) return [];
 
@@ -359,7 +514,6 @@ export function getCronJobLog(slug: string): string {
   const logPath = path.join(config.agenticOsDir, "cron", "logs", `${slug}.log`);
   try {
     const content = fs.readFileSync(logPath, "utf-8");
-    // Return last 50KB max to avoid sending huge logs
     if (content.length > 50000) {
       return "... (truncated)\n" + content.slice(-50000);
     }

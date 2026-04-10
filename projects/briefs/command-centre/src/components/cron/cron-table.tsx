@@ -6,6 +6,88 @@ import { useCronStore } from "@/store/cron-store";
 import { useClientStore } from "@/store/client-store";
 import { CronRow } from "./cron-row";
 import { CreateJobPanel } from "./create-job-panel";
+import type { CronSystemStatus } from "@/types/cron";
+
+function SchedulerStatusBanner({
+  systemStatus,
+  selectedClientId,
+}: {
+  systemStatus: CronSystemStatus;
+  selectedClientId: string | null;
+}) {
+  const isInstalled = systemStatus.installed;
+  const title = isInstalled
+    ? "Scheduler installed for the root workspace"
+    : "Scheduler not installed for the root workspace";
+  const description = isInstalled
+    ? "UI-created jobs only run automatically after the OS scheduler is installed. The root dispatcher is currently registered."
+    : "Jobs can be created from the UI, but they will not run automatically until the root dispatcher is installed on this machine.";
+
+  const cardStyle: React.CSSProperties = {
+    marginBottom: 20,
+    padding: "16px 18px",
+    borderRadius: "0.5rem",
+    backgroundColor: isInstalled ? "#F4FBF6" : "#FFF7ED",
+    border: `1px solid ${isInstalled ? "#D1FADF" : "#FED7AA"}`,
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+    fontSize: 10,
+    textTransform: "uppercase",
+    letterSpacing: "0.12em",
+    color: isInstalled ? "#166534" : "#9A3412",
+    marginBottom: 6,
+  };
+
+  const valueStyle: React.CSSProperties = {
+    fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+    fontWeight: 700,
+    fontSize: 16,
+    color: "#1B1C1B",
+    marginBottom: 8,
+  };
+
+  const bodyStyle: React.CSSProperties = {
+    fontFamily: "var(--font-inter), Inter, sans-serif",
+    fontSize: 13,
+    lineHeight: 1.5,
+    color: "#5E5E65",
+    margin: 0,
+  };
+
+  const codeStyle: React.CSSProperties = {
+    display: "inline-block",
+    marginTop: 8,
+    padding: "6px 8px",
+    borderRadius: "0.375rem",
+    backgroundColor: "#FFFFFF",
+    border: "1px solid rgba(0, 0, 0, 0.06)",
+    color: "#390C00",
+    fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace",
+    fontSize: 12,
+    wordBreak: "break-all",
+  };
+
+  return (
+    <div style={cardStyle}>
+      <div style={labelStyle}>{systemStatus.scheduler}</div>
+      <div style={valueStyle}>{title}</div>
+      <p style={bodyStyle}>{description}</p>
+      <div style={bodyStyle}>
+        Identifier: <strong>{systemStatus.identifier}</strong>
+      </div>
+      <div style={codeStyle}>
+        {isInstalled ? systemStatus.uninstallCommand : systemStatus.installCommand}
+      </div>
+      {selectedClientId && selectedClientId !== "root" && (
+        <p style={{ ...bodyStyle, marginTop: 8 }}>
+          The banner reflects the root workspace only. Client workspaces still need their own scheduler setup if you want automatic runs there.
+        </p>
+      )}
+    </div>
+  );
+}
 
 export function CronJobsView() {
   const jobs = useCronStore((s) => s.jobs);
@@ -17,6 +99,8 @@ export function CronJobsView() {
 
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [systemStatus, setSystemStatus] = useState<CronSystemStatus | null>(null);
+  const [systemStatusError, setSystemStatusError] = useState<string | null>(null);
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDragIndex(index);
@@ -47,10 +131,36 @@ export function CronJobsView() {
     fetchJobs();
   }, [fetchJobs, selectedClientId]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/cron/system-status")
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch scheduler status");
+        }
+
+        const data = (await response.json()) as CronSystemStatus;
+        if (!cancelled) {
+          setSystemStatus(data);
+          setSystemStatusError(null);
+        }
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setSystemStatusError(
+            error instanceof Error ? error.message : "Failed to fetch scheduler status"
+          );
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const activeCount = jobs.filter((j) => j.active).length;
   const pausedCount = jobs.filter((j) => !j.active).length;
-
-  // Count jobs that ran today by checking lastRun timestamps
   const todayStr = new Date().toISOString().slice(0, 10);
   const runsToday = jobs.filter(
     (j) => j.lastRun?.lastRun && j.lastRun.lastRun.startsWith(todayStr)
@@ -82,7 +192,30 @@ export function CronJobsView() {
 
   return (
     <div>
-      {/* Stats bar */}
+      {systemStatus && (
+        <SchedulerStatusBanner
+          systemStatus={systemStatus}
+          selectedClientId={selectedClientId}
+        />
+      )}
+
+      {systemStatusError && (
+        <div
+          style={{
+            marginBottom: 20,
+            padding: "12px 14px",
+            borderRadius: "0.5rem",
+            backgroundColor: "#FEF2F2",
+            border: "1px solid #FECACA",
+            fontFamily: "var(--font-inter), Inter, sans-serif",
+            fontSize: 13,
+            color: "#991B1B",
+          }}
+        >
+          {systemStatusError}
+        </div>
+      )}
+
       <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
         <div style={statCardStyle}>
           <div style={statValueStyle}>{activeCount}</div>
@@ -104,7 +237,6 @@ export function CronJobsView() {
         </div>
       </div>
 
-      {/* Header with create button */}
       <div
         style={{
           display: "flex",
@@ -146,7 +278,6 @@ export function CronJobsView() {
         </button>
       </div>
 
-      {/* Table header */}
       <div
         style={{
           display: "grid",
@@ -170,7 +301,6 @@ export function CronJobsView() {
         <span>Actions</span>
       </div>
 
-      {/* Loading state */}
       {isLoading && (
         <div
           style={{
@@ -185,7 +315,6 @@ export function CronJobsView() {
         </div>
       )}
 
-      {/* Empty state */}
       {!isLoading && jobs.length === 0 && (
         <div
           style={{
@@ -235,7 +364,6 @@ export function CronJobsView() {
         </div>
       )}
 
-      {/* Job rows */}
       {!isLoading &&
         jobs.map((job, i) => (
           <CronRow
@@ -251,7 +379,6 @@ export function CronJobsView() {
           />
         ))}
 
-      {/* Create panel */}
       <CreateJobPanel />
     </div>
   );

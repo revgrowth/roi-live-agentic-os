@@ -164,7 +164,7 @@ Run tasks automatically in the background -- even when Claude Code is closed. Dr
 
 ### How it works
 
-1. A lightweight dispatcher (`scripts/run-crons.sh`) runs every 60 seconds via your OS scheduler
+1. A lightweight dispatcher runs every 60 seconds via your OS scheduler: `scripts/run-crons.sh` on macOS/Linux and `scripts/run-crons.ps1` on Windows
 2. It scans `cron/jobs/*.md` and checks each file's `time` and `days` against the current time
 3. Any matching job fires `claude -p` with the prompt body from the file
 4. Each job logs to `cron/logs/{job-name}.log`
@@ -178,7 +178,7 @@ bash scripts/install-crons.sh
 
 **Windows (PowerShell as admin):**
 ```powershell
-powershell scripts/install-crons.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install-crons.ps1
 ```
 
 The dispatcher uses your Claude plan credits. Each run costs roughly $0.01-0.05 (haiku), $0.05-0.25 (sonnet), or $0.25-2.00 (opus) depending on the model and task complexity.
@@ -240,10 +240,10 @@ Full reference: `cron/templates/schedule-reference.md`
 |--------|-----|
 | **Pause a job** | Set `active: "false"` in the job file |
 | **Resume a job** | Set `active: "true"` in the job file |
-| **Run a job now** | `bash scripts/run-job.sh {job-name}` |
+| **Run a job now** | `bash scripts/run-job.sh {job-name}` on macOS/Linux or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run-job.ps1 {job-name}` on Windows |
 | **Check logs** | `cat cron/logs/{job-name}.log` |
 | **List all jobs** | `ls cron/jobs/` or ask Claude "what's scheduled?" |
-| **Remove the dispatcher** | `bash scripts/uninstall-crons.sh` (Mac) or `powershell scripts/uninstall-crons.ps1` (Windows) |
+| **Remove the dispatcher** | `bash scripts/uninstall-crons.sh` (macOS/Linux) or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\uninstall-crons.ps1` (Windows) |
 
 Removing the dispatcher only stops the scheduler. Your job files in `cron/jobs/` are never deleted.
 
@@ -251,6 +251,7 @@ Removing the dispatcher only stops the scheduler. Your job files in `cron/jobs/`
 
 - **macOS protected folders:** The dispatcher can't run from Desktop, Documents, or Downloads due to macOS sandboxing. The install script detects this and tells you to move the project.
 - **PATH:** The dispatcher adds `~/.local/bin`, `/usr/local/bin`, and `/opt/homebrew/bin` to PATH so it can find the `claude` CLI in background mode.
+- **Windows scheduler:** Creating a job in the Command Centre only writes the job file. Automatic execution on Windows still requires the Task Scheduler dispatcher install above.
 - **Existing sessions:** Jobs run as separate headless processes -- they don't interfere with any open Claude Code session.
 
 ---

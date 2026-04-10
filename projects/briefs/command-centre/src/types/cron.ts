@@ -1,3 +1,6 @@
+export type CronResult = "success" | "failure" | "timeout";
+export type CronRunResult = CronResult | "running";
+
 export interface CronJob {
   name: string;
   slug: string;
@@ -17,7 +20,7 @@ export interface CronJob {
 
 export interface CronRunStatus {
   lastRun: string;
-  result: "success" | "failure";
+  result: CronResult;
   duration: number;
   exitCode: number;
   runCount: number;
@@ -42,7 +45,7 @@ export interface CronRun {
   taskId: string | null;
   startedAt: string;
   completedAt: string | null;
-  result: "success" | "failure" | "running";
+  result: CronRunResult;
   durationSec: number | null;
   costUsd: number | null;
   exitCode: number | null;
@@ -73,4 +76,13 @@ export interface CronJobUpdateInput {
   timeout?: string;
   retry?: number;
   prompt?: string;
+}
+
+export interface CronSystemStatus {
+  platform: "windows" | "macos" | "linux";
+  scheduler: "task-scheduler" | "launchd" | "crontab";
+  installed: boolean;
+  identifier: string;
+  installCommand: string;
+  uninstallCommand: string;
 }

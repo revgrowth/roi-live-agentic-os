@@ -16,7 +16,7 @@ Drop a markdown file into `cron/jobs/`, install the dispatcher once, and your pr
 
 ## How It Works
 
-A lightweight dispatcher script (`scripts/run-crons.sh`) runs every minute via your OS crontab. It scans `cron/jobs/*.md`, checks each file's `time` and `days` against the current time, and fires any matching jobs via `claude -p`. Each execution is stateless and self-contained.
+A lightweight dispatcher script runs every minute via your OS scheduler: `scripts/run-crons.sh` on macOS/Linux and `scripts/run-crons.ps1` on Windows Task Scheduler. It scans `cron/jobs/*.md`, checks each file's `time` and `days` against the current time, and fires any matching jobs via `claude -p`. Each execution is stateless and self-contained.
 
 ## Outcome
 
@@ -38,14 +38,14 @@ No brand context needed — this is infrastructure.
 |--------|----------|------------|
 | **Create** | "schedule a job", "run X every morning" | Build a job file (Step 2–4), offer to install dispatcher (Step 5) |
 | **List** | "list jobs", "what's scheduled" | Read all files in `cron/jobs/` and status files from `cron/status/`, show a table with name, schedule, active, last run time, result, duration, and run/fail counts |
-| **Install** | "install cron", "start scheduled jobs" | Run `bash scripts/install-crons.sh` |
-| **Uninstall** | "uninstall cron", "stop all jobs" | Run `bash scripts/uninstall-crons.sh` |
+| **Install** | "install cron", "start scheduled jobs" | Run `bash scripts/install-crons.sh` on macOS/Linux or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install-crons.ps1` on Windows |
+| **Uninstall** | "uninstall cron", "stop all jobs" | Run `bash scripts/uninstall-crons.sh` on macOS/Linux or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\uninstall-crons.ps1` on Windows |
 | **Pause job** | "stop the X job", "disable X" | Set `active: "false"` in the job file |
 | **Resume job** | "re-enable X", "turn X back on" | Set `active: "true"` in the job file |
 | **Remove** | "remove the morning job" | Delete the job file |
-| **Run now** | "run X now", "trigger X manually" | Run `bash scripts/run-job.sh {name}` |
+| **Run now** | "run X now", "trigger X manually" | Run `bash scripts/run-job.sh {name}` on macOS/Linux or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run-job.ps1 {name}` on Windows |
 | **Logs** | "check job logs", "did the job run" | Read from `cron/logs/{job-name}.log` |
-| **Status** | "is the dispatcher running" | Check `crontab -l` (Mac) or scheduled tasks (Windows) |
+| **Status** | "is the dispatcher running" | Check LaunchAgents on macOS, `crontab -l` on Linux, or Task Scheduler on Windows |
 
 ## Step 2: Understand What the User Wants
 
@@ -162,6 +162,12 @@ Run any job immediately, ignoring its schedule:
 bash scripts/run-job.sh morning-kickoff
 ```
 
+Windows equivalent:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run-job.ps1 morning-kickoff
+```
+
 This is the same entrypoint a future Telegram bot would use.
 
 ---
@@ -189,12 +195,15 @@ When building a job prompt that uses this, add a line like: *"If there are no is
 
 ## Heartbeat Integration
 
-At session start (CLAUDE.md heartbeat step 8):
+At session start (CLAUDE.md heartbeat step 10):
 
-1. Check if dispatcher is installed (`crontab -l | grep run-crons` on Mac)
+1. Check if dispatcher is installed:
+   - macOS: `~/Library/LaunchAgents/com.agentic-os.{slug}.plist`
+   - Linux: `crontab -l | grep run-crons`
+   - Windows: `Get-ScheduledTask -TaskName AgenticOS-{slug}`
 2. If installed: read `cron/status/` files and report: "Cron dispatcher is active — N enabled jobs. Last run: {job} at {time} ({result})."
 3. If any jobs failed on last run, flag them: "{job} failed on last run — check logs?"
-4. If not installed but jobs exist: suggest `bash scripts/install-crons.sh`
+4. If not installed but jobs exist: suggest the platform-appropriate install command
 
 ---
 

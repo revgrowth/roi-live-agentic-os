@@ -5,6 +5,41 @@ import { getConfig } from "./config";
 
 let db: Database.Database | null = null;
 
+function cronRunsSupportsTimeout(database: Database.Database): boolean {
+  const row = database
+    .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'cron_runs'")
+    .get() as { sql?: string } | undefined;
+
+  return row?.sql?.includes("'timeout'") ?? false;
+}
+
+function migrateCronRunsForTimeout(database: Database.Database) {
+  database.exec(`
+    BEGIN;
+    CREATE TABLE cron_runs_new (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      jobSlug TEXT NOT NULL,
+      taskId TEXT,
+      startedAt TEXT NOT NULL,
+      completedAt TEXT,
+      result TEXT NOT NULL DEFAULT 'running' CHECK (result IN ('success', 'failure', 'timeout', 'running')),
+      durationSec REAL,
+      costUsd REAL,
+      exitCode INTEGER,
+      trigger TEXT DEFAULT 'scheduled',
+      createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    INSERT INTO cron_runs_new (id, jobSlug, taskId, startedAt, completedAt, result, durationSec, costUsd, exitCode, trigger, createdAt)
+    SELECT id, jobSlug, taskId, startedAt, completedAt, result, durationSec, costUsd, exitCode, trigger, createdAt
+    FROM cron_runs;
+    DROP TABLE cron_runs;
+    ALTER TABLE cron_runs_new RENAME TO cron_runs;
+    CREATE INDEX IF NOT EXISTS idx_cron_runs_jobSlug ON cron_runs(jobSlug);
+    CREATE INDEX IF NOT EXISTS idx_cron_runs_startedAt ON cron_runs(startedAt);
+    COMMIT;
+  `);
+}
+
 export function getDb(): Database.Database {
   if (db) return db;
 
@@ -100,6 +135,10 @@ export function getDb(): Database.Database {
   const cronRunTriggerCol = db.prepare("PRAGMA table_info(cron_runs)").all() as Array<{ name: string }>;
   if (!cronRunTriggerCol.some((c) => c.name === "trigger")) {
     db.exec("ALTER TABLE cron_runs ADD COLUMN trigger TEXT DEFAULT 'scheduled'");
+  }
+
+  if (!cronRunsSupportsTimeout(db)) {
+    migrateCronRunsForTimeout(db);
   }
 
   // Migration: add permissionMode column for controlling Claude CLI permission mode per task

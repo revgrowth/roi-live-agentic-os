@@ -6,11 +6,33 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DISPATCHER="${PROJECT_DIR}/scripts/run-crons.sh"
+DRY_RUN=0
+if [[ "${AGENTIC_OS_CRON_DRY_RUN:-}" =~ ^(1|true|TRUE|yes|YES)$ ]]; then
+  DRY_RUN=1
+fi
 
 # Derive a unique slug from the project directory name for multi-client support
 PROJECT_SLUG=$(basename "$PROJECT_DIR" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-')
 PLIST_NAME="com.agentic-os.${PROJECT_SLUG}"
 PLIST_PATH="${HOME}/Library/LaunchAgents/${PLIST_NAME}.plist"
+CRON_LINE="* * * * * ${DISPATCHER}"
+
+if [[ "$(uname)" == "Darwin" ]]; then
+  TARGET_KIND="launchd"
+  TARGET_IDENTIFIER="$PLIST_PATH"
+else
+  TARGET_KIND="crontab"
+  TARGET_IDENTIFIER="$CRON_LINE"
+fi
+
+echo "Cron installer target: ${TARGET_KIND}"
+echo "  Installer: scripts/install-crons.sh"
+echo "  Identifier: ${TARGET_IDENTIFIER}"
+
+if [[ $DRY_RUN -eq 1 ]]; then
+  echo "  Dry run enabled via AGENTIC_OS_CRON_DRY_RUN — skipping installation."
+  exit 0
+fi
 
 # Pre-flight checks
 if ! command -v claude &>/dev/null; then
@@ -103,7 +125,6 @@ PLIST
 # Linux — use crontab
 else
 
-  CRON_LINE="* * * * * ${DISPATCHER}"
   EXISTING=$(crontab -l 2>/dev/null || true)
 
   if echo "$EXISTING" | grep -qF "$DISPATCHER"; then

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { listCronJobs, createCronJob } from "@/lib/cron-service";
+import {
+  listCronJobs,
+  createCronJob,
+  getCronScheduleValidationError,
+} from "@/lib/cron-service";
 import type { CronJobCreateInput } from "@/types/cron";
 
 export async function GET(request: NextRequest) {
@@ -44,6 +48,11 @@ export async function POST(request: NextRequest) {
         { error: "prompt is required and must be a non-empty string" },
         { status: 400 }
       );
+    }
+
+    const scheduleError = getCronScheduleValidationError(body.time, body.days);
+    if (scheduleError) {
+      return NextResponse.json({ error: scheduleError }, { status: 400 });
     }
 
     const job = createCronJob(body);

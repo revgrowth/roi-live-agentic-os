@@ -65,6 +65,18 @@ function formatDuration(sec: number): string {
   return `${min}m ${remaining}s`;
 }
 
+function getResultBadge(result: "success" | "failure" | "timeout") {
+  if (result === "success") {
+    return { label: "OK", backgroundColor: "#ECFDF5", color: "#10B981" };
+  }
+
+  if (result === "timeout") {
+    return { label: "Timeout", backgroundColor: "#FFF7ED", color: "#EA580C" };
+  }
+
+  return { label: "Fail", backgroundColor: "#FEF2F2", color: "#EF4444" };
+}
+
 export function CronRow({
   job,
   index,
@@ -102,6 +114,7 @@ export function CronRow({
     }
   }, [isExpanded, job.slug, rawFile, loadingFile]);
   const runs = runHistory[job.slug] || [];
+  const lastRunBadge = job.lastRun ? getResultBadge(job.lastRun.result) : null;
 
   // Derive a human-friendly status label for the active run
   const runStatusLabel =
@@ -227,13 +240,11 @@ export function CronRow({
                   borderRadius: 4,
                   fontSize: 10,
                   fontWeight: 500,
-                  backgroundColor:
-                    job.lastRun.result === "success" ? "#ECFDF5" : "#FEF2F2",
-                  color:
-                    job.lastRun.result === "success" ? "#10B981" : "#EF4444",
+                  backgroundColor: lastRunBadge?.backgroundColor,
+                  color: lastRunBadge?.color,
                 }}
               >
-                {job.lastRun.result === "success" ? "OK" : "Fail"}
+                {lastRunBadge?.label}
               </span>
             </div>
           ) : (

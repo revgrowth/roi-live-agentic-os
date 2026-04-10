@@ -45,10 +45,37 @@ success() { printf "${GREEN}  ✓ %s${NC}\n" "$1"; }
 warn()    { printf "${YELLOW}  ! %s${NC}\n" "$1"; }
 fail()    { printf "${RED}  ✗ %s${NC}\n" "$1"; }
 
+install_cron_dispatcher() {
+    if is_windows_shell; then
+        local powershell_bin="powershell.exe"
+        if ! command -v "$powershell_bin" &>/dev/null; then
+            powershell_bin="powershell"
+        fi
+
+        if ! command -v "$powershell_bin" &>/dev/null; then
+            fail "PowerShell is required to install the Windows cron dispatcher."
+            return 1
+        fi
+
+        local installer_path="$SCRIPT_DIR/install-crons.ps1"
+        if command -v cygpath &>/dev/null; then
+            installer_path="$(cygpath -w "$installer_path")"
+        fi
+
+        echo "  Using Windows Task Scheduler installer (scripts/install-crons.ps1)..."
+        "$powershell_bin" -NoProfile -ExecutionPolicy Bypass -File "$installer_path"
+        return $?
+    fi
+
+    echo "  Using POSIX cron installer (scripts/install-crons.sh)..."
+    bash "$SCRIPT_DIR/install-crons.sh"
+}
+
 # ---------- Paths ----------
 CATALOG="$REPO_ROOT/.claude/skills/_catalog/catalog.json"
 INSTALLED_JSON="$REPO_ROOT/.claude/skills/_catalog/installed.json"
 SKILLS_DIR="$REPO_ROOT/.claude/skills"
+CRON_DRY_RUN="${AGENTIC_OS_CRON_DRY_RUN:-0}"
 
 # =============================================================================
 # 1. Welcome banner
@@ -260,7 +287,9 @@ echo ""
 info "Installing GSD project framework..."
 echo ""
 
-if command -v node &>/dev/null; then
+if [[ "$CRON_DRY_RUN" == "1" ]]; then
+    warn "AGENTIC_OS_CRON_DRY_RUN=1 set — skipping GSD install during installer dry run."
+elif command -v node &>/dev/null; then
     GSD_GLOBAL="$HOME/.claude/commands/gsd"
     GSD_LOCAL="$REPO_ROOT/.claude/commands/gsd"
     if [[ -d "$GSD_GLOBAL" ]] && [[ $(ls -1 "$GSD_GLOBAL"/*.md 2>/dev/null | wc -l) -gt 10 ]]; then
@@ -287,7 +316,12 @@ echo ""
 # ---------- Install cron dispatcher ----------
 echo ""
 echo "  Installing cron dispatcher..."
-bash "$SCRIPT_DIR/install-crons.sh"
+install_cron_dispatcher
+
+if [[ "$CRON_DRY_RUN" == "1" ]]; then
+    warn "Installer dry run complete — skipping alias installation."
+    exit 0
+fi
 
 # =============================================================================
 # 8. Install `centre` shell alias

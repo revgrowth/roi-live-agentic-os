@@ -1,12 +1,16 @@
-# Manual job trigger — run any job by name, ignoring schedule.
+# Manual job trigger - run any job by name, ignoring schedule.
 # Usage: powershell scripts/run-job.ps1 <job-name>
 
 param(
-    [Parameter(Mandatory=$true, Position=0)]
+    [Parameter(Mandatory = $true, Position = 0)]
     [string]$JobName
 )
 
-$ProjectDir = Split-Path -Parent $PSScriptRoot
+Set-StrictMode -Version 3.0
+
+. (Join-Path $PSScriptRoot "lib\cron-windows.ps1")
+
+$ProjectDir = Get-AgenticOsProjectDir -ScriptRoot $PSScriptRoot
 $JobFile = Join-Path $ProjectDir "cron\jobs\$JobName.md"
 $LogsDir = Join-Path $ProjectDir "cron\logs"
 $StatusDir = Join-Path $ProjectDir "cron\status"
@@ -16,32 +20,35 @@ if (-not (Test-Path $JobFile)) {
     Write-Host "Error: No job file at $JobFile"
     Write-Host ""
     Write-Host "Available jobs:"
-    Get-ChildItem -Path (Join-Path $ProjectDir "cron\jobs") -Filter "*.md" | ForEach-Object {
+    Get-ChildItem -Path (Join-Path $ProjectDir "cron\jobs") -Filter "*.md" -ErrorAction SilentlyContinue | ForEach-Object {
         Write-Host "  $($_.BaseName)"
     }
     exit 1
 }
 
+try {
+    $ClaudeCommand = Resolve-AgenticOsClaudeCommand
+} catch {
+    Write-Host $_.Exception.Message
+    exit 1
+}
+$ClaudeInvocation = Get-AgenticOsProcessInvocation -CommandPath $ClaudeCommand
+
 New-Item -ItemType Directory -Force -Path $LogsDir | Out-Null
 New-Item -ItemType Directory -Force -Path $StatusDir | Out-Null
 
-# --- Parse YAML frontmatter ---
-$content = Get-Content $JobFile -Raw
-
-$JobDisplayName = if ($content -match '(?m)^name:\s*"?([^"\r\n]+)"?') { $Matches[1].Trim() } else { $JobName }
-$model = if ($content -match '(?m)^model:\s*"?(\w+)"?') { $Matches[1] } else { "sonnet" }
-$notify = if ($content -match '(?m)^notify:\s*"?([^"\r\n]+)"?') { $Matches[1].Trim() } else { "on_finish" }
-$timeoutRaw = if ($content -match '(?m)^timeout:\s*"?([^"\r\n]+)"?') { $Matches[1].Trim() } else { "30m" }
-$retry = if ($content -match '(?m)^retry:\s*"?(\d+)"?') { [int]$Matches[1] } else { 0 }
-
-$parts = $content -split '---'
-if ($parts.Count -lt 3) {
+$job = Get-AgenticOsJobDefinition -FilePath $JobFile
+if ([string]::IsNullOrWhiteSpace($job.Prompt)) {
     Write-Host "Error: No prompt body found in $JobFile"
     exit 1
 }
-$prompt = ($parts[2..($parts.Count - 1)] -join '---').Trim()
 
-# --- Helper functions ---
+$timeoutMs = ConvertTo-AgenticOsTimeoutMs -Value $job.Timeout
+$logFile = Join-Path $LogsDir "$JobName.log"
+$statusFile = Join-Path $StatusDir "$JobName.json"
+$previousStatus = Read-AgenticOsStatusFile -Path $statusFile
+$previousRunCount = if ($previousStatus -and $previousStatus.run_count) { [int]$previousStatus.run_count } else { 0 }
+$previousFailCount = if ($previousStatus -and $previousStatus.fail_count) { [int]$previousStatus.fail_count } else { 0 }
 
 function Send-Notification {
     param(
@@ -88,169 +95,135 @@ function Send-Notification {
     }
 }
 
-function ConvertTo-Seconds {
-    param([string]$Value)
-    if ($Value -match '^(\d+)m$') { return [int]$Matches[1] * 60 }
-    elseif ($Value -match '^(\d+)h$') { return [int]$Matches[1] * 3600 }
-    elseif ($Value -match '^(\d+)s$') { return [int]$Matches[1] }
-    else { return [int]$Value }
-}
-
-function Format-Duration {
-    param([int]$Seconds)
-    if ($Seconds -ge 60) {
-        $m = [math]::Floor($Seconds / 60)
-        $s = $Seconds % 60
-        return "${m}m ${s}s"
-    } else {
-        return "${Seconds}s"
-    }
-}
-
-$timeoutSecs = ConvertTo-Seconds $timeoutRaw
-$logFile = Join-Path $LogsDir "$JobName.log"
-$statusFile = Join-Path $StatusDir "$JobName.json"
-
-Write-Host "Running job: $JobDisplayName (model: $model, timeout: $timeoutRaw, retry: $retry)"
+Write-Host "Running job: $($job.Name) (model: $($job.Model), timeout: $($job.Timeout), retry: $($job.Retry))"
 Write-Host ""
 
-# --- Read previous status for run_count / fail_count ---
-$prevRunCount = 0
-$prevFailCount = 0
-if (Test-Path $statusFile) {
-    try {
-        $prevStatus = Get-Content $statusFile -Raw | ConvertFrom-Json
-        $prevRunCount = $prevStatus.run_count
-        $prevFailCount = $prevStatus.fail_count
-    } catch {
-        # Corrupted status file — start fresh
-    }
-}
-
-# --- Execute with retry loop ---
 $attempt = 0
-$maxAttempts = $retry + 1
-$exitCode = 1
-$runtime = 0
+$maxAttempts = $job.Retry + 1
+$success = $false
+$timedOut = $false
+$lastExitCode = 1
+$capturedOutput = ""
+$totalDuration = 0
 
 Remove-Item Env:CLAUDECODE -ErrorAction SilentlyContinue
 
 while ($attempt -lt $maxAttempts) {
     $attempt++
-
-    if ($maxAttempts -gt 1) {
-        Write-Host "Attempt ${attempt}/${maxAttempts}..."
-    }
-
-    $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-    Add-Content $logFile "`n=== [$timestamp] MANUAL START: $JobDisplayName (attempt ${attempt}/${maxAttempts}) ==="
+    $attemptTag = if ($maxAttempts -gt 1) { " (attempt $attempt/$maxAttempts)" } else { "" }
+    $startTimestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    Add-Content $logFile "`n=== [$startTimestamp] MANUAL START: $($job.Name)$attemptTag ==="
     $startTime = Get-Date
 
-    # Launch Claude with timeout
+    $tempOut = [System.IO.Path]::GetTempFileName()
+    $tempErr = [System.IO.Path]::GetTempFileName()
+    $timedOut = $false
+
     try {
-        $psi = New-Object System.Diagnostics.ProcessStartInfo
-        $psi.FileName = "claude"
-        $psi.Arguments = "-p `"$prompt`" --model $model --dangerously-skip-permissions"
-        $psi.UseShellExecute = $false
-        $psi.RedirectStandardOutput = $true
-        $psi.RedirectStandardError = $true
-        $psi.EnvironmentVariables.Remove("CLAUDECODE")
+        $processArgs = $ClaudeInvocation.Arguments + @("-p", $job.Prompt, "--model", $job.Model, "--dangerously-skip-permissions")
+        $processResult = Invoke-AgenticOsProcess `
+            -FilePath $ClaudeInvocation.FilePath `
+            -Arguments $processArgs `
+            -TimeoutMs $timeoutMs `
+            -StdOutPath $tempOut `
+            -StdErrPath $tempErr
 
-        $process = [System.Diagnostics.Process]::Start($psi)
-        $timedOut = -not $process.WaitForExit($timeoutSecs * 1000)
+        $timedOut = [bool]$processResult.TimedOut
+        $lastExitCode = [int]$processResult.ExitCode
 
-        if ($timedOut) {
-            try { $process.Kill() } catch {}
-            $exitCode = 137
-            $output = $process.StandardOutput.ReadToEnd()
-            $errOutput = $process.StandardError.ReadToEnd()
-        } else {
-            $exitCode = $process.ExitCode
-            $output = $process.StandardOutput.ReadToEnd()
-            $errOutput = $process.StandardError.ReadToEnd()
+        if (Test-Path $tempOut) {
+            $outContent = Get-Content $tempOut -Raw -ErrorAction SilentlyContinue
+            if ($outContent) {
+                $capturedOutput = $outContent
+                Write-Host $outContent
+                Add-Content $logFile $outContent
+            }
         }
 
-        if ($output) {
-            Write-Host $output
-            Add-Content $logFile $output
-        }
-        if ($errOutput) {
-            Write-Host $errOutput
-            Add-Content $logFile $errOutput
+        if (Test-Path $tempErr) {
+            $errContent = Get-Content $tempErr -Raw -ErrorAction SilentlyContinue
+            if ($errContent) {
+                Write-Host $errContent
+                Add-Content $logFile "[stderr] $errContent"
+            }
         }
     } catch {
         Write-Host "Error: $_"
         Add-Content $logFile "[run-job] Error: $_"
-        $exitCode = 1
+        $lastExitCode = 1
+        $timedOut = $false
+    } finally {
+        Remove-Item $tempOut -ErrorAction SilentlyContinue
+        Remove-Item $tempErr -ErrorAction SilentlyContinue
     }
 
-    $runtime = [int]((Get-Date) - $startTime).TotalSeconds
-    $durationHuman = Format-Duration $runtime
-    $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    $duration = [int]((Get-Date) - $startTime).TotalSeconds
+    $totalDuration += $duration
+    $durationHuman = Format-AgenticOsDuration -Seconds $duration
+    $endTimestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 
-    if ($exitCode -eq 0) {
-        Add-Content $logFile "=== [$timestamp] MANUAL END: $JobDisplayName (${durationHuman}) ==="
+    if ($lastExitCode -eq 0 -and -not $timedOut) {
+        Add-Content $logFile "=== [$endTimestamp] MANUAL END: $($job.Name) ($durationHuman)$attemptTag ==="
+        $success = $true
         break
-    } elseif ($exitCode -eq 137 -or $exitCode -eq 143) {
-        Add-Content $logFile "=== [$timestamp] MANUAL TIMEOUT: $JobDisplayName (killed after ${timeoutRaw}) ==="
-    } else {
-        Add-Content $logFile "=== [$timestamp] MANUAL FAIL: $JobDisplayName (exit ${exitCode}, ${durationHuman}) ==="
     }
 
-    # If retries remain, log and continue
+    if ($timedOut) {
+        Add-Content $logFile "=== [$endTimestamp] MANUAL TIMEOUT: $($job.Name) after $durationHuman$attemptTag ==="
+    } else {
+        Add-Content $logFile "=== [$endTimestamp] MANUAL FAIL: $($job.Name) (exit $lastExitCode, $durationHuman)$attemptTag ==="
+    }
+
     if ($attempt -lt $maxAttempts) {
-        Write-Host "Attempt $attempt failed (exit $exitCode). Retrying..."
-        Add-Content $logFile "[run-job] Attempt $attempt failed (exit $exitCode). Retrying..."
+        Write-Host "Attempt $attempt failed (exit $lastExitCode). Retrying..."
+        Add-Content $logFile "[run-job] Attempt $attempt failed (exit $lastExitCode). Retrying..."
     }
 }
 
-# --- Write status file ---
-$durationHuman = Format-Duration $runtime
-$newRunCount = $prevRunCount + 1
-$newFailCount = $prevFailCount
-$result = "success"
+$result = if ($timedOut) { "timeout" } elseif ($success) { "success" } else { "failure" }
+$runCount = $previousRunCount + 1
+$failCount = if ($result -eq "success") { $previousFailCount } else { $previousFailCount + 1 }
+$durationHuman = Format-AgenticOsDuration -Seconds $totalDuration
 
-if ($exitCode -ne 0) {
-    $newFailCount = $prevFailCount + 1
-    if ($exitCode -eq 137 -or $exitCode -eq 143) {
-        $result = "timeout"
-    } else {
-        $result = "failure"
+Write-AgenticOsStatusFile -Path $statusFile -Data @{
+    last_run = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    result = $result
+    duration = $totalDuration
+    exit_code = $lastExitCode
+    run_count = $runCount
+    fail_count = $failCount
+}
+
+$isSilent = $success -and $capturedOutput -match "\[SILENT\]"
+$notifySuccess = $job.Notify -in @("on_finish", "on_success")
+$notifyFailure = $job.Notify -in @("on_finish", "on_failure")
+
+if (-not $isSilent) {
+    if ($success -and $notifySuccess) {
+        Send-Notification -Event "success" -Context @{
+            jobName = $job.Name
+            duration = $durationHuman
+            timeout = $job.Timeout
+            exitCode = $lastExitCode
+            catchUpSuffix = ""
+        } -LogFile $logFile
+    } elseif ($result -eq "timeout" -and $notifyFailure) {
+        Send-Notification -Event "timeout" -Context @{
+            jobName = $job.Name
+            duration = $durationHuman
+            timeout = $job.Timeout
+            exitCode = $lastExitCode
+            catchUpSuffix = ""
+        } -LogFile $logFile
+    } elseif ($result -eq "failure" -and $notifyFailure) {
+        Send-Notification -Event "failure" -Context @{
+            jobName = $job.Name
+            duration = $durationHuman
+            timeout = $job.Timeout
+            exitCode = $lastExitCode
+            catchUpSuffix = ""
+        } -LogFile $logFile
     }
 }
 
-$timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-$statusJson = "{`"last_run`":`"$timestamp`",`"result`":`"$result`",`"duration`":$runtime,`"exit_code`":$exitCode,`"run_count`":$newRunCount,`"fail_count`":$newFailCount}"
-Set-Content $statusFile $statusJson -NoNewline
-
-# --- Send notification based on notify field ---
-$notifySuccess = $notify -in @("on_finish", "on_success")
-$notifyFailure = $notify -in @("on_finish", "on_failure")
-
-if ($exitCode -eq 0 -and $notifySuccess) {
-    Send-Notification -Event "success" -Context @{
-        jobName = $JobDisplayName
-        duration = $durationHuman
-        timeout = $timeoutRaw
-        exitCode = $exitCode
-        catchUpSuffix = ""
-    } -LogFile $logFile
-} elseif ($result -eq "timeout" -and $notifyFailure) {
-    Send-Notification -Event "timeout" -Context @{
-        jobName = $JobDisplayName
-        duration = $durationHuman
-        timeout = $timeoutRaw
-        exitCode = $exitCode
-        catchUpSuffix = ""
-    } -LogFile $logFile
-} elseif ($exitCode -ne 0 -and $notifyFailure) {
-    Send-Notification -Event "failure" -Context @{
-        jobName = $JobDisplayName
-        duration = $durationHuman
-        timeout = $timeoutRaw
-        exitCode = $exitCode
-        catchUpSuffix = ""
-    } -LogFile $logFile
-}
-
-exit $exitCode
+exit $lastExitCode

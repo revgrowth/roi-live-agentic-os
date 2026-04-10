@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS cron_runs (
   taskId TEXT,
   startedAt TEXT NOT NULL,
   completedAt TEXT,
-  result TEXT NOT NULL DEFAULT 'running' CHECK (result IN ('success', 'failure', 'running')),
+  result TEXT NOT NULL DEFAULT 'running' CHECK (result IN ('success', 'failure', 'timeout', 'running')),
   durationSec REAL,
   costUsd REAL,
   exitCode INTEGER,

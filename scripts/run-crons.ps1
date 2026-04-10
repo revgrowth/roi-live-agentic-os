@@ -1,42 +1,35 @@
-# Dispatcher — runs every minute via Windows Task Scheduler.
+# Dispatcher - runs every minute via Windows Task Scheduler.
 # Scans cron/jobs/*.md, fires any jobs matching the current time and day.
 # Supports exact times ("09:00"), multiple times ("09:00,13:00"),
 # minute intervals ("every_1m", "every_5m"), and hour intervals ("every_1h", "every_2h").
-# Features: timeout, retry, notifications, status tracking, catch-up after sleep/reboot.
+# Features: timeout, retry, notifications, status tracking, and catch-up after sleep/reboot.
 
-$ProjectDir = Split-Path -Parent $PSScriptRoot
+Set-StrictMode -Version 3.0
+. (Join-Path $PSScriptRoot "lib\cron-windows.ps1")
+
+$ProjectDir = Get-AgenticOsProjectDir -ScriptRoot $PSScriptRoot
 $CronsDir = Join-Path $ProjectDir "cron\jobs"
 $LogsDir = Join-Path $ProjectDir "cron\logs"
 $StatusDir = Join-Path $ProjectDir "cron\status"
 $WindowsNotifyScript = Join-Path $ProjectDir "scripts\windows-notify.ps1"
-$NowHour = [int](Get-Date -Format "HH")
-$NowMin = Get-Date -Format "mm"
-$NowTime = Get-Date -Format "HH:mm"
-$NowDay = (Get-Date).ToString("ddd").ToLower()
-$NowUtc = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+$CronDbScript = Join-Path $ProjectDir "scripts\lib\cron-db.py"
+
+try {
+    $ClaudeCommand = Resolve-AgenticOsClaudeCommand
+} catch {
+    Write-Host $_.Exception.Message
+    exit 1
+}
+$ClaudeInvocation = Get-AgenticOsProcessInvocation -CommandPath $ClaudeCommand
+
+$PythonCommand = Resolve-AgenticOsPythonCommand
+$Now = Get-AgenticOsNow
+$NowTime = $Now.ToString("HH:mm")
+$NowDay = $Now.ToString("ddd", [System.Globalization.CultureInfo]::InvariantCulture).ToLowerInvariant()
+$NowUtc = $Now.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 
 New-Item -ItemType Directory -Force -Path $LogsDir | Out-Null
 New-Item -ItemType Directory -Force -Path $StatusDir | Out-Null
-
-# --- Helpers ---
-
-function Format-Duration {
-    param([int]$Seconds)
-    if ($Seconds -lt 60) { return "${Seconds}s" }
-    $m = [math]::Floor($Seconds / 60)
-    $s = $Seconds % 60
-    if ($s -eq 0) { return "${m}m" }
-    return "${m}m ${s}s"
-}
-
-function ConvertTo-TimeoutMs {
-    param([string]$Value)
-    if ($Value -match '^(\d+)s$') { return [int]$Matches[1] * 1000 }
-    if ($Value -match '^(\d+)m$') { return [int]$Matches[1] * 60 * 1000 }
-    if ($Value -match '^(\d+)h$') { return [int]$Matches[1] * 3600 * 1000 }
-    # Default 30 minutes
-    return 1800000
-}
 
 function Send-Notification {
     param(
@@ -83,144 +76,126 @@ function Send-Notification {
     }
 }
 
-function Test-TimeMatch {
-    param([string]$Sched)
+function Invoke-AgenticOsCronDb {
+    param(
+        [ValidateSet("start", "finish")]
+        [string]$Action,
+        [hashtable]$Payload,
+        [string]$LogFile
+    )
 
-    # Interval: every_Nm (minutes)
-    if ($Sched -match '^every_(\d+)m$') {
-        $interval = [int]$Matches[1]
-        return ([int]$NowMin % $interval -eq 0)
+    if (-not $PythonCommand -or -not (Test-Path $CronDbScript)) {
+        return $null
     }
 
-    # Interval: every_Nh (hours)
-    if ($Sched -match '^every_(\d+)h$') {
-        $interval = [int]$Matches[1]
-        return ($NowMin -eq "00" -and ($NowHour % $interval -eq 0))
+    if (-not (Test-Path $Payload.db_path)) {
+        return $null
     }
 
-    # Comma-separated or single time
-    $times = $Sched -split ',' | ForEach-Object { $_.Trim() }
-    return ($NowTime -in $times)
-}
+    $payloadJson = $Payload | ConvertTo-Json -Compress -Depth 10
+    $commandOutput = $payloadJson | & $PythonCommand.FilePath @($PythonCommand.Arguments + @($CronDbScript, $Action)) 2>&1
+    $exitCode = $LASTEXITCODE
+    $rawOutput = if ($commandOutput) { ($commandOutput | Out-String).Trim() } else { "" }
 
-function Test-TimeInRange {
-    param([string]$Sched, [datetime]$MissedTime)
-    # Only for fixed-time jobs — check if any scheduled time falls in the missed window
-    if ($Sched -match '^every_') { return $false }
-
-    $times = $Sched -split ',' | ForEach-Object { $_.Trim() }
-    foreach ($t in $times) {
-        if ($t -match '^\d{2}:\d{2}$') {
-            $schedDt = Get-Date -Hour ([int]$t.Substring(0,2)) -Minute ([int]$t.Substring(3,2)) -Second 0
-            if ($schedDt -ge $MissedTime -and $schedDt -lt (Get-Date)) {
-                return $true
-            }
+    if ($exitCode -ne 0) {
+        if ($LogFile) {
+            Add-Content $LogFile "[db] cron-db.py $Action failed (${exitCode}): $rawOutput"
         }
+        return $null
     }
-    return $false
-}
 
-function Read-StatusFile {
-    param([string]$Path)
-    if (Test-Path $Path) {
-        try {
-            return Get-Content $Path -Raw | ConvertFrom-Json
-        } catch {
-            return $null
+    if ([string]::IsNullOrWhiteSpace($rawOutput)) {
+        return $null
+    }
+
+    try {
+        return $rawOutput | ConvertFrom-Json
+    } catch {
+        if ($LogFile) {
+            Add-Content $LogFile "[db] cron-db.py $Action returned invalid JSON: $rawOutput"
         }
+        return $null
     }
-    return $null
-}
-
-function Write-StatusFile {
-    param([string]$Path, [hashtable]$Data)
-    $Data | ConvertTo-Json -Compress | Set-Content $Path -Encoding UTF8
 }
 
 function Invoke-Job {
     param(
-        [string]$File,
-        [string]$JobName,
-        [string]$Prompt,
-        [string]$Model,
-        [string]$Notify,
-        [string]$Description,
-        [string]$Timeout,
-        [int]$Retry,
+        [hashtable]$Job,
         [bool]$IsCatchUp = $false
     )
 
-    $basename = [System.IO.Path]::GetFileNameWithoutExtension($File)
-    $logFile = Join-Path $LogsDir "$basename.log"
-    $statusFile = Join-Path $StatusDir "$basename.json"
-    $pidFile = Join-Path $StatusDir "$basename.pid"
-    $timeoutMs = ConvertTo-TimeoutMs $Timeout
+    $logFile = Join-Path $LogsDir "$($Job.Slug).log"
+    $statusFile = Join-Path $StatusDir "$($Job.Slug).json"
+    $pidFile = Join-Path $StatusDir "$($Job.Slug).pid"
+    $timeoutMs = ConvertTo-AgenticOsTimeoutMs -Value $Job.Timeout
 
-    # Concurrency guard — skip if another instance is already running
     if (Test-Path $pidFile) {
         $existingPid = Get-Content $pidFile -ErrorAction SilentlyContinue
         if ($existingPid) {
             try {
-                $proc = Get-Process -Id ([int]$existingPid) -ErrorAction Stop
-                if (-not $proc.HasExited) {
-                    Add-Content $logFile "[dispatcher] Skipping ${JobName} - already running (PID ${existingPid})"
+                $process = Get-Process -Id ([int]$existingPid) -ErrorAction Stop
+                if (-not $process.HasExited) {
+                    Add-Content $logFile "[dispatcher] Skipping $($Job.Name) - already running (PID ${existingPid})"
                     return
                 }
             } catch {
-                # Process not found — stale PID file
+                # Stale pid file.
             }
-            Remove-Item $pidFile -ErrorAction SilentlyContinue
         }
+        Remove-Item $pidFile -ErrorAction SilentlyContinue
     }
 
-    # Write PID file for this job instance
     $PID | Set-Content $pidFile -Encoding UTF8
 
-    # Read previous status for counters
-    $prevStatus = Read-StatusFile $statusFile
-    $runCount = if ($prevStatus -and $prevStatus.run_count) { [int]$prevStatus.run_count } else { 0 }
-    $failCount = if ($prevStatus -and $prevStatus.fail_count) { [int]$prevStatus.fail_count } else { 0 }
+    $previousStatus = Read-AgenticOsStatusFile -Path $statusFile
+    $runCount = if ($previousStatus -and $previousStatus.run_count) { [int]$previousStatus.run_count } else { 0 }
+    $failCount = if ($previousStatus -and $previousStatus.fail_count) { [int]$previousStatus.fail_count } else { 0 }
 
-    $catchUpTag = if ($IsCatchUp) { " [CATCH-UP]" } else { "" }
-
-    # Retry loop
-    $maxAttempts = $Retry + 1
     $attempt = 0
+    $maxAttempts = $Job.Retry + 1
     $success = $false
-    $lastExitCodeVal = -1
-    $totalDuration = 0
+    $timedOut = $false
+    $lastExitCode = 1
     $capturedOutput = ""
+    $totalDuration = 0
+    $catchUpSuffix = if ($IsCatchUp) { " (catch-up)" } else { "" }
+
+    $jobStartedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    $jobStartEpoch = [DateTimeOffset](Get-Date)
+    $dbPath = Join-Path $ProjectDir ".command-centre\data.db"
+    $tracking = Invoke-AgenticOsCronDb -Action "start" -Payload @{
+        db_path = $dbPath
+        job_slug = $Job.Slug
+        job_name = $Job.Name
+        description = $Job.Description
+        started_at = $jobStartedAt
+    } -LogFile $logFile
 
     while ($attempt -lt $maxAttempts) {
         $attempt++
         $attemptTag = if ($maxAttempts -gt 1) { " (attempt $attempt/$maxAttempts)" } else { "" }
+        $startTimestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+        Add-Content $logFile "`n=== [$startTimestamp] START: $($Job.Name)$catchUpSuffix$attemptTag ==="
+        $attemptStart = Get-Date
 
-        $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-        Add-Content $logFile "`n=== [$timestamp] START: ${JobName}${catchUpTag}${attemptTag} ==="
-        $startTime = Get-Date
-
-        # Clear CLAUDECODE env var to avoid nested session error
-        Remove-Item Env:CLAUDECODE -ErrorAction SilentlyContinue
-
-        $timedOut = $false
         $tempOut = [System.IO.Path]::GetTempFileName()
         $tempErr = [System.IO.Path]::GetTempFileName()
+        $timedOut = $false
+
+        Remove-Item Env:CLAUDECODE -ErrorAction SilentlyContinue
 
         try {
-            $process = Start-Process -FilePath "claude" `
-                -ArgumentList "-p", "`"$prompt`"", "--model", $Model, "--dangerously-skip-permissions" `
-                -NoNewWindow -PassThru `
-                -RedirectStandardOutput $tempOut `
-                -RedirectStandardError $tempErr
+            $processArgs = $ClaudeInvocation.Arguments + @("-p", $Job.Prompt, "--model", $Job.Model, "--dangerously-skip-permissions")
+            $processResult = Invoke-AgenticOsProcess `
+                -FilePath $ClaudeInvocation.FilePath `
+                -Arguments $processArgs `
+                -TimeoutMs $timeoutMs `
+                -StdOutPath $tempOut `
+                -StdErrPath $tempErr
 
-            if (-not $process.WaitForExit($timeoutMs)) {
-                $process.Kill()
-                $timedOut = $true
-            }
+            $timedOut = [bool]$processResult.TimedOut
+            $lastExitCode = [int]$processResult.ExitCode
 
-            $lastExitCodeVal = $process.ExitCode
-
-            # Append output to log and capture for [SILENT] check
             if (Test-Path $tempOut) {
                 $outContent = Get-Content $tempOut -Raw -ErrorAction SilentlyContinue
                 if ($outContent) {
@@ -228,231 +203,167 @@ function Invoke-Job {
                     $capturedOutput = $outContent
                 }
             }
+
             if (Test-Path $tempErr) {
                 $errContent = Get-Content $tempErr -Raw -ErrorAction SilentlyContinue
-                if ($errContent) { Add-Content $logFile "[stderr] $errContent" }
+                if ($errContent) {
+                    Add-Content $logFile "[stderr] $errContent"
+                }
             }
         } catch {
             Add-Content $logFile "[dispatcher] Error: $_"
-            $lastExitCodeVal = 1
+            $lastExitCode = 1
+            $timedOut = $false
         } finally {
             Remove-Item $tempOut -ErrorAction SilentlyContinue
             Remove-Item $tempErr -ErrorAction SilentlyContinue
         }
 
-        $endTime = Get-Date
-        $duration = [int]($endTime - $startTime).TotalSeconds
+        $duration = [int]((Get-Date) - $attemptStart).TotalSeconds
         $totalDuration += $duration
-        $durationStr = Format-Duration $duration
-        $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+        $durationLabel = Format-AgenticOsDuration -Seconds $duration
+        $endTimestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 
-        if ($timedOut) {
-            Add-Content $logFile "=== [$timestamp] TIMEOUT: ${JobName} after ${durationStr}${attemptTag} ==="
-            $lastExitCodeVal = 124
-        } else {
-            Add-Content $logFile "=== [$timestamp] END: ${JobName} (${durationStr})${attemptTag} ==="
-        }
-
-        if ($lastExitCodeVal -eq 0 -and -not $timedOut) {
+        if ($lastExitCode -eq 0 -and -not $timedOut) {
+            Add-Content $logFile "=== [$endTimestamp] END: $($Job.Name) ($durationLabel)$catchUpSuffix$attemptTag ==="
             $success = $true
             break
         }
 
-        # If more attempts remain, log the retry
+        if ($timedOut) {
+            Add-Content $logFile "=== [$endTimestamp] TIMEOUT: $($Job.Name) after $durationLabel$catchUpSuffix$attemptTag ==="
+        } else {
+            Add-Content $logFile "=== [$endTimestamp] FAIL: $($Job.Name) (exit $lastExitCode, $durationLabel)$catchUpSuffix$attemptTag ==="
+        }
+
         if ($attempt -lt $maxAttempts) {
-            Add-Content $logFile "[dispatcher] Retrying ${JobName}..."
+            Add-Content $logFile "[dispatcher] Retrying $($Job.Name)..."
         }
     }
 
-    # Update counters
-    $runCount++
-    if (-not $success) { $failCount++ }
-
     $result = if ($timedOut) { "timeout" } elseif ($success) { "success" } else { "failure" }
+    $runCount++
+    if ($result -ne "success") {
+        $failCount++
+    }
 
-    # Write per-job status file
-    Write-StatusFile $statusFile @{
-        last_run   = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-        result     = $result
-        duration   = $totalDuration
-        exit_code  = $lastExitCodeVal
-        run_count  = $runCount
+    Write-AgenticOsStatusFile -Path $statusFile -Data @{
+        last_run = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+        result = $result
+        duration = $totalDuration
+        exit_code = $lastExitCode
+        run_count = $runCount
         fail_count = $failCount
     }
 
-    # Check for [SILENT] marker in output (job signals nothing to report)
-    $isSilent = $false
-    if ($success -and $capturedOutput -match '\[SILENT\]') {
-        $isSilent = $true
-    }
+    $completedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    [void](Invoke-AgenticOsCronDb -Action "finish" -Payload @{
+        db_path = $dbPath
+        job_slug = $Job.Slug
+        task_id = if ($tracking -and $tracking.PSObject.Properties.Name -contains "taskId") { [string]$tracking.taskId } else { "" }
+        cron_run_id = if ($tracking -and $tracking.PSObject.Properties.Name -contains "cronRunId") { [int]$tracking.cronRunId } else { 0 }
+        started_at = $jobStartedAt
+        completed_at = $completedAt
+        duration_sec = $totalDuration
+        exit_code = $lastExitCode
+        result = $result
+        timeout = $Job.Timeout
+        project_dir = $ProjectDir
+        start_epoch = [int]$jobStartEpoch.ToUnixTimeSeconds()
+        end_epoch = [int]([DateTimeOffset](Get-Date)).ToUnixTimeSeconds()
+    } -LogFile $logFile)
 
-    # Clean up PID file
     Remove-Item $pidFile -ErrorAction SilentlyContinue
 
-    # Notifications
-    $durationTotal = Format-Duration $totalDuration
-    $catchUpSuffix = if ($IsCatchUp) { " (catch-up)" } else { "" }
-    $notifySuccess = $Notify -in @("on_finish", "on_success")
-    $notifyFailure = $Notify -in @("on_finish", "on_failure")
+    $notifySuccess = $Job.Notify -in @("on_finish", "on_success")
+    $notifyFailure = $Job.Notify -in @("on_finish", "on_failure")
+    $isSilent = $success -and $capturedOutput -match "\[SILENT\]"
+    $durationTotalLabel = Format-AgenticOsDuration -Seconds $totalDuration
 
-    if ($isSilent) {
-        # Job signalled nothing to report — logged but no notification
-    } elseif ($success -and $notifySuccess) {
-        Send-Notification -Event "success" -Context @{
-            jobName = $JobName
-            duration = $durationTotal
-            timeout = $Timeout
-            exitCode = $lastExitCodeVal
-            catchUpSuffix = $catchUpSuffix
-        } -LogFile $logFile
-    } elseif ($timedOut -and $notifyFailure) {
-        Send-Notification -Event "timeout" -Context @{
-            jobName = $JobName
-            duration = $durationTotal
-            timeout = $Timeout
-            exitCode = $lastExitCodeVal
-            catchUpSuffix = $catchUpSuffix
-        } -LogFile $logFile
-    } elseif (-not $success -and $notifyFailure) {
-        Send-Notification -Event "failure" -Context @{
-            jobName = $JobName
-            duration = $durationTotal
-            timeout = $Timeout
-            exitCode = $lastExitCodeVal
-            catchUpSuffix = $catchUpSuffix
-        } -LogFile $logFile
+    if (-not $isSilent) {
+        if ($success -and $notifySuccess) {
+            Send-Notification -Event "success" -Context @{
+                jobName = $Job.Name
+                duration = $durationTotalLabel
+                timeout = $Job.Timeout
+                exitCode = $lastExitCode
+                catchUpSuffix = $catchUpSuffix
+            } -LogFile $logFile
+        } elseif ($result -eq "timeout" -and $notifyFailure) {
+            Send-Notification -Event "timeout" -Context @{
+                jobName = $Job.Name
+                duration = $durationTotalLabel
+                timeout = $Job.Timeout
+                exitCode = $lastExitCode
+                catchUpSuffix = $catchUpSuffix
+            } -LogFile $logFile
+        } elseif ($result -eq "failure" -and $notifyFailure) {
+            Send-Notification -Event "failure" -Context @{
+                jobName = $Job.Name
+                duration = $durationTotalLabel
+                timeout = $Job.Timeout
+                exitCode = $lastExitCode
+                catchUpSuffix = $catchUpSuffix
+            } -LogFile $logFile
+        }
     }
 }
-
-function Parse-JobFile {
-    param([string]$FilePath)
-
-    $content = Get-Content $FilePath -Raw
-
-    $active      = if ($content -match '(?m)^active:\s*"?(\w+)"?')         { $Matches[1] } else { "true" }
-    $schedTime   = if ($content -match '(?m)^time:\s*"?([^"\r\n]+)"?')     { $Matches[1].Trim() } else { "" }
-    $schedDays   = if ($content -match '(?m)^days:\s*"?(\w+)"?')           { $Matches[1] } else { "" }
-    $model       = if ($content -match '(?m)^model:\s*"?(\w+)"?')          { $Matches[1] } else { "sonnet" }
-    $jobName     = if ($content -match '(?m)^name:\s*"?([^"\r\n]+)"?')     { $Matches[1] } else { [System.IO.Path]::GetFileNameWithoutExtension($FilePath) }
-    $notify      = if ($content -match '(?m)^notify:\s*"?([^"\r\n]+)"?')   { $Matches[1].Trim() } else { "on_finish" }
-    $description = if ($content -match '(?m)^description:\s*"?([^"\r\n]+)"?') { $Matches[1].Trim() } else { "" }
-    $timeout     = if ($content -match '(?m)^timeout:\s*"?([^"\r\n]+)"?')  { $Matches[1].Trim() } else { "30m" }
-    $retry       = if ($content -match '(?m)^retry:\s*"?(\d+)"?')          { [int]$Matches[1] } else { 0 }
-
-    # Extract prompt body (everything after second ---)
-    $parts = $content -split '---'
-    $prompt = ""
-    if ($parts.Count -ge 3) {
-        $prompt = ($parts[2..($parts.Count - 1)] -join '---').Trim()
-    }
-
-    return @{
-        Active      = $active
-        Time        = $schedTime
-        Days        = $schedDays
-        Model       = $model
-        Name        = $jobName
-        Notify      = $notify
-        Description = $description
-        Timeout     = $timeout
-        Retry       = $retry
-        Prompt      = $prompt
-    }
-}
-
-function Test-DayMatch {
-    param([string]$ScheduledDays)
-    switch ($ScheduledDays) {
-        "daily"    { return $true }
-        "weekdays" { return ($NowDay -notin @("sat", "sun")) }
-        "weekends" { return ($NowDay -in @("sat", "sun")) }
-        default    { return ($ScheduledDays -match $NowDay) }
-    }
-}
-
-# --- Write dispatcher status BEFORE scanning jobs ---
 
 $dispatcherStatusFile = Join-Path $StatusDir "dispatcher.json"
-$prevDispatcher = Read-StatusFile $dispatcherStatusFile
+$previousDispatcher = Read-AgenticOsStatusFile -Path $dispatcherStatusFile
+$todayMarker = $Now.ToString("yyyy-MM-dd")
 
-Write-StatusFile $dispatcherStatusFile @{
-    last_dispatch = $NowUtc
-    pid           = $PID
-}
-
-# --- Catch-up: detect gap and run missed fixed-time jobs ---
-
-if ($prevDispatcher -and $prevDispatcher.last_dispatch) {
+if ($previousDispatcher -and $previousDispatcher.last_dispatch) {
     try {
-        $lastDispatch = [datetime]::Parse($prevDispatcher.last_dispatch).ToUniversalTime()
-        $nowDt = (Get-Date).ToUniversalTime()
-        $gapSeconds = ($nowDt - $lastDispatch).TotalSeconds
+        $lastDispatch = [DateTimeOffset]::Parse($previousDispatcher.last_dispatch, [System.Globalization.CultureInfo]::InvariantCulture)
+        $gapSeconds = ($Now - $lastDispatch).TotalSeconds
 
         if ($gapSeconds -gt 120) {
-            # Cap at 24 hours
-            $catchUpFrom = if ($gapSeconds -gt 86400) {
-                $nowDt.AddHours(-24)
-            } else {
-                $lastDispatch
+            $catchUpFrom = if ($gapSeconds -gt 86400) { $Now.AddHours(-24) } else { $lastDispatch }
+            $dispatcherLog = Join-Path $LogsDir "dispatcher.log"
+            Add-Content $dispatcherLog "`n=== [$NowUtc] CATCH-UP: gap of $(Format-AgenticOsDuration -Seconds ([int][Math]::Min($gapSeconds, 86400))) detected ==="
+
+            Get-ChildItem -Path $CronsDir -Filter "*.md" -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object {
+                $job = Get-AgenticOsJobDefinition -FilePath $_.FullName
+                if (-not $job.Active -or [string]::IsNullOrWhiteSpace($job.Prompt)) { return }
+                if (-not (Test-AgenticOsSupportedDays -Days $job.Days) -or -not (Test-AgenticOsSupportedTime -Time $job.Time)) { return }
+                if ($job.Time -match "^every_") { return }
+                if (-not (Test-AgenticOsTimeInRange -Schedule $job.Time -Days $job.Days -Start $catchUpFrom -End $Now)) { return }
+
+                $markerFile = Join-Path $StatusDir "$($job.Slug).catchup"
+                if ((Test-Path $markerFile) -and ((Get-Content $markerFile -ErrorAction SilentlyContinue) -eq $todayMarker)) {
+                    return
+                }
+
+                Set-Content $markerFile $todayMarker -NoNewline
+                Invoke-Job -Job $job -IsCatchUp $true
             }
-
-            $gapStr = Format-Duration ([int][math]::Min($gapSeconds, 86400))
-            # Log catch-up scan
-            $catchUpLogFile = Join-Path $LogsDir "dispatcher.log"
-            $timestamp = $nowDt.ToString("yyyy-MM-ddTHH:mm:ssZ")
-            Add-Content $catchUpLogFile "`n=== [$timestamp] CATCH-UP: gap of $gapStr detected, scanning missed jobs ==="
-
-            Get-ChildItem -Path $CronsDir -Filter "*.md" -ErrorAction SilentlyContinue | ForEach-Object {
-                $job = Parse-JobFile $_.FullName
-                if ($job.Active -eq "false") { return }
-                if ([string]::IsNullOrEmpty($job.Prompt)) { return }
-
-                # Only catch up fixed-time jobs (not intervals)
-                if ($job.Time -match '^every_') { return }
-
-                # Check if any scheduled time falls in the gap
-                if (-not (Test-TimeInRange $job.Time $catchUpFrom)) { return }
-
-                # Check day match (use today's day — close enough for catch-up)
-                if (-not (Test-DayMatch $job.Days)) { return }
-
-                Add-Content $catchUpLogFile "[catch-up] Running missed job: $($job.Name)"
-
-                Invoke-Job -File $_.FullName `
-                    -JobName $job.Name `
-                    -Prompt $job.Prompt `
-                    -Model $job.Model `
-                    -Notify $job.Notify `
-                    -Description $job.Description `
-                    -Timeout $job.Timeout `
-                    -Retry $job.Retry `
-                    -IsCatchUp $true
-            }
-
-            Add-Content $catchUpLogFile "=== [$timestamp] CATCH-UP: scan complete ==="
         }
     } catch {
-        # If we can't parse the last dispatch, skip catch-up silently
+        # Ignore malformed dispatcher timestamps.
     }
 }
 
-# --- Main dispatch loop ---
+Write-AgenticOsStatusFile -Path $dispatcherStatusFile -Data @{
+    last_dispatch = $NowUtc
+    pid = $PID
+}
 
-Get-ChildItem -Path $CronsDir -Filter "*.md" -ErrorAction SilentlyContinue | ForEach-Object {
-    $job = Parse-JobFile $_.FullName
+Get-ChildItem -Path $CronsDir -Filter "*.md" -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object {
+    $job = Get-AgenticOsJobDefinition -FilePath $_.FullName
 
-    if ($job.Active -eq "false") { return }
-    if (-not (Test-TimeMatch $job.Time)) { return }
-    if (-not (Test-DayMatch $job.Days)) { return }
-    if ([string]::IsNullOrEmpty($job.Prompt)) { return }
+    if (-not $job.Active) { return }
+    if ([string]::IsNullOrWhiteSpace($job.Prompt)) { return }
+    if (-not (Test-AgenticOsSupportedDays -Days $job.Days) -or -not (Test-AgenticOsSupportedTime -Time $job.Time)) { return }
+    if (-not (Test-AgenticOsDayMatch -Days $job.Days -Now $Now)) { return }
+    if (-not (Test-AgenticOsTimeMatch -Schedule $job.Time -Now $Now)) { return }
 
-    Invoke-Job -File $_.FullName `
-        -JobName $job.Name `
-        -Prompt $job.Prompt `
-        -Model $job.Model `
-        -Notify $job.Notify `
-        -Description $job.Description `
-        -Timeout $job.Timeout `
-        -Retry $job.Retry `
-        -IsCatchUp $false
+    if ($job.Time -notmatch "^every_") {
+        $markerFile = Join-Path $StatusDir "$($job.Slug).catchup"
+        if ((Test-Path $markerFile) -and ((Get-Content $markerFile -ErrorAction SilentlyContinue) -eq $todayMarker)) {
+            return
+        }
+    }
+
+    Invoke-Job -Job $job -IsCatchUp $false
 }
