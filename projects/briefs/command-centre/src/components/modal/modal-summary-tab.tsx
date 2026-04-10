@@ -10,6 +10,12 @@ import Link from "next/link";
 import type { Task, TaskUpdateInput, OutputFile, LogEntry } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 import { TaskProgress } from "./task-progress";
+import {
+  insertTextareaNewline,
+  shouldInsertModifierNewline,
+  shouldSubmitOnPlainEnter,
+  syncComposerTextareaHeight,
+} from "@/lib/composer";
 
 const statusConfig: Record<string, { icon: typeof CheckCircle2; color: string; bg: string; label: string }> = {
   backlog: { icon: Inbox, color: "#5E5E65", bg: "#F3F0EE", label: "In Backlog" },
@@ -1166,6 +1172,12 @@ function InlineReplyInput({ childId }: { childId: string }) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const appendLogEntry = useTaskStore((s) => s.appendLogEntry);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const maxHeight = 120;
+
+  useEffect(() => {
+    syncComposerTextareaHeight(textareaRef.current, { maxHeight });
+  }, [message]);
 
   const handleSubmit = useCallback(async () => {
     const trimmed = message.trim();
@@ -1203,18 +1215,28 @@ function InlineReplyInput({ childId }: { childId: string }) {
     <div
       style={{
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-end",
         gap: 6,
         padding: "6px 0",
       }}
     >
-      <input
+      <textarea
+        ref={textareaRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter") { e.preventDefault(); handleSubmit(); }
+          if (shouldInsertModifierNewline(e)) {
+            e.preventDefault();
+            insertTextareaNewline(e.currentTarget, setMessage);
+            return;
+          }
+          if (shouldSubmitOnPlainEnter(e)) {
+            e.preventDefault();
+            handleSubmit();
+          }
         }}
         placeholder="Reply to Claude..."
+        rows={1}
         style={{
           flex: 1,
           fontSize: 12,
@@ -1225,6 +1247,11 @@ function InlineReplyInput({ childId }: { childId: string }) {
           outline: "none",
           backgroundColor: "#FFFFFF",
           color: "#1B1C1B",
+          resize: "none",
+          lineHeight: 1.5,
+          minHeight: 32,
+          maxHeight,
+          overflowY: "hidden",
         }}
         onFocus={(e) => { e.currentTarget.style.borderColor = "#93452A"; }}
         onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.4)"; }}

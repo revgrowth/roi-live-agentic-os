@@ -1,11 +1,17 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { ArrowUp } from "lucide-react";
 import type { LogEntry } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 import { SlashCommandMenu } from "@/components/shared/slash-command-menu";
 import type { SlashCommand } from "@/lib/slash-commands";
+import {
+  insertTextareaNewline,
+  shouldInsertModifierNewline,
+  shouldSubmitOnPlainEnter,
+  syncComposerTextareaHeight,
+} from "@/lib/composer";
 
 interface ReplyInputProps {
   taskId: string;
@@ -24,6 +30,11 @@ export function ReplyInput({ taskId, isVisible, needsInput, taskStatus, onOptimi
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const createTask = useTaskStore((s) => s.createTask);
   const updateTask = useTaskStore((s) => s.updateTask);
+  const maxHeight = 160;
+
+  useEffect(() => {
+    syncComposerTextareaHeight(textareaRef.current, { maxHeight });
+  }, [message]);
 
   const handleSubmit = useCallback(async () => {
     const trimmed = message.trim();
@@ -95,8 +106,17 @@ export function ReplyInput({ taskId, isVisible, needsInput, taskStatus, onOptimi
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       // Let slash menu handle its own keys
-      if (showSlashMenu && ["ArrowDown", "ArrowUp", "Enter", "Tab", "Escape"].includes(e.key)) return;
-      if (e.key === "Enter" && !e.shiftKey) {
+      if (showSlashMenu && ["ArrowDown", "ArrowUp", "Tab", "Escape"].includes(e.key)) return;
+      if (showSlashMenu && e.key === "Enter") {
+        e.preventDefault();
+        return;
+      }
+      if (shouldInsertModifierNewline(e)) {
+        e.preventDefault();
+        insertTextareaNewline(e.currentTarget, handleChange);
+        return;
+      }
+      if (shouldSubmitOnPlainEnter(e)) {
         e.preventDefault();
         handleSubmit();
       }
@@ -152,6 +172,8 @@ export function ReplyInput({ taskId, isVisible, needsInput, taskStatus, onOptimi
             resize: "none",
             lineHeight: 1.5,
             color: "#1B1C1B",
+            maxHeight,
+            overflowY: "hidden",
           }}
           onFocus={(e) => {
             (e.target as HTMLTextAreaElement).style.outlineColor = "#93452A";
@@ -167,8 +189,7 @@ export function ReplyInput({ taskId, isVisible, needsInput, taskStatus, onOptimi
           style={{
             position: "absolute",
             right: 6,
-            top: "50%",
-            transform: "translateY(-50%)",
+            bottom: 6,
             width: 36,
             height: 36,
             borderRadius: "0.375rem",

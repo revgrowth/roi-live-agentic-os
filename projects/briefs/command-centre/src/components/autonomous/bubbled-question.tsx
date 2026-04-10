@@ -1,8 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircleQuestion, Send } from "lucide-react";
 import type { Message } from "@/types/chat";
+import {
+  insertTextareaNewline,
+  shouldInsertModifierNewline,
+  shouldSubmitOnPlainEnter,
+  syncComposerTextareaHeight,
+} from "@/lib/composer";
 
 interface BubbledQuestionProps {
   message: Message;
@@ -12,8 +18,24 @@ interface BubbledQuestionProps {
 export function BubbledQuestion({ message, onReply }: BubbledQuestionProps) {
   const [replyText, setReplyText] = useState("");
   const [showReply, setShowReply] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const maxHeight = 120;
 
   const taskTitle = message.metadata?.questionText || message.content;
+
+  useEffect(() => {
+    if (!showReply) return;
+    syncComposerTextareaHeight(textareaRef.current, { maxHeight });
+  }, [replyText, showReply]);
+
+  const handleSend = useCallback(() => {
+    const trimmed = replyText.trim();
+    if (!trimmed) return;
+
+    onReply(message.id, trimmed);
+    setReplyText("");
+    setShowReply(false);
+  }, [message.id, onReply, replyText]);
 
   return (
     <div style={{
@@ -69,19 +91,24 @@ export function BubbledQuestion({ message, onReply }: BubbledQuestionProps) {
           Reply to this &darr;
         </button>
       ) : (
-        <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
-          <input
-            type="text"
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 6, marginTop: 4 }}>
+          <textarea
+            ref={textareaRef}
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && replyText.trim()) {
-                onReply(message.id, replyText.trim());
-                setReplyText("");
-                setShowReply(false);
+              if (shouldInsertModifierNewline(e)) {
+                e.preventDefault();
+                insertTextareaNewline(e.currentTarget, setReplyText);
+                return;
+              }
+              if (shouldSubmitOnPlainEnter(e)) {
+                e.preventDefault();
+                handleSend();
               }
             }}
             placeholder="Type your reply..."
+            rows={1}
             autoFocus
             style={{
               flex: 1,
@@ -92,16 +119,15 @@ export function BubbledQuestion({ message, onReply }: BubbledQuestionProps) {
               fontFamily: "var(--font-inter), Inter, sans-serif",
               outline: "none",
               backgroundColor: "#FFFFFF",
+              resize: "none",
+              lineHeight: 1.5,
+              minHeight: 32,
+              maxHeight,
+              overflowY: "hidden",
             }}
           />
           <button
-            onClick={() => {
-              if (replyText.trim()) {
-                onReply(message.id, replyText.trim());
-                setReplyText("");
-                setShowReply(false);
-              }
-            }}
+            onClick={handleSend}
             disabled={!replyText.trim()}
             style={{
               display: "flex",
