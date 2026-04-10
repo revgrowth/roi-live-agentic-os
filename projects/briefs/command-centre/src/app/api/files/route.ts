@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { listDirectory } from "@/lib/file-service";
+import { listDirectory, normalizeRelativePath } from "@/lib/file-service";
 import { getClientAgenticOsDir } from "@/lib/config";
 
 const ALLOWED_ROOTS = ["context", "brand_context", "docs", "projects", ".planning", ".claude/skills"];
@@ -7,15 +7,17 @@ const ALLOWED_ROOTS = ["context", "brand_context", "docs", "projects", ".plannin
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const dir = searchParams.get("dir");
+    const dirParam = searchParams.get("dir");
     const clientId = searchParams.get("clientId");
 
-    if (!dir) {
+    if (!dirParam) {
       return NextResponse.json(
         { error: "dir query parameter is required" },
         { status: 400 }
       );
     }
+
+    const dir = normalizeRelativePath(dirParam);
 
     // Validate that the requested directory starts with an allowed root
     const isAllowed = ALLOWED_ROOTS.some(

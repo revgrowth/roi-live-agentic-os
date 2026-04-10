@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile, writeFile, deleteFile, moveFile } from "@/lib/file-service";
+import { readFile, writeFile, deleteFile, moveFile, normalizeRelativePath } from "@/lib/file-service";
 import { getClientAgenticOsDir } from "@/lib/config";
 
 const ALLOWED_ROOTS = ["context", "brand_context", "docs", "projects", ".planning", ".claude/skills"];
 const ALLOWED_ROOT_FILES = ["AGENTS.md", "CLAUDE.md", "README.md"];
 
 function validateFilePath(segments: string[]): string | null {
-  const filePath = segments.join("/");
+  const filePath = normalizeRelativePath(segments.join("/"));
   // Allow specific root-level files
   if (ALLOWED_ROOT_FILES.includes(filePath)) return filePath;
   const isAllowed = ALLOWED_ROOTS.some(
@@ -102,7 +102,7 @@ export async function PATCH(
     }
 
     // Validate destination path
-    const destSegments = destination.split("/");
+    const destSegments = normalizeRelativePath(destination).split("/");
     const destPath = validateFilePath(destSegments);
     if (!destPath) {
       return NextResponse.json(
