@@ -23,6 +23,17 @@ import sys
 import datetime
 import argparse
 
+# Windows defaults stdout to cp1252, which can't encode the box-drawing
+# glyphs used in the summary output. Reconfigure to UTF-8 so the script
+# doesn't crash mid-finalize on Windows. Safe no-op on macOS/Linux where
+# stdout is already UTF-8.
+for _stream in (sys.stdout, sys.stderr):
+    if (getattr(_stream, "encoding", "") or "").lower() != "utf-8":
+        try:
+            _stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, OSError):
+            pass
+
 # ---------- Colors ----------
 GREEN = "\033[0;32m"
 YELLOW = "\033[1;33m"
@@ -110,6 +121,27 @@ def finalize(optional, selected, core_skills, skills_dir, installed_json, catalo
         json.dump(data, f, indent=2)
         f.write("\n")
 
+    # Compute services list (used by both the result file and the summary)
+    all_services = sorted(set(
+        svc
+        for i, skill in enumerate(optional)
+        if selected[i]
+        for svc in skill["services"]
+    ))
+
+    # Write result JSON for Claude to read. Do this BEFORE printing the
+    # summary so a downstream print failure can't prevent the consumer
+    # (start-here command) from seeing the selection result.
+    result = {
+        "selected": sorted(selected_names),
+        "removed": sorted(removed_names),
+        "services_needed": all_services,
+    }
+    result_path = os.path.join(repo_root, ".claude", "skills", "_catalog", "selection-result.json")
+    with open(result_path, "w") as f:
+        json.dump(result, f, indent=2)
+        f.write("\n")
+
     # Print summary
     print()
     print(f"{CYAN}{BOLD}═══════════════════════════════════════════════{NC}")
@@ -127,13 +159,6 @@ def finalize(optional, selected, core_skills, skills_dir, installed_json, catalo
             print(f"    {DIM}✗ {s}{NC}")
         print()
 
-    # Show needed API keys
-    all_services = sorted(set(
-        svc
-        for i, skill in enumerate(optional)
-        if selected[i]
-        for svc in skill["services"]
-    ))
     if all_services:
         print(f"  {YELLOW}{BOLD}API keys (optional — skills work without them):{NC}")
         for svc in all_services:
@@ -142,17 +167,6 @@ def finalize(optional, selected, core_skills, skills_dir, installed_json, catalo
 
     print(f"  {DIM}Add skills back anytime with 'add a skill'.{NC}")
     print()
-
-    # Write result JSON for Claude to read
-    result = {
-        "selected": sorted(selected_names),
-        "removed": sorted(removed_names),
-        "services_needed": all_services,
-    }
-    result_path = os.path.join(repo_root, ".claude", "skills", "_catalog", "selection-result.json")
-    with open(result_path, "w") as f:
-        json.dump(result, f, indent=2)
-        f.write("\n")
 
     return result
 
