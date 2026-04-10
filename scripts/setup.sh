@@ -26,6 +26,7 @@ installed() { command -v "$1" &>/dev/null; }
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) REPO_ROOT="$(cygpath -m "$REPO_ROOT")" ;; esac
+source "$SCRIPT_DIR/lib/python.sh"
 
 # ---------- Detect OS ----------
 OS="unknown"
@@ -69,20 +70,15 @@ elif [[ "$OS" == "windows" ]]; then
 fi
 
 # ---------- Python 3 ----------
-printf "Checking python3... "
-if installed python3; then
-    ok "python3 $(python3 --version 2>&1 | awk '{print $2}')"
-elif installed python; then
-    # Windows often has 'python' not 'python3'
-    PY_VER=$(python --version 2>&1 | awk '{print $2}')
-    case "$PY_VER" in
-        3.*) ok "python $PY_VER (as 'python')" ;;
-        *)   fail "python found but it's version $PY_VER — need Python 3"
-             fail "Install Python 3: https://www.python.org/downloads/"
-             ERRORS=$((ERRORS + 1)) ;;
-    esac
+printf "Checking Python 3... "
+if resolve_python_cmd; then
+    ok "$PYTHON_VERSION via $PYTHON_LABEL"
+    if is_windows_shell && [[ $PYTHON3_DIAGNOSTIC_BROKEN -eq 1 ]]; then
+        warn "Windows exposes a non-working python3 at ${PYTHON3_DIAGNOSTIC_PATH}."
+        warn "Agentic OS will use '${PYTHON_LABEL}' instead. Manual cleanup is optional: disable the App Execution Alias or adjust PATH."
+    fi
 else
-    fail "python3 not found"
+    fail "Python 3 not found"
     fail "Install Python 3: https://www.python.org/downloads/"
     ERRORS=$((ERRORS + 1))
 fi

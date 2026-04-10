@@ -8,7 +8,7 @@ set -euo pipefail
 #   bash scripts/install.sh
 #
 # What it does:
-#   1. Checks prerequisites (git, bash, python3, node)
+#   1. Checks prerequisites (git, bash, Python 3, node)
 #   2. Creates .env from .env.example if missing
 #   3. Runs scripts/setup.sh for system dependencies
 #   4. Installs all skills (selection happens during first Claude session)
@@ -23,6 +23,7 @@ set -euo pipefail
 # ---------- Resolve repo root from script location ----------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+source "$SCRIPT_DIR/lib/python.sh"
 
 # Convert MSYS/Git Bash paths to Windows-native for Python compatibility
 case "$(uname -s)" in
@@ -76,7 +77,6 @@ info "Checking prerequisites..."
 echo ""
 
 PREREQ_FAIL=0
-PYTHON_CMD="python3"
 
 # Git
 printf "  git .......... "
@@ -108,20 +108,14 @@ else
     warn "Install from: https://nodejs.org/"
 fi
 
-# Python 3 — check python3 first, fall back to python (Windows often uses 'python')
-printf "  python3 ...... "
-if command -v python3 &>/dev/null; then
-    printf "${GREEN}$(python3 --version 2>&1 | awk '{print $2}')${NC}\n"
-    PYTHON_CMD="python3"
-elif command -v python &>/dev/null; then
-    PY_VER=$(python --version 2>&1 | awk '{print $2}')
-    case "$PY_VER" in
-        3.*) printf "${GREEN}${PY_VER} (as 'python')${NC}\n"
-             PYTHON_CMD="python" ;;
-        *)   printf "${RED}found python ${PY_VER} — need Python 3${NC}\n"
-             fail "Install Python 3: https://www.python.org/downloads/"
-             PREREQ_FAIL=1 ;;
-    esac
+# Python 3 — validate by executing it, not just by checking PATH
+printf "  Python 3 ..... "
+if resolve_python_cmd; then
+    printf "${GREEN}${PYTHON_VERSION} (via ${PYTHON_LABEL})${NC}\n"
+    if is_windows_shell && [[ $PYTHON3_DIAGNOSTIC_BROKEN -eq 1 ]]; then
+        warn "Windows exposes a non-working python3 at ${PYTHON3_DIAGNOSTIC_PATH}."
+        warn "Agentic OS will use '${PYTHON_LABEL}' instead. Manual cleanup is optional: disable the App Execution Alias or adjust PATH."
+    fi
 else
     printf "${RED}not found${NC}\n"
     fail "Install Python 3: https://www.python.org/downloads/"
@@ -196,7 +190,7 @@ info "Installing system dependencies..."
 echo ""
 
 if [[ -f "$REPO_ROOT/scripts/setup.sh" ]]; then
-    PYTHON_CMD="$PYTHON_CMD" bash "$REPO_ROOT/scripts/setup.sh" || true
+    bash "$REPO_ROOT/scripts/setup.sh" || true
 else
     warn "scripts/setup.sh not found — skipping dependency install"
 fi
@@ -216,7 +210,7 @@ fi
 # =============================================================================
 echo ""
 
-$PYTHON_CMD << PYEOF
+"${PYTHON_CMD[@]}" << PYEOF
 import json, datetime, os
 
 catalog_path = "$CATALOG"
@@ -294,4 +288,3 @@ echo ""
 echo ""
 echo "  Installing cron dispatcher..."
 bash "$SCRIPT_DIR/install-crons.sh"
-
