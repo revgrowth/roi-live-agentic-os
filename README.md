@@ -20,6 +20,18 @@ The installer checks your system, sets up dependencies, and lets you pick which 
 
 When it finishes, open Claude Code. It automatically detects you're new and walks you through building your brand foundation -- voice, positioning, and ideal customer profile.
 
+### Launching the command centre
+
+Open a new terminal (so the installed shell alias loads) and run:
+
+```bash
+centre
+```
+
+That's it. The `centre` command installs dependencies on first run, starts the Next.js dev server, and opens `http://localhost:3000` in your browser.
+
+On Windows, use `powershell -File scripts\centre.ps1` instead.
+
 Compatibility note: Agentic OS remains Claude-first, but the shared project instructions now live in `AGENTS.md`. Claude reads them through `CLAUDE.md`, and Codex can read `AGENTS.md` directly.
 
 ---

@@ -288,3 +288,94 @@ echo ""
 echo ""
 echo "  Installing cron dispatcher..."
 bash "$SCRIPT_DIR/install-crons.sh"
+
+# =============================================================================
+# 8. Install `centre` shell alias
+# =============================================================================
+echo ""
+info "Installing 'centre' launcher alias..."
+echo ""
+
+CENTRE_SCRIPT="$SCRIPT_DIR/centre.sh"
+ALIAS_LINE="alias centre='bash \"$CENTRE_SCRIPT\"'"
+ALIAS_MARKER="# Agentic OS — command centre launcher"
+
+install_alias_into() {
+    local rc="$1"
+    [[ -z "$rc" ]] && return 0
+    # Create the rc file if it doesn't exist
+    touch "$rc"
+    if grep -Fq "$ALIAS_MARKER" "$rc" 2>/dev/null; then
+        success "Alias already present in $(basename "$rc")"
+        return 0
+    fi
+    {
+        echo ""
+        echo "$ALIAS_MARKER"
+        echo "$ALIAS_LINE"
+    } >> "$rc"
+    success "Added 'centre' alias to $(basename "$rc")"
+}
+
+USER_SHELL_NAME="$(basename "${SHELL:-}")"
+RELOAD_HINT=""
+
+case "$(uname -s)" in
+    Darwin|Linux)
+        case "$USER_SHELL_NAME" in
+            zsh)
+                install_alias_into "$HOME/.zshrc"
+                RELOAD_HINT="source ~/.zshrc"
+                ;;
+            bash)
+                # macOS bash login shells read .bash_profile; Linux non-login reads .bashrc.
+                if [[ "$(uname -s)" == "Darwin" ]]; then
+                    install_alias_into "$HOME/.bash_profile"
+                    RELOAD_HINT="source ~/.bash_profile"
+                else
+                    install_alias_into "$HOME/.bashrc"
+                    RELOAD_HINT="source ~/.bashrc"
+                fi
+                ;;
+            fish)
+                mkdir -p "$HOME/.config/fish"
+                FISH_LINE="alias centre 'bash \"$CENTRE_SCRIPT\"'"
+                FISH_RC="$HOME/.config/fish/config.fish"
+                touch "$FISH_RC"
+                if grep -Fq "$ALIAS_MARKER" "$FISH_RC"; then
+                    success "Alias already present in config.fish"
+                else
+                    { echo ""; echo "$ALIAS_MARKER"; echo "$FISH_LINE"; } >> "$FISH_RC"
+                    success "Added 'centre' alias to config.fish"
+                fi
+                RELOAD_HINT="source ~/.config/fish/config.fish"
+                ;;
+            *)
+                warn "Unrecognised shell '\$SHELL=$USER_SHELL_NAME' — install the alias manually:"
+                echo "    $ALIAS_LINE"
+                ;;
+        esac
+        echo ""
+        if [[ -n "$RELOAD_HINT" ]]; then
+            warn "Open a new terminal (or run '$RELOAD_HINT') to activate the alias."
+        fi
+        info "Then launch the command centre from anywhere with: centre"
+        ;;
+    MINGW*|MSYS*|CYGWIN*)
+        # Git Bash on Windows — install bash alias AND a PowerShell profile function.
+        [[ -f "$HOME/.bashrc" ]] && install_alias_into "$HOME/.bashrc"
+        if command -v powershell.exe &>/dev/null; then
+            info "Installing PowerShell 'centre' function into \$PROFILE..."
+            powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(cygpath -w "$SCRIPT_DIR/install-centre-alias.ps1" 2>/dev/null || echo "$SCRIPT_DIR/install-centre-alias.ps1")" \
+                || warn "PowerShell alias install failed — you can run scripts\\install-centre-alias.ps1 manually."
+        else
+            warn "PowerShell not found — skipping \$PROFILE install."
+            warn "On Windows, prefer: powershell -File scripts\\centre.ps1"
+        fi
+        ;;
+    *)
+        warn "Unknown shell environment — install the alias manually:"
+        echo "    $ALIAS_LINE"
+        ;;
+esac
+echo ""
