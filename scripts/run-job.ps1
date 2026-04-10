@@ -10,6 +10,7 @@ $ProjectDir = Split-Path -Parent $PSScriptRoot
 $JobFile = Join-Path $ProjectDir "cron\jobs\$JobName.md"
 $LogsDir = Join-Path $ProjectDir "cron\logs"
 $StatusDir = Join-Path $ProjectDir "cron\status"
+$WindowsNotifyScript = Join-Path $ProjectDir "scripts\windows-notify.ps1"
 
 if (-not (Test-Path $JobFile)) {
     Write-Host "Error: No job file at $JobFile"
@@ -43,26 +44,47 @@ $prompt = ($parts[2..($parts.Count - 1)] -join '---').Trim()
 # --- Helper functions ---
 
 function Send-Notification {
-    param([string]$Title, [string]$Subtitle, [string]$Body)
+    param(
+        [ValidateSet("success", "timeout", "failure")]
+        [string]$Event,
+        [hashtable]$Context,
+        [string]$LogFile
+    )
+
     try {
-        # Try BurntToast first (Windows toast notifications)
-        if (Get-Module -ListAvailable -Name BurntToast -ErrorAction SilentlyContinue) {
-            Import-Module BurntToast -ErrorAction SilentlyContinue
-            New-BurntToastNotification -Text "$Title - $Subtitle", $Body -ErrorAction SilentlyContinue
-        } else {
-            # Fallback: Windows balloon notification via .NET
-            Add-Type -AssemblyName System.Windows.Forms -ErrorAction SilentlyContinue
-            $balloon = New-Object System.Windows.Forms.NotifyIcon
-            $balloon.Icon = [System.Drawing.SystemIcons]::Information
-            $balloon.BalloonTipTitle = "$Title - $Subtitle"
-            $balloon.BalloonTipText = $Body
-            $balloon.Visible = $true
-            $balloon.ShowBalloonTip(5000)
-            Start-Sleep -Seconds 6
-            $balloon.Dispose()
+        $contextJson = $Context | ConvertTo-Json -Compress
+        $contextBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($contextJson))
+        $commandOutput = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $WindowsNotifyScript `
+            -Channel "cron" `
+            -Event $Event `
+            -ContextBase64 $contextBase64 2>&1
+
+        $exitCode = $LASTEXITCODE
+        $rawOutput = if ($commandOutput) { ($commandOutput | Out-String).Trim() } else { "" }
+
+        if ($exitCode -ne 0) {
+            if ($LogFile) {
+                Add-Content $LogFile "[notify] windows-notify exit ${exitCode}: $rawOutput"
+            }
+            return
+        }
+
+        if ($rawOutput) {
+            try {
+                $result = $rawOutput | ConvertFrom-Json -ErrorAction Stop
+                if ($result.delivery -ne "toast" -and $LogFile) {
+                    Add-Content $LogFile "[notify] delivered via $($result.delivery): $($result.toast_error)"
+                }
+            } catch {
+                if ($LogFile) {
+                    Add-Content $LogFile "[notify] windows-notify output: $rawOutput"
+                }
+            }
         }
     } catch {
-        # Notifications are best-effort — never fail the job
+        if ($LogFile) {
+            Add-Content $LogFile "[notify] windows-notify error: $_"
+        }
     }
 }
 
@@ -206,11 +228,29 @@ $notifySuccess = $notify -in @("on_finish", "on_success")
 $notifyFailure = $notify -in @("on_finish", "on_failure")
 
 if ($exitCode -eq 0 -and $notifySuccess) {
-    Send-Notification -Title "Agentic OS" -Subtitle "$([char]0x2713) $JobDisplayName" -Body "Completed in $durationHuman"
+    Send-Notification -Event "success" -Context @{
+        jobName = $JobDisplayName
+        duration = $durationHuman
+        timeout = $timeoutRaw
+        exitCode = $exitCode
+        catchUpSuffix = ""
+    } -LogFile $logFile
 } elseif ($result -eq "timeout" -and $notifyFailure) {
-    Send-Notification -Title "Agentic OS" -Subtitle "$([char]0x2717) $JobDisplayName timed out" -Body "Killed after $timeoutRaw limit"
+    Send-Notification -Event "timeout" -Context @{
+        jobName = $JobDisplayName
+        duration = $durationHuman
+        timeout = $timeoutRaw
+        exitCode = $exitCode
+        catchUpSuffix = ""
+    } -LogFile $logFile
 } elseif ($exitCode -ne 0 -and $notifyFailure) {
-    Send-Notification -Title "Agentic OS" -Subtitle "$([char]0x2717) $JobDisplayName failed" -Body "Exit code $exitCode after $durationHuman"
+    Send-Notification -Event "failure" -Context @{
+        jobName = $JobDisplayName
+        duration = $durationHuman
+        timeout = $timeoutRaw
+        exitCode = $exitCode
+        catchUpSuffix = ""
+    } -LogFile $logFile
 }
 
 exit $exitCode
