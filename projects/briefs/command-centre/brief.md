@@ -27,7 +27,7 @@ Replace the terminal as the daily working environment for non-technical Agentic 
 ## Acceptance Criteria
 
 - A student can launch the command centre, create a task by describing it in plain language, watch it execute, and download the output — all without opening a terminal
-- All Agentic OS context (skills, brand, memory, CLAUDE.md) is inherited by spawned sessions
+- All Agentic OS context (skills, brand, memory, `AGENTS.md`, and Claude wrapper behavior) is inherited by spawned sessions
 - Multi-client scoping works across all views
 
 ## Constraints

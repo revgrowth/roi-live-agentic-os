@@ -16,8 +16,9 @@ def _find_project_env() -> Path:
         env_path = current / ".env"
         if env_path.exists():
             return env_path
+        agents_md = current / "AGENTS.md"
         claude_md = current / "CLAUDE.md"
-        if claude_md.exists():
+        if agents_md.exists() or claude_md.exists():
             return current / ".env"  # Project root found
         current = current.parent
     return Path.cwd() / ".env"  # Fallback

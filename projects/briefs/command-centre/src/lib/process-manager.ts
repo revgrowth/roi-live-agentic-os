@@ -169,7 +169,13 @@ class ProcessManager {
     const pathMod = require("path") as typeof import("path");
     const contextSources: { type: string; label: string; path?: string }[] = [];
 
-    // Check for CLAUDE.md (always loaded by Claude CLI automatically)
+    // Check for shared instruction files in the working directory
+    const agentsMdPath = pathMod.join(cwd, "AGENTS.md");
+    if (fs.existsSync(agentsMdPath)) {
+      contextSources.push({ type: "system", label: "AGENTS.md", path: "AGENTS.md" });
+    }
+
+    // Check for CLAUDE.md (loaded by Claude CLI and used as the compatibility wrapper)
     const claudeMdPath = pathMod.join(cwd, "CLAUDE.md");
     if (fs.existsSync(claudeMdPath)) {
       contextSources.push({ type: "system", label: "CLAUDE.md", path: "CLAUDE.md" });

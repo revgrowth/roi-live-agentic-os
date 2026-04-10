@@ -4,10 +4,10 @@
   "description": "Turn Claude Code into your Agentic Operating System.",
   "private": true,
   "scripts": {
-    "predev": "lsof -ti :3000 | xargs kill -9 2>/dev/null || true",
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
+    "predev": "node scripts/predev.cjs",
+    "dev": "node scripts/next-run.cjs dev",
+    "build": "node scripts/next-run.cjs build",
+    "start": "node scripts/next-run.cjs start",
     "lint": "next lint"
   },
   "repository": {

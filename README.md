@@ -20,6 +20,8 @@ The installer checks your system, sets up dependencies, and lets you pick which 
 
 When it finishes, open Claude Code. It automatically detects you're new and walks you through building your brand foundation -- voice, positioning, and ideal customer profile.
 
+Compatibility note: Agentic OS remains Claude-first, but the shared project instructions now live in `AGENTS.md`. Claude reads them through `CLAUDE.md`, and Codex can read `AGENTS.md` directly.
+
 ---
 
 ## What You Get
@@ -241,6 +243,35 @@ Removing the dispatcher only stops the scheduler. Your job files in `cron/jobs/`
 
 ---
 
+## Windows Notification Theme
+
+Windows notification visuals and default copy live in `scripts/windows-notify.config.json`.
+
+- `app` controls the Windows app identity, display name, Start Menu shortcut name, generated asset cache version, optional attribution, default toast duration, and the default layout (`compact` or `hero`).
+- `assets.logoPath` should point to the toast logo image. `assets.shortcutIconPath` should point to the Windows shortcut icon and must be an `.ico` file.
+- The repo-tracked asset folder for Windows branding is `scripts/assets/windows-notify/`.
+- `assets.heroPaths.*` can point to optional background images for hero mode. If blank or missing, the helper generates the hero background and overlays the event-specific text on top.
+- `assets.generatedLogo` controls the fallback logo artwork when the configured toast logo image is missing.
+- `assets.variants.*` controls the gradient palette, accent colors, sound, and emoji for each notification variant.
+- `copy.interactive.*` and `copy.cron.*` define the default `status`, `subject`, `detail`, `variant`, `duration`, and `layout` for each Windows notification event.
+- Supported template placeholders are `{project}`, `{seq}`, `{duration}`, `{rawMessage}`, `{jobName}`, `{timeout}`, `{exitCode}`, and `{catchUpSuffix}`.
+
+Preview the default compact toast with:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-windows-notify.ps1 -Variant success
+```
+
+Preview hero mode explicitly with:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-windows-notify.ps1 -Variant success -Layout hero
+```
+
+If you change generated colors, layout, or badge text, either bump `app.assetVersion` in `scripts/windows-notify.config.json` or delete the cached folder under `%LOCALAPPDATA%\AgenticOS\notifications\` so Windows rebuilds the generated assets.
+
+---
+
 ## Multiple Clients
 
 If you work with more than one client or brand, just tell Claude: **"add a client called [name]"**. It creates the workspace, and offers to switch you into it.
@@ -253,7 +284,7 @@ cd clients/client-name
 claude
 ```
 
-Each client has its own brand context, memory, and output. Methodology (CLAUDE.md, SOUL.md, USER.md) is shared automatically from the root — edit once, all clients see it. Skills and scripts sync automatically when you run `update.sh`.
+Each client has its own brand context, memory, and output. Shared methodology now lives in `AGENTS.md` at the root, with `CLAUDE.md` importing it for Claude Code. Skills and scripts sync automatically when you run `update.sh`.
 
 For the full setup guide, see [docs/multi-client-guide.md](docs/multi-client-guide.md).
 For how projects work (single tasks, planned projects, GSD), see [docs/projects-guide.md](docs/projects-guide.md).
@@ -278,7 +309,8 @@ For a quick reference, see [docs/cheat-sheet.md](docs/cheat-sheet.md).
 │       └── q2-launch/     <- Project folders with brief.md
 ├── .planning/             <- GSD project artifacts (Level 3, one at a time)
 ├── scripts/               <- Install, update, manage skills, watchdog
-└── CLAUDE.md              <- Agent orchestration (don't edit manually)
+├── AGENTS.md              <- Canonical shared instructions
+└── CLAUDE.md              <- Claude wrapper that imports AGENTS.md
 ```
 
 ---

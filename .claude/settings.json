@@ -40,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-ccnotify.sh\" UserPromptSubmit"
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-ccnotify.js\" UserPromptSubmit"
           },
           {
             "type": "command",
@@ -54,7 +54,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-ccnotify.sh\" Stop"
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-ccnotify.js\" Stop"
           },
           {
             "type": "command",
@@ -68,7 +68,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-ccnotify.sh\" Notification"
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-ccnotify.js\" Notification"
           },
           {
             "type": "command",
