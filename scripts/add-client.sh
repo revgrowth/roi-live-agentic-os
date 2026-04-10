@@ -29,6 +29,35 @@ fi
 
 echo "Creating client workspace: clients/${CLIENT_SLUG}/"
 
+create_client_agents_file() {
+  local target="$1"
+  local client_name="$2"
+  cat > "$target" <<EOF
+# Client: ${client_name}
+
+Add client-specific instructions here. These layer on top of the root AGENTS.md instructions — they don't replace them.
+
+## Client-Specific Instructions
+
+-
+
+## Notes
+
+-
+EOF
+}
+
+create_client_claude_wrapper() {
+  local target="$1"
+  cat > "$target" <<'EOF'
+# CLAUDE.md
+
+This file keeps Claude Code compatible with the client-specific instructions in `AGENTS.md`.
+
+@AGENTS.md
+EOF
+}
+
 # Create directory structure
 mkdir -p "${CLIENT_DIR}/brand_context"
 mkdir -p "${CLIENT_DIR}/context/memory"
@@ -73,21 +102,12 @@ if [[ -d "${PROJECT_DIR}/cron/templates" ]]; then
   echo "  Copied cron templates"
 fi
 
-# Create client-specific CLAUDE.md
-cat > "${CLIENT_DIR}/CLAUDE.md" <<CLAUDE
-# Client: ${CLIENT_NAME}
+# Create client instruction files
+create_client_agents_file "${CLIENT_DIR}/AGENTS.md" "${CLIENT_NAME}"
+echo "  Created client AGENTS.md"
 
-Add client-specific instructions here. These layer on top of the root CLAUDE.md methodology — they don't replace it.
-
-## Client-Specific Instructions
-
--
-
-## Notes
-
--
-CLAUDE
-echo "  Created client CLAUDE.md"
+create_client_claude_wrapper "${CLIENT_DIR}/CLAUDE.md"
+echo "  Created client CLAUDE.md wrapper"
 
 # Seed learnings from root (so clients start with accumulated knowledge)
 if [[ -f "${PROJECT_DIR}/context/learnings.md" ]]; then

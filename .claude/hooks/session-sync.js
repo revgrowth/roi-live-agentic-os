@@ -31,15 +31,18 @@ process.stdin.on("end", () => {
     projectSlug = briefsMatch[1];
   }
 
-  // Walk up from cwd to find the agentic-os root (contains .command-centre/ or CLAUDE.md)
+  // Walk up from cwd to find the agentic-os root (contains .command-centre/ or shared instruction files)
   function findAgenticOsRoot(startDir) {
     let dir = startDir;
     for (let i = 0; i < 10; i++) {
       // Check for .command-centre/port (strongest signal)
       if (fs.existsSync(path.join(dir, ".command-centre", "port"))) return dir;
-      // Check for CLAUDE.md + .claude/ at this level (agentic-os root marker)
+      // Check for AGENTS.md or CLAUDE.md plus .claude/ at this level (agentic-os root marker)
       if (
-        fs.existsSync(path.join(dir, "CLAUDE.md")) &&
+        (
+          fs.existsSync(path.join(dir, "AGENTS.md")) ||
+          fs.existsSync(path.join(dir, "CLAUDE.md"))
+        ) &&
         fs.existsSync(path.join(dir, ".claude"))
       ) return dir;
       const parent = path.dirname(dir);

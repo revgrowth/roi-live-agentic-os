@@ -88,7 +88,7 @@ Document these decisions in the SKILL.md — each step should make it clear whet
 
 Based on the user interview, fill in these components:
 
-- **name**: Skill identifier — must be `{category}-{skill-name}` in kebab-case. Read the **Skill Categories** table in CLAUDE.md for valid category prefixes (`mkt`, `str`, `ops`, `viz`, `acc`, `meta`). The folder name must match the `name` field exactly.
+- **name**: Skill identifier — must be `{category}-{skill-name}` in kebab-case. Read the **Skill Categories** table in AGENTS.md for valid category prefixes (`mkt`, `str`, `ops`, `viz`, `acc`, `meta`). The folder name must match the `name` field exactly.
 - **description**: When to trigger, what it does. This is the primary triggering mechanism - include both what the skill does AND specific contexts for when to use it. All "when to use" info goes here, not in the body. Note: currently Claude has a tendency to "undertrigger" skills -- to not use them when they'd be useful. To combat this, please make the skill descriptions a little bit "pushy". So for instance, instead of "How to build a simple fast dashboard to display internal Anthropic data.", you might write "How to build a simple fast dashboard to display internal Anthropic data. Make sure to use this skill whenever the user mentions dashboards, data visualization, internal metrics, or wants to display any kind of company data, even if they don't explicitly ask for a 'dashboard.'"
 - **compatibility**: Required tools, dependencies (optional, rarely needed)
 - **output path (mandatory for all output-producing skills)**: Every skill that produces files — content, transcripts, research briefs, images, diagrams, anything — must save output to `projects/{skill-folder-name}/` with date-stamped filenames: `{YYYY-MM-DD}_{descriptive-name}.md`. The SKILL.md must include an explicit "Save Output" step that: (1) creates the folder if it doesn't exist, (2) uses the exact path format `projects/{skill-folder-name}/{YYYY-MM-DD}_{batch-or-name}/`, (3) states "Always save output to disk. This is not optional." Utility skills (`tool-*`) that extract content (e.g., transcripts, scraped data) also save to `projects/{tool-name}/`. Only foundation skills that exclusively write to `brand_context/` are exempt. If a skill is missing this step, add it before considering the skill complete.
@@ -148,7 +148,7 @@ When editing an existing skill, check its section order against this template an
 
 ### Learnings Integration (Required)
 
-Every skill MUST include a step that reads `context/learnings.md` before producing output. This file is the system's long-term memory — it contains domain-tagged feedback from previous skill runs (what worked, what didn't, audience insights, voice notes, etc.). Think of it as a CLAUDE.md for each individual skill.
+Every skill MUST include a step that reads `context/learnings.md` before producing output. This file is the system's long-term memory — it contains domain-tagged feedback from previous skill runs (what worked, what didn't, audience insights, voice notes, etc.). Think of it as an `AGENTS.md` for each individual skill.
 
 When writing or editing a skill, ensure the SKILL.md includes:
 1. A reference to `context/learnings.md` in the Context Needs section

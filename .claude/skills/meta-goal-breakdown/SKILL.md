@@ -74,7 +74,7 @@ where the deliverables are known but need scoping?
 ├─ YES → Level 2: Project brief
 │         Hand off: create projects/briefs/{slug}/brief.md
 │         Run interactive scoping conversation (goal, deliverables,
-│         acceptance criteria, constraints) per CLAUDE.md Level 2 rules.
+│         acceptance criteria, constraints) per AGENTS.md Level 2 rules.
 │         STOP here — the brief scoping flow takes over.
 └─ NO ↓
 

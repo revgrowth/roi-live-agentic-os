@@ -24,7 +24,7 @@ End-of-session checklist. Four steps: review what was done, collect feedback, ap
 - Updated `context/USER.md` if new preferences were observed
 - Proposed `context/SOUL.md` updates if behaviour corrections were observed
 - Direct fixes applied to any skills that need them
-- CLAUDE.md Skill Registry, Context Matrix, and README.md synced with any new or removed skills/MCPs
+- AGENTS.md Skill Registry, Context Matrix, and README.md synced with any new or removed skills/MCPs
 - Clean git commit of all session work
 - Session summary presented in consistent format
 
@@ -142,14 +142,14 @@ If you noticed new patterns about how the user works — communication style, pr
 
 ### 3f: Skill & MCP Sync
 
-Run the reconciliation described in CLAUDE.md's **Skill & MCP Reconciliation** section. This catches anything that changed during the session:
+Run the reconciliation described in AGENTS.md's **Skill & MCP Reconciliation** section. This catches anything that changed during the session:
 
-1. **Skills** — compare `.claude/skills/` folders against CLAUDE.md's Skill Registry and Context Matrix:
-   - New skill folder not yet registered → add to CLAUDE.md Skill Registry, Context Matrix, README.md skill tables, and `context/learnings.md`
-   - Registered skill whose folder was deleted → ask user: "Remove `{skill-name}` from CLAUDE.md Skill Registry, Context Matrix, README.md, and context/learnings.md?"
+1. **Skills** — compare `.claude/skills/` folders against AGENTS.md's Skill Registry and Context Matrix:
+   - New skill folder not yet registered → add to AGENTS.md Skill Registry, Context Matrix, README.md skill tables, and `context/learnings.md`
+   - Registered skill whose folder was deleted → ask user: "Remove `{skill-name}` from AGENTS.md Skill Registry, Context Matrix, README.md, and context/learnings.md?"
 
-2. **External services** — for any new or modified skills, scan for API key dependencies (see CLAUDE.md § External service detection). Auto-add any new services to:
-   - CLAUDE.md Service Registry table
+2. **External services** — for any new or modified skills, scan for API key dependencies (see AGENTS.md § External service detection). Auto-add any new services to:
+   - AGENTS.md Service Registry table
    - `.env.example`
    - README.md External Services table
 
@@ -189,7 +189,7 @@ Skills modified:
   (or "None" if no skills were modified)
 
 Registry sync:
-- {what was added/removed from CLAUDE.md, README.md, context/learnings.md}
+- {what was added/removed from AGENTS.md, README.md, context/learnings.md}
   (or "No drift detected")
 
 Memory:

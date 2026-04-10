@@ -192,7 +192,7 @@ run_update() {
 
 declare -a SCENARIO_NAMES=(
     "No upstream changes at all"
-    "System file changes only (CLAUDE.md, README.md)"
+    "System file changes only (AGENTS.md, CLAUDE.md, README.md)"
     "Script changes only (scripts/*.sh)"
     "Existing skill updated upstream (no local mods)"
     "New skill added to catalog upstream"
@@ -248,10 +248,11 @@ setup_scenario_2() {
     reset_main
     reset_demo
     cd "$MAIN_WORK"
+    echo -e "\n<!-- Updated $(date) -->" >> AGENTS.md
     echo -e "\n<!-- Updated $(date) -->" >> CLAUDE.md
     echo -e "\n<!-- Updated $(date) -->" >> README.md
-    push_from_main "Update system files (CLAUDE.md, README.md)"
-    ok "Pushed system file changes (CLAUDE.md, README.md) to main."
+    push_from_main "Update system files (AGENTS.md, CLAUDE.md, README.md)"
+    ok "Pushed system file changes (AGENTS.md, CLAUDE.md, README.md) to main."
 }
 
 setup_scenario_3() {
@@ -328,6 +329,7 @@ setup_scenario_6() {
     reset_main
     reset_demo
     cd "$MAIN_WORK"
+    echo -e "\n<!-- Mixed update $(date) -->" >> AGENTS.md
     echo -e "\n<!-- Mixed update $(date) -->" >> CLAUDE.md
     echo -e "\n# Mixed script update" >> scripts/setup.sh
     if [[ -f .claude/skills/mkt-brand-voice/SKILL.md ]]; then
@@ -337,7 +339,7 @@ setup_scenario_6() {
         echo -e "\n<!-- Another upstream tweak -->" >> .claude/skills/tool-humanizer/SKILL.md
     fi
     push_from_main "Mixed update: system + scripts + skills"
-    ok "Pushed mixed changes (CLAUDE.md, scripts/setup.sh, 2 skills) to main."
+    ok "Pushed mixed changes (AGENTS.md, CLAUDE.md, scripts/setup.sh, 2 skills) to main."
 }
 
 setup_scenario_7() {
@@ -561,9 +563,9 @@ setup_scenario_21() {
 
     # User edits a protected file
     cd "$DEMO_REPO"
-    echo -e "\n<!-- User's CLAUDE.md customization -->" >> CLAUDE.md
-    ok "User modified CLAUDE.md locally. Upstream has script changes."
-    warn "CLAUDE.md should be stashed before pull, restored after."
+    echo -e "\n<!-- User's AGENTS.md customization -->" >> AGENTS.md
+    ok "User modified AGENTS.md locally. Upstream has script changes."
+    warn "AGENTS.md should be treated as a protected system-file customization."
 }
 
 setup_scenario_22() {
