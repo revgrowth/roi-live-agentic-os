@@ -8,7 +8,12 @@ let initialized = false;
 /**
  * Initialize the queue watcher.
  * Listens for task events and auto-executes tasks that enter 'queued' status.
- * Resets orphaned queued/running tasks from previous sessions back to backlog.
+ *
+ * Startup recovery policy: orphaned running/queued tasks from a previous
+ * session are moved to 'review' rather than auto-resumed. This prevents the
+ * command centre from silently spawning many concurrent Claude CLI processes
+ * when the server restarts mid-work (e.g. laptop sleep, crash, manual kill),
+ * which can saturate CPU. The user re-kicks tasks deliberately from the board.
  *
  * Idempotent -- safe to call multiple times.
  */
@@ -35,56 +40,36 @@ export function initQueueWatcher(): void {
     const db = getDb();
     const now = new Date().toISOString();
 
-    // Tasks that were actively running (no pending question) — re-queue them
-    // so they restart on this server session. Parent tasks with children
-    // stay as-is (container tasks, not executed directly).
-    const orphanedRunning = db
+    // Any task left in 'running' or 'queued' from a previous session is an
+    // orphan. Instead of auto-resuming them (which can spawn many concurrent
+    // Claude CLI processes and peg the CPU), move them all to 'review' so the
+    // user explicitly decides whether to continue them.
+    // Parent tasks with children stay as-is — they're containers, not executed.
+    const orphans = db
       .prepare(
         `SELECT t.* FROM tasks t
-         WHERE t.status = 'running' AND t.needsInput = 0
+         WHERE t.status IN ('running', 'queued')
          AND NOT EXISTS (SELECT 1 FROM tasks c WHERE c.parentId = t.id)
          ORDER BY t.columnOrder ASC`
       )
       .all() as Task[];
 
-    // Tasks that were waiting for input → move to review (work was done, just can't continue the conversation)
-    const orphanedWaiting = db
-      .prepare("SELECT * FROM tasks WHERE status = 'running' AND needsInput = 1 ORDER BY columnOrder ASC")
-      .all() as Task[];
-
-    // Queued tasks that never started → re-queue (they'll execute immediately)
-    const orphanedQueued = db
-      .prepare("SELECT * FROM tasks WHERE status = 'queued' ORDER BY columnOrder ASC")
-      .all() as Task[];
-
-    if (orphanedRunning.length > 0) {
-      console.log(`[queue-watcher] Re-queuing ${orphanedRunning.length} orphaned running task(s)`);
-      for (const task of orphanedRunning) {
+    if (orphans.length > 0) {
+      console.log(
+        `[queue-watcher] Moving ${orphans.length} orphaned task(s) from previous session to review (no auto-resume)`
+      );
+      for (const task of orphans) {
         db.prepare(
-          "UPDATE tasks SET status = 'queued', updatedAt = ?, activityLabel = NULL, startedAt = NULL, errorMessage = NULL, needsInput = 0 WHERE id = ?"
+          `UPDATE tasks
+           SET status = 'review',
+               updatedAt = ?,
+               activityLabel = NULL,
+               needsInput = 0,
+               errorMessage = CASE WHEN errorMessage IS NULL THEN 'Session ended before this task finished — re-kick from the board to continue.' ELSE errorMessage END
+           WHERE id = ?`
         ).run(now, task.id);
         const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(task.id) as Task;
         emitTaskEvent({ type: "task:status", task: updated, timestamp: now });
-      }
-    }
-
-    if (orphanedWaiting.length > 0) {
-      console.log(`[queue-watcher] Moving ${orphanedWaiting.length} waiting-for-input task(s) to review`);
-      for (const task of orphanedWaiting) {
-        db.prepare(
-          "UPDATE tasks SET status = 'review', updatedAt = ?, activityLabel = NULL, needsInput = 0, errorMessage = NULL WHERE id = ?"
-        ).run(now, task.id);
-        const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(task.id) as Task;
-        emitTaskEvent({ type: "task:status", task: updated, timestamp: now });
-      }
-    }
-
-    // Orphaned queued tasks will be picked up by the event listener above
-    // since they're already in 'queued' status — no action needed.
-    if (orphanedQueued.length > 0) {
-      console.log(`[queue-watcher] Found ${orphanedQueued.length} queued task(s) — re-triggering execution`);
-      for (const task of orphanedQueued) {
-        emitTaskEvent({ type: "task:status", task: { ...task, needsInput: Boolean(task.needsInput) }, timestamp: now });
       }
     }
 
