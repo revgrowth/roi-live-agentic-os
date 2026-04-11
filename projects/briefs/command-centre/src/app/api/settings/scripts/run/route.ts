@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 import { getConfig } from "@/lib/config";
 import { getScriptById } from "@/lib/script-registry";
+import { spawnUiProcess } from "@/lib/subprocess";
 
 const runningScripts = new Set<string>();
 
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     const stream = new ReadableStream({
       start(controller) {
-        const proc = spawn("bash", [scriptPath, ...argValues], {
+        const proc = spawnUiProcess("bash", [scriptPath, ...argValues], {
           cwd: config.agenticOsDir,
           stdio: ["pipe", "pipe", "pipe"],
         });
