@@ -93,9 +93,15 @@ function Invoke-AgenticOsCronDb {
     }
 
     $payloadJson = $Payload | ConvertTo-Json -Compress -Depth 10
-    $commandOutput = $payloadJson | & $PythonCommand.FilePath @($PythonCommand.Arguments + @($CronDbScript, $Action)) 2>&1
-    $exitCode = $LASTEXITCODE
-    $rawOutput = if ($commandOutput) { ($commandOutput | Out-String).Trim() } else { "" }
+    $tempFile = [System.IO.Path]::GetTempFileName()
+    try {
+        $payloadJson | Set-Content -Path $tempFile -Encoding UTF8
+        $commandOutput = & $PythonCommand.FilePath @($PythonCommand.Arguments + @($CronDbScript, $Action, $tempFile)) 2>&1
+        $exitCode = $LASTEXITCODE
+        $rawOutput = if ($commandOutput) { ($commandOutput | Out-String).Trim() } else { "" }
+    } finally {
+        Remove-Item -Path $tempFile -ErrorAction SilentlyContinue
+    }
 
     if ($exitCode -ne 0) {
         if ($LogFile) {

@@ -27,8 +27,12 @@ DELIVERABLE_EXTENSIONS = {
 
 
 def load_payload() -> tuple[str, dict]:
-    if len(sys.argv) != 2 or sys.argv[1] not in {"start", "finish"}:
-        raise SystemExit("usage: cron-db.py <start|finish>")
+    if len(sys.argv) not in {2, 3} or sys.argv[1] not in {"start", "finish"}:
+        raise SystemExit("usage: cron-db.py <start|finish> [payload_file]")
+
+    if len(sys.argv) == 3:
+        with open(sys.argv[2], "r", encoding="utf-8-sig") as f:
+            return sys.argv[1], json.load(f)
 
     return sys.argv[1], json.load(sys.stdin)
 
@@ -209,7 +213,7 @@ def main() -> None:
     else:
         result = update_finish(payload)
 
-    sys.stdout.write(json.dumps(result))
+    print(json.dumps(result))
 
 
 if __name__ == "__main__":
