@@ -4,6 +4,14 @@ import matter from "gray-matter";
 import { getConfig } from "./config";
 import type { FileNode, FileContent, SkillDependency, InstalledSkill } from "@/types/file";
 
+export function normalizeRelativePath(relativePath: string): string {
+  const normalized = relativePath.replace(/\\/g, "/").replace(/\/+/g, "/");
+  if (normalized.length > 1 && normalized.endsWith("/")) {
+    return normalized.slice(0, -1);
+  }
+  return normalized;
+}
+
 /**
  * Validate that a resolved path is within the given root directory.
  * Prevents directory traversal attacks.
@@ -22,7 +30,8 @@ function validatePath(resolved: string, rootDir: string): void {
  */
 function resolvePath(relativePath: string, baseDir?: string): string {
   const root = baseDir || getConfig().agenticOsDir;
-  const resolved = path.join(root, relativePath);
+  const normalizedPath = normalizeRelativePath(relativePath);
+  const resolved = path.join(root, normalizedPath);
   validatePath(resolved, root);
   return resolved;
 }
@@ -32,10 +41,11 @@ function resolvePath(relativePath: string, baseDir?: string): string {
  * For context/memory/ specifically: sort by filename descending, limit entries.
  */
 export function listDirectory(relativePath: string, options?: { limit?: number; baseDir?: string }): FileNode[] {
-  const resolved = resolvePath(relativePath, options?.baseDir);
+  const normalizedPath = normalizeRelativePath(relativePath);
+  const resolved = resolvePath(normalizedPath, options?.baseDir);
 
   if (!fs.existsSync(resolved) || !fs.statSync(resolved).isDirectory()) {
-    throw new Error(`Directory not found: ${relativePath}`);
+    throw new Error(`Directory not found: ${normalizedPath}`);
   }
 
   const entries = fs.readdirSync(resolved, { withFileTypes: true });
@@ -47,7 +57,7 @@ export function listDirectory(relativePath: string, options?: { limit?: number; 
       const stat = fs.statSync(fullPath);
       return {
         name: entry.name,
-        path: path.join(relativePath, entry.name),
+        path: normalizeRelativePath(path.posix.join(normalizedPath, entry.name)),
         type: entry.isDirectory() ? ("directory" as const) : ("file" as const),
         lastModified: stat.mtime.toISOString(),
         size: stat.size,
@@ -55,7 +65,7 @@ export function listDirectory(relativePath: string, options?: { limit?: number; 
     });
 
   // For context/memory/ specifically: sort newest first and limit
-  if (relativePath === "context/memory" || relativePath === "context/memory/") {
+  if (normalizedPath === "context/memory") {
     nodes.sort((a, b) => b.name.localeCompare(a.name));
     const limit = options?.limit || 30;
     nodes = nodes.slice(0, limit);
@@ -68,17 +78,18 @@ export function listDirectory(relativePath: string, options?: { limit?: number; 
  * Read a file's content and metadata.
  */
 export function readFile(relativePath: string, baseDir?: string): FileContent {
-  const resolved = resolvePath(relativePath, baseDir);
+  const normalizedPath = normalizeRelativePath(relativePath);
+  const resolved = resolvePath(normalizedPath, baseDir);
 
   if (!fs.existsSync(resolved)) {
-    throw new Error(`File not found: ${relativePath}`);
+    throw new Error(`File not found: ${normalizedPath}`);
   }
 
   const content = fs.readFileSync(resolved, "utf-8");
   const stat = fs.statSync(resolved);
 
   return {
-    path: relativePath,
+    path: normalizedPath,
     content,
     lastModified: stat.mtime.toISOString(),
   };
@@ -88,7 +99,8 @@ export function readFile(relativePath: string, baseDir?: string): FileContent {
  * Write a file with atomic write and optimistic concurrency check.
  */
 export function writeFile(relativePath: string, content: string, expectedLastModified?: string, baseDir?: string): FileContent {
-  const resolved = resolvePath(relativePath, baseDir);
+  const normalizedPath = normalizeRelativePath(relativePath);
+  const resolved = resolvePath(normalizedPath, baseDir);
 
   // Optimistic concurrency check
   if (expectedLastModified && fs.existsSync(resolved)) {
@@ -106,7 +118,7 @@ export function writeFile(relativePath: string, content: string, expectedLastMod
 
   const stat = fs.statSync(resolved);
   return {
-    path: relativePath,
+    path: normalizedPath,
     content,
     lastModified: stat.mtime.toISOString(),
   };
@@ -116,14 +128,15 @@ export function writeFile(relativePath: string, content: string, expectedLastMod
  * Delete a file within the agentic-os directory.
  */
 export function deleteFile(relativePath: string, baseDir?: string): void {
-  const resolved = resolvePath(relativePath, baseDir);
+  const normalizedPath = normalizeRelativePath(relativePath);
+  const resolved = resolvePath(normalizedPath, baseDir);
 
   if (!fs.existsSync(resolved)) {
-    throw new Error(`File not found: ${relativePath}`);
+    throw new Error(`File not found: ${normalizedPath}`);
   }
 
   if (fs.statSync(resolved).isDirectory()) {
-    throw new Error(`Cannot delete directories: ${relativePath}`);
+    throw new Error(`Cannot delete directories: ${normalizedPath}`);
   }
 
   fs.unlinkSync(resolved);
@@ -134,15 +147,17 @@ export function deleteFile(relativePath: string, baseDir?: string): void {
  */
 export function moveFile(fromPath: string, toPath: string, baseDir?: string): void {
   const root = baseDir || getConfig().agenticOsDir;
-  const resolvedFrom = resolvePath(fromPath, root);
-  const resolvedTo = resolvePath(toPath, root);
+  const normalizedFromPath = normalizeRelativePath(fromPath);
+  const normalizedToPath = normalizeRelativePath(toPath);
+  const resolvedFrom = resolvePath(normalizedFromPath, root);
+  const resolvedTo = resolvePath(normalizedToPath, root);
 
   if (!fs.existsSync(resolvedFrom)) {
-    throw new Error(`File not found: ${fromPath}`);
+    throw new Error(`File not found: ${normalizedFromPath}`);
   }
 
   if (fs.existsSync(resolvedTo)) {
-    throw new Error(`Target already exists: ${toPath}`);
+    throw new Error(`Target already exists: ${normalizedToPath}`);
   }
 
   // Ensure target directory exists

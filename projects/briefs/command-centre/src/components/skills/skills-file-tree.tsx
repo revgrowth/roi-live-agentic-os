@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { FileText, Folder, FolderOpen, Cpu } from "lucide-react";
 import type { FileNode } from "@/types/file";
 import { useClientId, appendClientId } from "@/hooks/use-client-id";
+import { asFileNodes, fetchFileNodes } from "@/lib/file-node-response";
 
 interface SkillsFileTreeProps {
   onSelectFile: (path: string) => void;
@@ -22,12 +23,9 @@ export function SkillsFileTree({ onSelectFile, selectedPath }: SkillsFileTreePro
 
     async function load() {
       try {
-        const res = await fetch(appendClientId(`/api/files?dir=${encodeURIComponent(".claude/skills")}`, clientId));
-        if (!res.ok) {
-          if (mounted) setLoading(false);
-          return;
-        }
-        const nodes: FileNode[] = await res.json();
+        const nodes = await fetchFileNodes(
+          appendClientId(`/api/files?dir=${encodeURIComponent(".claude/skills")}`, clientId)
+        );
         if (mounted) {
           // Filter out _catalog and non-directories, sort alphabetically
           const folders = nodes
@@ -55,9 +53,16 @@ export function SkillsFileTree({ onSelectFile, selectedPath }: SkillsFileTreePro
           next.add(dirPath);
           if (!childrenMap[dirPath]) {
             fetch(appendClientId(`/api/files?dir=${encodeURIComponent(dirPath)}`, clientId))
-              .then((r) => r.json())
-              .then((children: FileNode[]) => {
+              .then(async (r) => {
+                if (!r.ok) return [];
+                const payload: unknown = await r.json();
+                return asFileNodes(payload);
+              })
+              .then((children) => {
                 setChildrenMap((prev) => ({ ...prev, [dirPath]: children }));
+              })
+              .catch(() => {
+                setChildrenMap((prev) => ({ ...prev, [dirPath]: [] }));
               });
           }
         }

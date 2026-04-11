@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { FileText, Folder, FolderOpen } from "lucide-react";
 import type { FileNode } from "@/types/file";
 import { useClientId, appendClientId } from "@/hooks/use-client-id";
+import { asFileNodes, fetchFileNodes } from "@/lib/file-node-response";
 
 interface DocsFileTreeProps {
   onSelectFile: (path: string) => void;
@@ -99,8 +100,7 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
           )
         ),
         ...sectionDefs.map((s) =>
-          fetch(appendClientId(`/api/files?dir=${encodeURIComponent(s.dir)}`, clientId))
-            .then((r) => (r.ok ? r.json() : []))
+          fetchFileNodes(appendClientId(`/api/files?dir=${encodeURIComponent(s.dir)}`, clientId))
             .catch(() => [])
         ),
       ]);
@@ -178,9 +178,16 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
           next.add(dirPath);
           if (!childrenMap[dirPath]) {
             fetch(appendClientId(`/api/files?dir=${encodeURIComponent(dirPath)}`, clientId))
-              .then((r) => r.json())
-              .then((children: FileNode[]) => {
+              .then(async (r) => {
+                if (!r.ok) return [];
+                const payload: unknown = await r.json();
+                return asFileNodes(payload);
+              })
+              .then((children) => {
                 setChildrenMap((prev) => ({ ...prev, [dirPath]: children }));
+              })
+              .catch(() => {
+                setChildrenMap((prev) => ({ ...prev, [dirPath]: [] }));
               });
           }
         }
@@ -271,9 +278,16 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
           );
           if (expandedDirs.has(targetDir)) {
             fetch(appendClientId(`/api/files?dir=${encodeURIComponent(targetDir)}`, clientId))
-              .then((r) => r.json())
-              .then((children: FileNode[]) => {
+              .then(async (r) => {
+                if (!r.ok) return [];
+                const payload: unknown = await r.json();
+                return asFileNodes(payload);
+              })
+              .then((children) => {
                 setChildrenMap((prev) => ({ ...prev, [targetDir]: children }));
+              })
+              .catch(() => {
+                setChildrenMap((prev) => ({ ...prev, [targetDir]: [] }));
               });
           }
           if (selectedPath === sourcePath) {
