@@ -5,6 +5,12 @@ import { ArrowUp } from "lucide-react";
 import type { Task, LogEntry } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 import { ChatEntry, TextGroup, ToolSummaryBlock } from "./chat-entry";
+import {
+  insertTextareaNewline,
+  shouldInsertModifierNewline,
+  shouldSubmitOnPlainEnter,
+  syncComposerTextareaHeight,
+} from "@/lib/composer";
 
 /**
  * Group consecutive entries for business-focused rendering:
@@ -142,6 +148,12 @@ function buildMergedTimeline(
 function ChildReplyInput({ childTaskId, onReplySent }: { childTaskId: string; onReplySent: (childId: string, message: string) => void }) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const maxHeight = 120;
+
+  useEffect(() => {
+    syncComposerTextareaHeight(textareaRef.current, { maxHeight });
+  }, [message]);
 
   const handleSubmit = useCallback(async () => {
     const trimmed = message.trim();
@@ -167,18 +179,24 @@ function ChildReplyInput({ childTaskId, onReplySent }: { childTaskId: string; on
   }, [message, isSending, childTaskId, onReplySent]);
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8 }}>
-      <input
-        type="text"
+    <div style={{ display: "flex", alignItems: "flex-end", gap: 6, marginTop: 8 }}>
+      <textarea
+        ref={textareaRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
+          if (shouldInsertModifierNewline(e)) {
+            e.preventDefault();
+            insertTextareaNewline(e.currentTarget, setMessage);
+            return;
+          }
+          if (shouldSubmitOnPlainEnter(e)) {
             e.preventDefault();
             handleSubmit();
           }
         }}
         placeholder="Reply to this subtask..."
+        rows={1}
         style={{
           flex: 1,
           fontSize: 13,
@@ -190,6 +208,10 @@ function ChildReplyInput({ childTaskId, onReplySent }: { childTaskId: string; on
           color: "#1B1C1B",
           outline: "none",
           lineHeight: 1.4,
+          resize: "none",
+          minHeight: 32,
+          maxHeight,
+          overflowY: "hidden",
         }}
         onFocus={(e) => { e.currentTarget.style.borderColor = "#93452A"; }}
         onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.4)"; }}
@@ -225,6 +247,12 @@ function ReplyInput({ taskId }: { taskId: string }) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const appendLogEntry = useTaskStore((s) => s.appendLogEntry);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const maxHeight = 160;
+
+  useEffect(() => {
+    syncComposerTextareaHeight(textareaRef.current, { maxHeight });
+  }, [message]);
 
   const handleSubmit = useCallback(async () => {
     const trimmed = message.trim();
@@ -257,23 +285,29 @@ function ReplyInput({ taskId }: { taskId: string }) {
   return (
     <div style={{
       display: "flex",
-      alignItems: "center",
+      alignItems: "flex-end",
       gap: 8,
       padding: "10px 16px",
       borderTop: "1px solid rgba(218, 193, 185, 0.2)",
       background: "#faf9f7",
     }}>
-      <input
-        type="text"
+      <textarea
+        ref={textareaRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
+          if (shouldInsertModifierNewline(e)) {
+            e.preventDefault();
+            insertTextareaNewline(e.currentTarget, setMessage);
+            return;
+          }
+          if (shouldSubmitOnPlainEnter(e)) {
             e.preventDefault();
             handleSubmit();
           }
         }}
         placeholder="Reply..."
+        rows={1}
         style={{
           flex: 1,
           fontSize: 13,
@@ -285,6 +319,10 @@ function ReplyInput({ taskId }: { taskId: string }) {
           color: "#1B1C1B",
           outline: "none",
           lineHeight: 1.4,
+          resize: "none",
+          minHeight: 34,
+          maxHeight,
+          overflowY: "hidden",
         }}
         onFocus={(e) => { e.currentTarget.style.borderColor = "#93452A"; }}
         onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.4)"; }}

@@ -1,7 +1,13 @@
 "use client";
 
-import { useState, useRef, useCallback, KeyboardEvent } from "react";
+import { useState, useRef, useEffect, useCallback, KeyboardEvent } from "react";
 import { Send } from "lucide-react";
+import {
+  insertTextareaNewline,
+  shouldInsertModifierNewline,
+  shouldSubmitOnPlainEnter,
+  syncComposerTextareaHeight,
+} from "@/lib/composer";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -12,31 +18,30 @@ interface ChatInputProps {
 export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const maxHeight = 160;
+
+  useEffect(() => {
+    syncComposerTextareaHeight(textareaRef.current, { maxHeight });
+  }, [value]);
 
   const handleSend = useCallback(() => {
     const trimmed = value.trim();
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setValue("");
-    // Reset textarea height
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-    }
   }, [value, disabled, onSend]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (shouldInsertModifierNewline(e)) {
+      e.preventDefault();
+      insertTextareaNewline(e.currentTarget, setValue);
+      return;
+    }
+    if (shouldSubmitOnPlainEnter(e)) {
       e.preventDefault();
       handleSend();
     }
   }, [handleSend]);
-
-  const handleInput = useCallback(() => {
-    const ta = textareaRef.current;
-    if (!ta) return;
-    ta.style.height = "auto";
-    ta.style.height = Math.min(ta.scrollHeight, 160) + "px";
-  }, []);
 
   return (
     <div style={{
@@ -57,7 +62,7 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
         <textarea
           ref={textareaRef}
           value={value}
-          onChange={(e) => { setValue(e.target.value); handleInput(); }}
+          onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder || "Type a message..."}
           disabled={disabled}
@@ -72,7 +77,8 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
             fontSize: 14,
             lineHeight: "20px",
             color: "#1B1C1B",
-            maxHeight: 160,
+            maxHeight,
+            overflowY: "hidden",
             padding: "2px 0",
           }}
         />

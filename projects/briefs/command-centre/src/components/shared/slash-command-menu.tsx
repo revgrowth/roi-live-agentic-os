@@ -38,7 +38,13 @@ export function SlashCommandMenu({ query, onSelect, onClose, anchor = "above" }:
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setSelectedIndex((i) => Math.max(i - 1, 0));
-      } else if (e.key === "Enter" || e.key === "Tab") {
+      } else if (
+        (e.key === "Enter" || e.key === "Tab") &&
+        !e.shiftKey &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
         e.preventDefault();
         if (filtered[selectedIndex]) onSelect(filtered[selectedIndex]);
       } else if (e.key === "Escape") {
