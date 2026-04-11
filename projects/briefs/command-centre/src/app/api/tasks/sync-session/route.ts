@@ -46,16 +46,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ taskId: existing.id, isNew: false });
     }
 
-    // Check for a recently-started running task without a claudeSessionId
-    // (created by the board/dashboard, picked up by queue-watcher before the hook fires)
+    // Check for a recently-started running task. We prefer one without a claudeSessionId
+    // (e.g. freshly created by board/dashboard or cron), but if all running tasks have one,
+    // we take the most recently started one and overwrite its sessionId (handles cron daemon retries
+    // or rapid hook race conditions without spawning duplicated "Weird Path" ghost tasks).
     const recentRunning = db
       .prepare(
         `SELECT * FROM tasks
          WHERE status = 'running'
-           AND claudeSessionId IS NULL
            AND startedAt IS NOT NULL
-           AND (julianday(?) - julianday(startedAt)) * 86400 < 30
-         ORDER BY startedAt DESC
+           AND (julianday(?) - julianday(startedAt)) * 86400 < 120
+         ORDER BY 
+           CASE WHEN claudeSessionId IS NULL THEN 0 ELSE 1 END ASC,
+           updatedAt DESC
          LIMIT 1`
       )
       .get(now) as Task | undefined;

@@ -220,100 +220,6 @@ function ChildReplyInput({ childTaskId, onReplySent }: { childTaskId: string; on
   );
 }
 
-/** Reply input for the parent task — appears at bottom of activity tab */
-function ReplyInput({ taskId }: { taskId: string }) {
-  const [message, setMessage] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const appendLogEntry = useTaskStore((s) => s.appendLogEntry);
-
-  const handleSubmit = useCallback(async () => {
-    const trimmed = message.trim();
-    if (!trimmed || isSending) return;
-
-    setIsSending(true);
-    setMessage("");
-
-    // Optimistic log entry
-    appendLogEntry(taskId, {
-      id: "local-" + crypto.randomUUID(),
-      type: "user_reply",
-      content: trimmed,
-      timestamp: new Date().toISOString(),
-    });
-
-    try {
-      await fetch(`/api/tasks/${taskId}/reply`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed }),
-      });
-    } catch {
-      // Silently fail
-    } finally {
-      setIsSending(false);
-    }
-  }, [message, isSending, taskId, appendLogEntry]);
-
-  return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 8,
-      padding: "10px 16px",
-      borderTop: "1px solid rgba(218, 193, 185, 0.2)",
-      background: "#faf9f7",
-    }}>
-      <input
-        type="text"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit();
-          }
-        }}
-        placeholder="Reply..."
-        style={{
-          flex: 1,
-          fontSize: 13,
-          fontFamily: "var(--font-inter), Inter, sans-serif",
-          padding: "8px 12px",
-          backgroundColor: "#FFFFFF",
-          border: "1px solid rgba(218, 193, 185, 0.4)",
-          borderRadius: "0.375rem",
-          color: "#1B1C1B",
-          outline: "none",
-          lineHeight: 1.4,
-        }}
-        onFocus={(e) => { e.currentTarget.style.borderColor = "#93452A"; }}
-        onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.4)"; }}
-      />
-      <button
-        onClick={handleSubmit}
-        disabled={!message.trim() || isSending}
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: "0.375rem",
-          border: "none",
-          background: message.trim() && !isSending
-            ? "linear-gradient(135deg, #93452A, #B25D3F)"
-            : "#EAE8E6",
-          color: message.trim() && !isSending ? "#FFFFFF" : "#5E5E65",
-          cursor: message.trim() && !isSending ? "pointer" : "default",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          transition: "background 150ms ease",
-        }}
-      >
-        <ArrowUp size={14} />
-      </button>
-    </div>
-  );
-}
 
 interface ModalChatProps {
   taskId: string;
@@ -631,8 +537,6 @@ export function ModalChat({
         )}
       </div>
 
-      {/* Reply input — shown when task needs input */}
-      {needsInput && <ReplyInput taskId={taskId} />}
 
       {/* Jump to latest button */}
       {!isAutoScrolling && hasEntries && (

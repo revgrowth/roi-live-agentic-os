@@ -30,6 +30,12 @@ class ProcessManager {
   private lastProgressEmit = new Map<string, number>();
   /** Track which tasks are waiting for user reply (process exited, awaiting --continue) */
   private waitingForReply = new Set<string>();
+  /**
+   * Dedup map: key=taskId:type:content → timestamp (ms).
+   * Prevents duplicate DB rows when Claude CLI stream-json emits the
+   * same assistant text block more than once in quick succession.
+   */
+  private recentLogKeys = new Map<string, number>();
 
   constructor() {
     const cleanup = () => this.cleanup();
@@ -1309,6 +1315,25 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
   }
 
   addLogEntry(taskId: string, entry: LogEntry): void {
+    // Deduplicate: skip if identical type+content was already written for this
+    // task within the last 2 seconds.  Guards against Claude CLI stream-json
+    // emitting the same assistant text block twice in quick succession.
+    const dedupKey = `${taskId}:${entry.type}:${entry.content}`;
+    const nowMs = Date.now();
+    const lastSeen = this.recentLogKeys.get(dedupKey);
+    if (lastSeen !== undefined && nowMs - lastSeen < 2000) {
+      console.log(`[process-manager] Duplicate log suppressed for ${taskId.slice(0, 8)}: "${entry.content.slice(0, 60)}"`);
+      return;
+    }
+    this.recentLogKeys.set(dedupKey, nowMs);
+    // Prune stale entries to prevent unbounded growth
+    if (this.recentLogKeys.size > 500) {
+      const cutoff = nowMs - 5000;
+      for (const [key, ts] of this.recentLogKeys) {
+        if (ts < cutoff) this.recentLogKeys.delete(key);
+      }
+    }
+
     const db = getDb();
     db.prepare(
       "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
