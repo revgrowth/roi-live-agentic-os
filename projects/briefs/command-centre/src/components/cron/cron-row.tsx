@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Play, Pause, Trash2, ChevronDown, ChevronRight, Zap, Loader2, FileText, Clock } from "lucide-react";
+import { Play, Pause, Trash2, ChevronDown, ChevronRight, Zap, Loader2, FileText, Clock, Pencil } from "lucide-react";
 import { useCronStore } from "@/store/cron-store";
 import { RunHistory } from "./run-history";
 import type { CronJob } from "@/types/cron";
@@ -81,6 +81,7 @@ export function CronRow({
   const toggleJob = useCronStore((s) => s.toggleJob);
   const deleteJob = useCronStore((s) => s.deleteJob);
   const runJobNow = useCronStore((s) => s.runJobNow);
+  const setEditingJob = useCronStore((s) => s.setEditingJob);
   const isPinned = useCronStore((s) => s.pinnedSlugs.includes(job.slug));
   const activeRun = useCronStore((s) => s.activeRuns[job.slug]);
   const [expandedTab, setExpandedTab] = useState<"file" | "history">("history");
@@ -125,7 +126,7 @@ export function CronRow({
         onClick={() => expandJob(isExpanded ? null : job.slug)}
         style={{
           display: "grid",
-          gridTemplateColumns: "1.5fr 1fr 0.8fr 0.8fr 0.7fr 90px auto",
+          gridTemplateColumns: "1.5fr 1fr 0.8fr 0.8fr 0.7fr 90px 280px",
           gap: 12,
           alignItems: "center",
           padding: "14px 16px",
@@ -365,6 +366,33 @@ export function CronRow({
           >
             {job.active ? <Pause size={13} /> : <Play size={13} />}
             {job.active ? "Pause" : "Resume"}
+          </button>
+          <button
+            onClick={() => setEditingJob(job)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "4px 8px",
+              borderRadius: 6,
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              color: "#5E5E65",
+              fontSize: 11,
+              fontWeight: 500,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              transition: "color 150ms ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#93452A";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#5E5E65";
+            }}
+          >
+            <Pencil size={13} />
+            Edit
           </button>
           <button
             onClick={() => deleteJob(job.slug)}

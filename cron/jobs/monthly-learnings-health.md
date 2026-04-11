@@ -1,15 +1,14 @@
 ---
-name: "Monthly Learnings Health Check"
-time: "10:00"
-days: "mon"
-active: "true"
-model: "sonnet"
-notify: "on_finish"
-description: "Monthly audit of learnings.md for bloat, contradictions, and gaps"
-timeout: "10m"
-retry: "0"
+name: Monthly Learnings Health Check
+time: '10:00'
+days: mon
+active: 'true'
+model: sonnet
+notify: on_finish
+description: 'Monthly audit of learnings.md for bloat, contradictions, and gaps'
+timeout: 10m
+retry: '0'
 ---
-
 You are running as a scheduled job for Agentic OS.
 
 Read CLAUDE.md for system context.

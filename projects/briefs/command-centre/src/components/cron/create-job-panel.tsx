@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { useCronStore } from "@/store/cron-store";
 import { ScheduleSelector } from "./schedule-selector";
@@ -9,6 +9,9 @@ export function CreateJobPanel() {
   const showCreatePanel = useCronStore((s) => s.showCreatePanel);
   const setShowCreatePanel = useCronStore((s) => s.setShowCreatePanel);
   const createJob = useCronStore((s) => s.createJob);
+  const updateJob = useCronStore((s) => s.updateJob);
+  const editingJob = useCronStore((s) => s.editingJob);
+  const setEditingJob = useCronStore((s) => s.setEditingJob);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -16,27 +19,53 @@ export function CreateJobPanel() {
   const [model, setModel] = useState("sonnet");
   const [prompt, setPrompt] = useState("");
 
-  if (!showCreatePanel) return null;
+  // Sync state when editingJob changes
+  useEffect(() => {
+    if (editingJob) {
+      setName(editingJob.name || "");
+      setDescription(editingJob.description || "");
+      setSchedule({ time: editingJob.time || "09:00", days: editingJob.days || "daily" });
+      setModel(editingJob.model || "sonnet");
+      setPrompt(editingJob.prompt || "");
+    } else {
+      setName("");
+      setDescription("");
+      setSchedule({ time: "09:00", days: "daily" });
+      setModel("sonnet");
+      setPrompt("");
+    }
+  }, [editingJob]);
+
+  if (!showCreatePanel && !editingJob) return null;
+
+  const handleClose = () => {
+    setShowCreatePanel(false);
+    setEditingJob(null);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !prompt.trim()) return;
 
-    createJob({
-      name: name.trim(),
-      description: description.trim(),
-      time: schedule.time,
-      days: schedule.days,
-      model,
-      prompt: prompt.trim(),
-    });
-
-    // Reset form
-    setName("");
-    setDescription("");
-    setSchedule({ time: "09:00", days: "daily" });
-    setModel("sonnet");
-    setPrompt("");
+    if (editingJob) {
+      updateJob(editingJob.slug, {
+        name: name.trim(),
+        description: description.trim(),
+        time: schedule.time,
+        days: schedule.days,
+        model,
+        prompt: prompt.trim(),
+      });
+    } else {
+      createJob({
+        name: name.trim(),
+        description: description.trim(),
+        time: schedule.time,
+        days: schedule.days,
+        model,
+        prompt: prompt.trim(),
+      });
+    }
   };
 
   const inputStyle: React.CSSProperties = {
@@ -67,7 +96,7 @@ export function CreateJobPanel() {
     <>
       {/* Overlay */}
       <div
-        onClick={() => setShowCreatePanel(false)}
+        onClick={handleClose}
         style={{
           position: "fixed",
           inset: 0,
@@ -110,10 +139,10 @@ export function CreateJobPanel() {
               margin: 0,
             }}
           >
-            Create Job
+            {editingJob ? "Edit Job" : "Create Job"}
           </h3>
           <button
-            onClick={() => setShowCreatePanel(false)}
+            onClick={handleClose}
             style={{
               background: "none",
               border: "none",
@@ -243,7 +272,7 @@ export function CreateJobPanel() {
         >
           <button
             type="button"
-            onClick={() => setShowCreatePanel(false)}
+            onClick={handleClose}
             style={{
               background: "none",
               border: "none",
@@ -257,7 +286,7 @@ export function CreateJobPanel() {
           >
             Cancel
           </button>
-          <button
+            <button
             type="submit"
             onClick={handleSubmit}
             disabled={!name.trim() || !prompt.trim()}
@@ -275,7 +304,7 @@ export function CreateJobPanel() {
               transition: "opacity 150ms ease",
             }}
           >
-            Create Job
+            {editingJob ? "Save Changes" : "Create Job"}
           </button>
         </div>
       </div>

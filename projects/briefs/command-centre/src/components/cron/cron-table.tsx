@@ -146,11 +146,14 @@ export function CronJobsView() {
         </button>
       </div>
 
-      {/* Table header */}
+      {/* Table container for horizontal scroll */}
+      <div style={{ overflowX: "auto" }}>
+        <div style={{ minWidth: 1050 }}>
+          {/* Table header */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.5fr 1fr 0.8fr 0.8fr 0.7fr 90px 110px",
+          gridTemplateColumns: "1.5fr 1fr 0.8fr 0.8fr 0.7fr 90px 280px",
           gap: 12,
           padding: "8px 16px",
           fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
@@ -250,6 +253,8 @@ export function CronJobsView() {
             isDragging={dragIndex === i}
           />
         ))}
+        </div>
+      </div>
 
       {/* Create panel */}
       <CreateJobPanel />
