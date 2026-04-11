@@ -3,7 +3,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { ArrowUp } from "lucide-react";
 import type { Task, LogEntry } from "@/types/task";
-import { useTaskStore } from "@/store/task-store";
 import { ChatEntry, TextGroup, ToolSummaryBlock } from "./chat-entry";
 import {
   insertTextareaNewline,
@@ -242,116 +241,6 @@ function ChildReplyInput({ childTaskId, onReplySent }: { childTaskId: string; on
   );
 }
 
-/** Reply input for the parent task — appears at bottom of activity tab */
-function ReplyInput({ taskId }: { taskId: string }) {
-  const [message, setMessage] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const appendLogEntry = useTaskStore((s) => s.appendLogEntry);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const maxHeight = 160;
-
-  useEffect(() => {
-    syncComposerTextareaHeight(textareaRef.current, { maxHeight });
-  }, [message]);
-
-  const handleSubmit = useCallback(async () => {
-    const trimmed = message.trim();
-    if (!trimmed || isSending) return;
-
-    setIsSending(true);
-    setMessage("");
-
-    // Optimistic log entry
-    appendLogEntry(taskId, {
-      id: "local-" + crypto.randomUUID(),
-      type: "user_reply",
-      content: trimmed,
-      timestamp: new Date().toISOString(),
-    });
-
-    try {
-      await fetch(`/api/tasks/${taskId}/reply`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed }),
-      });
-    } catch {
-      // Silently fail
-    } finally {
-      setIsSending(false);
-    }
-  }, [message, isSending, taskId, appendLogEntry]);
-
-  return (
-    <div style={{
-      display: "flex",
-      alignItems: "flex-end",
-      gap: 8,
-      padding: "10px 16px",
-      borderTop: "1px solid rgba(218, 193, 185, 0.2)",
-      background: "#faf9f7",
-    }}>
-      <textarea
-        ref={textareaRef}
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        onKeyDown={(e) => {
-          if (shouldInsertModifierNewline(e)) {
-            e.preventDefault();
-            insertTextareaNewline(e.currentTarget, setMessage);
-            return;
-          }
-          if (shouldSubmitOnPlainEnter(e)) {
-            e.preventDefault();
-            handleSubmit();
-          }
-        }}
-        placeholder="Reply..."
-        rows={1}
-        style={{
-          flex: 1,
-          fontSize: 13,
-          fontFamily: "var(--font-inter), Inter, sans-serif",
-          padding: "8px 12px",
-          backgroundColor: "#FFFFFF",
-          border: "1px solid rgba(218, 193, 185, 0.4)",
-          borderRadius: "0.375rem",
-          color: "#1B1C1B",
-          outline: "none",
-          lineHeight: 1.4,
-          resize: "none",
-          minHeight: 34,
-          maxHeight,
-          overflowY: "hidden",
-        }}
-        onFocus={(e) => { e.currentTarget.style.borderColor = "#93452A"; }}
-        onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.4)"; }}
-      />
-      <button
-        onClick={handleSubmit}
-        disabled={!message.trim() || isSending}
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: "0.375rem",
-          border: "none",
-          background: message.trim() && !isSending
-            ? "linear-gradient(135deg, #93452A, #B25D3F)"
-            : "#EAE8E6",
-          color: message.trim() && !isSending ? "#FFFFFF" : "#5E5E65",
-          cursor: message.trim() && !isSending ? "pointer" : "default",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          transition: "background 150ms ease",
-        }}
-      >
-        <ArrowUp size={14} />
-      </button>
-    </div>
-  );
-}
 
 interface ModalChatProps {
   taskId: string;
@@ -669,8 +558,6 @@ export function ModalChat({
         )}
       </div>
 
-      {/* Reply input — shown when task needs input */}
-      {needsInput && <ReplyInput taskId={taskId} />}
 
       {/* Jump to latest button */}
       {!isAutoScrolling && hasEntries && (

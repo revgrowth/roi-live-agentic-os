@@ -119,12 +119,6 @@ export function TaskModal() {
     fetchLogEntries(selectedTaskId);
   }, [selectedTaskId, fetchLogEntries]);
 
-  // Fetch log entries for the currently viewed task + its children
-  useEffect(() => {
-    if (!viewingTaskId) return;
-    fetchLogEntries(viewingTaskId);
-  }, [viewingTaskId, fetchLogEntries]);
-
   // Fetch log entries for all child tasks
   useEffect(() => {
     if (!isParentTask || childTasks.length === 0) return;
