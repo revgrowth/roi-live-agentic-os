@@ -15,11 +15,17 @@ function SchedulerStatusBanner({
   systemStatus: CronSystemStatus;
   selectedClientId: string | null;
 }) {
-  const isInstalled = systemStatus.installed;
-  const title = isInstalled
-    ? "Scheduler installed for the root workspace"
+  const isActive = systemStatus.inProcess || systemStatus.installed;
+
+  const title = systemStatus.inProcess
+    ? "Scheduler active"
+    : systemStatus.installed
+    ? "External scheduler installed for the root workspace"
     : "Scheduler not installed for the root workspace";
-  const description = isInstalled
+
+  const description = systemStatus.inProcess
+    ? "Jobs run automatically while the Command Centre is running. Stopping the server stops all scheduled jobs."
+    : systemStatus.installed
     ? "UI-created jobs only run automatically after the OS scheduler is installed. The root dispatcher is currently registered."
     : "Jobs can be created from the UI, but they will not run automatically until the root dispatcher is installed on this machine.";
 
@@ -27,8 +33,8 @@ function SchedulerStatusBanner({
     marginBottom: 20,
     padding: "16px 18px",
     borderRadius: "0.5rem",
-    backgroundColor: isInstalled ? "#F4FBF6" : "#FFF7ED",
-    border: `1px solid ${isInstalled ? "#D1FADF" : "#FED7AA"}`,
+    backgroundColor: isActive ? "#F4FBF6" : "#FFF7ED",
+    border: `1px solid ${isActive ? "#D1FADF" : "#FED7AA"}`,
   };
 
   const labelStyle: React.CSSProperties = {
@@ -36,7 +42,7 @@ function SchedulerStatusBanner({
     fontSize: 10,
     textTransform: "uppercase",
     letterSpacing: "0.12em",
-    color: isInstalled ? "#166534" : "#9A3412",
+    color: isActive ? "#166534" : "#9A3412",
     marginBottom: 6,
   };
 
@@ -74,12 +80,16 @@ function SchedulerStatusBanner({
       <div style={labelStyle}>{systemStatus.scheduler}</div>
       <div style={valueStyle}>{title}</div>
       <p style={bodyStyle}>{description}</p>
-      <div style={bodyStyle}>
-        Identifier: <strong>{systemStatus.identifier}</strong>
-      </div>
-      <div style={codeStyle}>
-        {isInstalled ? systemStatus.uninstallCommand : systemStatus.installCommand}
-      </div>
+      {!systemStatus.inProcess && (
+        <>
+          <div style={bodyStyle}>
+            Identifier: <strong>{systemStatus.identifier}</strong>
+          </div>
+          <div style={codeStyle}>
+            {systemStatus.installed ? systemStatus.uninstallCommand : systemStatus.installCommand}
+          </div>
+        </>
+      )}
       {selectedClientId && selectedClientId !== "root" && (
         <p style={{ ...bodyStyle, marginTop: 8 }}>
           The banner reflects the root workspace only. Client workspaces still need their own scheduler setup if you want automatic runs there.

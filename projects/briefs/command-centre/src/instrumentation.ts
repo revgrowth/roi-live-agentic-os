@@ -11,6 +11,10 @@ export async function register() {
     const { initQueueWatcher } = await import("./lib/queue-watcher");
     initQueueWatcher();
 
+    // Start the in-process cron scheduler (replaces OS-level Task Scheduler / launchd / crontab)
+    const { initCronScheduler } = await import("./lib/cron-scheduler");
+    initCronScheduler();
+
     // Write port file so hooks can discover the command centre
     const fs = await import("fs");
     const path = await import("path");

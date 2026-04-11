@@ -80,8 +80,10 @@ export interface CronJobUpdateInput {
 
 export interface CronSystemStatus {
   platform: "windows" | "macos" | "linux";
-  scheduler: "task-scheduler" | "launchd" | "crontab";
+  scheduler: "task-scheduler" | "launchd" | "crontab" | "in-process";
   installed: boolean;
+  /** True when the Command Centre server is managing cron scheduling in-process */
+  inProcess: boolean;
   identifier: string;
   installCommand: string;
   uninstallCommand: string;

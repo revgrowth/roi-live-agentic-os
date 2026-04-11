@@ -3,6 +3,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import type { CronSystemStatus } from "@/types/cron";
+import { isCronSchedulerRunning } from "./cron-scheduler";
 
 function toProjectSlug(agenticOsDir: string): string {
   return path
@@ -46,6 +47,22 @@ function isCrontabInstalled(dispatcherPath: string): boolean {
 }
 
 export function getCronSystemStatus(agenticOsDir: string): CronSystemStatus {
+  const inProcess = isCronSchedulerRunning();
+
+  // When the Command Centre is running, the in-process scheduler manages everything
+  if (inProcess) {
+    return {
+      platform: process.platform === "win32" ? "windows" : process.platform === "darwin" ? "macos" : "linux",
+      scheduler: "in-process",
+      installed: true,
+      inProcess: true,
+      identifier: "Command Centre (in-process)",
+      installCommand: "npm run dev",
+      uninstallCommand: "Stop the Command Centre server",
+    };
+  }
+
+  // Fallback: report OS-level scheduler status (server not running in-process yet)
   const projectSlug = toProjectSlug(agenticOsDir);
 
   if (process.platform === "win32") {
@@ -54,6 +71,7 @@ export function getCronSystemStatus(agenticOsDir: string): CronSystemStatus {
       platform: "windows",
       scheduler: "task-scheduler",
       installed: isWindowsTaskInstalled(identifier),
+      inProcess: false,
       identifier,
       installCommand: "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\\install-crons.ps1",
       uninstallCommand: "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\\uninstall-crons.ps1",
@@ -71,6 +89,7 @@ export function getCronSystemStatus(agenticOsDir: string): CronSystemStatus {
       platform: "macos",
       scheduler: "launchd",
       installed: fs.existsSync(identifier),
+      inProcess: false,
       identifier,
       installCommand: "bash scripts/install-crons.sh",
       uninstallCommand: "bash scripts/uninstall-crons.sh",
@@ -82,8 +101,10 @@ export function getCronSystemStatus(agenticOsDir: string): CronSystemStatus {
     platform: "linux",
     scheduler: "crontab",
     installed: isCrontabInstalled(dispatcherPath),
+    inProcess: false,
     identifier: `* * * * * ${dispatcherPath}`,
     installCommand: "bash scripts/install-crons.sh",
     uninstallCommand: "bash scripts/uninstall-crons.sh",
   };
 }
+
