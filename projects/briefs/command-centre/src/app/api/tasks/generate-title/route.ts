@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { spawn } from "child_process";
+import { killChildProcessTree, spawnUiProcess } from "@/lib/subprocess";
 
 function quickExtract(description: string): string {
   // Take the first sentence or first 50 chars, whichever is shorter
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 function generateTitle(description: string): Promise<string | null> {
   return new Promise((resolve) => {
     const timeout = setTimeout(() => {
-      try { proc.kill("SIGTERM"); } catch { /* gone */ }
+      try { killChildProcessTree(proc); } catch { /* gone */ }
       resolve(null);
     }, 8000);
 
@@ -47,7 +47,7 @@ function generateTitle(description: string): Promise<string | null> {
 
     const prompt = `Summarise this task as a short label (max 6 words, lowercase). Write it like a human would say it casually — e.g. "skool post about pricing", "linkedin carousel for launch", "fix header alignment bug". Do NOT prefix with "Task:", "Write:", or any label. Return ONLY the summary, nothing else.\n\n${description.slice(0, 500)}`;
 
-    const proc = spawn("claude", ["-p", prompt, "--output-format", "text"], {
+    const proc = spawnUiProcess("claude", ["-p", prompt, "--output-format", "text"], {
       stdio: ["pipe", "pipe", "pipe"],
       env: cleanEnv,
     });

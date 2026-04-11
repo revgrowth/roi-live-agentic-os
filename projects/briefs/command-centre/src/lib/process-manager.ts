@@ -1,10 +1,11 @@
-import { spawn, type ChildProcess } from "child_process";
+import type { ChildProcess } from "child_process";
 import { createInterface } from "readline";
 import { getDb } from "./db";
 import { getConfig, getClientAgenticOsDir } from "./config";
 import { emitTaskEvent } from "./event-bus";
 import { ClaudeOutputParser } from "./claude-parser";
 import { fileWatcher } from "./file-watcher";
+import { killChildProcessTree, spawnManagedTaskProcess } from "./subprocess";
 import type { Task, LogEntry } from "@/types/task";
 
 /**
@@ -39,18 +40,11 @@ class ProcessManager {
 
   /**
    * Kill a process and its entire process tree.
-   * Processes are spawned with detached: true, so they get their own process group.
-   * Sending a signal to -pid kills the entire group (parent + all descendants).
+   * On Unix, detached tasks get their own process group.
+   * On Windows, use taskkill so background Claude runs stay hidden.
    */
   private killProcessTree(proc: ChildProcess, signal: NodeJS.Signals = "SIGTERM"): void {
-    if (!proc.pid) return;
-    try {
-      // Kill the entire process group (negative pid)
-      process.kill(-proc.pid, signal);
-    } catch {
-      // Process group already gone — try killing just the process
-      try { proc.kill(signal); } catch { /* already gone */ }
-    }
+    killChildProcessTree(proc, signal);
   }
 
   /** Check if this task has an active in-memory session (managed by processManager) */
@@ -943,14 +937,13 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
 
     let proc: ChildProcess;
     try {
-      proc = spawn("claude", args, {
+      proc = spawnManagedTaskProcess("claude", args, {
         cwd,
         stdio: ["pipe", "pipe", "pipe"],
         env: cleanEnv,
-        detached: true,
       });
-      // Unref so the process group doesn't keep the parent alive on exit
-      // (cleanup() will kill them explicitly)
+      // Unref so the child doesn't keep the parent alive on exit.
+      // cleanup() still kills active processes explicitly.
       proc.unref();
       console.log(`[process-manager] Spawn succeeded, pid=${proc.pid}`);
 

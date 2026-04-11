@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { spawn } from "child_process";
 import { getDb } from "@/lib/db";
+import { killChildProcessTree, spawnUiProcess } from "@/lib/subprocess";
 
 interface TaskRow {
   id: string;
@@ -124,7 +124,7 @@ function runClaude(prompt: string): Promise<string | null> {
   return new Promise((resolve) => {
     const timeout = setTimeout(() => {
       try {
-        proc.kill("SIGTERM");
+        killChildProcessTree(proc);
       } catch {
         /* gone */
       }
@@ -134,7 +134,7 @@ function runClaude(prompt: string): Promise<string | null> {
     const cleanEnv = { ...process.env };
     delete cleanEnv.CLAUDECODE;
 
-    const proc = spawn("claude", ["-p", prompt, "--output-format", "text", "-m", "haiku"], {
+    const proc = spawnUiProcess("claude", ["-p", prompt, "--output-format", "text", "-m", "haiku"], {
       stdio: ["pipe", "pipe", "pipe"],
       env: cleanEnv,
     });
