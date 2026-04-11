@@ -4,4 +4,4 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPT_PATH="$REPO_ROOT/projects/briefs/command-centre/scripts/cron-daemon.cjs"
 
-node "$SCRIPT_PATH" run-job "$@"
+node "$SCRIPT_PATH" status "$@"

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FileText, Image, FileType, ExternalLink } from "lucide-react";
+import { useClientStore } from "@/store/client-store";
 import type { CronRun, CronRunOutput } from "@/types/cron";
 
 interface RunHistoryProps {
@@ -52,6 +53,19 @@ function truncateFilename(name: string, maxLen = 28): string {
   return name.slice(0, maxLen - 3) + "...";
 }
 
+function getRunResultBadge(result: CronRun["result"]) {
+  switch (result) {
+    case "success":
+      return { label: "Success", backgroundColor: "#ECFDF5", color: "#10B981" };
+    case "failure":
+      return { label: "Failed", backgroundColor: "#FEF2F2", color: "#EF4444" };
+    case "timeout":
+      return { label: "Timeout", backgroundColor: "#FFF7ED", color: "#EA580C" };
+    default:
+      return { label: "Running", backgroundColor: "#EFF6FF", color: "#3B82F6" };
+  }
+}
+
 function OutputLink({ output }: { output: CronRunOutput }) {
   const Icon = getFileIcon(output.extension);
 
@@ -98,6 +112,7 @@ export function RunHistory({ runs, jobSlug, prompt }: RunHistoryProps) {
   const [log, setLog] = useState<string | null>(null);
   const [loadingLog, setLoadingLog] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
+  const selectedClientId = useClientStore((s) => s.selectedClientId);
 
   const toggleLog = async () => {
     if (log !== null) {
@@ -106,7 +121,8 @@ export function RunHistory({ runs, jobSlug, prompt }: RunHistoryProps) {
     }
     setLoadingLog(true);
     try {
-      const res = await fetch(`/api/cron/${jobSlug}/logs`);
+      const query = selectedClientId ? `?clientId=${encodeURIComponent(selectedClientId)}` : "";
+      const res = await fetch(`/api/cron/${jobSlug}/logs${query}`);
       if (res.ok) {
         const data = await res.json();
         setLog(data.log || "(empty log)");
@@ -169,111 +185,100 @@ export function RunHistory({ runs, jobSlug, prompt }: RunHistoryProps) {
       </div>
 
       {/* Rows */}
-      {runs.map((run) => (
-        <div
-          key={run.id}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 80px 100px 100px 80px 1fr",
-            gap: 8,
-            padding: "6px 8px",
-            alignItems: "center",
-            fontFamily: "var(--font-inter), Inter, sans-serif",
-            fontSize: 13,
-          }}
-        >
-          <span style={{ color: "#1B1C1B" }}>
-            {formatRelativeTime(run.startedAt)}
-          </span>
-          <span>
-            <span
-              style={{
-                display: "inline-block",
-                padding: "2px 8px",
-                borderRadius: 4,
-                fontSize: 11,
-                fontWeight: 500,
-                backgroundColor:
-                  run.trigger === "manual" ? "#FFFBEB" : "#F3F4F6",
-                color:
-                  run.trigger === "manual" ? "#D97706" : "#6B7280",
-              }}
-            >
-              {run.trigger === "manual" ? "Manual" : "Scheduled"}
-            </span>
-          </span>
-          <span>
-            <span
-              style={{
-                display: "inline-block",
-                padding: "2px 8px",
-                borderRadius: 4,
-                fontSize: 11,
-                fontWeight: 500,
-                backgroundColor:
-                  run.result === "success"
-                    ? "#ECFDF5"
-                    : run.result === "failure"
-                      ? "#FEF2F2"
-                      : "#EFF6FF",
-                color:
-                  run.result === "success"
-                    ? "#10B981"
-                    : run.result === "failure"
-                      ? "#EF4444"
-                      : "#3B82F6",
-              }}
-            >
-              {run.result === "success"
-                ? "Success"
-                : run.result === "failure"
-                  ? "Failed"
-                  : "Running"}
-            </span>
-          </span>
-          <span
+      {runs.map((run) => {
+        const badge = getRunResultBadge(run.result);
+        return (
+          <div
+            key={run.id}
             style={{
-              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              color: "#5E5E65",
+              display: "grid",
+              gridTemplateColumns: "1fr 80px 100px 100px 80px 1fr",
+              gap: 8,
+              padding: "6px 8px",
+              alignItems: "center",
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              fontSize: 13,
             }}
           >
-            {formatDuration(run.durationSec)}
-          </span>
-          <span
-            style={{
-              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              color: "#5E5E65",
-            }}
-          >
-            {run.costUsd !== null && run.costUsd > 0
-              ? `$${run.costUsd.toFixed(2)}`
-              : "--"}
-          </span>
-          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-            {run.outputs.length > 0 ? (
-              <>
-                {run.outputs.slice(0, 2).map((output, i) => (
-                  <OutputLink key={i} output={output} />
-                ))}
-                {run.outputs.length > 2 && (
-                  <span
-                    style={{
-                      fontSize: 11,
-                      color: "#5E5E65",
-                      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                      lineHeight: "20px",
-                    }}
-                  >
-                    +{run.outputs.length - 2} more
-                  </span>
-                )}
-              </>
-            ) : (
-              <span style={{ fontSize: 11, color: "#9E9EA0" }}>--</span>
-            )}
+            <span style={{ color: "#1B1C1B" }}>
+              {formatRelativeTime(run.startedAt)}
+            </span>
+            <span>
+              <span
+                style={{
+                  display: "inline-block",
+                  padding: "2px 8px",
+                  borderRadius: 4,
+                  fontSize: 11,
+                  fontWeight: 500,
+                  backgroundColor:
+                    run.trigger === "manual" ? "#FFFBEB" : "#F3F4F6",
+                  color:
+                    run.trigger === "manual" ? "#D97706" : "#6B7280",
+                }}
+              >
+                {run.trigger === "manual" ? "Manual" : "Scheduled"}
+              </span>
+            </span>
+            <span>
+              <span
+                style={{
+                  display: "inline-block",
+                  padding: "2px 8px",
+                  borderRadius: 4,
+                  fontSize: 11,
+                  fontWeight: 500,
+                  backgroundColor: badge.backgroundColor,
+                  color: badge.color,
+                }}
+              >
+                {badge.label}
+              </span>
+            </span>
+            <span
+              style={{
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                color: "#5E5E65",
+              }}
+            >
+              {formatDuration(run.durationSec)}
+            </span>
+            <span
+              style={{
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                color: "#5E5E65",
+              }}
+            >
+              {run.costUsd !== null && run.costUsd > 0
+                ? `$${run.costUsd.toFixed(2)}`
+                : "--"}
+            </span>
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+              {run.outputs.length > 0 ? (
+                <>
+                  {run.outputs.slice(0, 2).map((output, i) => (
+                    <OutputLink key={i} output={output} />
+                  ))}
+                  {run.outputs.length > 2 && (
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: "#5E5E65",
+                        fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                        lineHeight: "20px",
+                      }}
+                    >
+                      +{run.outputs.length - 2} more
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span style={{ fontSize: 11, color: "#9E9EA0" }}>--</span>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       {/* Action buttons row */}
       <div style={{ marginTop: 8, paddingLeft: 8, display: "flex", gap: 16 }}>

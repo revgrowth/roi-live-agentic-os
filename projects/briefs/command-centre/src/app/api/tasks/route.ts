@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
-import type { Task, TaskCreateInput } from "@/types/task";
+import type { Task, TaskCreateInput, TaskStatus } from "@/types/task";
 
 export async function GET(request: NextRequest) {
   try {
@@ -76,10 +76,13 @@ export async function POST(request: NextRequest) {
     // system queues them when their turn comes. Top-level tasks start as queued
     // so the queue watcher picks them up immediately.
     // Allow explicit status override (e.g., "review" for scoping flow).
-    const validStatuses = ["backlog", "queued", "review"];
-    const initialStatus = bodyStatus && validStatuses.includes(bodyStatus)
-      ? bodyStatus
-      : bodyParentId ? "backlog" : "queued";
+    const validStatuses: TaskStatus[] = ["backlog", "queued", "review"];
+    const initialStatus: TaskStatus =
+      bodyStatus && validStatuses.includes(bodyStatus as TaskStatus)
+        ? (bodyStatus as TaskStatus)
+        : bodyParentId
+          ? "backlog"
+          : "queued";
     const task: Task = {
       id: crypto.randomUUID(),
       title: title.trim(),

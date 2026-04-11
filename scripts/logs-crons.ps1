@@ -7,4 +7,4 @@ param(
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $ScriptPath = Join-Path $RepoRoot "projects\briefs\command-centre\scripts\cron-daemon.cjs"
 
-node $ScriptPath run-job @Arguments
+node $ScriptPath logs @Arguments

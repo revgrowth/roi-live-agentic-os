@@ -286,7 +286,7 @@ export async function GET(request: NextRequest) {
         try {
           const raw = fs.readFileSync(path.join(cronStatusDir, file), "utf-8");
           const status = JSON.parse(raw);
-          const time = status.lastRun || status.completedAt || "";
+          const time = status.last_run || status.lastRun || status.completedAt || "";
           if (time > latestTime) {
             latestTime = time;
             cronLastRun = {

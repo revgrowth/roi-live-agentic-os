@@ -14,8 +14,7 @@ set -euo pipefail
 #   4. Installs all skills (selection happens during first Claude session)
 #   5. Writes installed.json
 #   6. Installs GSD project framework (get-shit-done-cc)
-#   7. Installs cron dispatcher
-#   8. Prints next steps
+#   7. Prints next steps
 #
 # Idempotent — safe to run multiple times.
 # =============================================================================
@@ -49,6 +48,7 @@ fail()    { printf "${RED}  ✗ %s${NC}\n" "$1"; }
 CATALOG="$REPO_ROOT/.claude/skills/_catalog/catalog.json"
 INSTALLED_JSON="$REPO_ROOT/.claude/skills/_catalog/installed.json"
 SKILLS_DIR="$REPO_ROOT/.claude/skills"
+CRON_DRY_RUN="${AGENTIC_OS_CRON_DRY_RUN:-0}"
 
 # =============================================================================
 # 1. Welcome banner
@@ -260,7 +260,9 @@ echo ""
 info "Installing GSD project framework..."
 echo ""
 
-if command -v node &>/dev/null; then
+if [[ "$CRON_DRY_RUN" == "1" ]]; then
+    warn "AGENTIC_OS_CRON_DRY_RUN=1 set — skipping GSD install during installer dry run."
+elif command -v node &>/dev/null; then
     GSD_GLOBAL="$HOME/.claude/commands/gsd"
     GSD_LOCAL="$REPO_ROOT/.claude/commands/gsd"
     if [[ -d "$GSD_GLOBAL" ]] && [[ $(ls -1 "$GSD_GLOBAL"/*.md 2>/dev/null | wc -l) -gt 10 ]]; then
@@ -284,13 +286,13 @@ else
 fi
 echo ""
 
-# ---------- Install cron dispatcher ----------
-echo ""
-echo "  Installing cron dispatcher..."
-bash "$SCRIPT_DIR/install-crons.sh"
+if [[ "$CRON_DRY_RUN" == "1" ]]; then
+    warn "Installer dry run complete — skipping alias installation."
+    exit 0
+fi
 
 # =============================================================================
-# 8. Install `centre` shell alias
+# 7. Install `centre` shell alias
 # =============================================================================
 echo ""
 info "Installing 'centre' launcher alias..."

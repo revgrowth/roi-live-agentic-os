@@ -74,7 +74,7 @@
     },
     "ops-cron": {
       "category": "operations",
-      "description": "Schedule recurring Claude Code tasks via crontab",
+      "description": "Schedule recurring Claude Code tasks with the managed cron runtime",
       "requires_services": [],
       "dependencies": [],
       "mcp_servers": []

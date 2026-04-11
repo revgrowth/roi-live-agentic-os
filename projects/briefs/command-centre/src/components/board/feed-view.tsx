@@ -2221,11 +2221,19 @@ function ScheduledSection({ jobs, onNavigate, dimmed }: { jobs: CronJob[]; onNav
                 fontFamily: "'DM Mono', monospace",
                 padding: "1px 4px",
                 borderRadius: 3,
-                background: lastResult === "success" ? "rgba(122,184,122,0.15)" : "rgba(239,68,68,0.1)",
-                color: lastResult === "success" ? "#5a9a5a" : "#ef4444",
+                background: lastResult === "success"
+                  ? "rgba(122,184,122,0.15)"
+                  : lastResult === "timeout"
+                    ? "rgba(234,88,12,0.12)"
+                    : "rgba(239,68,68,0.1)",
+                color: lastResult === "success"
+                  ? "#5a9a5a"
+                  : lastResult === "timeout"
+                    ? "#c2410c"
+                    : "#ef4444",
                 flexShrink: 0,
               }}>
-                {lastResult === "success" ? "OK" : "FAIL"}
+                {lastResult === "success" ? "OK" : lastResult === "timeout" ? "TIMEOUT" : "FAIL"}
               </span>
             )}
           </div>

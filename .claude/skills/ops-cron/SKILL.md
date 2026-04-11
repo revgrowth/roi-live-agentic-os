@@ -1,26 +1,35 @@
 ---
 name: ops-cron
 description: >
-  Schedule recurring tasks that run automatically via OS crontab (Mac/Linux)
-  or Task Scheduler (Windows). Job files in cron/jobs/ define what runs, when,
-  and with which model. Headless claude -p executes each job. Triggers on:
-  "schedule a job", "cron job", "run this every morning", "automate daily",
-  "recurring task", "scheduled job", "check scheduled jobs", "list jobs",
-  "install cron", "run job manually".
-  Does NOT trigger for one-off tasks or in-session reminders.
+  Schedule recurring tasks with Agentic OS's managed cron runtime. Jobs live in
+  cron/jobs/ and are executed by the same scheduling core in two hosts: the
+  Command Centre server while it is running, or a manual CLI daemon started
+  with start-crons. Triggers on: "schedule a job", "cron job", "run this every
+  morning", "automate daily", "recurring task", "scheduled job", "check
+  scheduled jobs", "list jobs", "run job manually", "start crons", "stop
+  crons", "cron status", "cron logs". Does NOT trigger for one-off tasks or
+  in-session reminders.
 ---
 
 # Scheduled Jobs
 
-Drop a markdown file into `cron/jobs/`, install the dispatcher once, and your prompts run automatically at the times you set. Each job fires headless `claude -p` — no open session required.
+Use this skill whenever the user wants recurring automation. The runtime is managed by Agentic OS itself, not by Task Scheduler, launchd, or crontab.
 
 ## How It Works
 
-A lightweight dispatcher script (`scripts/run-crons.sh`) runs every minute via your OS crontab. It scans `cron/jobs/*.md`, checks each file's `time` and `days` against the current time, and fires any matching jobs via `claude -p`. Each execution is stateless and self-contained.
+- Job files live in `cron/jobs/`
+- The same scheduling core handles job discovery, schedule matching, catch-up, dedupe, queueing, and execution
+- The scheduler can run in-process inside the Command Centre or in a headless CLI daemon
+- Root jobs and `clients/*` jobs share one runtime and one leader lock per workspace
+- `Run now` uses the same enqueue and execution path as scheduled runs
 
 ## Outcome
 
-Job file in `cron/jobs/`. Automatic execution in the background. Per-job logs in `cron/logs/`.
+- Job file in `cron/jobs/`
+- Automatic execution while the chosen host is alive
+- Logs in `cron/logs/`
+- Per-job status in `cron/status/`
+- Runtime PID, lock, heartbeat, and daemon logs in `.command-centre/`
 
 ## Context Needs
 
@@ -28,7 +37,7 @@ Job file in `cron/jobs/`. Automatic execution in the background. Per-job logs in
 |------|-----------|--------------------------|
 | `context/learnings.md` | `## ops-cron` section | Known issues with specific jobs |
 
-No brand context needed — this is infrastructure.
+No brand context needed.
 
 ---
 
@@ -36,103 +45,61 @@ No brand context needed — this is infrastructure.
 
 | Action | User says | What to do |
 |--------|----------|------------|
-| **Create** | "schedule a job", "run X every morning" | Build a job file (Step 2–4), offer to install dispatcher (Step 5) |
-| **List** | "list jobs", "what's scheduled" | Read all files in `cron/jobs/` and status files from `cron/status/`, show a table with name, schedule, active, last run time, result, duration, and run/fail counts |
-| **Install** | "install cron", "start scheduled jobs" | Run `bash scripts/install-crons.sh` |
-| **Uninstall** | "uninstall cron", "stop all jobs" | Run `bash scripts/uninstall-crons.sh` |
+| **Create** | "schedule a job", "run X every morning" | Build the job file, then explain the runtime options |
+| **List** | "list jobs", "what's scheduled" | Read `cron/jobs/` and `cron/status/`, then show name, workspace, schedule, active flag, last run, result, duration, and run/fail counts |
+| **Start runtime** | "start crons", "start scheduled jobs" | Run `bash scripts/start-crons.sh` or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\start-crons.ps1` |
+| **Stop runtime** | "stop crons", "stop scheduled jobs" | Run `bash scripts/stop-crons.sh` or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\stop-crons.ps1` |
+| **Runtime status** | "cron status", "is cron running" | Run `bash scripts/status-crons.sh` or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\status-crons.ps1` |
+| **Runtime logs** | "cron logs", "show daemon logs" | Run `bash scripts/logs-crons.sh` or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\logs-crons.ps1` |
 | **Pause job** | "stop the X job", "disable X" | Set `active: "false"` in the job file |
 | **Resume job** | "re-enable X", "turn X back on" | Set `active: "true"` in the job file |
 | **Remove** | "remove the morning job" | Delete the job file |
-| **Run now** | "run X now", "trigger X manually" | Run `bash scripts/run-job.sh {name}` |
-| **Logs** | "check job logs", "did the job run" | Read from `cron/logs/{job-name}.log` |
-| **Status** | "is the dispatcher running" | Check `crontab -l` (Mac) or scheduled tasks (Windows) |
+| **Run now** | "run X now", "trigger X manually" | Run `bash scripts/run-job.sh {name}` or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run-job.ps1 {name}` |
+| **Compatibility wrapper** | "install cron", "uninstall cron" | Explain that `install-crons` and `uninstall-crons` are deprecated wrappers around `start-crons` and `stop-crons` |
 
-## Step 2: Understand What the User Wants
+## Step 2: Understand the Job
 
 Ask up to 4 focused questions:
 
-1. **What should it do?** — Get the task in plain language. Probe for specifics:
-   - "Which topics or keywords should it focus on?"
-   - "Where should the output go?"
-   - "What format do you want the output in?"
-
-2. **Which skills should it use?** — Check `.claude/skills/` for installed skills that match the task. Ask the user:
-   - "I can see you have `str-trending-research` installed — should this job use that methodology?"
-   - "You also have `mkt-content-repurposing` — want it to repurpose findings into posts?"
-   - List relevant installed skills and let them pick which to chain together.
-
-3. **When and how often?** — Map to the time format:
-   - "Every morning at 9" → `time: "09:00"`, `days: "daily"`
-   - "Every 2 hours on weekdays" → `time: "every_2h"`, `days: "weekdays"`
-   - "Three times a day" → ask which times, then `time: "09:00,13:00,17:00"`
-   - "Mondays and Wednesdays" → `days: "mon,wed"`
-
-5. **Notifications and timeout?** — Ask if they want to be notified when the job finishes:
-   - `on_finish` (default) — notifies on success and failure
-   - `on_failure` — only notifies on errors or timeouts
-   - `silent` — no notifications
-   - If the job is long-running, suggest adjusting `timeout` (default 30m)
-
-4. **Which model?** — Explain the trade-off:
-   - `haiku` — fast and cheap ($0.01–0.05/run), good for simple lookups
-   - `sonnet` — balanced (default, $0.05–0.25/run), good for research and writing
-   - `opus` — most capable ($0.25–2.00/run), good for complex multi-step tasks
+1. What should it do?
+   - Clarify the task, outputs, and success criteria.
+2. Which skills should it use?
+   - Check `.claude/skills/` for matching methodologies and ask the user which ones to chain.
+3. When and how often should it run?
+   - Map to `time` and `days`.
+4. Which model, notification mode, and timeout?
+   - `haiku` for cheap/simple work, `sonnet` for the default, `opus` for complex jobs.
 
 ## Step 3: Build the Prompt
 
 Write a self-contained prompt body that:
 
-- Starts with "You are running as a scheduled job for Agentic OS."
-- Tells Claude to read CLAUDE.md for system context
-- **References specific skill files** if using skills: "Read .claude/skills/{skill-name}/SKILL.md for the methodology"
-- **References specific brand context files** if the task needs voice/positioning/ICP
-- Gives clear, numbered steps for multi-step tasks
-- Specifies exact output path with date placeholder
-- Includes error handling ("If X fails, do Y")
+- Starts with `You are running as a scheduled job for Agentic OS.`
+- Tells Claude to read `CLAUDE.md` for system context
+- References exact skill files when methodology matters
+- References exact brand context files when tone, positioning, or ICP matter
+- Uses numbered steps for multi-step work
+- Specifies the output path explicitly
+- Includes error handling
 
 ## Step 4: Create the File and Confirm
 
-1. Create the job file at `cron/jobs/{job-name}.md`
-2. **Show the user what was created.** Display:
-   - The full file path so they can click to review it
-   - A summary table of the schedule
-   - Estimated cost per run and per month
-3. Ask: "Want to review or adjust anything before we activate it?"
+1. Create `cron/jobs/{job-name}.md`
+2. Show:
+   - the full file path
+   - schedule summary
+   - estimated cost per run and per month
+3. Ask if they want to adjust anything before activation
 
-Example confirmation:
+## Step 5: Explain the Host Choice
 
-```
-Created: cron/jobs/daily-trending-research.md
+Give the user the right runtime model:
 
-Schedule:
-  Time:    every 2 hours
-  Days:    weekdays
-  Model:   sonnet
-  Active:  true
-  Notify:  on_finish
-  Timeout: 30m
-  Retry:   0
+- **UI user:** keep the Command Centre server running; the scheduler dies with it
+- **CLI user:** start the daemon manually with `start-crons`; stop it with `stop-crons`
+- **Both together:** only one host becomes leader; the other stays passive
 
-Estimated cost: ~$0.15/run × 12 runs/day × 22 weekdays = ~$40/month
-
-The job uses the str-trending-research methodology and saves output to
-projects/str-trending-research/. Review the file to check the prompt:
-/path/to/cron/jobs/daily-trending-research.md
-```
-
-## Step 5: Install the Dispatcher
-
-If the dispatcher isn't already installed, offer to install it:
-
-**Mac/Linux:**
-```bash
-bash scripts/install-crons.sh
-```
-
-**Windows (PowerShell as admin):**
-```powershell
-powershell scripts/install-crons.ps1
-```
+Never suggest Task Scheduler, launchd, or crontab.
 
 ---
 
@@ -146,11 +113,11 @@ powershell scripts/install-crons.ps1
 | "every 10 minutes" | `"every_10m"` | 144x/day |
 | "every 30 minutes" | `"every_30m"` | 48x/day |
 | "every hour" | `"every_1h"` | 24x/day on the hour |
-| "every 2 hours" | `"every_2h"` | 12x/day (00:00, 02:00, ...) |
-| "every 4 hours" | `"every_4h"` | 6x/day (00:00, 04:00, ...) |
+| "every 2 hours" | `"every_2h"` | 12x/day |
+| "every 4 hours" | `"every_4h"` | 6x/day |
 | "three times a day" | `"09:00,13:00,17:00"` | Ask which times |
 
-Full reference with all options: see `cron/templates/schedule-reference.md`
+Full reference: `cron/templates/schedule-reference.md`
 
 ---
 
@@ -162,39 +129,32 @@ Run any job immediately, ignoring its schedule:
 bash scripts/run-job.sh morning-kickoff
 ```
 
-This is the same entrypoint a future Telegram bot would use.
+Windows:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run-job.ps1 morning-kickoff
+```
+
+Use `--client {client-id}` when the slug exists in multiple workspaces.
 
 ---
 
-## Status & Notifications
+## Runtime Notes
 
-**Per-job status files** are written to `cron/status/{job-name}.json` after each execution. Each file tracks: result (`success`/`failure`/`timeout`), duration, last run timestamp, total run count, and fail count. These are read by the **List** action to show a status table.
-
-**OS notifications** are sent when a job completes, controlled by the `notify` field:
-- `on_finish` (default) — notifies on both success and failure
-- `on_failure` — only notifies on errors or timeouts
-- `silent` — never notifies
-
-**Smart silence (`[SILENT]`):** Jobs can suppress their notification on a per-run basis. If a job's prompt instructs Claude to end its response with `[SILENT]` when there's nothing to report, the dispatcher skips the notification but still logs the output normally. Use this for monitoring-style jobs (health checks, update scanners) where "all clear" doesn't need a ping. Action-oriented jobs (digests, research) should always notify.
-
-When building a job prompt that uses this, add a line like: *"If there are no issues to report, end your response with `[SILENT]`."*
-
-**No duplicate runs:** If a job is still running when the next scheduled trigger fires, the dispatcher skips the duplicate. This prevents slow jobs from piling up when the runtime exceeds the schedule interval. If a previous run crashed without cleaning up, the dispatcher detects the stale state and starts the job normally.
-
-**Catch-up behavior:** If the laptop was closed (sleep/lid shut) during a scheduled fixed-time job, the dispatcher detects the missed window on wake and runs the job automatically. Interval-based jobs (`every_Nh`) do not catch up — they simply resume on the next matching interval.
-
-**Timeout** prevents runaway jobs. Default is 30 minutes. If a job exceeds its timeout, the process is killed and the result is recorded as `timeout`. If `retry` > 0, the job is re-attempted up to N times, each with the full timeout.
-
----
+- Fixed-time schedules support catch-up after downtime; interval schedules do not
+- Deduplication is per job, per client, per minute
+- Retries reuse the same execution helper as the first attempt
+- `cron/status/{job}.json` tracks result, duration, last run, run count, and fail count
+- `.command-centre/cron-runtime-lock.json` tracks the current leader
+- `.command-centre/cron-daemon.pid` and `.command-centre/cron-daemon.log` support `status`, `stop`, and `logs`
 
 ## Heartbeat Integration
 
-At session start (CLAUDE.md heartbeat step 8):
+At session start:
 
-1. Check if dispatcher is installed (`crontab -l | grep run-crons` on Mac)
-2. If installed: read `cron/status/` files and report: "Cron dispatcher is active — N enabled jobs. Last run: {job} at {time} ({result})."
-3. If any jobs failed on last run, flag them: "{job} failed on last run — check logs?"
-4. If not installed but jobs exist: suggest `bash scripts/install-crons.sh`
+1. Check `.command-centre/cron-runtime-lock.json` and `.command-centre/cron-daemon.pid`
+2. If a runtime is active, read `cron/status/` and report the latest relevant run
+3. If jobs exist and the runtime is stopped, mention the `start-crons` command only when scheduling matters
 
 ---
 
@@ -206,4 +166,4 @@ At session start (CLAUDE.md heartbeat step 8):
 
 ## Self-Update
 
-If the user reports a job failing or a scheduling issue — update the `## Rules` section immediately with the fix and today's date. Also log to `context/learnings.md` under `## ops-cron`.
+If the user reports a job failure or scheduling issue, update `## Rules` with the fix and today's date. Also log the feedback to `context/learnings.md` under `## ops-cron`.

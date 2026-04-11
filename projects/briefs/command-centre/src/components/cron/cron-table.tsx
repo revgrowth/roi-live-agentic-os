@@ -6,6 +6,103 @@ import { useCronStore } from "@/store/cron-store";
 import { useClientStore } from "@/store/client-store";
 import { CronRow } from "./cron-row";
 import { CreateJobPanel } from "./create-job-panel";
+import type { CronSystemStatus } from "@/types/cron";
+
+function SchedulerStatusBanner({
+  systemStatus,
+  selectedClientId,
+}: {
+  systemStatus: CronSystemStatus;
+  selectedClientId: string | null;
+}) {
+  const isActive = systemStatus.runtime !== "stopped";
+
+  const title =
+    systemStatus.runtime === "in-process"
+      ? systemStatus.leader
+        ? "Command Centre is scheduling jobs"
+        : "Command Centre runtime is passive"
+      : systemStatus.runtime === "daemon"
+        ? "CLI daemon is scheduling jobs"
+        : "Managed cron runtime is stopped";
+
+  const description =
+    systemStatus.runtime === "in-process"
+      ? systemStatus.leader
+        ? "Jobs run automatically while this Command Centre process is alive. Stopping the server stops scheduling."
+        : "Another runtime currently owns scheduling. This UI stays passive and still lets you inspect jobs and queue manual runs."
+      : systemStatus.runtime === "daemon"
+        ? "A headless CLI daemon is active. The UI stays passive while the daemon owns scheduling and lock heartbeat."
+        : "No managed runtime is active. Automatic scheduling is off until you start the CLI daemon or keep the Command Centre server running.";
+
+  const cardStyle: React.CSSProperties = {
+    marginBottom: 20,
+    padding: "16px 18px",
+    borderRadius: "0.5rem",
+    backgroundColor: isActive ? "#F4FBF6" : "#FFF7ED",
+    border: `1px solid ${isActive ? "#D1FADF" : "#FED7AA"}`,
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+    fontSize: 10,
+    textTransform: "uppercase",
+    letterSpacing: "0.12em",
+    color: isActive ? "#166534" : "#9A3412",
+    marginBottom: 6,
+  };
+
+  const valueStyle: React.CSSProperties = {
+    fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+    fontWeight: 700,
+    fontSize: 16,
+    color: "#1B1C1B",
+    marginBottom: 8,
+  };
+
+  const bodyStyle: React.CSSProperties = {
+    fontFamily: "var(--font-inter), Inter, sans-serif",
+    fontSize: 13,
+    lineHeight: 1.5,
+    color: "#5E5E65",
+    margin: 0,
+  };
+
+  const codeStyle: React.CSSProperties = {
+    display: "inline-block",
+    marginTop: 8,
+    padding: "6px 8px",
+    borderRadius: "0.375rem",
+    backgroundColor: "#FFFFFF",
+    border: "1px solid rgba(0, 0, 0, 0.06)",
+    color: "#390C00",
+    fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace",
+    fontSize: 12,
+    wordBreak: "break-all",
+  };
+
+  return (
+    <div style={cardStyle}>
+      <div style={labelStyle}>{systemStatus.runtime}</div>
+      <div style={valueStyle}>{title}</div>
+      <p style={bodyStyle}>{description}</p>
+      <div style={bodyStyle}>
+        Identifier: <strong>{systemStatus.identifier || "none"}</strong>
+      </div>
+      <div style={{ ...bodyStyle, marginTop: 6 }}>
+        Workspaces covered: <strong>{systemStatus.workspaceCount}</strong>
+      </div>
+      <div style={codeStyle}>
+        {systemStatus.runtime === "stopped" ? systemStatus.startCommand : systemStatus.stopCommand}
+      </div>
+      {selectedClientId && (
+        <p style={{ ...bodyStyle, marginTop: 8 }}>
+          Job files from the selected client still share the same managed runtime and leader lock as the root workspace.
+        </p>
+      )}
+    </div>
+  );
+}
 
 export function CronJobsView() {
   const jobs = useCronStore((s) => s.jobs);
@@ -17,6 +114,8 @@ export function CronJobsView() {
 
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [systemStatus, setSystemStatus] = useState<CronSystemStatus | null>(null);
+  const [systemStatusError, setSystemStatusError] = useState<string | null>(null);
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDragIndex(index);
@@ -47,10 +146,36 @@ export function CronJobsView() {
     fetchJobs();
   }, [fetchJobs, selectedClientId]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/cron/system-status")
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch scheduler status");
+        }
+
+        const data = (await response.json()) as CronSystemStatus;
+        if (!cancelled) {
+          setSystemStatus(data);
+          setSystemStatusError(null);
+        }
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setSystemStatusError(
+            error instanceof Error ? error.message : "Failed to fetch scheduler status"
+          );
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const activeCount = jobs.filter((j) => j.active).length;
   const pausedCount = jobs.filter((j) => !j.active).length;
-
-  // Count jobs that ran today by checking lastRun timestamps
   const todayStr = new Date().toISOString().slice(0, 10);
   const runsToday = jobs.filter(
     (j) => j.lastRun?.lastRun && j.lastRun.lastRun.startsWith(todayStr)
@@ -82,7 +207,30 @@ export function CronJobsView() {
 
   return (
     <div>
-      {/* Stats bar */}
+      {systemStatus && (
+        <SchedulerStatusBanner
+          systemStatus={systemStatus}
+          selectedClientId={selectedClientId}
+        />
+      )}
+
+      {systemStatusError && (
+        <div
+          style={{
+            marginBottom: 20,
+            padding: "12px 14px",
+            borderRadius: "0.5rem",
+            backgroundColor: "#FEF2F2",
+            border: "1px solid #FECACA",
+            fontFamily: "var(--font-inter), Inter, sans-serif",
+            fontSize: 13,
+            color: "#991B1B",
+          }}
+        >
+          {systemStatusError}
+        </div>
+      )}
+
       <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
         <div style={statCardStyle}>
           <div style={statValueStyle}>{activeCount}</div>
@@ -104,7 +252,6 @@ export function CronJobsView() {
         </div>
       </div>
 
-      {/* Header with create button */}
       <div
         style={{
           display: "flex",
@@ -146,7 +293,6 @@ export function CronJobsView() {
         </button>
       </div>
 
-      {/* Table header */}
       <div
         style={{
           display: "grid",
@@ -170,7 +316,6 @@ export function CronJobsView() {
         <span>Actions</span>
       </div>
 
-      {/* Loading state */}
       {isLoading && (
         <div
           style={{
@@ -185,7 +330,6 @@ export function CronJobsView() {
         </div>
       )}
 
-      {/* Empty state */}
       {!isLoading && jobs.length === 0 && (
         <div
           style={{
@@ -235,7 +379,6 @@ export function CronJobsView() {
         </div>
       )}
 
-      {/* Job rows */}
       {!isLoading &&
         jobs.map((job, i) => (
           <CronRow
@@ -251,7 +394,6 @@ export function CronJobsView() {
           />
         ))}
 
-      {/* Create panel */}
       <CreateJobPanel />
     </div>
   );

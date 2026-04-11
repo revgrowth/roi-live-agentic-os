@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { listCronJobs, createCronJob } from "@/lib/cron-service";
+import {
+  listCronJobs,
+  createCronJob,
+  getCronScheduleValidationError,
+} from "@/lib/cron-service";
 import type { CronJobCreateInput } from "@/types/cron";
 
 export async function GET(request: NextRequest) {
@@ -18,6 +22,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const clientId = request.nextUrl.searchParams.get("clientId");
     const body = (await request.json()) as CronJobCreateInput;
 
     // Validate required fields
@@ -46,7 +51,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const job = createCronJob(body);
+    const scheduleError = getCronScheduleValidationError(body.time, body.days);
+    if (scheduleError) {
+      return NextResponse.json({ error: scheduleError }, { status: 400 });
+    }
+
+    const job = createCronJob(body, clientId);
     return NextResponse.json(job, { status: 201 });
   } catch (error) {
     console.error("POST /api/cron error:", error);

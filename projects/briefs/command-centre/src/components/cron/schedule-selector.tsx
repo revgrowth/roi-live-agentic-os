@@ -12,13 +12,12 @@ interface ScheduleSelectorProps {
   onChange: (value: ScheduleValue) => void;
 }
 
-type Preset = "daily" | "weekdays" | "weekly" | "monthly" | "custom";
+type Preset = "daily" | "weekdays" | "weekly" | "custom";
 
 const PRESETS: { label: string; value: Preset }[] = [
   { label: "Daily", value: "daily" },
   { label: "Weekdays", value: "weekdays" },
   { label: "Weekly", value: "weekly" },
-  { label: "Monthly", value: "monthly" },
   { label: "Custom", value: "custom" },
 ];
 
@@ -35,7 +34,6 @@ const DAYS_OF_WEEK = [
 function getPresetFromDays(days: string): Preset {
   if (days === "daily") return "daily";
   if (days === "weekdays") return "weekdays";
-  if (days === "1" || days === "monthly") return "monthly";
   if (DAYS_OF_WEEK.some((d) => d.value === days)) return "weekly";
   return "custom";
 }
@@ -56,9 +54,6 @@ export function ScheduleSelector({ value, onChange }: ScheduleSelectorProps) {
           break;
         case "weekly":
           days = "mon";
-          break;
-        case "monthly":
-          days = "1";
           break;
         case "custom":
           // Keep current days

@@ -1,3 +1,6 @@
+export type CronResult = "success" | "failure" | "timeout";
+export type CronRunResult = CronResult | "running";
+
 export interface CronJob {
   name: string;
   slug: string;
@@ -13,11 +16,15 @@ export interface CronJob {
   lastRun: CronRunStatus | null;
   stats: CronStats;
   prompt: string;
+  clientId: string | null;
+  workspaceKey: string;
+  workspaceLabel: string;
+  workspaceDir: string;
 }
 
 export interface CronRunStatus {
   lastRun: string;
-  result: "success" | "failure";
+  result: CronResult;
   duration: number;
   exitCode: number;
   runCount: number;
@@ -42,7 +49,7 @@ export interface CronRun {
   taskId: string | null;
   startedAt: string;
   completedAt: string | null;
-  result: "success" | "failure" | "running";
+  result: CronRunResult;
   durationSec: number | null;
   costUsd: number | null;
   exitCode: number | null;
@@ -73,4 +80,17 @@ export interface CronJobUpdateInput {
   timeout?: string;
   retry?: number;
   prompt?: string;
+}
+
+export interface CronSystemStatus {
+  runtime: "in-process" | "daemon" | "stopped";
+  leader: boolean;
+  identifier: string | null;
+  startCommand: string;
+  stopCommand: string;
+  statusCommand: string;
+  logsCommand: string;
+  workspaceCount: number;
+  heartbeatAt: string | null;
+  pid: number | null;
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Play, Pause, Trash2, ChevronDown, ChevronRight, Zap, Loader2, FileText, Clock } from "lucide-react";
 import { useCronStore } from "@/store/cron-store";
+import { useClientStore } from "@/store/client-store";
 import { RunHistory } from "./run-history";
 import type { CronJob } from "@/types/cron";
 
@@ -65,6 +66,18 @@ function formatDuration(sec: number): string {
   return `${min}m ${remaining}s`;
 }
 
+function getResultBadge(result: "success" | "failure" | "timeout") {
+  if (result === "success") {
+    return { label: "OK", backgroundColor: "#ECFDF5", color: "#10B981" };
+  }
+
+  if (result === "timeout") {
+    return { label: "Timeout", backgroundColor: "#FFF7ED", color: "#EA580C" };
+  }
+
+  return { label: "Fail", backgroundColor: "#FEF2F2", color: "#EF4444" };
+}
+
 export function CronRow({
   job,
   index,
@@ -83,6 +96,7 @@ export function CronRow({
   const runJobNow = useCronStore((s) => s.runJobNow);
   const isPinned = useCronStore((s) => s.pinnedSlugs.includes(job.slug));
   const activeRun = useCronStore((s) => s.activeRuns[job.slug]);
+  const selectedClientId = useClientStore((s) => s.selectedClientId);
   const [expandedTab, setExpandedTab] = useState<"file" | "history">("history");
   const [rawFile, setRawFile] = useState<string | null>(null);
   const [loadingFile, setLoadingFile] = useState(false);
@@ -94,14 +108,16 @@ export function CronRow({
   useEffect(() => {
     if (isExpanded && rawFile === null && !loadingFile) {
       setLoadingFile(true);
-      fetch(`/api/cron/${job.slug}/source`)
+      const query = selectedClientId ? `?clientId=${encodeURIComponent(selectedClientId)}` : "";
+      fetch(`/api/cron/${job.slug}/source${query}`)
         .then((r) => r.json())
         .then((d) => setRawFile(d.content || "(empty)"))
         .catch(() => setRawFile("(failed to load file)"))
         .finally(() => setLoadingFile(false));
     }
-  }, [isExpanded, job.slug, rawFile, loadingFile]);
+  }, [isExpanded, job.slug, rawFile, loadingFile, selectedClientId]);
   const runs = runHistory[job.slug] || [];
+  const lastRunBadge = job.lastRun ? getResultBadge(job.lastRun.result) : null;
 
   // Derive a human-friendly status label for the active run
   const runStatusLabel =
@@ -227,13 +243,11 @@ export function CronRow({
                   borderRadius: 4,
                   fontSize: 10,
                   fontWeight: 500,
-                  backgroundColor:
-                    job.lastRun.result === "success" ? "#ECFDF5" : "#FEF2F2",
-                  color:
-                    job.lastRun.result === "success" ? "#10B981" : "#EF4444",
+                  backgroundColor: lastRunBadge?.backgroundColor,
+                  color: lastRunBadge?.color,
                 }}
               >
-                {job.lastRun.result === "success" ? "OK" : "Fail"}
+                {lastRunBadge?.label}
               </span>
             </div>
           ) : (
