@@ -101,6 +101,7 @@ interface CronStore {
   expandedJob: string | null;
   runHistory: Record<string, CronRun[]>;
   showCreatePanel: boolean;
+  editingJob: CronJob | null;
   /** slug → active run info (persists until task reaches review/done) */
   activeRuns: Record<string, ActiveCronRun>;
   /** Slugs pinned to the top of the list */
@@ -110,10 +111,12 @@ interface CronStore {
   toggleJob: (slug: string) => Promise<void>;
   deleteJob: (slug: string) => Promise<void>;
   createJob: (input: CronJobCreateInput) => Promise<void>;
+  updateJob: (slug: string, input: CronJobUpdateInput) => Promise<void>;
   runJobNow: (slug: string) => Promise<void>;
   expandJob: (slug: string | null) => void;
   fetchRunHistory: (slug: string) => Promise<void>;
   setShowCreatePanel: (show: boolean) => void;
+  setEditingJob: (job: CronJob | null) => void;
   moveJob: (fromIndex: number, toIndex: number) => void;
   togglePin: (slug: string) => void;
 }
@@ -125,6 +128,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
   expandedJob: null,
   runHistory: {},
   showCreatePanel: false,
+  editingJob: null,
   activeRuns: {},
   pinnedSlugs: typeof window !== "undefined" ? loadPinnedSlugs() : [],
 
@@ -275,6 +279,26 @@ export const useCronStore = create<CronStore>((set, get) => ({
     }
   },
 
+  updateJob: async (slug: string, input: CronJobUpdateInput) => {
+    try {
+      const res = await fetch(`/api/cron/${slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) throw new Error("Failed to update cron job");
+      const updated = await res.json();
+      set((state) => ({
+        jobs: state.jobs.map((j) => (j.slug === slug ? updated : j)),
+        editingJob: null,
+      }));
+    } catch (err) {
+      set({
+        error: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
+  },
+
   expandJob: (slug: string | null) => {
     set({ expandedJob: slug });
     if (slug) {
@@ -308,6 +332,10 @@ export const useCronStore = create<CronStore>((set, get) => ({
 
   setShowCreatePanel: (show: boolean) => {
     set({ showCreatePanel: show });
+  },
+
+  setEditingJob: (job: CronJob | null) => {
+    set({ editingJob: job });
   },
 
   moveJob: (fromIndex: number, toIndex: number) => {
