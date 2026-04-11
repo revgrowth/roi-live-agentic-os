@@ -18,7 +18,7 @@ Before doing anything else in any Claude Code session:
 7. Scan `projects/briefs/*/brief.md` for active projects and report them if any exist.
 8. Scan `.claude/skills/` so you know what is installed.
 9. Run the reconciliation rules defined in `AGENTS.md`.
-10. Check whether the cron dispatcher is installed. Derive the project slug and check the platform-appropriate scheduler target: `~/Library/LaunchAgents/com.agentic-os.{slug}.plist` on macOS, `Get-ScheduledTask -TaskName AgenticOS-{slug}` on Windows, or `crontab -l` for the dispatcher entry on Linux. If installed, read `cron/status/` files and report the latest status when relevant. If it is not installed, only mention it if the user asks about scheduling.
+10. Check the managed cron runtime. Inspect `.command-centre/cron-runtime-lock.json`, `.command-centre/cron-daemon.pid`, and `cron/status/` when they exist. If a runtime is active, report the latest relevant status. If the runtime is stopped, only mention it if the user asks about scheduling or if cron jobs exist and their state matters.
 11. Automatically run `/start-here` after the checks above. Do not ask the user to type it manually.
 
 ### Daily Memory

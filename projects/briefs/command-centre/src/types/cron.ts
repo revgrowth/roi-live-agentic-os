@@ -16,6 +16,10 @@ export interface CronJob {
   lastRun: CronRunStatus | null;
   stats: CronStats;
   prompt: string;
+  clientId: string | null;
+  workspaceKey: string;
+  workspaceLabel: string;
+  workspaceDir: string;
 }
 
 export interface CronRunStatus {
@@ -79,12 +83,14 @@ export interface CronJobUpdateInput {
 }
 
 export interface CronSystemStatus {
-  platform: "windows" | "macos" | "linux";
-  scheduler: "task-scheduler" | "launchd" | "crontab" | "in-process";
-  installed: boolean;
-  /** True when the Command Centre server is managing cron scheduling in-process */
-  inProcess: boolean;
-  identifier: string;
-  installCommand: string;
-  uninstallCommand: string;
+  runtime: "in-process" | "daemon" | "stopped";
+  leader: boolean;
+  identifier: string | null;
+  startCommand: string;
+  stopCommand: string;
+  statusCommand: string;
+  logsCommand: string;
+  workspaceCount: number;
+  heartbeatAt: string | null;
+  pid: number | null;
 }

@@ -77,6 +77,16 @@ function applySavedOrder(jobs: CronJob[]): CronJob[] {
   return sorted;
 }
 
+function withClientQuery(path: string): string {
+  const clientId = useClientStore.getState().selectedClientId;
+  if (!clientId) {
+    return path;
+  }
+
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}clientId=${encodeURIComponent(clientId)}`;
+}
+
 /** Tracks the status of a manually triggered cron run */
 export interface ActiveCronRun {
   taskId: string;
@@ -139,7 +149,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
 
   toggleJob: async (slug: string) => {
     try {
-      const res = await fetch(`/api/cron/${slug}/toggle`, {
+      const res = await fetch(withClientQuery(`/api/cron/${slug}/toggle`), {
         method: "PATCH",
       });
       if (!res.ok) throw new Error("Failed to toggle cron job");
@@ -159,7 +169,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
     if (get().activeRuns[slug]) return;
 
     try {
-      const res = await fetch(`/api/cron/${slug}/run`, { method: "POST" });
+      const res = await fetch(withClientQuery(`/api/cron/${slug}/run`), { method: "POST" });
       if (!res.ok) throw new Error("Failed to trigger cron job");
       const task = await res.json();
 
@@ -231,7 +241,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
     }));
 
     try {
-      const res = await fetch(`/api/cron/${slug}`, { method: "DELETE" });
+      const res = await fetch(withClientQuery(`/api/cron/${slug}`), { method: "DELETE" });
       if (!res.ok) {
         set({ jobs: prev });
         throw new Error("Failed to delete cron job");
@@ -246,10 +256,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
 
   createJob: async (input: CronJobCreateInput) => {
     try {
-      const clientId = useClientStore.getState().selectedClientId;
-      const url = clientId
-        ? `/api/cron?clientId=${encodeURIComponent(clientId)}`
-        : "/api/cron";
+      const url = withClientQuery("/api/cron");
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -273,7 +280,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
     if (slug) {
       get().fetchRunHistory(slug);
       // Also refresh this job's metadata (last run, stats) from the server
-      fetch(`/api/cron/${slug}`)
+      fetch(withClientQuery(`/api/cron/${slug}`))
         .then((res) => res.ok ? res.json() : null)
         .then((updated) => {
           if (updated) {
@@ -288,7 +295,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
 
   fetchRunHistory: async (slug: string) => {
     try {
-      const res = await fetch(`/api/cron/${slug}/history`);
+      const res = await fetch(withClientQuery(`/api/cron/${slug}/history`));
       if (!res.ok) return;
       const history = await res.json();
       set((state) => ({

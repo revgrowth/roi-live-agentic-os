@@ -14,8 +14,7 @@ set -euo pipefail
 #   4. Installs all skills (selection happens during first Claude session)
 #   5. Writes installed.json
 #   6. Installs GSD project framework (get-shit-done-cc)
-#   7. Installs cron dispatcher
-#   8. Prints next steps
+#   7. Prints next steps
 #
 # Idempotent — safe to run multiple times.
 # =============================================================================
@@ -44,32 +43,6 @@ info()    { printf "${CYAN}%s${NC}\n" "$1"; }
 success() { printf "${GREEN}  ✓ %s${NC}\n" "$1"; }
 warn()    { printf "${YELLOW}  ! %s${NC}\n" "$1"; }
 fail()    { printf "${RED}  ✗ %s${NC}\n" "$1"; }
-
-install_cron_dispatcher() {
-    if is_windows_shell; then
-        local powershell_bin="powershell.exe"
-        if ! command -v "$powershell_bin" &>/dev/null; then
-            powershell_bin="powershell"
-        fi
-
-        if ! command -v "$powershell_bin" &>/dev/null; then
-            fail "PowerShell is required to install the Windows cron dispatcher."
-            return 1
-        fi
-
-        local installer_path="$SCRIPT_DIR/install-crons.ps1"
-        if command -v cygpath &>/dev/null; then
-            installer_path="$(cygpath -w "$installer_path")"
-        fi
-
-        echo "  Using Windows Task Scheduler installer (scripts/install-crons.ps1)..."
-        "$powershell_bin" -NoProfile -ExecutionPolicy Bypass -File "$installer_path"
-        return $?
-    fi
-
-    echo "  Using POSIX cron installer (scripts/install-crons.sh)..."
-    bash "$SCRIPT_DIR/install-crons.sh"
-}
 
 # ---------- Paths ----------
 CATALOG="$REPO_ROOT/.claude/skills/_catalog/catalog.json"
@@ -313,18 +286,13 @@ else
 fi
 echo ""
 
-# ---------- Install cron dispatcher ----------
-echo ""
-echo "  Installing cron dispatcher..."
-install_cron_dispatcher
-
 if [[ "$CRON_DRY_RUN" == "1" ]]; then
     warn "Installer dry run complete — skipping alias installation."
     exit 0
 fi
 
 # =============================================================================
-# 8. Install `centre` shell alias
+# 7. Install `centre` shell alias
 # =============================================================================
 echo ""
 info "Installing 'centre' launcher alias..."

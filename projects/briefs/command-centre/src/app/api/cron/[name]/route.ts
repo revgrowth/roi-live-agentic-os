@@ -8,12 +8,13 @@ import {
 import type { CronJobUpdateInput } from "@/types/cron";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ name: string }> }
 ) {
   try {
     const { name } = await params;
-    const job = getCronJob(name);
+    const clientId = request.nextUrl.searchParams.get("clientId");
+    const job = getCronJob(name, clientId);
 
     if (!job) {
       return NextResponse.json({ error: "Cron job not found" }, { status: 404 });
@@ -35,7 +36,8 @@ export async function PATCH(
 ) {
   try {
     const { name } = await params;
-    const existing = getCronJob(name);
+    const clientId = request.nextUrl.searchParams.get("clientId");
+    const existing = getCronJob(name, clientId);
     if (!existing) {
       return NextResponse.json({ error: "Cron job not found" }, { status: 404 });
     }
@@ -50,7 +52,7 @@ export async function PATCH(
       }
     }
 
-    const updated = updateCronJob(name, body);
+    const updated = updateCronJob(name, body, clientId);
     return NextResponse.json(updated);
   } catch (error) {
     console.error("PATCH /api/cron/[name] error:", error);
@@ -62,17 +64,18 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ name: string }> }
 ) {
   try {
     const { name } = await params;
-    const existing = getCronJob(name);
+    const clientId = request.nextUrl.searchParams.get("clientId");
+    const existing = getCronJob(name, clientId);
     if (!existing) {
       return NextResponse.json({ error: "Cron job not found" }, { status: 404 });
     }
 
-    deleteCronJob(name);
+    deleteCronJob(name, clientId);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error("DELETE /api/cron/[name] error:", error);

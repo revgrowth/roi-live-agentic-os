@@ -220,14 +220,14 @@ cp .env clients/client-two/.env
 
 ## Cron Across Clients
 
-Each client can have its own cron dispatcher:
+One managed cron runtime covers the root workspace plus every `clients/*` workspace. Start it once from the workspace root:
 
 ```bash
-cd clients/client-one && bash scripts/install-crons.sh
-cd clients/client-two && bash scripts/install-crons.sh
+cd ~/Projects/agentic-os
+bash scripts/start-crons.sh
 ```
 
-The dispatcher name is derived from the folder path, so separate clients do not conflict.
+The Command Centre UI also schedules root and client jobs while the server is running. If the UI and daemon coexist, a shared leader lock in `.command-centre/` ensures only one host schedules jobs at a time.
 
 ---
 

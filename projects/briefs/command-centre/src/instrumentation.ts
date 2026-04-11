@@ -11,7 +11,7 @@ export async function register() {
     const { initQueueWatcher } = await import("./lib/queue-watcher");
     initQueueWatcher();
 
-    // Start the in-process cron scheduler (replaces OS-level Task Scheduler / launchd / crontab)
+    // Start the in-process cron scheduler used while the Command Centre is running.
     const { initCronScheduler } = await import("./lib/cron-scheduler");
     initCronScheduler();
 

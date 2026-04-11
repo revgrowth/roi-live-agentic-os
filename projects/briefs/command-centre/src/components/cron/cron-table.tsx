@@ -15,19 +15,25 @@ function SchedulerStatusBanner({
   systemStatus: CronSystemStatus;
   selectedClientId: string | null;
 }) {
-  const isActive = systemStatus.inProcess || systemStatus.installed;
+  const isActive = systemStatus.runtime !== "stopped";
 
-  const title = systemStatus.inProcess
-    ? "Scheduler active"
-    : systemStatus.installed
-    ? "External scheduler installed for the root workspace"
-    : "Scheduler not installed for the root workspace";
+  const title =
+    systemStatus.runtime === "in-process"
+      ? systemStatus.leader
+        ? "Command Centre is scheduling jobs"
+        : "Command Centre runtime is passive"
+      : systemStatus.runtime === "daemon"
+        ? "CLI daemon is scheduling jobs"
+        : "Managed cron runtime is stopped";
 
-  const description = systemStatus.inProcess
-    ? "Jobs run automatically while the Command Centre is running. Stopping the server stops all scheduled jobs."
-    : systemStatus.installed
-    ? "UI-created jobs only run automatically after the OS scheduler is installed. The root dispatcher is currently registered."
-    : "Jobs can be created from the UI, but they will not run automatically until the root dispatcher is installed on this machine.";
+  const description =
+    systemStatus.runtime === "in-process"
+      ? systemStatus.leader
+        ? "Jobs run automatically while this Command Centre process is alive. Stopping the server stops scheduling."
+        : "Another runtime currently owns scheduling. This UI stays passive and still lets you inspect jobs and queue manual runs."
+      : systemStatus.runtime === "daemon"
+        ? "A headless CLI daemon is active. The UI stays passive while the daemon owns scheduling and lock heartbeat."
+        : "No managed runtime is active. Automatic scheduling is off until you start the CLI daemon or keep the Command Centre server running.";
 
   const cardStyle: React.CSSProperties = {
     marginBottom: 20,
@@ -77,22 +83,21 @@ function SchedulerStatusBanner({
 
   return (
     <div style={cardStyle}>
-      <div style={labelStyle}>{systemStatus.scheduler}</div>
+      <div style={labelStyle}>{systemStatus.runtime}</div>
       <div style={valueStyle}>{title}</div>
       <p style={bodyStyle}>{description}</p>
-      {!systemStatus.inProcess && (
-        <>
-          <div style={bodyStyle}>
-            Identifier: <strong>{systemStatus.identifier}</strong>
-          </div>
-          <div style={codeStyle}>
-            {systemStatus.installed ? systemStatus.uninstallCommand : systemStatus.installCommand}
-          </div>
-        </>
-      )}
-      {selectedClientId && selectedClientId !== "root" && (
+      <div style={bodyStyle}>
+        Identifier: <strong>{systemStatus.identifier || "none"}</strong>
+      </div>
+      <div style={{ ...bodyStyle, marginTop: 6 }}>
+        Workspaces covered: <strong>{systemStatus.workspaceCount}</strong>
+      </div>
+      <div style={codeStyle}>
+        {systemStatus.runtime === "stopped" ? systemStatus.startCommand : systemStatus.stopCommand}
+      </div>
+      {selectedClientId && (
         <p style={{ ...bodyStyle, marginTop: 8 }}>
-          The banner reflects the root workspace only. Client workspaces still need their own scheduler setup if you want automatic runs there.
+          Job files from the selected client still share the same managed runtime and leader lock as the root workspace.
         </p>
       )}
     </div>

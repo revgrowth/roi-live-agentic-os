@@ -28,10 +28,14 @@
 
 ## Scheduled Jobs
 
-The cron dispatcher is installed automatically during setup. Just create jobs and they run on schedule.
+The Command Centre schedules jobs while it is running. If you want scheduling with the UI closed, start the managed daemon manually.
 
 | Action | Command |
 |--------|---------|
+| Start daemon | `bash scripts/start-crons.sh` |
+| Stop daemon | `bash scripts/stop-crons.sh` |
+| Runtime status | `bash scripts/status-crons.sh` |
+| Daemon logs | `bash scripts/logs-crons.sh` |
 | Run job manually | `bash scripts/run-job.sh job-name` |
 | Check job logs | `cat cron/logs/job-name.log` |
 | List jobs | `ls cron/jobs/` or ask Claude "what's scheduled?" |

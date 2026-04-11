@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FileText, Image, FileType, ExternalLink } from "lucide-react";
+import { useClientStore } from "@/store/client-store";
 import type { CronRun, CronRunOutput } from "@/types/cron";
 
 interface RunHistoryProps {
@@ -111,6 +112,7 @@ export function RunHistory({ runs, jobSlug, prompt }: RunHistoryProps) {
   const [log, setLog] = useState<string | null>(null);
   const [loadingLog, setLoadingLog] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
+  const selectedClientId = useClientStore((s) => s.selectedClientId);
 
   const toggleLog = async () => {
     if (log !== null) {
@@ -119,7 +121,8 @@ export function RunHistory({ runs, jobSlug, prompt }: RunHistoryProps) {
     }
     setLoadingLog(true);
     try {
-      const res = await fetch(`/api/cron/${jobSlug}/logs`);
+      const query = selectedClientId ? `?clientId=${encodeURIComponent(selectedClientId)}` : "";
+      const res = await fetch(`/api/cron/${jobSlug}/logs${query}`);
       if (res.ok) {
         const data = await res.json();
         setLog(data.log || "(empty log)");

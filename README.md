@@ -160,28 +160,49 @@ Skills will tell you when they could use a key you haven't added yet, and they a
 
 ## Scheduled Jobs (Cron)
 
-Run tasks automatically in the background -- even when Claude Code is closed. Drop a markdown file into `cron/jobs/`, install the dispatcher once, and your prompts run on schedule via headless `claude -p`.
+Run tasks automatically through a managed runtime shared by the Command Centre and the CLI daemon. Drop a markdown file into `cron/jobs/`, then choose which host should keep the scheduler alive.
 
 ### How it works
 
-1. A lightweight dispatcher runs every 60 seconds via your OS scheduler: `scripts/run-crons.sh` on macOS/Linux and `scripts/run-crons.ps1` on Windows
-2. It scans `cron/jobs/*.md` and checks each file's `time` and `days` against the current time
-3. Any matching job fires `claude -p` with the prompt body from the file
-4. Each job logs to `cron/logs/{job-name}.log`
+1. The same cron core discovers jobs from the root workspace and every `clients/*` workspace
+2. It evaluates schedules, catch-up windows, dedupe, retries, heartbeat, and leadership in one place
+3. Matching jobs enqueue tasks and execute them headlessly via `claude -p`
+4. Per-job status still lands in `cron/status/`, logs still land in `cron/logs/`, and runtime state lives in `.command-centre/`
+5. Only one runtime host becomes leader at a time, so the UI and daemon never double-fire the same minute
 
-### Install the dispatcher
+### Choose the host
 
-**Mac:**
+**Command Centre UI**
+- The scheduler runs in-process while the Command Centre server is running
+- It stops with the server
+- It always starts the queue watcher, but only schedules jobs if it wins the leader lock
+
+**CLI daemon**
+- Use this when you want scheduling to continue while the UI is closed
+- Start and stop it manually
+- It writes PID, lock, heartbeat, and logs to `.command-centre/`
+
+### Manage the daemon
+
+**Mac/Linux**
 ```bash
-bash scripts/install-crons.sh
+bash scripts/start-crons.sh
+bash scripts/status-crons.sh
+bash scripts/logs-crons.sh
+bash scripts/stop-crons.sh
 ```
 
-**Windows (PowerShell as admin):**
+**Windows (PowerShell)**
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install-crons.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\start-crons.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\status-crons.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\logs-crons.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\stop-crons.ps1
 ```
 
-The dispatcher uses your Claude plan credits. Each run costs roughly $0.01-0.05 (haiku), $0.05-0.25 (sonnet), or $0.25-2.00 (opus) depending on the model and task complexity.
+Compatibility note: `install-crons` and `uninstall-crons` still exist, but they are deprecated wrappers around `start-crons` and `stop-crons`. They no longer register anything with Task Scheduler, launchd, or crontab.
+
+The managed runtime uses your Claude plan credits. Each run costs roughly $0.01-0.05 (haiku), $0.05-0.25 (sonnet), or $0.25-2.00 (opus) depending on the model and task complexity.
 
 ### Create a job
 
@@ -229,7 +250,7 @@ Full reference: `cron/templates/schedule-reference.md`
 - **OS notifications** -- jobs send a native notification when they finish. Control this with the `notify` field: `"on_finish"` (default, notifies on success and failure), `"on_failure"` (errors and timeouts only), or `"silent"` (never notify).
 - **Smart silence** -- monitoring jobs that find nothing to report can suppress their notification automatically. The job's prompt tells Claude to end with `[SILENT]` when there's nothing actionable. The job still logs normally -- you just don't get pinged for "all clear" results.
 - **No duplicate runs** -- if a job is still running when the next scheduled trigger fires, the new run is skipped. This prevents slow jobs from piling up. If a previous run crashed without cleaning up, the system detects the stale state and recovers automatically.
-- **Status tracking** -- each job writes its result to `cron/status/`. Ask Claude "list my jobs" to see a table with last run time, result, duration, and run/fail counts.
+- **Status tracking** -- each job writes its result to `cron/status/`. The managed runtime also tracks leadership, heartbeat, PID, and daemon logs in `.command-centre/`.
 - **Catch-up on wake** -- if your laptop was closed during a scheduled fixed-time job, it runs automatically when the machine wakes up. Interval jobs (`every_Nh`) resume on the next matching interval without catching up.
 - **Timeout** -- prevents runaway jobs. Default is 30 minutes. Configure per job with the `timeout` field (e.g., `"5m"`, `"1h"`, `"90s"`). If a job exceeds its timeout, the process is killed and the result is recorded as `timeout`.
 - **Retry** -- set `retry: "1"` (or higher) to automatically re-run a job on failure. Each retry gets the full timeout. Default is 0 (no retries).
@@ -243,15 +264,20 @@ Full reference: `cron/templates/schedule-reference.md`
 | **Run a job now** | `bash scripts/run-job.sh {job-name}` on macOS/Linux or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run-job.ps1 {job-name}` on Windows |
 | **Check logs** | `cat cron/logs/{job-name}.log` |
 | **List all jobs** | `ls cron/jobs/` or ask Claude "what's scheduled?" |
-| **Remove the dispatcher** | `bash scripts/uninstall-crons.sh` (macOS/Linux) or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\uninstall-crons.ps1` (Windows) |
+| **Start the daemon** | `bash scripts/start-crons.sh` or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\start-crons.ps1` |
+| **Stop the daemon** | `bash scripts/stop-crons.sh` or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\stop-crons.ps1` |
+| **Check runtime status** | `bash scripts/status-crons.sh` or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\status-crons.ps1` |
+| **Show daemon logs** | `bash scripts/logs-crons.sh` or `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\logs-crons.ps1` |
 
-Removing the dispatcher only stops the scheduler. Your job files in `cron/jobs/` are never deleted.
+Stopping the daemon only stops automatic scheduling. Your job files in `cron/jobs/` are never deleted.
 
 ### Important notes
 
-- **macOS protected folders:** The dispatcher can't run from Desktop, Documents, or Downloads due to macOS sandboxing. The install script detects this and tells you to move the project.
-- **PATH:** The dispatcher adds `~/.local/bin`, `/usr/local/bin`, and `/opt/homebrew/bin` to PATH so it can find the `claude` CLI in background mode.
-- **Windows scheduler:** Creating a job in the Command Centre only writes the job file. Automatic execution on Windows still requires the Task Scheduler dispatcher install above.
+- **No OS scheduler fallback** -- automatic scheduling no longer depends on Task Scheduler, launchd, or crontab.
+- **UI behavior** -- if you rely on the Command Centre host, scheduling stops when the server stops.
+- **CLI behavior** -- the daemon is manual. Start it when you want background scheduling and stop it explicitly when you do not.
+- **Leader lock** -- if the UI and daemon coexist, only one of them schedules jobs. The other host stays passive.
+- **Legacy scripts** -- `run-crons` is deprecated and no longer performs scheduling.
 - **Existing sessions:** Jobs run as separate headless processes -- they don't interfere with any open Claude Code session.
 
 ---

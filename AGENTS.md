@@ -84,6 +84,10 @@ These are core system functions handled by scripts. Check them before searching 
 | "remove a skill", "uninstall {skill}" | Run `bash scripts/remove-skill.sh {skill-name}` |
 | "add a skill", "install {skill}" | Run `bash scripts/add-skill.sh {skill-name}` |
 | "list skills", "what skills are installed" | Run `bash scripts/list-skills.sh` |
+| "start crons", "start scheduled jobs" | Run `bash scripts/start-crons.sh` |
+| "stop crons", "stop scheduled jobs" | Run `bash scripts/stop-crons.sh` |
+| "cron status", "status crons" | Run `bash scripts/status-crons.sh` |
+| "cron logs", "logs crons" | Run `bash scripts/logs-crons.sh` |
 
 ### Add Client Flow
 
@@ -142,6 +146,7 @@ agentic-os/
 - Claude reads the same shared guidance through the root `CLAUDE.md`
 - Codex reads the root and client `AGENTS.md` files directly when working inside a client folder
 - Each client has its own `brand_context/`, `context/memory/`, `context/learnings.md`, `USER.md`, `projects/`, and `cron/jobs/`
+- One managed cron runtime per workspace schedules the root plus every `clients/*` job, with a shared leader lock in `.command-centre/`
 - Shared skills are edited at the root level; client-only skills live in that client's `.claude/skills/`
 
 Full guide: [docs/multi-client-guide.md](docs/multi-client-guide.md)
@@ -222,6 +227,12 @@ Every skill and its output folder uses a category prefix.
 |-------|-------------|
 | `tool-stitch` | "fetch stitch design", "get stitch screens", "stitch project", "pull from stitch", "stitch code", "export stitch" |
 
+### Operations Skills
+
+| Skill | Triggers on |
+|-------|-------------|
+| `ops-cron` | "schedule a job", "cron job", "run this every morning", "automate daily", "recurring task", "scheduled job", "check scheduled jobs", "list jobs", "run job manually", "start crons", "stop crons", "cron status", "cron logs" |
+
 *Optional skills are auto-registered by reconciliation when their folders appear on disk. Install optional skills with `bash scripts/add-skill.sh <name>`. See `.claude/skills/_catalog/catalog.json` for the full list.*
 
 ---
@@ -241,6 +252,7 @@ Load only the `brand_context/` files listed for each skill.
 | `tool-stitch` | — | — | — | — | — | `## tool-stitch` |
 | `viz-stitch-design` | tone only | summary | language section | — | — | `## viz-stitch-design` |
 | `viz-interface-design` | tone only | summary | language section | — | — | `## viz-interface-design` |
+| `ops-cron` | — | — | — | — | — | `## ops-cron` |
 
 **Matrix key:** `writes` = creates file | `full` = entire file | `summary` = 1-2 sentences | `tone only` = tone + vocabulary | `language section` = words-they-use section | `## skill-name` = read only that section from `context/learnings.md`
 

@@ -1,9 +1,8 @@
 /**
  * Cron-Task Sync Service
  *
- * Polls the SQLite database for tasks created by the external cron dispatcher
- * (which writes directly to SQLite) and emits SSE events so the frontend
- * kanban board updates in real-time.
+ * Polls the SQLite database for tasks created by the managed cron runtime
+ * and emits SSE events so the frontend kanban board updates in real-time.
  */
 import { getDb } from "./db";
 import { emitTaskEvent } from "./event-bus";

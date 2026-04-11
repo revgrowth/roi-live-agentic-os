@@ -1,6 +1,8 @@
 import { onTaskEvent, emitTaskEvent, type TaskEvent } from "./event-bus";
 import { processManager } from "./process-manager";
 import { getDb } from "./db";
+import { getCronSystemStatus } from "./cron-system-status";
+import { getInProcessCronRuntimeIdentifier } from "./cron-scheduler";
 import type { Task } from "@/types/task";
 
 let initialized = false;
@@ -28,6 +30,16 @@ export function initQueueWatcher(): void {
     // Trigger on status changes, updates, or newly created tasks that are already queued
     if (event.type !== "task:status" && event.type !== "task:updated" && event.type !== "task:created") return;
     if (event.task.status !== "queued") return;
+
+    if (event.task.cronJobSlug) {
+      const runtimeStatus = getCronSystemStatus(getInProcessCronRuntimeIdentifier());
+      if (runtimeStatus.runtime === "daemon") {
+        console.log(
+          `[queue-watcher] Skipping queued cron task ${event.task.id} because daemon runtime is leader`
+        );
+        return;
+      }
+    }
 
     console.log(`[queue-watcher] Task ${event.task.id} entered queued status (via ${event.type}), triggering execution`);
     processManager.executeTask(event.task.id).catch((err) => {
@@ -119,6 +131,25 @@ export function initQueueWatcher(): void {
     try {
       const db = getDb();
       const now = new Date().toISOString();
+
+      const runtimeStatus = getCronSystemStatus(getInProcessCronRuntimeIdentifier());
+      if (runtimeStatus.runtime !== "daemon") {
+        const queuedCronTasks = db
+          .prepare(
+            `SELECT * FROM tasks
+             WHERE status = 'queued'
+               AND cronJobSlug IS NOT NULL
+             ORDER BY createdAt ASC`
+          )
+          .all() as Task[];
+
+        for (const task of queuedCronTasks) {
+          if (processManager.hasActiveSession(task.id)) continue;
+          processManager.executeTask(task.id).catch((err) => {
+            console.error(`[queue-watcher] Failed to execute queued cron task ${task.id}:`, err);
+          });
+        }
+      }
 
       // 1. PID-based reaping: tasks stuck in 'running' with a dead PID
       // Only reap 'running' tasks — 'review' tasks already completed normally

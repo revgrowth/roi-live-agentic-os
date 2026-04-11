@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getRawJobFile } from "@/lib/cron-service";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ name: string }> }
 ) {
   try {
     const { name } = await params;
-    const content = getRawJobFile(name);
+    const clientId = request.nextUrl.searchParams.get("clientId");
+    const content = getRawJobFile(name, clientId);
 
     if (content === null) {
       return NextResponse.json({ error: "Cron job file not found" }, { status: 404 });
