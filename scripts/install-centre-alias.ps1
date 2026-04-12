@@ -1,5 +1,5 @@
 # =============================================================================
-# Agentic OS — Install 'centre' PowerShell function into $PROFILE
+# Agentic OS - Install 'centre' PowerShell function into $PROFILE
 # =============================================================================
 # Adds a function called `centre` to the current user's PowerShell profile
 # that launches scripts\centre.ps1 from anywhere. Idempotent.
@@ -9,10 +9,11 @@ $ErrorActionPreference = "Stop"
 
 $ScriptDir   = Split-Path -Parent $MyInvocation.MyCommand.Path
 $CentreScript = Join-Path $ScriptDir "centre.ps1"
-$Marker      = "# Agentic OS — command centre launcher"
+$Marker      = "# Agentic OS - command centre launcher"
+$LegacyMarker = "# Agentic OS $([char]0x2014) command centre launcher"
 
 if (-not (Test-Path $CentreScript)) {
-    Write-Host "  ✗ centre.ps1 not found at $CentreScript" -ForegroundColor Red
+    Write-Host "  [X] centre.ps1 not found at $CentreScript" -ForegroundColor Red
     exit 1
 }
 
@@ -22,8 +23,11 @@ if (-not (Test-Path $PROFILE)) {
 }
 
 $existing = Get-Content $PROFILE -Raw -ErrorAction SilentlyContinue
-if ($existing -and ($existing -match [regex]::Escape($Marker))) {
-    Write-Host "  ✓ 'centre' already present in `$PROFILE" -ForegroundColor Green
+if ($existing -and (
+    $existing -match [regex]::Escape($Marker) -or
+    $existing -match [regex]::Escape($LegacyMarker)
+)) {
+    Write-Host "  [OK] 'centre' already present in `$PROFILE" -ForegroundColor Green
     exit 0
 }
 
@@ -36,5 +40,5 @@ function centre {
 "@
 
 Add-Content -Path $PROFILE -Value $functionBlock
-Write-Host "  ✓ Added 'centre' function to `$PROFILE ($PROFILE)" -ForegroundColor Green
-Write-Host "  ! Open a new PowerShell window (or run: . `$PROFILE) to activate it." -ForegroundColor Yellow
+Write-Host "  [OK] Added 'centre' function to `$PROFILE ($PROFILE)" -ForegroundColor Green
+Write-Host "  [!] Open a new PowerShell window (or run: . `$PROFILE) to activate it." -ForegroundColor Yellow
