@@ -29,8 +29,9 @@ process.stdin.on("end", () => {
     return;
   }
 
-  const { taskId, port } = mapping;
+  const { taskId, port, syncMode = "managed" } = mapping;
   if (!taskId) return;
+  if (syncMode === "managed") return;
 
   const toolName = data.tool_name || "unknown";
   const toolInput = data.tool_input || {};

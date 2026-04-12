@@ -43,7 +43,11 @@ export async function POST(request: NextRequest) {
         timestamp: now,
       });
 
-      return NextResponse.json({ taskId: existing.id, isNew: false });
+      return NextResponse.json({
+        taskId: existing.id,
+        isNew: false,
+        syncMode: "managed" as const,
+      });
     }
 
     // Check for a recently-started running task. We prefer one without a claudeSessionId
@@ -78,7 +82,11 @@ export async function POST(request: NextRequest) {
         timestamp: now,
       });
 
-      return NextResponse.json({ taskId: recentRunning.id, isNew: false });
+      return NextResponse.json({
+        taskId: recentRunning.id,
+        isNew: false,
+        syncMode: "managed" as const,
+      });
     }
 
     // Create new task (genuinely new terminal session, not spawned by the board)
@@ -141,7 +149,10 @@ export async function POST(request: NextRequest) {
 
     emitTaskEvent({ type: "task:created", task, timestamp: now });
 
-    return NextResponse.json({ taskId: id, isNew: true }, { status: 201 });
+    return NextResponse.json(
+      { taskId: id, isNew: true, syncMode: "hook-owned" as const },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("POST /api/tasks/sync-session error:", error);
     return NextResponse.json(

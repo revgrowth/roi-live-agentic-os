@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
 import { processManager } from "@/lib/process-manager";
 import type { Task } from "@/types/task";
+import { insertTaskLog, normalizeTaskLogContent } from "@/lib/task-logs";
 
 export async function POST(
   request: NextRequest,
@@ -30,6 +31,13 @@ export async function POST(
     return NextResponse.json({ error: "Task not found" }, { status: 404 });
   }
 
+  if (task.cronJobSlug) {
+    return NextResponse.json(
+      { error: "Scheduled tasks are read-only and cannot receive replies" },
+      { status: 409 }
+    );
+  }
+
   const needsInput = Boolean(task.needsInput);
   const isResuming = task.status === "review" || task.status === "done";
   const isRunning = task.status === "running";
@@ -46,12 +54,14 @@ export async function POST(
 
   const now = new Date().toISOString();
   const trimmed = message.trim();
-
-  // Persist user reply as log entry
-  const entryId = crypto.randomUUID();
-  db.prepare(
-    "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-  ).run(entryId, id, "user_reply", now, trimmed, null, null, null, 0);
+  const logResult = insertTaskLog(db, id, {
+    type: "user_reply",
+    timestamp: now,
+    content: trimmed,
+  });
+  const normalizedReply = logResult.inserted
+    ? logResult.entry.content
+    : normalizeTaskLogContent("user_reply", trimmed);
 
   // Title is set once at creation (via AI generation or fallback).
   // User replies are follow-ups, not new goals — don't overwrite the title.
@@ -67,26 +77,23 @@ export async function POST(
     task: { ...updated, needsInput: false },
     timestamp: now,
   });
-  emitTaskEvent({
-    type: "task:log",
-    task: { ...updated, needsInput: false },
-    timestamp: now,
-    logEntry: {
-      id: entryId,
-      type: "user_reply",
+  if (logResult.inserted) {
+    emitTaskEvent({
+      type: "task:log",
+      task: { ...updated, needsInput: false },
       timestamp: now,
-      content: trimmed,
-    },
-  });
+      logEntry: logResult.entry,
+    });
+  }
 
   // Try in-memory path first (can kill running processes if needed)
-  const success = await processManager.replyToTask(id, trimmed);
+  const success = await processManager.replyToTask(id, normalizedReply);
 
   if (!success) {
     // In-memory state was stale — spawn resume turn directly
     console.log(`[reply-route] In-memory replyToTask returned false — spawning via DB path`);
     try {
-      await processManager.spawnContinueTurn(id, trimmed, isResuming);
+      await processManager.spawnContinueTurn(id, normalizedReply, isResuming);
     } catch (err) {
       console.error(`[reply-route] Failed to spawn continue turn:`, err);
     }

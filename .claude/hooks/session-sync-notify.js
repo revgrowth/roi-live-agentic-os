@@ -30,8 +30,9 @@ process.stdin.on("end", () => {
     return;
   }
 
-  const { taskId, port } = mapping;
+  const { taskId, port, syncMode = "managed" } = mapping;
   if (!taskId) return;
+  if (syncMode === "managed") return;
 
   // Truncate long messages for the activity label
   const label = message.length > 100 ? message.slice(0, 97) + "..." : message;

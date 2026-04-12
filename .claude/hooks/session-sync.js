@@ -110,6 +110,7 @@ process.stdin.on("end", () => {
               fs.writeFileSync(tmpFile, JSON.stringify({
                 taskId: result.taskId,
                 port: ${JSON.stringify(port)},
+                syncMode: result.syncMode || (result.isNew ? "hook-owned" : "managed"),
               }));
             }
           } catch {}

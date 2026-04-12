@@ -1,21 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { processManager } from "@/lib/process-manager";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
 import type { Task, LogEntry } from "@/types/task";
+import {
+  getTaskLogDuplicateSignature,
+  getTaskLogEntries,
+  insertTaskLog,
+  taskLogRowToEntry,
+  TASK_LOG_DUPLICATE_WINDOW_MS,
+} from "@/lib/task-logs";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const db = getDb();
 
   // First try direct logs for this task
-  let entries = processManager.getLogEntries(id);
+  let entries = getTaskLogEntries(db, id);
 
   // If no logs and this is a parent/container task, aggregate child task logs
   if (entries.length === 0) {
-    const db = getDb();
     const childCount = db.prepare(
       "SELECT COUNT(*) as count FROM tasks WHERE parentId = ?"
     ).get(id) as { count: number };
@@ -23,26 +29,49 @@ export async function GET(
     if (childCount.count > 0) {
       // Fetch logs from all child tasks, ordered by timestamp
       const childLogs = db.prepare(
-        `SELECT tl.id, tl.type, tl.timestamp, tl.content, tl.toolName, tl.toolArgs,
+        `SELECT tl.id, tl.taskId, tl.type, tl.timestamp, tl.content, tl.toolName, tl.toolArgs,
                 tl.toolResult, tl.isCollapsed, t.title as taskTitle, t.phaseNumber, t.gsdStep
          FROM task_logs tl
          JOIN tasks t ON tl.taskId = t.id
          WHERE t.parentId = ?
          ORDER BY tl.timestamp ASC`
       ).all(id) as Array<{
-        id: string; type: string; timestamp: string; content: string;
+        id: string; taskId: string; type: string; timestamp: string; content: string;
         toolName: string | null; toolArgs: string | null; toolResult: string | null;
         isCollapsed: number; taskTitle: string; phaseNumber: number | null; gsdStep: string | null;
       }>;
 
       // Group by child task and insert header entries so the user knows
       // which subtask each block of logs came from
-      let lastTaskTitle = "";
+      let lastTaskId = "";
+      const recentChildDuplicates = new Map<string, number>();
       entries = [];
       for (const row of childLogs) {
+        const entry = taskLogRowToEntry(row);
+        if (!entry) {
+          continue;
+        }
+
+        const signature = getTaskLogDuplicateSignature(entry);
+        if (signature) {
+          const dedupeKey = `${row.taskId}:${signature}`;
+          const timestampMs = Date.parse(entry.timestamp);
+          const lastSeen = recentChildDuplicates.get(dedupeKey);
+          if (
+            lastSeen !== undefined &&
+            Number.isFinite(timestampMs) &&
+            timestampMs - lastSeen <= TASK_LOG_DUPLICATE_WINDOW_MS
+          ) {
+            continue;
+          }
+          if (Number.isFinite(timestampMs)) {
+            recentChildDuplicates.set(dedupeKey, timestampMs);
+          }
+        }
+
         // Insert a divider when switching between child tasks
-        if (row.taskTitle !== lastTaskTitle) {
-          lastTaskTitle = row.taskTitle;
+        if (row.taskId !== lastTaskId) {
+          lastTaskId = row.taskId;
           const label = row.phaseNumber != null
             ? `Phase ${row.phaseNumber}${row.gsdStep ? ` (${row.gsdStep})` : ""}: ${row.taskTitle}`
             : row.taskTitle;
@@ -54,16 +83,7 @@ export async function GET(
           });
         }
 
-        entries.push({
-          id: row.id,
-          type: row.type as LogEntry["type"],
-          timestamp: row.timestamp,
-          content: row.content,
-          ...(row.toolName ? { toolName: row.toolName } : {}),
-          ...(row.toolArgs ? { toolArgs: row.toolArgs } : {}),
-          ...(row.toolResult ? { toolResult: row.toolResult } : {}),
-          ...(row.isCollapsed ? { isCollapsed: true } : {}),
-        });
+        entries.push(entry);
       }
     }
   }
@@ -97,19 +117,22 @@ export async function POST(
       return NextResponse.json({ error: "type and content are required" }, { status: 400 });
     }
 
-    const entry: LogEntry = {
-      id: crypto.randomUUID(),
+    const result = insertTaskLog(db, id, {
       type: type as LogEntry["type"],
-      timestamp: new Date().toISOString(),
       content,
-      ...(toolName ? { toolName } : {}),
-      ...(toolArgs ? { toolArgs } : {}),
-      ...(toolResult ? { toolResult } : {}),
-    };
+      toolName,
+      toolArgs,
+      toolResult,
+    });
 
-    db.prepare(
-      "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-    ).run(entry.id, id, entry.type, entry.timestamp, entry.content, toolName ?? null, toolArgs ?? null, toolResult ?? null, 0);
+    if (!result.inserted) {
+      return NextResponse.json(
+        { ok: true, suppressed: true, reason: result.reason },
+        { status: 200 }
+      );
+    }
+
+    const entry = result.entry;
 
     emitTaskEvent({
       type: "task:log",

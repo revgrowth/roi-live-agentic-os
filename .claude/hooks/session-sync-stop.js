@@ -33,7 +33,7 @@ process.stdin.on("end", () => {
     return;
   }
 
-  const { taskId, port } = mapping;
+  const { taskId, port, syncMode = "managed" } = mapping;
   if (!taskId) return;
 
   const safePort = JSON.stringify(String(port || "3000"));
@@ -94,14 +94,16 @@ process.stdin.on("end", () => {
     }
 
     async function run() {
-      // 1. Set status to review with meaningful label
-      await makeRequest("PATCH", "/api/tasks/${taskId}/status",
-        { status: "review", activityLabel: ${JSON.stringify(activityLabel)} });
-
       const responseText = ${JSON.stringify(logContent)};
-      if (responseText) {
-        await makeRequest("POST", "/api/tasks/${taskId}/logs",
-          { type: "text", content: responseText });
+      if (${JSON.stringify(syncMode)} !== "managed") {
+        // 1. Set status to review with meaningful label
+        await makeRequest("PATCH", "/api/tasks/${taskId}/status",
+          { status: "review", activityLabel: ${JSON.stringify(activityLabel)} });
+
+        if (responseText) {
+          await makeRequest("POST", "/api/tasks/${taskId}/logs",
+            { type: "text", content: responseText });
+        }
       }
 
       // 2. Wait 3 seconds, then check if the Claude process is still alive
@@ -117,9 +119,11 @@ process.stdin.on("end", () => {
       }
 
       if (!processAlive) {
-        // Claude process is gone — session truly ended
-        await makeRequest("PATCH", "/api/tasks/${taskId}/status",
-          { status: "done", activityLabel: "Session ended" });
+        if (${JSON.stringify(syncMode)} !== "managed") {
+          // Claude process is gone — session truly ended
+          await makeRequest("PATCH", "/api/tasks/${taskId}/status",
+            { status: "done", activityLabel: "Session ended" });
+        }
 
         // Clean up tmp file
         try { fs.unlinkSync(${JSON.stringify(tmpFile)}); } catch {}

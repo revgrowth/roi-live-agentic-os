@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { useClientStore } from "./client-store";
-import type { CronJob, CronRun, CronJobCreateInput } from "@/types/cron";
+import type {
+  CronJob,
+  CronRun,
+  CronJobCreateInput,
+  CronJobUpdateInput,
+} from "@/types/cron";
 import type { TaskStatus } from "@/types/task";
 
 const CRON_ORDER_KEY = "cron-job-order";

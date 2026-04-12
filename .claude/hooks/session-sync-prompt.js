@@ -32,8 +32,9 @@ process.stdin.on("end", () => {
     return; // No mapping file — command centre wasn't running at session start
   }
 
-  const { taskId, port, titleSet } = mapping;
+  const { taskId, port, titleSet, syncMode = "managed" } = mapping;
   if (!taskId) return;
+  if (syncMode === "managed") return;
 
   // Truncate prompt for title (first line, max 80 chars)
   const firstLine = prompt.split("\n")[0].trim();
