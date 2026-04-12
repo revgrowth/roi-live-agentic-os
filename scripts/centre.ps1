@@ -1,5 +1,5 @@
 # =============================================================================
-# Agentic OS — Command Centre Launcher (Windows / PowerShell)
+# Agentic OS - Command Centre Launcher (Windows / PowerShell)
 # =============================================================================
 # Usage:
 #   powershell -File scripts\centre.ps1
@@ -20,10 +20,10 @@ $CentreDir = Join-Path $RepoRoot "projects\briefs\command-centre"
 $Port      = if ($env:PORT) { $env:PORT } else { "3000" }
 $Url       = "http://localhost:$Port"
 
-function Info    ($msg) { Write-Host $msg -ForegroundColor Cyan }
-function Success ($msg) { Write-Host "  ✓ $msg" -ForegroundColor Green }
-function Warn    ($msg) { Write-Host "  ! $msg" -ForegroundColor Yellow }
-function Fail    ($msg) { Write-Host "  ✗ $msg" -ForegroundColor Red }
+function Info    ($msg) { Write-Host "  [!] $msg" -ForegroundColor Cyan }
+function Success ($msg) { Write-Host "  [OK] $msg" -ForegroundColor Green }
+function Warn    ($msg) { Write-Host "  [!] $msg" -ForegroundColor Yellow }
+function Fail    ($msg) { Write-Host "  [X] $msg" -ForegroundColor Red }
 
 if (-not (Test-Path $CentreDir)) {
     Fail "Command centre not found at: $CentreDir"
@@ -44,12 +44,12 @@ if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
 try {
     $response = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 1 -ErrorAction Stop
     if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 500) {
-        Info "Command centre already running at $Url — opening browser."
+        Info "Command centre already running at $Url - opening browser."
         Start-Process $Url
         exit 0
     }
 } catch {
-    # Not running — continue to start it.
+    # Not running - continue to start it.
 }
 
 Set-Location $CentreDir
@@ -61,7 +61,7 @@ if ($Clean -and (Test-Path ".next")) {
 }
 
 if (-not (Test-Path "node_modules")) {
-    Info "First run — installing command centre dependencies..."
+    Info "First run - installing command centre dependencies..."
     npm install
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     Success "Dependencies installed"
@@ -69,10 +69,10 @@ if (-not (Test-Path "node_modules")) {
 }
 
 Write-Host ""
-Write-Host "    ╔══════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "    ║          A G E N T I C   O S                 ║" -ForegroundColor Cyan
-Write-Host "    ║              Command Centre                  ║" -ForegroundColor Cyan
-Write-Host "    ╚══════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "    ==============================================" -ForegroundColor Cyan
+Write-Host "             A G E N T I C   O S" -ForegroundColor Cyan
+Write-Host "               Command Centre" -ForegroundColor Cyan
+Write-Host "    ==============================================" -ForegroundColor Cyan
 Write-Host ""
 Info "Starting on $Url"
 Write-Host ""
