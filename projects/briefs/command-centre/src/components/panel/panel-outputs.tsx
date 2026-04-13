@@ -100,7 +100,7 @@ export function PanelOutputs({ taskId, onFileClick }: { taskId: string; onFileCl
         >
           {outputFiles.map((file) => {
             const Icon = getFileIcon(file.extension);
-            const docsHref = `/docs?file=${encodeURIComponent(file.relativePath)}`;
+            const docsHref = `/?tab=docs&file=${encodeURIComponent(file.relativePath)}`;
             const isImage = IMAGE_EXTENSIONS.has(file.extension);
 
             return (

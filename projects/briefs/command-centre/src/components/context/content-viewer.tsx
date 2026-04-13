@@ -9,6 +9,7 @@ import type { FileContent } from "@/types/file";
 
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg", "ico"]);
 const BINARY_EXTENSIONS = new Set([...IMAGE_EXTENSIONS, "pdf"]);
+const HTML_EXTENSIONS = new Set(["html", "htm"]);
 
 interface ContentViewerProps {
   selectedPath: string | null;
@@ -43,6 +44,10 @@ export function ContentViewer({ selectedPath, onFileDeleted }: ContentViewerProp
   };
 
   const isBinaryFile = selectedPath ? BINARY_EXTENSIONS.has(getExtension(selectedPath)) : false;
+  const isHtmlFile = selectedPath ? HTML_EXTENSIONS.has(getExtension(selectedPath)) : false;
+  const [htmlView, setHtmlView] = useState<"preview" | "source">("preview");
+  // Treat paths without a file extension as directories — don't try to fetch as a file.
+  const isDirectoryPath = selectedPath ? getExtension(selectedPath) === "" : false;
 
   const fetchFile = useCallback(async (filePath: string) => {
     const ext = filePath.split(".").pop()?.toLowerCase() || "";
@@ -75,13 +80,15 @@ export function ContentViewer({ selectedPath, onFileDeleted }: ContentViewerProp
   }, [clientId]);
 
   useEffect(() => {
-    if (selectedPath) {
+    if (selectedPath && !isDirectoryPath) {
       fetchFile(selectedPath);
+      setHtmlView("preview");
     } else {
       setFile(null);
+      setError(null);
       setMode("preview");
     }
-  }, [selectedPath, fetchFile]);
+  }, [selectedPath, fetchFile, isDirectoryPath]);
 
   const handleSave = async (content: string) => {
     if (!file || !selectedPath) return;
@@ -146,6 +153,36 @@ export function ContentViewer({ selectedPath, onFileDeleted }: ContentViewerProp
           }}
         >
           Select a file from the tree to view its contents
+        </p>
+      </div>
+    );
+  }
+
+  // Directory placeholder — the tree highlights the folder, viewer waits for a file pick.
+  if (isDirectoryPath) {
+    const folderName = selectedPath.split("/").filter(Boolean).pop() || selectedPath;
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+          minHeight: 400,
+          padding: 24,
+        }}
+      >
+        <p
+          style={{
+            fontFamily: "var(--font-inter), Inter, sans-serif",
+            fontSize: 14,
+            color: "#5E5E65",
+            textAlign: "center",
+          }}
+        >
+          <span style={{ fontWeight: 600, color: "#1B1C1B" }}>{folderName}</span>
+          <br />
+          Select a file from this folder in the tree to view it
         </p>
       </div>
     );
@@ -293,6 +330,32 @@ export function ContentViewer({ selectedPath, onFileDeleted }: ContentViewerProp
             >
               <Download size={14} /> Download
             </button>
+          ) : isHtmlFile ? (
+            <div style={{ display: "flex", gap: 4 }}>
+              {(["preview", "source"] as const).map((v) => (
+                <button
+                  key={v}
+                  onClick={() => setHtmlView(v)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "6px 14px",
+                    border: "none",
+                    borderRadius: "0.25rem",
+                    backgroundColor: htmlView === v ? "#FFDBCF" : "#F6F3F1",
+                    color: htmlView === v ? "#390C00" : "#5E5E65",
+                    fontFamily: "var(--font-inter), Inter, sans-serif",
+                    fontSize: 13,
+                    fontWeight: 500,
+                    cursor: "pointer",
+                    transition: "background 150ms ease",
+                  }}
+                >
+                  {v === "preview" ? <><Eye size={14} /> Preview</> : <><Pencil size={14} /> Source</>}
+                </button>
+              ))}
+            </div>
           ) : (
             <button
               onClick={() => setMode(mode === "preview" ? "edit" : "preview")}
@@ -442,7 +505,7 @@ export function ContentViewer({ selectedPath, onFileDeleted }: ContentViewerProp
       )}
 
       {/* Content */}
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
         {isBinaryFile ? (
           <>
             {/* Image rendering */}
@@ -477,6 +540,29 @@ export function ContentViewer({ selectedPath, onFileDeleted }: ContentViewerProp
               />
             )}
           </>
+        ) : isHtmlFile ? (
+          htmlView === "preview" ? (
+            <iframe
+              src={`/api/files/preview?path=${encodeURIComponent(selectedPath)}`}
+              title={fileName}
+              sandbox="allow-scripts allow-same-origin"
+              style={{
+                flex: 1,
+                width: "100%",
+                minHeight: "70vh",
+                border: "1px solid #EAE8E6",
+                borderRadius: 8,
+                background: "#fff",
+              }}
+            />
+          ) : (
+            <MarkdownEditor
+              content={file.content}
+              onSave={handleSave}
+              onCancel={() => setHtmlView("preview")}
+              isSaving={isSaving}
+            />
+          )
         ) : mode === "preview" ? (
           <MarkdownPreview content={file.content} />
         ) : (
