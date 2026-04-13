@@ -10,12 +10,6 @@ import Link from "next/link";
 import type { Task, TaskUpdateInput, OutputFile, LogEntry } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 import { TaskProgress } from "./task-progress";
-import {
-  insertTextareaNewline,
-  shouldInsertModifierNewline,
-  shouldSubmitOnPlainEnter,
-  syncComposerTextareaHeight,
-} from "@/lib/composer";
 
 const statusConfig: Record<string, { icon: typeof CheckCircle2; color: string; bg: string; label: string }> = {
   backlog: { icon: Inbox, color: "#5E5E65", bg: "#F3F0EE", label: "In Backlog" },
@@ -334,7 +328,10 @@ export function ModalSummaryTab({
         </div>
       )}
 
-      {/* Chat log digest — Activity first */}
+      {/* Chat log digest — hidden for project/gsd parents (those surface their
+          subtasks as the main content and clicking a subtask drills straight
+          into that child's own full conversation). */}
+      {!isParent && (
       <div style={{ padding: "20px 24px 0 24px" }}>
         <SectionHeader
           label="Activity"
@@ -418,6 +415,7 @@ export function ModalSummaryTab({
           </div>
         )}
       </div>
+      )}
 
       {/* Output files (parent + aggregated child outputs) — under activity */}
       <div style={{ padding: "16px 24px 0 24px" }}>
@@ -791,7 +789,7 @@ function ModalSubtaskInput({
 }: {
   parentId: string;
   projectSlug: string | null;
-  createTask: (title: string, description: string | null, level: "task" | "project" | "gsd", projectSlug?: string | null, parentId?: string | null) => Promise<void>;
+  createTask: (title: string, description: string | null, level: "task" | "project" | "gsd", projectSlug?: string | null, parentId?: string | null) => Promise<string | null>;
 }) {
   const [isAdding, setIsAdding] = useState(false);
   const [value, setValue] = useState("");
@@ -873,47 +871,29 @@ function ExpandableSubtaskRow({
   onViewFull?: (id: string) => void;
   updateTask: (id: string, updates: TaskUpdateInput) => Promise<void>;
 }) {
-  const [expanded, setExpanded] = useState(false);
-  const childLogEntries = useTaskStore((s) => s.logEntries[child.id]) ?? [];
-  const fetchLogEntries = useTaskStore((s) => s.fetchLogEntries);
-
-  // Fetch log entries when expanded
-  useEffect(() => {
-    if (expanded) {
-      fetchLogEntries(child.id);
-    }
-  }, [expanded, child.id, fetchLogEntries]);
-
-  const childDigest = expanded ? buildChatDigest(childLogEntries) : [];
-  const lastEntry = childLogEntries.length > 0 ? childLogEntries[childLogEntries.length - 1] : null;
-  const needsReply = lastEntry?.type === "question";
   const childCfg = statusConfig[child.status] || statusConfig.backlog;
 
   return (
     <div>
-      {/* Row header — click to expand/collapse */}
+      {/* Row — click drills straight into the child's full conversation */}
       <button
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => onViewFull?.(child.id)}
         style={{
           display: "flex",
           alignItems: "center",
           gap: 8,
           padding: "8px 10px",
-          borderRadius: expanded ? "6px 6px 0 0" : 6,
-          backgroundColor: expanded ? "#EDE8E5" : "#F6F3F1",
+          borderRadius: 6,
+          backgroundColor: "#F6F3F1",
           border: "none",
           cursor: "pointer",
           textAlign: "left",
           width: "100%",
           transition: "background 150ms ease",
         }}
-        onMouseEnter={(e) => { if (!expanded) e.currentTarget.style.backgroundColor = "#EDE8E5"; }}
-        onMouseLeave={(e) => { if (!expanded) e.currentTarget.style.backgroundColor = "#F6F3F1"; }}
+        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#EDE8E5"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#F6F3F1"; }}
       >
-        {expanded
-          ? <ChevronDown size={12} color="#5E5E65" style={{ flexShrink: 0 }} />
-          : <ChevronRight size={12} color="#5E5E65" style={{ flexShrink: 0 }} />
-        }
         <span
           style={{
             display: "inline-block",
@@ -1039,244 +1019,6 @@ function ExpandableSubtaskRow({
             Undo
           </button>
         )}
-      </button>
-
-      {/* Expanded panel */}
-      {expanded && (
-        <div
-          style={{
-            backgroundColor: "#FAFAF9",
-            borderRadius: "0 0 6px 6px",
-            border: "1px solid #EDE8E5",
-            borderTop: "none",
-            padding: "10px 12px",
-          }}
-        >
-          {/* Needs Review banner */}
-          {child.status === "review" && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "8px 12px",
-                backgroundColor: "#FFF5F0",
-                borderRadius: 6,
-                marginBottom: 10,
-              }}
-            >
-              <Eye size={14} color="#B25D3F" />
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                  color: "#B25D3F",
-                }}
-              >
-                Needs Review
-              </span>
-            </div>
-          )}
-
-          {/* Condensed activity digest */}
-          {childDigest.length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: 1, marginBottom: needsReply ? 10 : 0 }}>
-              {childDigest.slice(-5).map((item, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: 6,
-                    padding: "3px 0",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 9,
-                      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                      color: "#9C9CA0",
-                      minWidth: 36,
-                      flexShrink: 0,
-                      marginTop: 2,
-                    }}
-                  >
-                    {formatTime(item.time)}
-                  </span>
-                  <DigestIcon type={item.type} />
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontFamily: "var(--font-inter), Inter, sans-serif",
-                      color: item.type === "tools" ? "#5E5E65" : item.type === "reply" || item.type === "skill" ? "#93452A" : "#1B1C1B",
-                      fontWeight: item.type === "question" || item.type === "skill" ? 500 : 400,
-                      lineHeight: 1.4,
-                      flex: 1,
-                      overflow: "hidden",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical" as const,
-                    }}
-                  >
-                    {item.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div
-              style={{
-                fontSize: 12,
-                color: "#9C9CA0",
-                fontFamily: "var(--font-inter), Inter, sans-serif",
-                padding: "4px 0",
-              }}
-            >
-              No activity yet
-            </div>
-          )}
-
-          {/* Inline reply if child needs input */}
-          {needsReply && (
-            <InlineReplyInput childId={child.id} />
-          )}
-
-          {/* View full link */}
-          {onViewFull && <button
-            onClick={() => onViewFull(child.id)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontSize: 11,
-              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              color: "#93452A",
-              fontWeight: 500,
-              padding: "6px 0 0 0",
-              marginTop: 4,
-            }}
-          >
-            View full <ChevronRight size={10} />
-          </button>}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function InlineReplyInput({ childId }: { childId: string }) {
-  const [message, setMessage] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const appendLogEntry = useTaskStore((s) => s.appendLogEntry);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const maxHeight = 120;
-
-  useEffect(() => {
-    syncComposerTextareaHeight(textareaRef.current, { maxHeight });
-  }, [message]);
-
-  const handleSubmit = useCallback(async () => {
-    const trimmed = message.trim();
-    if (!trimmed || isSending) return;
-
-    setIsSending(true);
-
-    // Optimistic: add reply to log
-    appendLogEntry(childId, {
-      id: "local-" + crypto.randomUUID(),
-      type: "user_reply",
-      timestamp: new Date().toISOString(),
-      content: trimmed,
-    });
-
-    setMessage("");
-
-    try {
-      const res = await fetch(`/api/tasks/${childId}/reply`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed }),
-      });
-      if (!res.ok) {
-        console.error(`[inline-reply] Reply failed: ${res.status}`);
-      }
-    } catch {
-      // Silently fail
-    } finally {
-      setIsSending(false);
-    }
-  }, [message, isSending, childId, appendLogEntry]);
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "flex-end",
-        gap: 6,
-        padding: "6px 0",
-      }}
-    >
-      <textarea
-        ref={textareaRef}
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        onKeyDown={(e) => {
-          if (shouldInsertModifierNewline(e)) {
-            e.preventDefault();
-            insertTextareaNewline(e.currentTarget, setMessage);
-            return;
-          }
-          if (shouldSubmitOnPlainEnter(e)) {
-            e.preventDefault();
-            handleSubmit();
-          }
-        }}
-        placeholder="Reply to Claude..."
-        rows={1}
-        style={{
-          flex: 1,
-          fontSize: 12,
-          fontFamily: "var(--font-inter), Inter, sans-serif",
-          padding: "6px 10px",
-          border: "1px solid rgba(218, 193, 185, 0.4)",
-          borderRadius: 6,
-          outline: "none",
-          backgroundColor: "#FFFFFF",
-          color: "#1B1C1B",
-          resize: "none",
-          lineHeight: 1.5,
-          minHeight: 32,
-          maxHeight,
-          overflowY: "hidden",
-        }}
-        onFocus={(e) => { e.currentTarget.style.borderColor = "#93452A"; }}
-        onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.4)"; }}
-      />
-      <button
-        onClick={handleSubmit}
-        disabled={!message.trim() || isSending}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 28,
-          height: 28,
-          borderRadius: 6,
-          border: "none",
-          background: message.trim() && !isSending
-            ? "linear-gradient(135deg, #93452A, #B25D3F)"
-            : "#EAE8E6",
-          color: message.trim() && !isSending ? "#FFFFFF" : "#5E5E65",
-          cursor: message.trim() && !isSending ? "pointer" : "default",
-          flexShrink: 0,
-          transition: "background 150ms ease",
-        }}
-      >
-        <ArrowUp size={14} />
       </button>
     </div>
   );
