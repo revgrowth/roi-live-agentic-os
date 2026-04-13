@@ -5,11 +5,13 @@ import type {
   CronRun,
   CronJobCreateInput,
   CronJobUpdateInput,
+  CronSystemStatus,
 } from "@/types/cron";
 import type { TaskStatus } from "@/types/task";
 
 const CRON_ORDER_KEY = "cron-job-order";
 const CRON_PINNED_KEY = "cron-job-pinned";
+const CRON_SYSTEM_STATUS_PATH = "/api/cron/system-status";
 
 function loadCronOrder(): string[] | null {
   try {
@@ -101,6 +103,7 @@ export interface ActiveCronRun {
 
 interface CronStore {
   jobs: CronJob[];
+  systemStatus: CronSystemStatus | null;
   isLoading: boolean;
   error: string | null;
   expandedJob: string | null;
@@ -113,6 +116,7 @@ interface CronStore {
   pinnedSlugs: string[];
 
   fetchJobs: () => Promise<void>;
+  fetchSystemStatus: () => Promise<void>;
   toggleJob: (slug: string) => Promise<void>;
   deleteJob: (slug: string) => Promise<void>;
   createJob: (input: CronJobCreateInput) => Promise<void>;
@@ -128,6 +132,7 @@ interface CronStore {
 
 export const useCronStore = create<CronStore>((set, get) => ({
   jobs: [],
+  systemStatus: null,
   isLoading: false,
   error: null,
   expandedJob: null,
@@ -144,15 +149,38 @@ export const useCronStore = create<CronStore>((set, get) => ({
       const url = clientId
         ? `/api/cron?clientId=${encodeURIComponent(clientId)}`
         : "/api/cron";
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to fetch cron jobs");
-      const jobs = applySavedOrder(await res.json());
-      set({ jobs, isLoading: false });
+      const [jobsRes, systemStatusRes] = await Promise.allSettled([
+        fetch(url),
+        fetch(CRON_SYSTEM_STATUS_PATH),
+      ]);
+
+      if (jobsRes.status !== "fulfilled" || !jobsRes.value.ok) {
+        throw new Error("Failed to fetch cron jobs");
+      }
+
+      const jobs = applySavedOrder(await jobsRes.value.json());
+      const systemStatus =
+        systemStatusRes.status === "fulfilled" && systemStatusRes.value.ok
+          ? ((await systemStatusRes.value.json()) as CronSystemStatus)
+          : get().systemStatus;
+
+      set({ jobs, systemStatus, isLoading: false });
     } catch (err) {
       set({
         error: err instanceof Error ? err.message : "Unknown error",
         isLoading: false,
       });
+    }
+  },
+
+  fetchSystemStatus: async () => {
+    try {
+      const res = await fetch(CRON_SYSTEM_STATUS_PATH);
+      if (!res.ok) return;
+      const systemStatus = (await res.json()) as CronSystemStatus;
+      set({ systemStatus });
+    } catch {
+      // Silently fail -- runtime status is secondary to job loading
     }
   },
 
@@ -308,6 +336,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
     set({ expandedJob: slug });
     if (slug) {
       get().fetchRunHistory(slug);
+      get().fetchSystemStatus();
       // Also refresh this job's metadata (last run, stats) from the server
       fetch(withClientQuery(`/api/cron/${slug}`))
         .then((res) => res.ok ? res.json() : null)

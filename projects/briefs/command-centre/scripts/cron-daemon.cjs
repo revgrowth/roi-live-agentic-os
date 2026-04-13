@@ -44,6 +44,9 @@ function formatStatus(status) {
   return [
     `runtime: ${status.runtime}`,
     `leader: ${status.leader}`,
+    `leaderState: ${status.leaderState}`,
+    `statusSummary: ${status.statusSummary}`,
+    `ownershipReason: ${status.ownershipReason}`,
     `identifier: ${status.identifier || "none"}`,
     `pid: ${status.pid || "none"}`,
     `workspaceCount: ${status.workspaceCount}`,

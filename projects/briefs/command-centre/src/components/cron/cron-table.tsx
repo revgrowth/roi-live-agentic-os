@@ -6,6 +6,7 @@ import { useCronStore } from "@/store/cron-store";
 import { useClientStore } from "@/store/client-store";
 import { CronRow } from "./cron-row";
 import { CreateJobPanel } from "./create-job-panel";
+import { RuntimeStatus } from "./runtime-status";
 
 export function CronJobsView() {
   const jobs = useCronStore((s) => s.jobs);
@@ -100,6 +101,8 @@ export function CronJobsView() {
           <div style={statLabelStyle}>Today&apos;s Spend</div>
         </div>
       </div>
+
+      <RuntimeStatus />
 
       <div
         style={{
