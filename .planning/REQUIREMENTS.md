@@ -1,204 +1,96 @@
-# Requirements: Agentic OS Command Centre
+# Requirements: Cron Jobs Hardening
 
-**Defined:** 2025-03-25
-**Core Value:** A user can describe a task, watch it run, and get the output — without ever opening a terminal.
+**Defined:** 2026-04-13  
+**Core Value:** Cron jobs must feel reliable, understandable, and safely contained whether they run from the root workspace or from a client workspace.
 
 ## v1 Requirements
 
-### Design
+### CLI Experience
 
-- [x] **DESIGN-01**: Copy-paste-ready Google Stitch prompts produced for all dashboard views before code is written
-- [x] **DESIGN-02**: Stitch prompts cover Board, Cron Jobs, Context, Brand, Skills views and client switcher — one prompt per view/screen
-- [x] **DESIGN-03**: A design language document defines shared tokens (colours, typography, spacing, component styles) referenced by all prompts
-- [x] **DESIGN-04**: Each Stitch prompt specifies all relevant view states: empty, loading, running, completed, and error
+- [ ] **CLI-01**: User can start the cron daemon from the CLI and immediately understand whether a daemon was started, already running, or blocked by another runtime state
+- [ ] **CLI-02**: User can inspect cron status from the CLI through structured, human-friendly output that shows runtime owner, leader state, PID, heartbeat freshness, and workspace count
+- [ ] **CLI-03**: User can inspect daemon logs from the CLI through readable output with clear headings, recent context, and file path hints
+- [ ] **CLI-04**: User can stop the cron daemon from the CLI and immediately understand what changed
 
-### Infrastructure
+### Runtime Ownership
 
-- [ ] **INFRA-01**: App initializes SQLite database on first launch with full schema
-- [ ] **INFRA-02**: App starts via single command from project directory
-- [ ] **INFRA-03**: App accepts configurable agentic-os directory path (defaults to cwd, configurable via settings)
-- [ ] **INFRA-04**: REST API endpoints for all task CRUD operations
-- [ ] **INFRA-05**: SSE endpoint streams live task status updates and output file events to frontend
+- [ ] **OWNR-01**: User can tell whether cron scheduling is currently owned by the CLI daemon, the in-process UI runtime, or neither
+- [ ] **OWNR-02**: User sees consistent ownership state in both the CLI and the UI for the same workspace
+- [ ] **OWNR-03**: User does not get duplicate scheduled cron execution when the CLI daemon and UI server are both running
+- [ ] **OWNR-04**: User can understand when a cron run was skipped because another run or runtime already owned execution
 
-### Board
+### Windows Background Execution
 
-- [x] **BOARD-01**: Kanban board displays 5 columns: Backlog, Queued, Running, Review, Done
-- [x] **BOARD-02**: User can create a task by typing a natural language description
-- [x] **BOARD-03**: User can drag and drop cards between columns
-- [ ] **BOARD-04**: Cards visually distinguish between Task, Project, and GSD levels
-- [ ] **BOARD-05**: Project and GSD cards expand to show child tasks and progress
+- [ ] **WIN-01**: User can start the CLI daemon on Windows without a visible terminal window appearing
+- [ ] **WIN-02**: User can let a daemon-triggered cron job run on Windows without visible terminal popups during execution
+- [ ] **WIN-03**: Windows hidden-background behavior preserves daemon logging, status reporting, and clean stop behavior
 
-### Execution
+### Client Isolation
 
-- [ ] **EXEC-01**: Dashboard spawns Claude CLI as subprocess within configured agentic-os directory
-- [ ] **EXEC-02**: Claude CLI subprocess inherits full agentic-os context (CLAUDE.md, skills, brand, memory)
-- [ ] **EXEC-03**: Running tasks show live progress via SSE (status changes + output files appearing)
-- [ ] **EXEC-04**: Process manager handles cleanup on task cancel/error (no zombie processes)
+- [ ] **CLNT-01**: User can run a client cron job and have it execute inside the selected client workspace, not the root workspace
+- [ ] **CLNT-02**: User can run a client cron job and have any generated outputs land only inside allowed directories of that client workspace
+- [ ] **CLNT-03**: User can view client cron logs and status files only inside that client's workspace and history views
+- [ ] **CLNT-04**: User can inspect root and client cron jobs with the same slug without the UI mixing their state, history, or controls
+- [ ] **CLNT-05**: User can run, edit, toggle, delete, and inspect a cron job in the UI while the selected client scope is preserved end to end
+- [ ] **CLNT-06**: Generated client cron wrappers correctly target the shared root runtime while preserving the selected client workspace for execution
 
-### Tracking
+### Safety and Verification
 
-- [x] **TRACK-01**: Each task logs tokens used, cost, and duration
-- [x] **TRACK-02**: Global stats bar shows: tasks running, tasks completed, active crons, today's spend
-
-### Outputs
-
-- [x] **OUT-01**: Completed tasks display list of output files on the card
-- [x] **OUT-02**: User can preview markdown, text, and CSV files inline without leaving the board
-- [x] **OUT-03**: User can download any output file
-
-### Detail Panel
-
-- [x] **PANEL-01**: Clicking a card opens a slide-out panel with task level, skill used, progress, and stats
-- [x] **PANEL-02**: Panel shows full list of output files with inline preview capability
-
-### Cron
-
-- [x] **CRON-01**: User can create recurring tasks with daily, weekly, monthly, or custom cron expression
-- [x] **CRON-02**: Dedicated Cron Jobs view shows run history, average duration, average cost, next run, and active/paused status
-
-### Management Tabs
-
-- [x] **CTX-01**: Context tab displays and allows editing of memory/context files from the agentic-os project
-- [x] **BRAND-01**: Brand tab displays and allows editing of brand context files (voice, positioning, ICP, style)
-- [x] **SKILL-01**: Skills tab shows browsable list of installed skills with name, trigger description, and dependencies
-
-### Client Switching
-
-- [x] **CLIENT-01**: Client switcher in nav bar scopes all views to a specific client folder or root
-- [x] **CLIENT-02**: Board, cron jobs, context, brand, and skills all filter by selected client
-
-### Design (UI Implementation)
-
-- [ ] **UI-01**: Clean light theme with minimal UI inspired by Vibe Kanban — no emojis, no dev jargon
-- [ ] **UI-02**: Nav structure: Board | Cron Jobs | Context | Brand | Skills with client switcher in top bar
-
-### Task Execution & Detail UI (Phase 6)
-
-- [x] **EXEC-06-01**: Task creation captures both a short task name (card title) and a longer description (full brief sent to Claude) with inline-expand form
-- [x] **EXEC-06-02**: Process manager spawns Claude CLI with stdin piped (not ignored), enabling two-way communication for questions and replies
-- [x] **EXEC-06-03**: Parser detects when Claude asks a question and emits question events via SSE, with reply API to pipe user responses to stdin
-- [ ] **EXEC-06-04**: Clicking a task opens a full-screen modal (not 480px slide-out) with chat-style execution logs, task metadata sidebar, and output files
-- [ ] **EXEC-06-05**: Execution logs stream live with auto-scroll, tool calls shown as collapsible cards, and Jump to latest button when scrolled up
-
-## v1.1 Requirements
-
-### Settings & Configuration
-
-- [x] **SETTINGS-01**: Settings page accessible from sidebar with tabbed layout for Scripts, Environment, MCP, and Claude Settings
-- [x] **SETTINGS-02**: Environment tab displays `.env` key-value pairs with values masked by default, a reveal toggle per row, and a copy-to-clipboard button per value
-- [x] **SETTINGS-03**: Environment tab supports adding, editing, and deleting key-value pairs, saving back to `.env` file
-- [x] **SETTINGS-04**: MCP tab displays `.mcp.json` in a syntax-highlighted JSON editor with save functionality
-- [x] **SETTINGS-05**: Claude Settings tab displays `.claude/settings.json` in a syntax-highlighted JSON editor with save functionality
-- [x] **SETTINGS-06**: JSON editors validate syntax before saving and show inline error indicators for malformed JSON
-
-### Script Runner
-
-- [x] **SCRIPT-01**: Scripts tab lists available system scripts from `scripts/` directory with human-readable labels and descriptions
-- [x] **SCRIPT-02**: Scripts that require arguments (e.g. `add-client.sh`) show an input form in the UI before execution (client name field for add-client)
-- [x] **SCRIPT-03**: Running a script streams stdout/stderr output live to the UI in a terminal-style output area
-- [x] **SCRIPT-04**: Destructive or long-running scripts (e.g. `update.sh`) require confirmation before execution
-- [x] **SCRIPT-05**: Script execution shows running/success/error status with appropriate visual indicators
+- [ ] **SAFE-01**: User gets a visible warning or failure state if a client cron run writes outside the selected client workspace
+- [ ] **SAFE-02**: User can trust cron run history because interrupted or partially recovered runs are not silently reported as successful
+- [ ] **SAFE-03**: Regression coverage exists for root-vs-client execution, same-slug isolation, runtime leadership, and Windows hidden execution behavior
 
 ## v2 Requirements
 
-### Smart Routing
+### Convenience Improvements
 
-- **ROUTE-01**: Skill auto-routing matches task description to the right Agentic OS skill automatically
-- **ROUTE-02**: User can override auto-selected skill before execution
-
-### Output Versioning
-
-- **VER-01**: Cron job outputs versioned by run for side-by-side comparison
-- **VER-02**: User can view diff between consecutive cron run outputs
-
-### Detail Panel Enhancements
-
-- **PANEL-03**: Project/GSD cards show sub-task breakdown with per-task output files
-- **PANEL-04**: Cron tasks show schedule info, next run, and run history in panel
-
-### Budget Controls
-
-- **BUDGET-01**: User can set budget limits per task level
-- **BUDGET-02**: Dashboard warns when approaching budget threshold
-
-### Distribution
-
-- **DIST-01**: App distributable via npx (one-command install from npm registry)
-- **DIST-02**: Setup script handles native dependency compilation gracefully
+- **CONV-01**: User can create or edit cron jobs through natural-language guidance
+- **CONV-02**: User can duplicate or template common cron job setups
+- **CONV-03**: User can preview when a schedule will run before saving
+- **CONV-04**: User can inspect richer cross-workspace summaries and cost analytics for cron jobs
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Cloud hosting / SaaS | Local-only for v1 — simplifies everything (no auth, no infra) |
-| Git/diff/branch visibility | Business tool, not a developer tool — no dev concepts in UI |
-| OAuth / user authentication | Single-user local app — no accounts needed |
-| Mobile app | Desktop browser only — dashboard is a workstation tool |
-| Real-time collaborative editing | Single user per instance |
-| Agent SDK integration | Claude CLI subprocess is simpler and proven; revisit if SDK matures |
+| Replacing the cron system with an OS scheduler | Preserve the existing shared runtime model |
+| Building a cloud or remote cron service | This project is limited to the local Agentic OS runtime |
+| Broad redesign of the full task system | This stream is specifically about cron behavior and cron UX |
+| Full visual automation builder | Too large for a hardening stream |
+| Deep performance analytics | Nice to have later, not required for trust and containment |
 
 ## Traceability
 
+Which phases cover which requirements. Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DESIGN-01 | Phase 1 | Complete |
-| DESIGN-02 | Phase 1 | Complete |
-| DESIGN-03 | Phase 1 | Complete |
-| DESIGN-04 | Phase 1 | Complete |
-| INFRA-01 | Phase 2 | Pending |
-| INFRA-02 | Phase 2 | Pending |
-| INFRA-03 | Phase 2 | Pending |
-| INFRA-04 | Phase 2 | Pending |
-| INFRA-05 | Phase 2 | Pending |
-| BOARD-01 | Phase 2 | Complete |
-| BOARD-02 | Phase 2 | Complete |
-| BOARD-03 | Phase 2 | Complete |
-| BOARD-04 | Phase 2 | Pending |
-| BOARD-05 | Phase 2 | Pending |
-| EXEC-01 | Phase 2 | Pending |
-| EXEC-02 | Phase 2 | Pending |
-| EXEC-03 | Phase 2 | Pending |
-| EXEC-04 | Phase 2 | Pending |
-| TRACK-01 | Phase 3 | Complete |
-| TRACK-02 | Phase 3 | Complete |
-| OUT-01 | Phase 3 | Complete |
-| OUT-02 | Phase 3 | Complete |
-| OUT-03 | Phase 3 | Complete |
-| PANEL-01 | Phase 3 | Complete |
-| PANEL-02 | Phase 3 | Complete |
-| CRON-01 | Phase 4 | Complete |
-| CRON-02 | Phase 4 | Complete |
-| CTX-01 | Phase 4 | Complete |
-| BRAND-01 | Phase 4 | Complete |
-| SKILL-01 | Phase 4 | Complete |
-| CLIENT-01 | Phase 5 | Complete |
-| CLIENT-02 | Phase 5 | Complete |
-| UI-01 | Phase 2 | Pending |
-| UI-02 | Phase 2 | Pending |
-| EXEC-06-01 | Phase 6 | Complete |
-| EXEC-06-02 | Phase 6 | Complete |
-| EXEC-06-03 | Phase 6 | Complete |
-| EXEC-06-04 | Phase 6 | Pending |
-| EXEC-06-05 | Phase 6 | Pending |
-
-| SETTINGS-01 | Phase 7 | Complete |
-| SETTINGS-02 | Phase 7 | Complete |
-| SETTINGS-03 | Phase 7 | Complete |
-| SETTINGS-04 | Phase 7 | Complete |
-| SETTINGS-05 | Phase 7 | Complete |
-| SETTINGS-06 | Phase 7 | Complete |
-| SCRIPT-01 | Phase 7 | Complete |
-| SCRIPT-02 | Phase 7 | Complete |
-| SCRIPT-03 | Phase 7 | Complete |
-| SCRIPT-04 | Phase 7 | Complete |
-| SCRIPT-05 | Phase 7 | Complete |
+| CLI-01 | TBD | Pending |
+| CLI-02 | TBD | Pending |
+| CLI-03 | TBD | Pending |
+| CLI-04 | TBD | Pending |
+| OWNR-01 | TBD | Pending |
+| OWNR-02 | TBD | Pending |
+| OWNR-03 | TBD | Pending |
+| OWNR-04 | TBD | Pending |
+| WIN-01 | TBD | Pending |
+| WIN-02 | TBD | Pending |
+| WIN-03 | TBD | Pending |
+| CLNT-01 | TBD | Pending |
+| CLNT-02 | TBD | Pending |
+| CLNT-03 | TBD | Pending |
+| CLNT-04 | TBD | Pending |
+| CLNT-05 | TBD | Pending |
+| CLNT-06 | TBD | Pending |
+| SAFE-01 | TBD | Pending |
+| SAFE-02 | TBD | Pending |
+| SAFE-03 | TBD | Pending |
 
 **Coverage:**
-- v1 requirements: 39 total
-- v1.1 requirements: 11 total
-- Mapped to phases: 50
-- Unmapped: 0
+- v1 requirements: 20 total
+- Mapped to phases: 0
+- Unmapped: 20 ⚠️
 
 ---
-*Requirements defined: 2025-03-25*
-*Last updated: 2026-03-26 — v1.1 Settings & Script Runner requirements added*
+*Requirements defined: 2026-04-13*  
+*Last updated: 2026-04-13 after initial definition*
