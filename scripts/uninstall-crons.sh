@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "uninstall-crons is deprecated. Stopping the managed cron daemon instead."
-bash "$(cd "$(dirname "$0")" && pwd)/stop-crons.sh" "$@"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/lib/cron-ui.sh"
+
+agentic_os_cron_banner \
+    "uninstall-crons is deprecated" \
+    "Stopping the managed cron daemon instead."
+agentic_os_cron_info "Redirecting to stop-crons..."
+bash "$SCRIPT_DIR/stop-crons.sh" "$@"

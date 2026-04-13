@@ -1333,6 +1333,30 @@ function collectOutputFiles(workspaceDir, beforeSnapshot, startMs, endMs) {
   return files;
 }
 
+function buildCronExecutionPrompt(job, workspace) {
+  const basePrompt = String(job.prompt || "").trim();
+  if (!workspace.clientId) {
+    return basePrompt;
+  }
+
+  return [
+    `You are running a scheduled job inside the client workspace "${workspace.label}".`,
+    `Workspace root: ${workspace.workspaceDir}`,
+    "Stay inside this workspace for all reads and writes.",
+    'When creating output files, use explicit client-local paths such as "projects/..." inside the current workspace.',
+    "Do not create or update files in the root workspace or in another client workspace.",
+    basePrompt,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function formatOutputLeakMessage(files) {
+  const paths = files.map((file) => file.relativePath).slice(0, 5);
+  const suffix = files.length > 5 ? ` (+${files.length - 5} more)` : "";
+  return `Client cron job wrote outside its workspace: ${paths.join(", ")}${suffix}`;
+}
+
 function persistTaskOutputs(agenticOsDir, taskId, files) {
   const db = getDb(agenticOsDir);
   db.prepare("DELETE FROM task_outputs WHERE taskId = ?").run(taskId);
@@ -1401,6 +1425,7 @@ function spawnClaudeRun(job, cwd, logFilePath) {
   return new Promise((resolve, reject) => {
     const env = { ...process.env };
     delete env.CLAUDECODE;
+    env.AGENTIC_OS_DIR = cwd;
     const claudeCommand = env.AGENTIC_OS_CLAUDE_BIN || "claude";
     const claudeArgs = ["-p", job.prompt, "--model", job.model, "--dangerously-skip-permissions"];
     const useWindowsCmdShell =
@@ -1411,6 +1436,7 @@ function spawnClaudeRun(job, cwd, logFilePath) {
       cwd,
       env,
       stdio: ["ignore", "pipe", "pipe"],
+      windowsHide: true,
     });
 
     let stdout = "";
@@ -1503,6 +1529,11 @@ async function executeCronTask(agenticOsDir, taskId) {
   const startIso = new Date().toISOString();
   const startMs = Date.now();
   const beforeSnapshot = takeOutputSnapshot(workspace.workspaceDir);
+  const beforeRootSnapshot = workspace.clientId ? takeOutputSnapshot(agenticOsDir) : null;
+  const executionJob = {
+    ...job,
+    prompt: buildCronExecutionPrompt(job, workspace),
+  };
 
   appendCronLog(
     agenticOsDir,
@@ -1529,7 +1560,7 @@ async function executeCronTask(agenticOsDir, taskId) {
     }
 
     try {
-      lastRun = await spawnClaudeRun(job, workspace.workspaceDir, logFilePath);
+      lastRun = await spawnClaudeRun(executionJob, workspace.workspaceDir, logFilePath);
     } catch (error) {
       lastRun = {
         exitCode: 1,
@@ -1548,9 +1579,24 @@ async function executeCronTask(agenticOsDir, taskId) {
   const completedAt = new Date().toISOString();
   const endMs = Date.now();
   const durationMs = endMs - startMs;
-  const result = lastRun.timedOut ? "timeout" : lastRun.exitCode === 0 ? "success" : "failure";
   const outputs = collectOutputFiles(workspace.workspaceDir, beforeSnapshot, startMs, endMs);
+  const leakedRootOutputs =
+    beforeRootSnapshot ? collectOutputFiles(agenticOsDir, beforeRootSnapshot, startMs, endMs) : [];
+  const containmentError =
+    leakedRootOutputs.length > 0 ? formatOutputLeakMessage(leakedRootOutputs) : null;
+  const result = containmentError
+    ? "failure"
+    : lastRun.timedOut
+      ? "timeout"
+      : lastRun.exitCode === 0
+        ? "success"
+        : "failure";
+  const exitCode = containmentError && lastRun.exitCode === 0 ? 1 : lastRun.exitCode;
   persistTaskOutputs(agenticOsDir, taskId, outputs);
+
+  if (containmentError) {
+    appendCronLog(agenticOsDir, job.clientId, job.slug, `[cron-daemon] ${containmentError}`);
+  }
 
   appendCronLog(
     agenticOsDir,
@@ -1561,7 +1607,10 @@ async function executeCronTask(agenticOsDir, taskId) {
 
   const updatedTask = finalizeTask(agenticOsDir, taskId, {
     result,
-    errorMessage: result === "success" ? null : lastRun.stderr || `Exit code ${lastRun.exitCode}`,
+    errorMessage:
+      result === "success"
+        ? null
+        : containmentError || lastRun.stderr || `Exit code ${exitCode}`,
     durationMs,
     completedAt,
     activityLabel:
@@ -1574,7 +1623,7 @@ async function executeCronTask(agenticOsDir, taskId) {
 
   completeCronRunForTask(agenticOsDir, updatedTask, {
     result,
-    exitCode: lastRun.exitCode,
+    exitCode,
     durationMs,
     completedAt,
   });
@@ -1582,7 +1631,7 @@ async function executeCronTask(agenticOsDir, taskId) {
   return {
     task: updatedTask,
     result,
-    exitCode: lastRun.exitCode,
+    exitCode,
     durationMs,
     outputs,
   };

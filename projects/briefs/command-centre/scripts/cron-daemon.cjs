@@ -217,6 +217,7 @@ function startDaemon() {
     cwd: agenticOsDir,
     detached: true,
     stdio: ["ignore", logFd, logFd],
+    windowsHide: true,
     env: {
       ...process.env,
       AGENTIC_OS_DIR: agenticOsDir,
