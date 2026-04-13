@@ -4,5 +4,12 @@ param(
     [string[]]$Arguments
 )
 
-Write-Host "uninstall-crons is deprecated. Stopping the managed cron daemon instead."
+$CronUiPath = Join-Path $PSScriptRoot "lib\cron-ui.ps1"
+. $CronUiPath
+
+Write-AgenticOsCronBanner `
+    -Heading "uninstall-crons is deprecated" `
+    -Subheading "Stopping the managed cron daemon instead."
+Write-AgenticOsCronInfo "Redirecting to stop-crons..."
 & (Join-Path $PSScriptRoot "stop-crons.ps1") @Arguments
+exit $LASTEXITCODE

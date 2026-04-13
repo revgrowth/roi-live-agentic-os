@@ -1,5 +1,23 @@
 export type CronResult = "success" | "failure" | "timeout";
 export type CronRunResult = CronResult | "running";
+export type CronRunResultSource = "observed" | "inferred";
+export type CronRunCompletionReason =
+  | "completed"
+  | "failed"
+  | "timed_out"
+  | "recovered_inferred_state"
+  | "recovered_missing_task"
+  | "recovered_orphaned_task"
+  | "recovered_from_terminal_task_state"
+  | "recovered_from_stuck_needs_input";
+export type CronLeaderState = "active" | "stale" | "absent";
+export type CronOwnershipReason =
+  | "local-leader-active"
+  | "external-leader-active"
+  | "stale-leader-record"
+  | "daemon-process-without-lock"
+  | "local-runtime-without-leader"
+  | "no-runtime-detected";
 
 export interface CronJob {
   name: string;
@@ -54,6 +72,8 @@ export interface CronRun {
   costUsd: number | null;
   exitCode: number | null;
   trigger: "manual" | "scheduled";
+  resultSource: CronRunResultSource | null;
+  completionReason: CronRunCompletionReason | null;
   outputs: CronRunOutput[];
 }
 
@@ -85,7 +105,11 @@ export interface CronJobUpdateInput {
 export interface CronSystemStatus {
   runtime: "in-process" | "daemon" | "stopped";
   leader: boolean;
+  leaderState: CronLeaderState;
   identifier: string | null;
+  localRuntimePresent: boolean;
+  ownershipReason: CronOwnershipReason;
+  statusSummary: string;
   startCommand: string;
   stopCommand: string;
   statusCommand: string;

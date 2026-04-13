@@ -1,5 +1,35 @@
-import { getManagedCronRuntimeStatus } from "./cron-service";
+import { getConfig } from "./config";
+import type { CronSystemStatus } from "@/types/cron";
 
-export function getCronSystemStatus(localIdentifier?: string | null) {
-  return getManagedCronRuntimeStatus(localIdentifier);
+const cronRuntime = require("./cron-runtime.js");
+
+function getAgenticOsDir(): string {
+  return getConfig().agenticOsDir;
+}
+
+export function getCronSystemStatus(
+  localIdentifier?: string | null
+): CronSystemStatus {
+  const status = cronRuntime.getManagedRuntimeStatus(
+    getAgenticOsDir(),
+    localIdentifier || undefined
+  ) as CronSystemStatus;
+
+  return {
+    ...status,
+    statusSummary: status.statusSummary || "No cron runtime is active.",
+  };
+}
+
+export function isLocalCronSchedulingLeader(
+  localIdentifier?: string | null
+): boolean {
+  const status = getCronSystemStatus(localIdentifier);
+  return status.leader && status.leaderState === "active";
+}
+
+export function getCronSystemStatusSummary(
+  localIdentifier?: string | null
+): string {
+  return getCronSystemStatus(localIdentifier).statusSummary;
 }
