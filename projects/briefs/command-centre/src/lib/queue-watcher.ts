@@ -3,38 +3,9 @@ import { processManager } from "./process-manager";
 import { getDb } from "./db";
 import { getCronSystemStatus } from "./cron-system-status";
 import { getInProcessCronRuntimeIdentifier } from "./cron-scheduler";
-import type { CronRunCompletionReason } from "@/types/cron";
 import type { Task } from "@/types/task";
 
-const cronRuntime = require("./cron-runtime.js");
-
 let initialized = false;
-
-function getRecoveredCronRunCompletionReason(
-  row: {
-    taskId: string | null;
-    taskStatus: string | null;
-  },
-  fallback: CronRunCompletionReason = "recovered_inferred_state"
-): CronRunCompletionReason {
-  if (!row.taskId) {
-    return "recovered_missing_task";
-  }
-
-  if (!row.taskStatus) {
-    return "recovered_missing_task";
-  }
-
-  if (row.taskStatus === "running" || row.taskStatus === "queued") {
-    return "recovered_orphaned_task";
-  }
-
-  if (row.taskStatus === "review" || row.taskStatus === "done") {
-    return "recovered_from_terminal_task_state";
-  }
-
-  return fallback;
-}
 
 /**
  * Initialize the queue watcher.
@@ -135,28 +106,19 @@ export function initQueueWatcher(): void {
     if (stuckCronRuns.length > 0) {
       console.log(`[queue-watcher] Reconciling ${stuckCronRuns.length} stuck cron_runs row(s)`);
       for (const row of stuckCronRuns) {
-        const recoveryReason = getRecoveredCronRunCompletionReason(row);
-        const recovery = cronRuntime.buildRecoveredCronRunUpdate(recoveryReason, {
-          completedAt: row.completedAt || now,
-          durationMs: row.durationMs || 0,
-          costUsd: row.costUsd ?? null,
-        });
-
-        db.prepare(
-          `UPDATE cron_runs
-           SET completedAt = ?, result = ?, resultSource = ?, completionReason = ?,
-               durationSec = ?, costUsd = ?, exitCode = ?
-           WHERE id = ?`
-        ).run(
-          recovery.completedAt,
-          recovery.result,
-          recovery.resultSource,
-          recovery.completionReason,
-          recovery.durationSec,
-          recovery.costUsd,
-          recovery.exitCode,
-          row.cronRunId
-        );
+        if (!row.taskId || !row.taskStatus || row.taskStatus === "running" || row.taskStatus === "queued") {
+          // Task is still active or missing — mark cron run as failure (orphaned)
+          db.prepare(
+            `UPDATE cron_runs SET completedAt = ?, result = 'failure', durationSec = 0 WHERE id = ?`
+          ).run(now, row.cronRunId);
+        } else {
+          // Task reached a terminal state — update cron run to match
+          const result = row.errorMessage ? "failure" : "success";
+          const durationSec = row.durationMs ? Math.round(row.durationMs / 1000) : 0;
+          db.prepare(
+            `UPDATE cron_runs SET completedAt = ?, result = ?, durationSec = ?, costUsd = ? WHERE id = ?`
+          ).run(row.completedAt || now, result, durationSec, row.costUsd || 0, row.cronRunId);
+        }
       }
     }
   } catch (err) {
@@ -335,29 +297,11 @@ export function initQueueWatcher(): void {
 
         // Also close any stuck cron_runs for this task
         if (updated.cronJobSlug) {
-          const recovery = cronRuntime.buildRecoveredCronRunUpdate(
-            "recovered_from_stuck_needs_input",
-            {
-              completedAt: now,
-              durationMs: updated.durationMs || 0,
-              costUsd: updated.costUsd ?? null,
-            }
-          );
           db.prepare(
-            `UPDATE cron_runs
-             SET completedAt = ?, result = ?, resultSource = ?, completionReason = ?,
-                 durationSec = ?, costUsd = ?, exitCode = ?
-             WHERE taskId = ? AND result = 'running'`
-          ).run(
-            recovery.completedAt,
-            recovery.result,
-            recovery.resultSource,
-            recovery.completionReason,
-            recovery.durationSec,
-            recovery.costUsd,
-            recovery.exitCode,
-            task.id
-          );
+            `UPDATE cron_runs SET completedAt = ?, result = 'success', durationSec = COALESCE(
+              CAST((julianday(?) - julianday(startedAt)) * 86400 AS INTEGER), 0
+            ) WHERE taskId = ? AND result = 'running'`
+          ).run(now, now, task.id);
         }
       }
     } catch (err) {

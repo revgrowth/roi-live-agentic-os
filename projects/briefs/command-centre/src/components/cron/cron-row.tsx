@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Play, Pause, Trash2, ChevronDown, ChevronRight, Zap, Loader2, FileText, Clock, Pencil } from "lucide-react";
-import { getCronJobKey, useCronStore } from "@/store/cron-store";
+import { useCronStore } from "@/store/cron-store";
 import { useClientStore } from "@/store/client-store";
 import { RunHistory } from "./run-history";
-import type { CronJob, CronRun } from "@/types/cron";
+import type { CronJob } from "@/types/cron";
 
 interface CronRowProps {
   job: CronJob;
@@ -78,18 +78,6 @@ function getResultBadge(result: "success" | "failure" | "timeout") {
   return { label: "Fail", backgroundColor: "#FEF2F2", color: "#EF4444" };
 }
 
-function getLatestRunTruthLabel(run: CronRun | undefined): string | null {
-  if (!run || !run.resultSource) {
-    return null;
-  }
-
-  if (run.resultSource === "inferred") {
-    return "Recovered result";
-  }
-
-  return "Observed result";
-}
-
 export function CronRow({
   job,
   index,
@@ -107,17 +95,15 @@ export function CronRow({
   const deleteJob = useCronStore((s) => s.deleteJob);
   const runJobNow = useCronStore((s) => s.runJobNow);
   const setEditingJob = useCronStore((s) => s.setEditingJob);
-  const jobKey = getCronJobKey(job.slug, job.clientId);
   const isPinned = useCronStore((s) => s.pinnedSlugs.includes(job.slug));
-  const activeRun = useCronStore((s) => s.activeRuns[jobKey]);
-  const systemStatus = useCronStore((s) => s.systemStatus);
+  const activeRun = useCronStore((s) => s.activeRuns[job.slug]);
   const selectedClientId = useClientStore((s) => s.selectedClientId);
   const [expandedTab, setExpandedTab] = useState<"file" | "history">("history");
   const [rawFile, setRawFile] = useState<string | null>(null);
   const [loadingFile, setLoadingFile] = useState(false);
 
   const isActiveRun = !!activeRun;
-  const isExpanded = expandedJob === jobKey;
+  const isExpanded = expandedJob === job.slug;
 
   // Auto-fetch job file when expanded
   useEffect(() => {
@@ -130,10 +116,8 @@ export function CronRow({
         .catch(() => setRawFile("(failed to load file)"))
         .finally(() => setLoadingFile(false));
     }
-  }, [isExpanded, job.slug, jobKey, rawFile, loadingFile, selectedClientId]);
-  const runs = runHistory[jobKey] || [];
-  const latestRun = runs[0];
-  const latestRunTruthLabel = getLatestRunTruthLabel(latestRun);
+  }, [isExpanded, job.slug, rawFile, loadingFile, selectedClientId]);
+  const runs = runHistory[job.slug] || [];
   const lastRunBadge = job.lastRun ? getResultBadge(job.lastRun.result) : null;
 
   // Derive a human-friendly status label for the active run
@@ -251,28 +235,21 @@ export function CronRow({
         {/* Last Run */}
         <div style={{ fontSize: 13, color: "#5E5E65" }}>
           {job.lastRun ? (
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span>{formatRelativeTime(job.lastRun.lastRun)}</span>
-                <span
-                  style={{
-                    display: "inline-block",
-                    padding: "1px 6px",
-                    borderRadius: 4,
-                    fontSize: 10,
-                    fontWeight: 500,
-                    backgroundColor: lastRunBadge?.backgroundColor,
-                    color: lastRunBadge?.color,
-                  }}
-                >
-                  {lastRunBadge?.label}
-                </span>
-              </div>
-              {latestRunTruthLabel && (
-                <div style={{ fontSize: 10, color: "#5E5E65", marginTop: 4 }}>
-                  {latestRunTruthLabel}
-                </div>
-              )}
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span>{formatRelativeTime(job.lastRun.lastRun)}</span>
+              <span
+                style={{
+                  display: "inline-block",
+                  padding: "1px 6px",
+                  borderRadius: 4,
+                  fontSize: 10,
+                  fontWeight: 500,
+                  backgroundColor: lastRunBadge?.backgroundColor,
+                  color: lastRunBadge?.color,
+                }}
+              >
+                {lastRunBadge?.label}
+              </span>
             </div>
           ) : (
             "--"
@@ -312,7 +289,6 @@ export function CronRow({
                 backgroundColor: "#FEF3CD",
                 color: "#856404",
               }}
-              title={systemStatus?.statusSummary}
             >
               <span
                 style={{
@@ -328,21 +304,19 @@ export function CronRow({
               Running
             </span>
           ) : (
-            <div title={systemStatus?.statusSummary}>
-              <span
-                style={{
-                  display: "inline-block",
-                  padding: "4px 10px",
-                  borderRadius: "0.375rem",
-                  fontSize: 12,
-                  fontWeight: 500,
-                  backgroundColor: job.active ? "#FFDBCF" : "#EAE8E6",
-                  color: job.active ? "#390C00" : "#5E5E65",
-                }}
-              >
-                {job.active ? "Active" : "Paused"}
-              </span>
-            </div>
+            <span
+              style={{
+                display: "inline-block",
+                padding: "4px 10px",
+                borderRadius: "0.375rem",
+                fontSize: 12,
+                fontWeight: 500,
+                backgroundColor: job.active ? "#FFDBCF" : "#EAE8E6",
+                color: job.active ? "#390C00" : "#5E5E65",
+              }}
+            >
+              {job.active ? "Active" : "Paused"}
+            </span>
           )}
         </div>
 

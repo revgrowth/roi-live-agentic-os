@@ -5,32 +5,17 @@ import type {
   CronRun,
   CronJobCreateInput,
   CronJobUpdateInput,
-  CronSystemStatus,
 } from "@/types/cron";
 import type { TaskStatus } from "@/types/task";
 
 const CRON_ORDER_KEY = "cron-job-order";
 const CRON_PINNED_KEY = "cron-job-pinned";
-const CRON_SYSTEM_STATUS_PATH = "/api/cron/system-status";
 
-function getCronScopeKey(clientId: string | null): string {
-  return clientId || "root";
-}
-
-export function getCronJobKey(slug: string, clientId: string | null): string {
-  return `${getCronScopeKey(clientId)}:${slug}`;
-}
-
-function getScopedStorageKey(baseKey: string, clientId: string | null): string {
-  return `${baseKey}:${getCronScopeKey(clientId)}`;
-}
-
-function loadCronOrder(clientId: string | null): string[] | null {
+function loadCronOrder(): string[] | null {
   try {
-    const scopedKey = getScopedStorageKey(CRON_ORDER_KEY, clientId);
     const stored =
       typeof window !== "undefined"
-        ? localStorage.getItem(scopedKey)
+        ? localStorage.getItem(CRON_ORDER_KEY)
         : null;
     return stored ? JSON.parse(stored) : null;
   } catch {
@@ -38,25 +23,21 @@ function loadCronOrder(clientId: string | null): string[] | null {
   }
 }
 
-function saveCronOrder(clientId: string | null, slugs: string[]) {
+function saveCronOrder(slugs: string[]) {
   try {
     if (typeof window !== "undefined") {
-      localStorage.setItem(
-        getScopedStorageKey(CRON_ORDER_KEY, clientId),
-        JSON.stringify(slugs)
-      );
+      localStorage.setItem(CRON_ORDER_KEY, JSON.stringify(slugs));
     }
   } catch {
     // Ignore
   }
 }
 
-function loadPinnedSlugs(clientId: string | null): string[] {
+function loadPinnedSlugs(): string[] {
   try {
-    const scopedKey = getScopedStorageKey(CRON_PINNED_KEY, clientId);
     const stored =
       typeof window !== "undefined"
-        ? localStorage.getItem(scopedKey)
+        ? localStorage.getItem(CRON_PINNED_KEY)
         : null;
     return stored ? JSON.parse(stored) : [];
   } catch {
@@ -64,22 +45,19 @@ function loadPinnedSlugs(clientId: string | null): string[] {
   }
 }
 
-function savePinnedSlugs(clientId: string | null, slugs: string[]) {
+function savePinnedSlugs(slugs: string[]) {
   try {
     if (typeof window !== "undefined") {
-      localStorage.setItem(
-        getScopedStorageKey(CRON_PINNED_KEY, clientId),
-        JSON.stringify(slugs)
-      );
+      localStorage.setItem(CRON_PINNED_KEY, JSON.stringify(slugs));
     }
   } catch {
     // Ignore
   }
 }
 
-function applySavedOrder(jobs: CronJob[], clientId: string | null): CronJob[] {
-  const order = loadCronOrder(clientId);
-  const pinned = new Set(loadPinnedSlugs(clientId));
+function applySavedOrder(jobs: CronJob[]): CronJob[] {
+  const order = loadCronOrder();
+  const pinned = new Set(loadPinnedSlugs());
   const sorted = [...jobs];
 
   // First apply saved order
@@ -123,27 +101,25 @@ export interface ActiveCronRun {
 
 interface CronStore {
   jobs: CronJob[];
-  systemStatus: CronSystemStatus | null;
   isLoading: boolean;
   error: string | null;
   expandedJob: string | null;
   runHistory: Record<string, CronRun[]>;
   showCreatePanel: boolean;
   editingJob: CronJob | null;
-  /** scoped job key → active run info (persists until task reaches review/done) */
+  /** slug → active run info (persists until task reaches review/done) */
   activeRuns: Record<string, ActiveCronRun>;
   /** Slugs pinned to the top of the list */
   pinnedSlugs: string[];
 
   fetchJobs: () => Promise<void>;
-  fetchSystemStatus: () => Promise<void>;
   toggleJob: (slug: string) => Promise<void>;
   deleteJob: (slug: string) => Promise<void>;
   createJob: (input: CronJobCreateInput) => Promise<void>;
   updateJob: (slug: string, input: CronJobUpdateInput) => Promise<void>;
   runJobNow: (slug: string) => Promise<void>;
   expandJob: (slug: string | null) => void;
-  fetchRunHistory: (slug: string, clientId?: string | null) => Promise<void>;
+  fetchRunHistory: (slug: string) => Promise<void>;
   setShowCreatePanel: (show: boolean) => void;
   setEditingJob: (job: CronJob | null) => void;
   moveJob: (fromIndex: number, toIndex: number) => void;
@@ -152,7 +128,6 @@ interface CronStore {
 
 export const useCronStore = create<CronStore>((set, get) => ({
   jobs: [],
-  systemStatus: null,
   isLoading: false,
   error: null,
   expandedJob: null,
@@ -160,8 +135,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
   showCreatePanel: false,
   editingJob: null,
   activeRuns: {},
-  pinnedSlugs:
-    typeof window !== "undefined" ? loadPinnedSlugs(useClientStore.getState().selectedClientId) : [],
+  pinnedSlugs: typeof window !== "undefined" ? loadPinnedSlugs() : [],
 
   fetchJobs: async () => {
     set({ isLoading: true, error: null });
@@ -170,43 +144,15 @@ export const useCronStore = create<CronStore>((set, get) => ({
       const url = clientId
         ? `/api/cron?clientId=${encodeURIComponent(clientId)}`
         : "/api/cron";
-      const [jobsRes, systemStatusRes] = await Promise.allSettled([
-        fetch(url),
-        fetch(CRON_SYSTEM_STATUS_PATH),
-      ]);
-
-      if (jobsRes.status !== "fulfilled" || !jobsRes.value.ok) {
-        throw new Error("Failed to fetch cron jobs");
-      }
-
-      const jobs = applySavedOrder(await jobsRes.value.json(), clientId);
-      const systemStatus =
-        systemStatusRes.status === "fulfilled" && systemStatusRes.value.ok
-          ? ((await systemStatusRes.value.json()) as CronSystemStatus)
-          : get().systemStatus;
-
-      set({
-        jobs,
-        systemStatus,
-        pinnedSlugs: loadPinnedSlugs(clientId),
-        isLoading: false,
-      });
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Failed to fetch cron jobs");
+      const jobs = applySavedOrder(await res.json());
+      set({ jobs, isLoading: false });
     } catch (err) {
       set({
         error: err instanceof Error ? err.message : "Unknown error",
         isLoading: false,
       });
-    }
-  },
-
-  fetchSystemStatus: async () => {
-    try {
-      const res = await fetch(CRON_SYSTEM_STATUS_PATH);
-      if (!res.ok) return;
-      const systemStatus = (await res.json()) as CronSystemStatus;
-      set({ systemStatus });
-    } catch {
-      // Silently fail -- runtime status is secondary to job loading
     }
   },
 
@@ -229,9 +175,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
 
   runJobNow: async (slug: string) => {
     // Prevent double-runs
-    const clientId = useClientStore.getState().selectedClientId;
-    const jobKey = getCronJobKey(slug, clientId);
-    if (get().activeRuns[jobKey]) return;
+    if (get().activeRuns[slug]) return;
 
     try {
       const res = await fetch(withClientQuery(`/api/cron/${slug}/run`), { method: "POST" });
@@ -242,7 +186,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
       set((state) => ({
         activeRuns: {
           ...state.activeRuns,
-          [jobKey]: {
+          [slug]: {
             taskId: task.id,
             status: task.status as TaskStatus,
             activityLabel: task.activityLabel,
@@ -251,8 +195,8 @@ export const useCronStore = create<CronStore>((set, get) => ({
       }));
 
       // Immediately refresh run history so the "Running" row appears
-      if (get().expandedJob === jobKey) {
-        get().fetchRunHistory(slug, clientId);
+      if (get().expandedJob === slug) {
+        get().fetchRunHistory(slug);
       }
 
       // Poll the task status until it reaches a terminal state
@@ -267,12 +211,12 @@ export const useCronStore = create<CronStore>((set, get) => ({
           set((state) => ({
             activeRuns: isTerminal
               ? (() => {
-                  const { [jobKey]: _, ...rest } = state.activeRuns;
+                  const { [slug]: _, ...rest } = state.activeRuns;
                   return rest;
                 })()
               : {
                   ...state.activeRuns,
-                  [jobKey]: {
+                  [slug]: {
                     taskId: task.id,
                     status: statusData.status,
                     activityLabel: statusData.activityLabel,
@@ -284,8 +228,8 @@ export const useCronStore = create<CronStore>((set, get) => ({
             clearInterval(pollInterval);
             // Refresh this job's metadata and history
             get().fetchJobs();
-            if (get().expandedJob === jobKey) {
-              get().fetchRunHistory(slug, clientId);
+            if (get().expandedJob === slug) {
+              get().fetchRunHistory(slug);
             }
           }
         } catch {
@@ -342,7 +286,7 @@ export const useCronStore = create<CronStore>((set, get) => ({
 
   updateJob: async (slug: string, input: CronJobUpdateInput) => {
     try {
-      const res = await fetch(withClientQuery(`/api/cron/${slug}`), {
+      const res = await fetch(`/api/cron/${slug}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -361,12 +305,9 @@ export const useCronStore = create<CronStore>((set, get) => ({
   },
 
   expandJob: (slug: string | null) => {
-    const clientId = useClientStore.getState().selectedClientId;
-    const jobKey = slug ? getCronJobKey(slug, clientId) : null;
-    set({ expandedJob: jobKey });
+    set({ expandedJob: slug });
     if (slug) {
-      get().fetchRunHistory(slug, clientId);
-      get().fetchSystemStatus();
+      get().fetchRunHistory(slug);
       // Also refresh this job's metadata (last run, stats) from the server
       fetch(withClientQuery(`/api/cron/${slug}`))
         .then((res) => res.ok ? res.json() : null)
@@ -381,17 +322,13 @@ export const useCronStore = create<CronStore>((set, get) => ({
     }
   },
 
-  fetchRunHistory: async (slug: string, clientId: string | null = useClientStore.getState().selectedClientId) => {
+  fetchRunHistory: async (slug: string) => {
     try {
-      const res = await fetch(
-        clientId
-          ? `/api/cron/${slug}/history?clientId=${encodeURIComponent(clientId)}`
-          : `/api/cron/${slug}/history`
-      );
+      const res = await fetch(withClientQuery(`/api/cron/${slug}/history`));
       if (!res.ok) return;
       const history = await res.json();
       set((state) => ({
-        runHistory: { ...state.runHistory, [getCronJobKey(slug, clientId)]: history },
+        runHistory: { ...state.runHistory, [slug]: history },
       }));
     } catch {
       // Silently fail -- run history is non-critical
@@ -416,20 +353,19 @@ export const useCronStore = create<CronStore>((set, get) => ({
     if (fromPinned !== toPinned) return;
     const [moved] = jobs.splice(fromIndex, 1);
     jobs.splice(toIndex, 0, moved);
-    saveCronOrder(useClientStore.getState().selectedClientId, jobs.map((j) => j.slug));
+    saveCronOrder(jobs.map((j) => j.slug));
     set({ jobs });
   },
 
   togglePin: (slug: string) => {
-    const clientId = useClientStore.getState().selectedClientId;
     const current = get().pinnedSlugs;
     const next = current.includes(slug)
       ? current.filter((s) => s !== slug)
       : [...current, slug];
-    savePinnedSlugs(clientId, next);
+    savePinnedSlugs(next);
     set({ pinnedSlugs: next });
     // Re-sort jobs with updated pins
-    const jobs = applySavedOrder(get().jobs, clientId);
+    const jobs = applySavedOrder(get().jobs);
     set({ jobs });
   },
 }));

@@ -16,7 +16,6 @@ const RUNTIME_STALE_MS = 120_000;
 const RUNTIME_LOCK_FILE = "cron-runtime-lock.json";
 const RUNTIME_PID_FILE = "cron-daemon.pid";
 const RUNTIME_LOG_FILE = "cron-daemon.log";
-const CRON_RUN_RESULT_SOURCES = new Set(["observed", "inferred"]);
 const OUTPUT_SCAN_ROOTS = ["projects", "brand_context", "context"];
 const OUTPUT_SCAN_IGNORES = new Set([
   ".git",
@@ -493,8 +492,6 @@ function getDb(agenticOsDir) {
   ensureColumn(db, "cron_runs", "trigger", "ALTER TABLE cron_runs ADD COLUMN trigger TEXT DEFAULT 'scheduled'");
   ensureColumn(db, "cron_runs", "clientId", "ALTER TABLE cron_runs ADD COLUMN clientId TEXT");
   ensureColumn(db, "cron_runs", "scheduledFor", "ALTER TABLE cron_runs ADD COLUMN scheduledFor TEXT");
-  ensureColumn(db, "cron_runs", "resultSource", "ALTER TABLE cron_runs ADD COLUMN resultSource TEXT");
-  ensureColumn(db, "cron_runs", "completionReason", "ALTER TABLE cron_runs ADD COLUMN completionReason TEXT");
 
   db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_clientId ON tasks(clientId)");
   db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_cronJobSlug ON tasks(cronJobSlug)");
@@ -669,7 +666,7 @@ function getCronRunHistory(agenticOsDir, slug, clientId) {
   const db = getDb(agenticOsDir);
   const rows = db
     .prepare(
-      `SELECT id, jobSlug, taskId, startedAt, completedAt, result, resultSource, completionReason, durationSec, costUsd, exitCode, trigger
+      `SELECT id, jobSlug, taskId, startedAt, completedAt, result, durationSec, costUsd, exitCode, trigger
        FROM cron_runs
        WHERE jobSlug = ?
          AND COALESCE(clientId, '') = COALESCE(?, '')
@@ -695,8 +692,6 @@ function getCronRunHistory(agenticOsDir, slug, clientId) {
       return {
         ...row,
         trigger: row.trigger || "scheduled",
-        resultSource: normalizeCronRunResultSource(row.resultSource),
-        completionReason: normalizeCronRunCompletionReason(row.completionReason),
         outputs,
       };
     });
@@ -721,8 +716,6 @@ function getCronRunHistory(agenticOsDir, slug, clientId) {
       costUsd: 0,
       exitCode: status.exitCode || 0,
       trigger: "scheduled",
-      resultSource: null,
-      completionReason: null,
       outputs: [],
     },
   ];
@@ -804,160 +797,6 @@ function writeDaemonPid(agenticOsDir, pid) {
 
 function removeDaemonPid(agenticOsDir) {
   fs.rmSync(getRuntimePaths(agenticOsDir).pidPath, { force: true });
-}
-
-function normalizeCronRunResultSource(value) {
-  return CRON_RUN_RESULT_SOURCES.has(value) ? value : null;
-}
-
-function normalizeCronRunCompletionReason(value) {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const trimmed = value.trim();
-  return trimmed ? trimmed : null;
-}
-
-function getDefaultCompletionReason(result, resultSource) {
-  if (resultSource === "inferred") {
-    return "recovered_inferred_state";
-  }
-
-  switch (result) {
-    case "timeout":
-      return "timed_out";
-    case "failure":
-      return "failed";
-    case "success":
-      return "completed";
-    default:
-      return null;
-  }
-}
-
-function buildRecoveredCronRunUpdate(completionReason, details = {}) {
-  const result = details.result === "timeout" ? "timeout" : "failure";
-  const durationSec =
-    details.durationSec !== undefined
-      ? details.durationSec
-      : details.durationMs !== undefined
-        ? Math.round(details.durationMs / 1000)
-        : 0;
-  const normalizedCompletionReason =
-    normalizeCronRunCompletionReason(completionReason) || "recovered_inferred_state";
-
-  return {
-    completedAt: details.completedAt || new Date().toISOString(),
-    result,
-    resultSource: "inferred",
-    completionReason: normalizedCompletionReason,
-    durationSec,
-    costUsd: details.costUsd ?? null,
-    exitCode:
-      details.exitCode !== undefined
-        ? details.exitCode
-        : result === "timeout"
-          ? 124
-          : 1,
-  };
-}
-
-function toRuntimeLabel(runtime) {
-  switch (runtime) {
-    case "daemon":
-      return "Daemon";
-    case "in-process":
-      return "In-process runtime";
-    default:
-      return "No runtime";
-  }
-}
-
-function buildRuntimeStatusSummary(status) {
-  switch (status.ownershipReason) {
-    case "local-leader-active":
-      return "This runtime currently owns cron scheduling.";
-    case "external-leader-active":
-      return `${toRuntimeLabel(status.runtime)} currently owns cron scheduling${status.localRuntimePresent ? "; this runtime is standby." : "."}`;
-    case "stale-leader-record":
-      return status.localRuntimePresent
-        ? "A stale cron leader record was found; this runtime is running but not yet the owner."
-        : "A stale cron leader record was found; no active cron owner is confirmed.";
-    case "daemon-process-without-lock":
-      return status.localRuntimePresent
-        ? "A daemon process exists, but there is no active cron leader record; this runtime is currently standby."
-        : "A daemon process exists, but there is no active cron leader record.";
-    case "local-runtime-without-leader":
-      return "This runtime is available, but no cron leader is active yet.";
-    default:
-      return "No cron runtime is active.";
-  }
-}
-
-function deriveManagedRuntimeStatus(agenticOsDir, localIdentifier) {
-  const commands = getRuntimeCommands();
-  const workspaceCount = listWorkspaceDescriptors(agenticOsDir).length;
-  const current = readRuntimeRecord(agenticOsDir);
-  const leaderState = !current
-    ? "absent"
-    : isRuntimeRecordStale(current)
-      ? "stale"
-      : "active";
-  const activeLeader = leaderState === "active" ? current : null;
-  const daemonPid = readDaemonPid(agenticOsDir);
-  const daemonProcessPresent = Boolean(daemonPid && isProcessAlive(daemonPid));
-  const localRuntimePresent = Boolean(localIdentifier);
-  const runtime = activeLeader
-    ? activeLeader.runtime
-    : daemonProcessPresent
-      ? "daemon"
-      : localRuntimePresent
-        ? "in-process"
-        : "stopped";
-  const leader = activeLeader
-    ? localIdentifier
-      ? activeLeader.identifier === localIdentifier
-      : true
-    : false;
-
-  let ownershipReason = "no-runtime-detected";
-  if (activeLeader) {
-    ownershipReason =
-      localIdentifier && activeLeader.identifier === localIdentifier
-        ? "local-leader-active"
-        : "external-leader-active";
-  } else if (leaderState === "stale") {
-    ownershipReason = "stale-leader-record";
-  } else if (daemonProcessPresent) {
-    ownershipReason = "daemon-process-without-lock";
-  } else if (localRuntimePresent) {
-    ownershipReason = "local-runtime-without-leader";
-  }
-
-  const status = {
-    runtime,
-    leader,
-    leaderState,
-    identifier:
-      activeLeader?.identifier ||
-      current?.identifier ||
-      (daemonProcessPresent ? `daemon-${daemonPid}` : localIdentifier || null),
-    localRuntimePresent,
-    ownershipReason,
-    startCommand: activeLeader?.startCommand || commands.startCommand,
-    stopCommand: activeLeader?.stopCommand || commands.stopCommand,
-    statusCommand: commands.statusCommand,
-    logsCommand: commands.logsCommand,
-    workspaceCount: activeLeader?.workspaceCount || current?.workspaceCount || workspaceCount,
-    heartbeatAt: current?.heartbeatAt || null,
-    pid: activeLeader?.pid || (daemonProcessPresent ? daemonPid : localRuntimePresent ? process.pid : null),
-  };
-
-  return {
-    ...status,
-    statusSummary: buildRuntimeStatusSummary(status),
-  };
 }
 
 function claimRuntimeLeadership(agenticOsDir, candidate) {
@@ -1044,7 +883,69 @@ function releaseRuntimeLeadership(agenticOsDir, identifier) {
 }
 
 function getManagedRuntimeStatus(agenticOsDir, localIdentifier) {
-  return deriveManagedRuntimeStatus(agenticOsDir, localIdentifier);
+  const commands = getRuntimeCommands();
+  const workspaceCount = listWorkspaceDescriptors(agenticOsDir).length;
+  const current = readRuntimeRecord(agenticOsDir);
+  const active = current && !isRuntimeRecordStale(current);
+  const daemonPid = readDaemonPid(agenticOsDir);
+
+  if (!active) {
+    if (daemonPid && isProcessAlive(daemonPid)) {
+      return {
+        runtime: "daemon",
+        leader: false,
+        identifier: current?.identifier || `daemon-${daemonPid}`,
+        startCommand: commands.startCommand,
+        stopCommand: commands.stopCommand,
+        statusCommand: commands.statusCommand,
+        logsCommand: commands.logsCommand,
+        workspaceCount,
+        heartbeatAt: current?.heartbeatAt || null,
+        pid: daemonPid,
+      };
+    }
+
+    if (localIdentifier) {
+      return {
+        runtime: "in-process",
+        leader: false,
+        identifier: localIdentifier,
+        startCommand: commands.startCommand,
+        stopCommand: commands.stopCommand,
+        statusCommand: commands.statusCommand,
+        logsCommand: commands.logsCommand,
+        workspaceCount,
+        heartbeatAt: null,
+        pid: process.pid,
+      };
+    }
+
+    return {
+      runtime: "stopped",
+      leader: false,
+      identifier: null,
+      startCommand: commands.startCommand,
+      stopCommand: commands.stopCommand,
+      statusCommand: commands.statusCommand,
+      logsCommand: commands.logsCommand,
+      workspaceCount,
+      heartbeatAt: null,
+      pid: daemonPid,
+    };
+  }
+
+  return {
+    runtime: current.runtime,
+    leader: localIdentifier ? current.identifier === localIdentifier : true,
+    identifier: current.identifier || null,
+    startCommand: current.startCommand || commands.startCommand,
+    stopCommand: current.stopCommand || commands.stopCommand,
+    statusCommand: commands.statusCommand,
+    logsCommand: commands.logsCommand,
+    workspaceCount: current.workspaceCount || workspaceCount,
+    heartbeatAt: current.heartbeatAt || null,
+    pid: current.pid || null,
+  };
 }
 
 function getNextBacklogOrder(db) {
@@ -1143,8 +1044,8 @@ function enqueueCronJob(agenticOsDir, job, options = {}) {
 
   const cronRun = db
     .prepare(
-      `INSERT INTO cron_runs (jobSlug, taskId, startedAt, result, resultSource, completionReason, trigger, clientId, scheduledFor)
-       VALUES (?, ?, ?, 'running', NULL, NULL, ?, ?, ?)
+      `INSERT INTO cron_runs (jobSlug, taskId, startedAt, result, trigger, clientId, scheduledFor)
+       VALUES (?, ?, ?, 'running', ?, ?, ?)
        RETURNING id`
     )
     .get(job.slug, task.id, now, options.trigger || "scheduled", normalizedClientId, scheduledFor);
@@ -1180,10 +1081,6 @@ function completeCronRunForTask(agenticOsDir, task, payload = {}) {
   const completedAt = payload.completedAt || new Date().toISOString();
   const durationSec = payload.durationSec ?? Math.round((payload.durationMs || 0) / 1000);
   const result = payload.result || (task.errorMessage ? "failure" : "success");
-  const resultSource = normalizeCronRunResultSource(payload.resultSource) || "observed";
-  const completionReason =
-    normalizeCronRunCompletionReason(payload.completionReason) ||
-    getDefaultCompletionReason(result, resultSource);
   const exitCode =
     payload.exitCode !== undefined
       ? payload.exitCode
@@ -1201,13 +1098,11 @@ function completeCronRunForTask(agenticOsDir, task, payload = {}) {
   if (existing) {
     db.prepare(
       `UPDATE cron_runs
-       SET completedAt = ?, result = ?, resultSource = ?, completionReason = ?, durationSec = ?, costUsd = ?, exitCode = ?, clientId = COALESCE(clientId, ?)
+       SET completedAt = ?, result = ?, durationSec = ?, costUsd = ?, exitCode = ?, clientId = COALESCE(clientId, ?)
        WHERE id = ?`
     ).run(
       completedAt,
       result,
-      resultSource,
-      completionReason,
       durationSec,
       payload.costUsd ?? null,
       exitCode,
@@ -1217,17 +1112,15 @@ function completeCronRunForTask(agenticOsDir, task, payload = {}) {
   } else {
     db.prepare(
       `INSERT INTO cron_runs (
-         jobSlug, taskId, startedAt, completedAt, result, resultSource, completionReason, durationSec, costUsd, exitCode,
+         jobSlug, taskId, startedAt, completedAt, result, durationSec, costUsd, exitCode,
          trigger, clientId, scheduledFor
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       task.cronJobSlug,
       task.id,
       task.startedAt || completedAt,
       completedAt,
       result,
-      resultSource,
-      completionReason,
       durationSec,
       payload.costUsd ?? null,
       exitCode,
@@ -1333,30 +1226,6 @@ function collectOutputFiles(workspaceDir, beforeSnapshot, startMs, endMs) {
   return files;
 }
 
-function buildCronExecutionPrompt(job, workspace) {
-  const basePrompt = String(job.prompt || "").trim();
-  if (!workspace.clientId) {
-    return basePrompt;
-  }
-
-  return [
-    `You are running a scheduled job inside the client workspace "${workspace.label}".`,
-    `Workspace root: ${workspace.workspaceDir}`,
-    "Stay inside this workspace for all reads and writes.",
-    'When creating output files, use explicit client-local paths such as "projects/..." inside the current workspace.',
-    "Do not create or update files in the root workspace or in another client workspace.",
-    basePrompt,
-  ]
-    .filter(Boolean)
-    .join("\n\n");
-}
-
-function formatOutputLeakMessage(files) {
-  const paths = files.map((file) => file.relativePath).slice(0, 5);
-  const suffix = files.length > 5 ? ` (+${files.length - 5} more)` : "";
-  return `Client cron job wrote outside its workspace: ${paths.join(", ")}${suffix}`;
-}
-
 function persistTaskOutputs(agenticOsDir, taskId, files) {
   const db = getDb(agenticOsDir);
   db.prepare("DELETE FROM task_outputs WHERE taskId = ?").run(taskId);
@@ -1425,7 +1294,6 @@ function spawnClaudeRun(job, cwd, logFilePath) {
   return new Promise((resolve, reject) => {
     const env = { ...process.env };
     delete env.CLAUDECODE;
-    env.AGENTIC_OS_DIR = cwd;
     const claudeCommand = env.AGENTIC_OS_CLAUDE_BIN || "claude";
     const claudeArgs = ["-p", job.prompt, "--model", job.model, "--dangerously-skip-permissions"];
     const useWindowsCmdShell =
@@ -1436,7 +1304,6 @@ function spawnClaudeRun(job, cwd, logFilePath) {
       cwd,
       env,
       stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
     });
 
     let stdout = "";
@@ -1529,11 +1396,6 @@ async function executeCronTask(agenticOsDir, taskId) {
   const startIso = new Date().toISOString();
   const startMs = Date.now();
   const beforeSnapshot = takeOutputSnapshot(workspace.workspaceDir);
-  const beforeRootSnapshot = workspace.clientId ? takeOutputSnapshot(agenticOsDir) : null;
-  const executionJob = {
-    ...job,
-    prompt: buildCronExecutionPrompt(job, workspace),
-  };
 
   appendCronLog(
     agenticOsDir,
@@ -1560,7 +1422,7 @@ async function executeCronTask(agenticOsDir, taskId) {
     }
 
     try {
-      lastRun = await spawnClaudeRun(executionJob, workspace.workspaceDir, logFilePath);
+      lastRun = await spawnClaudeRun(job, workspace.workspaceDir, logFilePath);
     } catch (error) {
       lastRun = {
         exitCode: 1,
@@ -1579,24 +1441,9 @@ async function executeCronTask(agenticOsDir, taskId) {
   const completedAt = new Date().toISOString();
   const endMs = Date.now();
   const durationMs = endMs - startMs;
+  const result = lastRun.timedOut ? "timeout" : lastRun.exitCode === 0 ? "success" : "failure";
   const outputs = collectOutputFiles(workspace.workspaceDir, beforeSnapshot, startMs, endMs);
-  const leakedRootOutputs =
-    beforeRootSnapshot ? collectOutputFiles(agenticOsDir, beforeRootSnapshot, startMs, endMs) : [];
-  const containmentError =
-    leakedRootOutputs.length > 0 ? formatOutputLeakMessage(leakedRootOutputs) : null;
-  const result = containmentError
-    ? "failure"
-    : lastRun.timedOut
-      ? "timeout"
-      : lastRun.exitCode === 0
-        ? "success"
-        : "failure";
-  const exitCode = containmentError && lastRun.exitCode === 0 ? 1 : lastRun.exitCode;
   persistTaskOutputs(agenticOsDir, taskId, outputs);
-
-  if (containmentError) {
-    appendCronLog(agenticOsDir, job.clientId, job.slug, `[cron-daemon] ${containmentError}`);
-  }
 
   appendCronLog(
     agenticOsDir,
@@ -1607,10 +1454,7 @@ async function executeCronTask(agenticOsDir, taskId) {
 
   const updatedTask = finalizeTask(agenticOsDir, taskId, {
     result,
-    errorMessage:
-      result === "success"
-        ? null
-        : containmentError || lastRun.stderr || `Exit code ${exitCode}`,
+    errorMessage: result === "success" ? null : lastRun.stderr || `Exit code ${lastRun.exitCode}`,
     durationMs,
     completedAt,
     activityLabel:
@@ -1623,7 +1467,7 @@ async function executeCronTask(agenticOsDir, taskId) {
 
   completeCronRunForTask(agenticOsDir, updatedTask, {
     result,
-    exitCode,
+    exitCode: lastRun.exitCode,
     durationMs,
     completedAt,
   });
@@ -1631,7 +1475,7 @@ async function executeCronTask(agenticOsDir, taskId) {
   return {
     task: updatedTask,
     result,
-    exitCode,
+    exitCode: lastRun.exitCode,
     durationMs,
     outputs,
   };
@@ -1697,7 +1541,6 @@ module.exports = {
   isRuntimeRecordStale,
   writeDaemonPid,
   removeDaemonPid,
-  buildRecoveredCronRunUpdate,
   claimRuntimeLeadership,
   refreshRuntimeHeartbeat,
   releaseRuntimeLeadership,
