@@ -1,9 +1,11 @@
 import { getConfig } from "./config";
+import { getCronSystemStatus } from "./cron-system-status";
 import type {
   CronJob,
   CronRun,
   CronJobCreateInput,
   CronJobUpdateInput,
+  CronSystemStatus,
 } from "@/types/cron";
 
 const cronRuntime = require("./cron-runtime.js");
@@ -97,8 +99,10 @@ export function completeCronRunForTask(
   cronRuntime.completeCronRunForTask(getAgenticOsDir(), task, payload || {});
 }
 
-export function getManagedCronRuntimeStatus(localIdentifier?: string | null) {
-  return cronRuntime.getManagedRuntimeStatus(getAgenticOsDir(), localIdentifier || undefined);
+export function getManagedCronRuntimeStatus(
+  localIdentifier?: string | null
+): CronSystemStatus {
+  return getCronSystemStatus(localIdentifier);
 }
 
 export function claimCronLeadership(candidate: Record<string, unknown>) {

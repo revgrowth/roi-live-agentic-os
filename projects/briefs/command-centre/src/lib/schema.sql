@@ -18,9 +18,6 @@ CREATE TABLE IF NOT EXISTS tasks (
   phaseNumber INTEGER,
   gsdStep TEXT CHECK (gsdStep IN ('discuss', 'plan', 'execute', 'verify')),
   claudePid INTEGER,
-  model TEXT,
-  dependsOnTaskIds TEXT,
-  startSnapshot TEXT,
   FOREIGN KEY (parentId) REFERENCES tasks(id) ON DELETE CASCADE
 );
 
@@ -47,6 +44,8 @@ CREATE TABLE IF NOT EXISTS cron_runs (
   startedAt TEXT NOT NULL,
   completedAt TEXT,
   result TEXT NOT NULL DEFAULT 'running' CHECK (result IN ('success', 'failure', 'timeout', 'running')),
+  resultSource TEXT CHECK (resultSource IN ('observed', 'inferred')),
+  completionReason TEXT,
   durationSec REAL,
   costUsd REAL,
   exitCode INTEGER,
@@ -60,15 +59,13 @@ CREATE INDEX IF NOT EXISTS idx_cron_runs_startedAt ON cron_runs(startedAt);
 CREATE TABLE IF NOT EXISTS task_logs (
   id TEXT PRIMARY KEY,
   taskId TEXT NOT NULL,
-  type TEXT NOT NULL CHECK (type IN ('text', 'tool_use', 'tool_result', 'question', 'structured_question', 'user_reply', 'system')),
+  type TEXT NOT NULL CHECK (type IN ('text', 'tool_use', 'tool_result', 'question', 'user_reply', 'system')),
   timestamp TEXT NOT NULL,
   content TEXT NOT NULL DEFAULT '',
   toolName TEXT,
   toolArgs TEXT,
   toolResult TEXT,
   isCollapsed INTEGER DEFAULT 0,
-  questionSpec TEXT,
-  questionAnswers TEXT,
   FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_task_logs_taskId ON task_logs(taskId);

@@ -44,6 +44,9 @@ function formatStatus(status) {
   return [
     `runtime: ${status.runtime}`,
     `leader: ${status.leader}`,
+    `leaderState: ${status.leaderState}`,
+    `statusSummary: ${status.statusSummary}`,
+    `ownershipReason: ${status.ownershipReason}`,
     `identifier: ${status.identifier || "none"}`,
     `pid: ${status.pid || "none"}`,
     `workspaceCount: ${status.workspaceCount}`,
@@ -214,6 +217,7 @@ function startDaemon() {
     cwd: agenticOsDir,
     detached: true,
     stdio: ["ignore", logFd, logFd],
+    windowsHide: true,
     env: {
       ...process.env,
       AGENTIC_OS_DIR: agenticOsDir,

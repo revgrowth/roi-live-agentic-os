@@ -41,6 +41,16 @@ function formatDuration(sec: number | null): string {
 
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg"]);
 const PDF_EXTENSIONS = new Set(["pdf"]);
+const RUN_COMPLETION_REASON_LABELS: Record<string, string> = {
+  completed: "Normal completion",
+  failed: "Normal failure",
+  timed_out: "Normal timeout",
+  recovered_inferred_state: "Recovered state",
+  recovered_missing_task: "Recovered missing job",
+  recovered_orphaned_task: "Recovered orphaned run",
+  recovered_from_terminal_task_state: "Recovered finished task",
+  recovered_from_stuck_needs_input: "Recovered stuck input",
+};
 
 function getFileIcon(ext: string) {
   if (IMAGE_EXTENSIONS.has(ext)) return Image;
@@ -64,6 +74,28 @@ function getRunResultBadge(result: CronRun["result"]) {
     default:
       return { label: "Running", backgroundColor: "#EFF6FF", color: "#3B82F6" };
   }
+}
+
+function getRunTruthLabel(run: CronRun): string | null {
+  if (!run.resultSource && !run.completionReason) {
+    return null;
+  }
+
+  const sourceLabel =
+    run.resultSource === "inferred"
+      ? "Inferred"
+      : run.resultSource === "observed"
+        ? "Observed"
+        : null;
+  const reasonLabel = run.completionReason
+    ? RUN_COMPLETION_REASON_LABELS[run.completionReason] || run.completionReason
+    : null;
+
+  if (sourceLabel && reasonLabel) {
+    return `${sourceLabel} · ${reasonLabel}`;
+  }
+
+  return sourceLabel || reasonLabel;
 }
 
 function OutputLink({ output }: { output: CronRunOutput }) {
@@ -166,7 +198,7 @@ export function RunHistory({ runs, jobSlug, prompt }: RunHistoryProps) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 80px 100px 100px 80px 1fr",
+          gridTemplateColumns: "1fr 80px 120px 100px 80px 1fr",
           gap: 8,
           padding: "0 8px 8px",
           fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
@@ -192,7 +224,7 @@ export function RunHistory({ runs, jobSlug, prompt }: RunHistoryProps) {
             key={run.id}
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 80px 100px 100px 80px 1fr",
+              gridTemplateColumns: "1fr 80px 120px 100px 80px 1fr",
               gap: 8,
               padding: "6px 8px",
               alignItems: "center",
@@ -234,6 +266,18 @@ export function RunHistory({ runs, jobSlug, prompt }: RunHistoryProps) {
               >
                 {badge.label}
               </span>
+              {getRunTruthLabel(run) && (
+                <div
+                  style={{
+                    fontSize: 10,
+                    color: "#5E5E65",
+                    marginTop: 4,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {getRunTruthLabel(run)}
+                </div>
+              )}
             </span>
             <span
               style={{

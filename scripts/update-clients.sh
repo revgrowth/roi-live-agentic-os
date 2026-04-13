@@ -37,6 +37,135 @@ This file keeps Claude Code compatible with the client-specific instructions in 
 EOF
 }
 
+create_client_cron_proxy_scripts() {
+  local scripts_dir="$1"
+
+  cat > "${scripts_dir}/start-crons.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_PROJECT_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
+AGENTIC_OS_DIR="$ROOT_PROJECT_DIR" bash "$ROOT_PROJECT_DIR/scripts/start-crons.sh" "$@"
+EOF
+
+  cat > "${scripts_dir}/stop-crons.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_PROJECT_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
+AGENTIC_OS_DIR="$ROOT_PROJECT_DIR" bash "$ROOT_PROJECT_DIR/scripts/stop-crons.sh" "$@"
+EOF
+
+  cat > "${scripts_dir}/status-crons.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_PROJECT_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
+AGENTIC_OS_DIR="$ROOT_PROJECT_DIR" bash "$ROOT_PROJECT_DIR/scripts/status-crons.sh" "$@"
+EOF
+
+  cat > "${scripts_dir}/logs-crons.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_PROJECT_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
+AGENTIC_OS_DIR="$ROOT_PROJECT_DIR" bash "$ROOT_PROJECT_DIR/scripts/logs-crons.sh" "$@"
+EOF
+
+  cat > "${scripts_dir}/run-job.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_PROJECT_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
+CLIENT_SLUG="$(basename "$(cd "$(dirname "$0")/.." && pwd)")"
+AGENTIC_OS_DIR="$ROOT_PROJECT_DIR" bash "$ROOT_PROJECT_DIR/scripts/run-job.sh" "$@" --client "$CLIENT_SLUG"
+EOF
+
+  cat > "${scripts_dir}/start-crons.ps1" <<'EOF'
+[CmdletBinding()]
+param(
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$Arguments
+)
+
+$RootProjectDir = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+$RootScript = Join-Path $RootProjectDir "scripts\start-crons.ps1"
+$env:AGENTIC_OS_DIR = $RootProjectDir
+
+& $RootScript @Arguments
+EOF
+
+  cat > "${scripts_dir}/stop-crons.ps1" <<'EOF'
+[CmdletBinding()]
+param(
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$Arguments
+)
+
+$RootProjectDir = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+$RootScript = Join-Path $RootProjectDir "scripts\stop-crons.ps1"
+$env:AGENTIC_OS_DIR = $RootProjectDir
+
+& $RootScript @Arguments
+EOF
+
+  cat > "${scripts_dir}/status-crons.ps1" <<'EOF'
+[CmdletBinding()]
+param(
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$Arguments
+)
+
+$RootProjectDir = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+$RootScript = Join-Path $RootProjectDir "scripts\status-crons.ps1"
+$env:AGENTIC_OS_DIR = $RootProjectDir
+
+& $RootScript @Arguments
+EOF
+
+  cat > "${scripts_dir}/logs-crons.ps1" <<'EOF'
+[CmdletBinding()]
+param(
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$Arguments
+)
+
+$RootProjectDir = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+$RootScript = Join-Path $RootProjectDir "scripts\logs-crons.ps1"
+$env:AGENTIC_OS_DIR = $RootProjectDir
+
+& $RootScript @Arguments
+EOF
+
+  cat > "${scripts_dir}/run-job.ps1" <<'EOF'
+[CmdletBinding()]
+param(
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$Arguments
+)
+
+$RootProjectDir = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+$ClientSlug = Split-Path -Leaf (Split-Path -Parent $PSScriptRoot)
+$RootScript = Join-Path $RootProjectDir "scripts\run-job.ps1"
+$env:AGENTIC_OS_DIR = $RootProjectDir
+
+$ForwardedArguments = @()
+if ($Arguments) {
+    $ForwardedArguments += $Arguments
+}
+$ForwardedArguments += @("--client", $ClientSlug)
+
+& $RootScript @ForwardedArguments
+EOF
+
+  chmod +x \
+    "${scripts_dir}/start-crons.sh" \
+    "${scripts_dir}/stop-crons.sh" \
+    "${scripts_dir}/status-crons.sh" \
+    "${scripts_dir}/logs-crons.sh" \
+    "${scripts_dir}/run-job.sh"
+}
+
 is_claude_wrapper() {
   local file="$1"
   [[ -f "$file" ]] || return 1
@@ -180,6 +309,7 @@ for CLIENT_DIR in "${CLIENTS_DIR}"/*/; do
   # Sync scripts
   rm -rf "${CLIENT_DIR}/scripts"
   cp -R "${PROJECT_DIR}/scripts" "${CLIENT_DIR}/scripts"
+  create_client_cron_proxy_scripts "${CLIENT_DIR}/scripts"
   echo "  Scripts synced"
 
   # Sync cron templates

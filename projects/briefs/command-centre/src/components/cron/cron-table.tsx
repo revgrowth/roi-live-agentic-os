@@ -6,12 +6,14 @@ import { useCronStore } from "@/store/cron-store";
 import { useClientStore } from "@/store/client-store";
 import { CronRow } from "./cron-row";
 import { CreateJobPanel } from "./create-job-panel";
+import { RuntimeStatus } from "./runtime-status";
 
 export function CronJobsView() {
   const jobs = useCronStore((s) => s.jobs);
   const isLoading = useCronStore((s) => s.isLoading);
   const fetchJobs = useCronStore((s) => s.fetchJobs);
   const setShowCreatePanel = useCronStore((s) => s.setShowCreatePanel);
+  const setEditingJob = useCronStore((s) => s.setEditingJob);
   const moveJob = useCronStore((s) => s.moveJob);
   const selectedClientId = useClientStore((s) => s.selectedClientId);
 
@@ -44,8 +46,9 @@ export function CronJobsView() {
   };
 
   useEffect(() => {
+    setEditingJob(null);
     fetchJobs();
-  }, [fetchJobs, selectedClientId]);
+  }, [fetchJobs, selectedClientId, setEditingJob]);
 
   const activeCount = jobs.filter((j) => j.active).length;
   const pausedCount = jobs.filter((j) => !j.active).length;
@@ -100,6 +103,8 @@ export function CronJobsView() {
           <div style={statLabelStyle}>Today&apos;s Spend</div>
         </div>
       </div>
+
+      <RuntimeStatus />
 
       <div
         style={{
@@ -169,83 +174,83 @@ export function CronJobsView() {
         <span>Actions</span>
       </div>
 
-      {isLoading && (
-        <div
-          style={{
-            textAlign: "center",
-            padding: 40,
-            fontFamily: "var(--font-inter), Inter, sans-serif",
-            fontSize: 14,
-            color: "#5E5E65",
-          }}
-        >
-          Loading scheduled tasks...
-        </div>
-      )}
+          {isLoading && (
+            <div
+              style={{
+                textAlign: "center",
+                padding: 40,
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                fontSize: 14,
+                color: "#5E5E65",
+              }}
+            >
+              Loading scheduled tasks...
+            </div>
+          )}
 
-      {!isLoading && jobs.length === 0 && (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "60px 20px",
-            fontFamily: "var(--font-inter), Inter, sans-serif",
-          }}
-        >
-          <Clock size={48} color="#5E5E65" style={{ marginBottom: 16 }} />
-          <h4
-            style={{
-              fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
-              fontWeight: 600,
-              fontSize: 16,
-              color: "#1B1C1B",
-              margin: "0 0 8px 0",
-            }}
-          >
-            No scheduled tasks configured yet
-          </h4>
-          <p
-            style={{
-              fontSize: 14,
-              color: "#5E5E65",
-              maxWidth: 320,
-              margin: "0 auto 20px",
-            }}
-          >
-            Set up recurring tasks to automate your regular workflows.
-          </p>
-          <button
-            onClick={() => setShowCreatePanel(true)}
-            style={{
-              background: "linear-gradient(135deg, #93452A 0%, #B25D3F 100%)",
-              color: "#FFFFFF",
-              fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
-              fontWeight: 600,
-              padding: "10px 20px",
-              borderRadius: "0.375rem",
-              border: "none",
-              cursor: "pointer",
-              fontSize: 14,
-            }}
-          >
-            Create First Job
-          </button>
-        </div>
-      )}
+          {!isLoading && jobs.length === 0 && (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "60px 20px",
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+              }}
+            >
+              <Clock size={48} color="#5E5E65" style={{ marginBottom: 16 }} />
+              <h4
+                style={{
+                  fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+                  fontWeight: 600,
+                  fontSize: 16,
+                  color: "#1B1C1B",
+                  margin: "0 0 8px 0",
+                }}
+              >
+                No scheduled tasks configured yet
+              </h4>
+              <p
+                style={{
+                  fontSize: 14,
+                  color: "#5E5E65",
+                  maxWidth: 320,
+                  margin: "0 auto 20px",
+                }}
+              >
+                Set up recurring tasks to automate your regular workflows.
+              </p>
+              <button
+                onClick={() => setShowCreatePanel(true)}
+                style={{
+                  background: "linear-gradient(135deg, #93452A 0%, #B25D3F 100%)",
+                  color: "#FFFFFF",
+                  fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+                  fontWeight: 600,
+                  padding: "10px 20px",
+                  borderRadius: "0.375rem",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 14,
+                }}
+              >
+                Create First Job
+              </button>
+            </div>
+          )}
 
-      {!isLoading &&
-        jobs.map((job, i) => (
-          <CronRow
-            key={job.slug}
-            job={job}
-            index={i}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-            onDragEnd={handleDragEnd}
-            isDragOver={dragOverIndex === i}
-            isDragging={dragIndex === i}
-          />
-        ))}
+          {!isLoading &&
+            jobs.map((job, i) => (
+              <CronRow
+                key={`${job.clientId ?? "root"}:${job.slug}`}
+                job={job}
+                index={i}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onDragEnd={handleDragEnd}
+                isDragOver={dragOverIndex === i}
+                isDragging={dragIndex === i}
+              />
+            ))}
         </div>
       </div>
 
