@@ -1,15 +1,14 @@
 ---
-name: "Skill Update Check"
-time: "09:00"
-days: "weekdays"
-active: "true"
-model: "haiku"
-notify: "on_finish"
-description: "Checks for new or updated skills in the catalog"
-timeout: "5m"
-retry: "1"
+name: Skill Update Check
+time: '09:00'
+days: weekdays
+active: 'false'
+model: haiku
+notify: on_finish
+description: Checks for new or updated skills in the catalog
+timeout: 5m
+retry: '1'
 ---
-
 You are running as a scheduled job for Agentic OS.
 
 Read CLAUDE.md for system context.

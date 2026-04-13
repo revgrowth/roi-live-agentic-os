@@ -2,7 +2,7 @@
 name: Monthly Learnings Health Check
 time: '10:00'
 days: mon
-active: 'true'
+active: 'false'
 model: sonnet
 notify: on_finish
 description: 'Monthly audit of learnings.md for bloat, contradictions, and gaps'

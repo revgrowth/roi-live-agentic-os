@@ -14,6 +14,34 @@
 const fs = require('fs');
 const path = require('path');
 
+// Resolve the active planning config by walking up from cwd.
+// Supports per-brief layout (projects/briefs/{slug}/.planning/).
+function findPlanningConfig(startCwd) {
+  let current = path.resolve(startCwd);
+  for (let depth = 0; depth < 20; depth += 1) {
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    if (path.basename(parent) === 'briefs' && path.basename(path.dirname(parent)) === 'projects') {
+      const p = path.join(current, '.planning', 'config.json');
+      return fs.existsSync(p) ? p : null;
+    }
+    current = parent;
+  }
+  try {
+    const briefsDir = path.join(startCwd, 'projects', 'briefs');
+    if (fs.existsSync(briefsDir)) {
+      const active = [];
+      for (const entry of fs.readdirSync(briefsDir, { withFileTypes: true })) {
+        if (!entry.isDirectory()) continue;
+        const p = path.join(briefsDir, entry.name, '.planning', 'config.json');
+        if (fs.existsSync(p)) active.push(p);
+      }
+      if (active.length === 1) return active[0];
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
 let input = '';
 const stdinTimeout = setTimeout(() => process.exit(0), 3000);
 process.stdin.setEncoding('utf8');
@@ -57,10 +85,10 @@ process.stdin.on('end', () => {
       process.exit(0);
     }
 
-    // Check if workflow guard is enabled
+    // Check if workflow guard is enabled — resolve via per-brief .planning/
     const cwd = data.cwd || process.cwd();
-    const configPath = path.join(cwd, '.planning', 'config.json');
-    if (fs.existsSync(configPath)) {
+    const configPath = findPlanningConfig(cwd);
+    if (configPath && fs.existsSync(configPath)) {
       try {
         const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
         if (!config.hooks?.workflow_guard) {

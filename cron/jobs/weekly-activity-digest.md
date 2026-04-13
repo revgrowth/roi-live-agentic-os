@@ -1,15 +1,14 @@
 ---
-name: "Weekly Activity Digest"
-time: "17:00"
-days: "fri"
-active: "true"
-model: "sonnet"
-notify: "on_finish"
-description: "Summarises the week's sessions, deliverables, and cron job activity"
-timeout: "10m"
-retry: "0"
+name: Weekly Activity Digest
+time: '17:00'
+days: fri
+active: 'false'
+model: sonnet
+notify: on_finish
+description: 'Summarises the week''s sessions, deliverables, and cron job activity'
+timeout: 10m
+retry: '0'
 ---
-
 You are running as a scheduled job for Agentic OS.
 
 Read CLAUDE.md for system context. Read context/SOUL.md for voice.

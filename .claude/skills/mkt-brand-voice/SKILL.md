@@ -4,10 +4,11 @@ description: >
   Extract or build a brand's voice so every skill writes in their style.
   Triggers on: "brand voice", "writing style", "make this sound like me",
   "define our voice", "analyze my content", "voice guide", "how should we
-  sound", "tone of voice", "brand personality", "analyze my website".
+  sound", "tone of voice", "brand personality", "analyze my website",
+  "deep brand voice", "playbook mode", "agentic academy playbook".
   Four modes: Import (existing brand guidelines), Extract (analyze existing
-  content), Build (interview from scratch), Auto-Scrape (URL provided,
-  skill researches). Produces
+  content), Build (interview from scratch — quick or deep Playbook variant),
+  Auto-Scrape (URL provided, skill researches). Produces
   brand_context/voice-profile.md and brand_context/samples.md.
   Foundation skill — run before any execution skill that reads voice context.
   Does NOT trigger for positioning, audience research, or keyword work.
@@ -52,6 +53,8 @@ If it doesn't exist → **Mode selection.** Ask:
 > 4. Here's my URL — research it yourself"
 
 If the user provides a URL in their first message, skip mode selection and go directly to Auto-Scrape. If they attach or paste a structured brand guide, go directly to Import.
+
+**Playbook note:** Mode 3 (Build) has two variants — a Quick 8-question flow and a deep "Agentic Academy Playbook" flow. Playbook is an opt-in sub-variant of Build, never a separate mode. Only offer it when the user is entering Build mode, has no existing `voice-profile.md`, and hasn't already gathered a strong sample corpus from Import/Extract/Auto-Scrape. Users with an existing profile always hit **Update mode** and never see Playbook unless they explicitly ask for a "deep rebuild" or say "run the brand voice playbook".
 
 ---
 
@@ -101,11 +104,16 @@ After analyzing, collect 5-10 sentences that best represent the voice for `sampl
 
 Best for: starting fresh, or existing content is too generic to reliably extract from.
 
-Read `references/build-questions.md` for the full question bank and synthesis process.
+**Quick vs Deep fork (ask this first):**
 
-Ask a maximum of 8 questions — prioritize based on what you already know from context. If positioning.md is loaded, skip questions it already answers.
+> "Quick setup (5-8 targeted questions, ~5 min) or the full Agentic Academy playbook (deeper interview, ~10-15 min, better for people starting from zero)?"
 
-After building, ask the user for 2-3 sample sentences in their voice for `samples.md`.
+- **Quick** → use `references/build-questions.md`. Ask a maximum of 8 questions, prioritised by what context is already loaded. If `positioning.md` is loaded, skip questions it already answers. After building, ask for 2-3 sample sentences for `samples.md`.
+- **Playbook** → use `references/playbook-questions.md`. Walk through Step 1 (Personality, 5 questions), Step 2 (Strategic Framework, 4 questions — skip Q1/Q2 if `icp.md`/`positioning.md` exist), and Step 3 (Example Collection). Samples collected during the interview feed directly into `samples.md`. Follow the Playbook's Synthesis Instructions — derive every characteristic from the user's actual answers, never template from the example brief.
+
+If the user has already indicated a preference (e.g. the `/start-here` flow passed through a "deep flow" flag, or the user said "run the brand voice playbook"), skip the fork and route directly to the matching variant.
+
+If the user already produced a strong sample corpus through Import / Extract / Auto-Scrape in this session, do **not** offer Playbook — they already have the raw material; keep Build as Quick.
 
 ---
 
@@ -192,6 +200,8 @@ Cap at 3 rounds. If still unresolved, offer to save current version and refine o
 **`brand_context/voice-profile.md`**
 Read `references/voice-profile-template.md` for the exact format. All sections required.
 Include a structured JSON data block at the end (inside a `<details>` tag) that conforms to `references/voice-profile.schema.json`. Read the schema before generating the JSON to ensure all required fields are present.
+
+If Playbook mode was used, ensure every section in `voice-profile.md` is traceable to a specific answer — no templated language from the example brief. Core Voice Characteristics must be named from the user's actual words; signature phrases must be their actual phrases; the never list must reflect their Q1 anti-corporate answer.
 
 **`brand_context/samples.md`**
 5-10 sentences. For each, note: source type, and why it's representative.

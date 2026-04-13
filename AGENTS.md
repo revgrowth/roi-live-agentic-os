@@ -221,6 +221,13 @@ Every skill and its output folder uses a category prefix.
 | `viz-stitch-design` | "design a UI", "create a screen", "stitch design", "UI mockup", "app design", "landing page design", "mobile screen", "web layout", "wireframe to UI", "design this page" |
 | `viz-interface-design` | "dashboard", "admin panel", "SaaS UI", "data interface", "metrics display", "control panel", "monitoring UI", "analytics view", "settings page", "interactive tool interface" |
 
+### Operations Skills
+
+| Skill | Triggers on |
+|-------|-------------|
+| `ops-new-feature` | "new feature", "start feature", "add feature", "begin work on", "start working on", "finish feature", "done with feature", "merge feature", "feature done", "merge this" |
+| `ops-release` | "release", "cut a release", "bump version", "ship it", "new version", "tag a release" |
+
 ### Utility Skills
 
 | Skill | Triggers on |
@@ -253,6 +260,8 @@ Load only the `brand_context/` files listed for each skill.
 | `viz-stitch-design` | tone only | summary | language section | — | — | `## viz-stitch-design` |
 | `viz-interface-design` | tone only | summary | language section | — | — | `## viz-interface-design` |
 | `ops-cron` | — | — | — | — | — | `## ops-cron` |
+| `ops-new-feature` | — | — | — | — | — | `## ops-new-feature` |
+| `ops-release` | — | — | — | — | — | `## ops-release` |
 
 **Matrix key:** `writes` = creates file | `full` = entire file | `summary` = 1-2 sentences | `tone only` = tone + vocabulary | `language section` = words-they-use section | `## skill-name` = read only that section from `context/learnings.md`
 
@@ -281,7 +290,7 @@ Load only the `brand_context/` files listed for each skill.
 
 **Level 2 brief requirements:** goal, deliverables, acceptance criteria, constraints, and dependencies. Keep it to one page.
 
-**Level 3 rule:** `.planning/` is shared at the workspace root, so only one active GSD project can exist per workspace at a time. Archive finished GSD work with `/archive-gsd`.
+**Level 3 rule:** Each Level 3 project owns its own `.planning/` inside `projects/briefs/{slug}/`. Multiple GSD projects can be active in parallel. Archive finished GSD work with `/archive-gsd` (flips the brief's status — nothing moves).
 
 **Project containment rule:** The Agentic OS root is the operating system, not a place for project outputs. All project source code, configs, manifests, build artifacts, and data files must live inside the project folder.
 

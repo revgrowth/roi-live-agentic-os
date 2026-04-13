@@ -22,6 +22,43 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
+// Walk up from cwd to find an active .planning/ dir.
+// Supports the per-brief layout: projects/briefs/{slug}/.planning/
+// Falls back to cwd/.planning for legacy/workspace-root cases.
+function findPlanningDir(startCwd) {
+  // 1. cwd walk — if we're inside projects/briefs/{slug}/..., use that brief's .planning/
+  let current = path.resolve(startCwd);
+  for (let depth = 0; depth < 20; depth += 1) {
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    if (path.basename(parent) === 'briefs' && path.basename(path.dirname(parent)) === 'projects') {
+      const candidate = path.join(current, '.planning');
+      if (fs.existsSync(candidate)) return candidate;
+      return null;
+    }
+    current = parent;
+  }
+  // 2. Fallback: look for exactly one projects/briefs/*/.planning/ under cwd
+  try {
+    const briefsDir = path.join(startCwd, 'projects', 'briefs');
+    if (fs.existsSync(briefsDir)) {
+      const active = [];
+      for (const entry of fs.readdirSync(briefsDir, { withFileTypes: true })) {
+        if (!entry.isDirectory()) continue;
+        const p = path.join(briefsDir, entry.name, '.planning');
+        if (fs.existsSync(p)) active.push(p);
+      }
+      if (active.length === 1) return active[0];
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
+function findPlanningConfig(startCwd) {
+  const dir = findPlanningDir(startCwd);
+  return dir ? path.join(dir, 'config.json') : null;
+}
+
 const WARNING_THRESHOLD = 35;  // remaining_percentage <= 35%
 const CRITICAL_THRESHOLD = 25; // remaining_percentage <= 25%
 const STALE_SECONDS = 60;      // ignore metrics older than 60s
@@ -47,8 +84,8 @@ process.stdin.on('end', () => {
 
     // Check if context warnings are disabled via config
     const cwd = data.cwd || process.cwd();
-    const configPath = path.join(cwd, '.planning', 'config.json');
-    if (fs.existsSync(configPath)) {
+    const configPath = findPlanningConfig(cwd);
+    if (configPath && fs.existsSync(configPath)) {
       try {
         const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
         if (config.hooks?.context_warnings === false) {
@@ -116,8 +153,9 @@ process.stdin.on('end', () => {
     warnData.lastLevel = currentLevel;
     fs.writeFileSync(warnPath, JSON.stringify(warnData));
 
-    // Detect if GSD is active (has .planning/STATE.md in working directory)
-    const isGsdActive = fs.existsSync(path.join(cwd, '.planning', 'STATE.md'));
+    // Detect if GSD is active (has STATE.md inside the resolved planning dir)
+    const planningDir = findPlanningDir(cwd);
+    const isGsdActive = !!(planningDir && fs.existsSync(path.join(planningDir, 'STATE.md')));
 
     // Build advisory warning message (never use imperative commands that
     // override user preferences — see #884)

@@ -60,13 +60,13 @@ Scan what happened this session:
 
 ## Step 2: Collect Feedback
 
-Ask the user three questions (skip any that don't apply to the session):
+Default to one question: **"Anything to note before I wrap up?"**
+
+Only expand to the full three questions below if multiple skills were used in the session or the user explicitly wants to give detailed feedback:
 
 1. **What worked well?** — Anything the skills produced that hit the mark
 2. **What didn't work?** — Anything that missed, needed heavy editing, or frustrated you
 3. **Any specific skill issues?** — Did a skill take the wrong approach, miss context, or produce the wrong format?
-
-If the session was short or routine, one question is enough: "Anything to note before I wrap up?"
 
 ---
 
@@ -100,7 +100,9 @@ After applying fixes, log what was changed in the skill's learnings section so t
 
 ### 3c: Finalise Daily Memory
 
-One file per day: `context/memory/{YYYY-MM-DD}.md`. The heartbeat (or `/start-here`) creates the session block at the start. Wrap-up **finalises the existing block** — it does NOT create a new session block.
+One file per day: `context/memory/{YYYY-MM-DD}.md`. The session block is created at startup. Wrap-up **finalises the existing block** — it does NOT create a new session block.
+
+**Note:** Auto-tracking during the session means most deliverables, decisions, and open threads are already logged. This step is about confirming and polishing what's there, not writing from scratch.
 
 **Find the current session's `## Session N` block** and replace any placeholder text with real content from the session. Fill in all four sections:
 
@@ -140,9 +142,16 @@ Most sessions won't trigger this. Only propose changes for patterns, not one-off
 
 If you noticed new patterns about how the user works — communication style, preferred formats, feedback cadence, working hours — update `context/USER.md`. Don't ask permission for small additions to the Notes section; do ask before changing core preferences.
 
-### 3f: Skill & MCP Sync
+### 3f: Skill & MCP Sync + Deferred Startup Checks
 
-Run the reconciliation described in AGENTS.md's **Skill & MCP Reconciliation** section. This catches anything that changed during the session:
+This step absorbs the checks deferred from startup to keep session start fast. Run all of the following:
+
+**Deferred checks:**
+- **Stale brand_context flagging:** Scan `brand_context/` for files older than 30 days. Flag any that are stale.
+- **Active project scan:** Scan `projects/briefs/*/brief.md` for active projects. Report any that exist.
+- **Cron dispatcher status:** Check whether the cron dispatcher is installed. If so, read `cron/status/` and report anything relevant.
+
+**Reconciliation** (from AGENTS.md's **Skill & MCP Reconciliation** section). This catches anything that changed during the session:
 
 1. **Skills** — compare `.claude/skills/` folders against AGENTS.md's Skill Registry and Context Matrix:
    - New skill folder not yet registered → add to AGENTS.md Skill Registry, Context Matrix, README.md skill tables, and `context/learnings.md`

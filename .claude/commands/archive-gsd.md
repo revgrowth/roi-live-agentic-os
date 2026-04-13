@@ -1,56 +1,58 @@
 # /archive-gsd
 
-Archive the current GSD project's `.planning/` directory so you can start a new one.
+Mark a GSD project as complete. Each Level 3 project owns its own `.planning/`
+folder inside `projects/briefs/{slug}/`, so archiving is now a simple
+frontmatter flip — nothing moves on disk.
 
 ## What This Does
 
-1. Finds the active GSD project by scanning `projects/briefs/*/brief.md` for a brief with `level: 3` and `status: active`
-2. Moves `.planning/` into that project's folder as `planning-archive/`
-3. Updates the brief's frontmatter from `status: active` to `status: complete`
-4. Reports where everything was moved
+1. Finds an active GSD project by scanning `projects/briefs/*/brief.md` for
+   a brief with `level: 3` and `status: active`.
+2. Updates that brief's frontmatter from `status: active` to `status: complete`.
+3. Leaves `projects/briefs/{slug}/.planning/` exactly where it is, as a
+   self-contained historical record.
+
+Multiple GSD projects can be active in parallel, so this command only
+affects the one you choose.
 
 ## Steps
 
-### Step 1: Find the active GSD project
+### Step 1: Find active GSD projects
 
-Scan `projects/briefs/*/brief.md` for a file with `level: 3` and `status: active` in its YAML frontmatter.
+Scan `projects/briefs/*/brief.md` for files with `level: 3` and
+`status: active` in YAML frontmatter.
 
-- **Found one** → continue to Step 2
-- **Found none** → check if `.planning/` exists:
-  - `.planning/` exists but no matching brief → ask: "There's a `.planning/` directory but no matching project brief. Which project folder should I archive it into?" Let the user specify a project name, then create `projects/briefs/{name}/planning-archive/` and move `.planning/` there.
-  - No `.planning/` at all → tell the user: "No active GSD project found — nothing to archive."
-- **Found multiple** → ask the user which one to archive (this shouldn't happen, but handle it gracefully)
+- **Found none** → tell the user: "No active GSD project found — nothing to archive."
+- **Found one** → continue to Step 2 with that project.
+- **Found multiple** → ask the user which one to archive.
 
 ### Step 2: Confirm with the user
 
-Show what will happen:
-
-> "I'll archive the GSD project **{project-name}**:"
-> - Move `.planning/` → `projects/briefs/{project-name}/planning-archive/`
-> - Update `projects/briefs/{project-name}/brief.md` status to `complete`
+> "I'll mark the GSD project **{project-name}** as complete:"
+> - Update `projects/briefs/{project-name}/brief.md` → `status: complete`
+> - `projects/briefs/{project-name}/.planning/` stays in place
 >
 > "Go ahead?"
 
 Wait for confirmation before proceeding.
 
-### Step 3: Archive
+### Step 3: Flip the status
 
-1. Move the directory: `mv .planning/ projects/briefs/{project-name}/planning-archive/`
-2. Update the brief's YAML frontmatter: change `status: active` to `status: complete`
-3. Verify the move succeeded (check that `projects/briefs/{project-name}/planning-archive/` exists and `.planning/` is gone)
+Edit the brief's YAML frontmatter: change `status: active` to
+`status: complete`. Do not touch `.planning/` or anything else.
 
 ### Step 4: Report
 
-> "Done. Your GSD project **{project-name}** is archived."
+> "Done. **{project-name}** is archived."
 >
-> - Planning archive: `projects/briefs/{project-name}/planning-archive/`
 > - Brief: `projects/briefs/{project-name}/brief.md` (status: complete)
-> - Project outputs are still in `projects/briefs/{project-name}/`
+> - Planning: `projects/briefs/{project-name}/.planning/` (unchanged)
 >
-> "You're free to start a new GSD project with `/gsd:new-project`."
+> "Other GSD projects are unaffected. Start a new one any time with `/gsd:new-project`."
 
 ## Anti-Patterns
 
-- Never delete `.planning/` — always move it
-- Never archive without user confirmation
-- Never archive if `.planning/` doesn't exist
+- Never move `.planning/` — it already lives in the right place.
+- Never delete anything — only the frontmatter field changes.
+- Never archive without user confirmation.
+- Never assume there's only one active GSD project — always check.
