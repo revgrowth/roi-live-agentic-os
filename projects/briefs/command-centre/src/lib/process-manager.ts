@@ -1,14 +1,21 @@
-import type { ChildProcess } from "child_process";
+import { spawn, type ChildProcess } from "child_process";
 import { createInterface } from "readline";
 import { getDb } from "./db";
 import { getConfig, getClientAgenticOsDir } from "./config";
-import { completeCronRunForTask } from "./cron-service";
 import { emitTaskEvent } from "./event-bus";
 import { ClaudeOutputParser } from "./claude-parser";
 import { fileWatcher } from "./file-watcher";
-import { killChildProcessTree, spawnManagedTaskProcess } from "./subprocess";
-import { getTaskLogEntries, insertTaskLog } from "./task-logs";
+import { buildSiblingContextBlock } from "./gather-context";
 import type { Task, LogEntry } from "@/types/task";
+import type { QuestionSpec } from "@/types/question-spec";
+
+/**
+ * Injected into every initial task prompt so Claude knows to emit
+ * typed clarifying questions as a fenced block instead of asking in
+ * prose. The prose-detection path still catches cases where Claude
+ * ignores this instruction.
+ */
+const STRUCTURED_QUESTION_ADDENDUM = `\n\n---\nWhen you need clarification from the user, do NOT ask in prose. Instead emit a fenced code block with the language tag \`ask-user-questions\` containing a JSON array of typed question objects. Each object has: id (short string), prompt (the question), type ("text" | "multiline" | "select" | "multiselect"), required (boolean), and options (array of strings, only for select/multiselect). Prefer select/multiselect when the set of reasonable answers is small. Example:\n\n\`\`\`ask-user-questions\n[\n  { "id": "audience", "prompt": "Who is the primary audience?", "type": "text", "required": true },\n  { "id": "tone", "prompt": "What tone should this take?", "type": "select", "options": ["Formal", "Casual", "Playful"], "required": true }\n]\n\`\`\`\n\nEmit the block and stop — the system will surface it to the user, collect answers, and resume you with their replies.\n---\n`;
 
 /**
  * Manages Claude CLI child processes for task execution.
@@ -42,11 +49,18 @@ class ProcessManager {
 
   /**
    * Kill a process and its entire process tree.
-   * On Unix, detached tasks get their own process group.
-   * On Windows, use taskkill so background Claude runs stay hidden.
+   * Processes are spawned with detached: true, so they get their own process group.
+   * Sending a signal to -pid kills the entire group (parent + all descendants).
    */
   private killProcessTree(proc: ChildProcess, signal: NodeJS.Signals = "SIGTERM"): void {
-    killChildProcessTree(proc, signal);
+    if (!proc.pid) return;
+    try {
+      // Kill the entire process group (negative pid)
+      process.kill(-proc.pid, signal);
+    } catch {
+      // Process group already gone — try killing just the process
+      try { proc.kill(signal); } catch { /* already gone */ }
+    }
   }
 
   /** Check if this task has an active in-memory session (managed by processManager) */
@@ -138,6 +152,17 @@ class ProcessManager {
     // Clear stale output files from previous runs
     db.prepare("DELETE FROM task_outputs WHERE taskId = ?").run(taskId);
 
+    // Log the user's original goal as the first chat entry.
+    // Use the task description (the full goal text) or fall back to the title.
+    // This ensures the chat shows what the user typed, not the system prompt.
+    const userGoalText = task.description || task.title;
+    this.addLogEntry(taskId, {
+      id: crypto.randomUUID(),
+      type: "user_reply",
+      timestamp: now,
+      content: userGoalText,
+    });
+
     const updatedTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
     emitTaskEvent({ type: "task:status", task: this.normalizeTask(updatedTask), timestamp: now });
 
@@ -146,6 +171,24 @@ class ProcessManager {
       await fileWatcher.startWatching(taskId, task.projectSlug, task.clientId);
     } catch (err) {
       console.error(`[process-manager] fileWatcher.startWatching failed:`, err);
+    }
+
+    // Capture baseline snapshot for diff-aware Files tab
+    try {
+      const fsSnap = require("fs") as typeof import("fs");
+      const pathSnap = require("path") as typeof import("path");
+      const { captureSnapshot } = require("./file-diff") as typeof import("./file-diff");
+      const snapConfig = getConfig();
+      const snapCwd = task.clientId ? getClientAgenticOsDir(task.clientId) : snapConfig.agenticOsDir;
+      if (task.projectSlug) {
+        const projDir = pathSnap.join(snapCwd, "projects", "briefs", task.projectSlug);
+        if (fsSnap.existsSync(projDir)) {
+          const snapshot = captureSnapshot(projDir);
+          db.prepare("UPDATE tasks SET startSnapshot = ? WHERE id = ?").run(JSON.stringify(snapshot), taskId);
+        }
+      }
+    } catch (err) {
+      console.error(`[process-manager] snapshot capture failed:`, err);
     }
 
     // Build the initial prompt
@@ -203,19 +246,49 @@ class ProcessManager {
     // Build prompt — detect special task types first
     let prompt = "";
     const isSlashCommand = task.description?.match(/^Run \/[\w:.-]+/);
-    const taskRow = db.prepare("SELECT gsdStep FROM tasks WHERE id = ?").get(taskId) as { gsdStep: string | null } | undefined;
+    const taskRow = db.prepare("SELECT gsdStep, phaseNumber FROM tasks WHERE id = ?").get(taskId) as { gsdStep: string | null; phaseNumber: number | null } | undefined;
     const gsdStep = taskRow?.gsdStep;
+    const gsdPhaseNumber = taskRow?.phaseNumber;
     const isTopLevelParent = !task.parentId;
+
+    // Single-session-per-project: if this task's parent already owns a live
+    // Claude session, we resume INTO that session instead of spawning fresh.
+    // All project/GSD subtasks share one conversation memory so the integrator
+    // step at the end of the project can compose everything without any
+    // cross-process context plumbing.
+    let resumeParentSession = false;
+    let parentSessionId: string | null = null;
+    if (task.parentId) {
+      const parentRow = db
+        .prepare(
+          "SELECT id, level, claudeSessionId FROM tasks WHERE id = ?"
+        )
+        .get(task.parentId) as
+        | { id: string; level: string; claudeSessionId: string | null }
+        | undefined;
+      if (
+        parentRow &&
+        (parentRow.level === "project" || parentRow.level === "gsd") &&
+        parentRow.claudeSessionId
+      ) {
+        resumeParentSession = true;
+        parentSessionId = parentRow.claudeSessionId;
+      }
+    }
 
     if (isSlashCommand) {
       // Slash command task — pass the description as-is (e.g. "Run /start-here", "Run /gsd:plan-phase 6")
       prompt = task.description!;
     } else if (gsdStep) {
+      // Target the explicit phase number the user clicked so each GSD step
+      // button ends up running the right command (e.g. /gsd:plan-phase 3)
+      // instead of the ambiguous "current phase".
+      const phaseArg = gsdPhaseNumber != null ? ` ${gsdPhaseNumber}` : "";
       const gsdPrompts: Record<string, string> = {
-        discuss: "Run /gsd:discuss-phase for the current phase. Ask the user interactive questions — do NOT use --auto. Wait for their replies.",
-        plan: "Run /gsd:plan-phase for the current phase.",
-        execute: "Run /gsd:execute-phase for the current phase.",
-        verify: "Run /gsd:verify-work for the current phase.",
+        discuss: `Run /gsd:discuss-phase${phaseArg}. Ask the user interactive questions — do NOT use --auto. Wait for their replies.`,
+        plan: `Run /gsd:plan-phase${phaseArg}.`,
+        execute: `Run /gsd:execute-phase${phaseArg}.`,
+        verify: `Run /gsd:verify-work${phaseArg}.`,
       };
       prompt = gsdPrompts[gsdStep] || task.title;
     } else if (task.level === "project" && isTopLevelParent) {
@@ -224,6 +297,24 @@ class ProcessManager {
     } else if (task.level === "gsd" && isTopLevelParent) {
       // GSD project — run /gsd:new-project which handles interviews, research, and roadmap creation
       prompt = `Run /gsd:new-project "${task.title}"${task.description ? `\n\nContext from user: ${task.description}` : ""}`;
+    } else if (resumeParentSession && parentSessionId) {
+      // Resume path: parent already has a live session holding the brief,
+      // brand context, and every previous subtask's full transcript in
+      // Claude's own memory. Skip the brief/sibling prepends entirely — we
+      // just queue the next turn as "do this subtask."
+      prompt = task.description
+        ? `Next subtask: ${task.title}\n\n${task.description}`
+        : `Next subtask: ${task.title}`;
+      contextSources.push({
+        type: "system",
+        label: "Resumed from project session",
+      });
+      // Mirror the parent's session ID onto this child row so the existing
+      // spawnClaudeTurn --resume lookup (which reads from the task row) finds
+      // it. Any later user reply to this subtask will also resolve to the
+      // same session via the standard reply path.
+      db.prepare("UPDATE tasks SET claudeSessionId = ? WHERE id = ?")
+        .run(parentSessionId, taskId);
     } else {
       if (task.projectSlug) {
         const briefPath = pathMod.join(cwd, "projects", "briefs", task.projectSlug, "brief.md");
@@ -235,11 +326,26 @@ class ProcessManager {
           }
         } catch { /* proceed without context */ }
       }
+      // Sibling context — only relevant when we're NOT resuming a shared
+      // parent session. If the parent owns a session, Claude's own memory
+      // already contains everything the sibling manifest would describe.
+      try {
+        const siblingBlock = buildSiblingContextBlock(task);
+        if (siblingBlock) {
+          prompt += `${siblingBlock}\n\n---\n\n`;
+          contextSources.push({ type: "system", label: "Sibling task context" });
+        }
+      } catch (err) {
+        console.error("[process-manager] buildSiblingContextBlock failed:", err);
+      }
       prompt += task.description ? `Task: ${task.title}\n\n${task.description}` : task.title;
     }
 
-    // Inject session activity summary for wrap-up and session-aware tasks
-    const needsSessionContext = this.isSessionContextTask(task);
+    // Inject session activity summary for wrap-up and session-aware tasks.
+    // Skip when resuming a parent session — that session already has today's
+    // context in its own memory and doesn't need a cross-task summary.
+    const needsSessionContext =
+      !resumeParentSession && this.isSessionContextTask(task);
     console.log(`[process-manager] Session context check for "${task.title}" (desc: "${task.description?.slice(0, 50)}"): ${needsSessionContext}`);
     if (needsSessionContext) {
       const sessionSummary = this.buildSessionSummary(cwd, taskId);
@@ -254,8 +360,23 @@ class ProcessManager {
         .run(JSON.stringify(contextSources), taskId);
     }
 
-    // Spawn the initial turn
-    this.spawnClaudeTurn(taskId, prompt, cwd, false);
+    // Expand @tag references in the prompt against context/prompt-tags.md
+    try {
+      const { expandPromptTags } = require("./prompt-tags") as typeof import("./prompt-tags");
+      prompt = expandPromptTags(prompt, task.clientId);
+    } catch (err) {
+      console.error(`[process-manager] prompt tag expansion failed:`, err);
+    }
+
+    // Append the structured-question addendum so Claude emits typed
+    // clarifying questions as fenced blocks instead of prose.
+    prompt = prompt + STRUCTURED_QUESTION_ADDENDUM;
+
+    // Spawn the turn. When resuming a parent-owned session, flag
+    // isContinuation=true so spawnClaudeTurn routes through the --resume
+    // branch and picks up the parent's session ID (mirrored onto this row
+    // above).
+    this.spawnClaudeTurn(taskId, prompt, cwd, resumeParentSession);
   }
 
   /**
@@ -323,6 +444,24 @@ class ProcessManager {
    * Cancel a running or waiting task.
    */
   async cancelTask(taskId: string): Promise<void> {
+    await this.killSession(taskId);
+
+    const db = getDb();
+    const now = new Date().toISOString();
+    db.prepare(
+      "UPDATE tasks SET status = ?, updatedAt = ?, activityLabel = ?, costUsd = NULL, tokensUsed = NULL, durationMs = NULL, errorMessage = NULL, startedAt = NULL, completedAt = NULL, needsInput = 0 WHERE id = ?"
+    ).run("review", now, "Cancelled — re-queue or delete", taskId);
+
+    const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
+    emitTaskEvent({ type: "task:status", task: this.normalizeTask(updated), timestamp: now });
+  }
+
+  /**
+   * Kill the process and clean up session state without touching the DB or
+   * emitting SSE events. Used by the PATCH handler when the caller manages
+   * the final DB state (e.g. marking done).
+   */
+  async killSession(taskId: string): Promise<void> {
     const session = this.sessions.get(taskId);
     if (session) {
       this.killProcessTree(session.proc);
@@ -337,15 +476,6 @@ class ProcessManager {
     this.lastProgressEmit.delete(taskId);
 
     await fileWatcher.stopWatching(taskId);
-
-    const db = getDb();
-    const now = new Date().toISOString();
-    db.prepare(
-      "UPDATE tasks SET status = ?, updatedAt = ?, activityLabel = ?, costUsd = NULL, tokensUsed = NULL, durationMs = NULL, errorMessage = NULL, startedAt = NULL, completedAt = NULL, needsInput = 0 WHERE id = ?"
-    ).run("review", now, "Cancelled — re-queue or delete", taskId);
-
-    const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
-    emitTaskEvent({ type: "task:status", task: this.normalizeTask(updated), timestamp: now });
   }
 
   // ── Prompt builders for interactive scoping ─────────────────────
@@ -453,6 +583,14 @@ IMPORTANT INSTRUCTIONS:
    d. End with a summary of what you planned and ask: "Want to adjust anything before I start working through these?"
 
 3. On SUBSEQUENT turns: The user may want to adjust deliverables, add constraints, or refine scope. Update the brief file and subtasks accordingly. If the user says it looks good, confirm and end.
+
+4. LIVE SUBTASK MANAGEMENT: As the project conversation progresses, the subtask list on the UI is the user's source of truth for "what's left". You can mutate it during any turn:
+   - To ADD a new subtask mid-project, emit another \`\`\`subtasks\`\`\` JSON block. Existing titles are preserved; only new titles get appended.
+   - To MARK one or more existing subtasks as done (without rewriting the whole list), emit a \`\`\`subtasks_done\`\`\` block:
+     \`\`\`subtasks_done
+     ["Exact title of subtask A", "Exact title of subtask B"]
+     \`\`\`
+   - Match done-titles exactly as they appear in the current list (case is ignored). Use this whenever you complete a deliverable so the user can see progress.
 
 CRITICAL: Every turn MUST end with a question mark (?). This is how the system detects that you need user input.
 Keep subtasks high-level — one per major deliverable, not every granular step.`;
@@ -712,7 +850,42 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
       }
     }
 
-    let subtasks: Array<{ title: string; description?: string; phaseNumber?: number; gsdStep?: string }>;
+    // Also look for a ```subtasks_done``` block listing titles Claude has
+    // marked complete during this turn. This lets the model tick off work
+    // as the conversation progresses, without re-emitting the whole list.
+    let doneTitles: string[] = [];
+    for (const log of logs) {
+      const match = log.content.match(/```subtasks_done\s*\n([\s\S]*?)```/);
+      if (match) {
+        try {
+          const parsed = JSON.parse(match[1].trim());
+          if (Array.isArray(parsed)) {
+            doneTitles = parsed
+              .filter((v): v is string => typeof v === "string")
+              .map((s) => s.trim().toLowerCase())
+              .filter(Boolean);
+          }
+        } catch { /* ignore malformed */ }
+        break;
+      }
+    }
+
+    // Apply done-marks to existing children by title (case-insensitive).
+    if (doneTitles.length > 0) {
+      const existingChildren = db.prepare(
+        "SELECT id, title, status FROM tasks WHERE parentId = ?"
+      ).all(parentTaskId) as Array<{ id: string; title: string; status: string }>;
+      for (const child of existingChildren) {
+        if (child.status === "done") continue;
+        if (doneTitles.includes(child.title.trim().toLowerCase())) {
+          db.prepare(
+            "UPDATE tasks SET status = 'done', completedAt = ?, updatedAt = ?, needsInput = 0 WHERE id = ?"
+          ).run(now, now, child.id);
+        }
+      }
+    }
+
+    let subtasks: Array<{ title: string; description?: string; phaseNumber?: number; gsdStep?: string; status?: string }>;
 
     if (subtaskJson) {
       try {
@@ -758,24 +931,72 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
       return;
     }
 
-    // Skip if subtasks already exist for this parent (avoid duplicates on re-runs)
-    const existingCount = db.prepare(
-      "SELECT COUNT(*) as cnt FROM tasks WHERE parentId = ?"
-    ).get(parentTaskId) as { cnt: number };
-    if (existingCount.cnt > 0) {
-      console.log(`[process-manager] ${existingCount.cnt} subtasks already exist for ${parentTaskId.slice(0, 8)}, skipping`);
+    // Load existing children so we can append only NEW subtasks instead of
+    // blanket-skipping when any child already exists. This lets Claude add
+    // higher-level subtasks as the project conversation progresses.
+    const existingChildren = db.prepare(
+      "SELECT id, title, status FROM tasks WHERE parentId = ?"
+    ).all(parentTaskId) as Array<{ id: string; title: string; status: string }>;
+    const existingTitles = new Set(
+      existingChildren.map((c) => c.title.trim().toLowerCase())
+    );
+
+    // Drop garbage + dedupe within this payload. Claude occasionally parrots
+    // the "[Project Context: <slug>]" prompt prefix back into the subtasks
+    // block, and sometimes emits the same title twice. Both bugs surface as
+    // a flood of duplicate subtasks in the feed.
+    const seenTitles = new Set<string>();
+    subtasks = subtasks.filter((sub) => {
+      if (!sub || typeof sub.title !== "string") return false;
+      const title = sub.title.trim();
+      if (!title) return false;
+      if (title.startsWith("[Project Context:")) return false;
+      if (seenTitles.has(title)) return false;
+      seenTitles.add(title);
+      return true;
+    });
+
+    if (subtasks.length === 0) {
+      console.log(`[process-manager] All subtasks filtered out as garbage for ${parentTaskId.slice(0, 8)}`);
       return;
     }
 
-    console.log(`[process-manager] Creating ${subtasks.length} subtasks for ${parentTaskId.slice(0, 8)}`);
+    // Skip ones that already exist (case-insensitive title match). Anything
+    // new gets appended after the existing set. Also honour an explicit
+    // status: "done" field on each subtask for live tick-offs.
+    const newSubtasks = subtasks.filter((sub) => {
+      const key = sub.title.trim().toLowerCase();
+      if (existingTitles.has(key)) {
+        // Existing subtask — update status if Claude marked it done.
+        if (sub.status === "done") {
+          const match = existingChildren.find(
+            (c) => c.title.trim().toLowerCase() === key
+          );
+          if (match && match.status !== "done") {
+            db.prepare(
+              "UPDATE tasks SET status = 'done', completedAt = ?, updatedAt = ?, needsInput = 0 WHERE id = ?"
+            ).run(now, now, match.id);
+          }
+        }
+        return false;
+      }
+      return true;
+    });
 
-    // Get min columnOrder to insert subtasks in order
-    const minOrder = db.prepare(
-      "SELECT COALESCE(MIN(columnOrder), 1) as minOrder FROM tasks WHERE parentId = ?"
-    ).get(parentTaskId) as { minOrder: number };
-    let order = minOrder.minOrder - subtasks.length;
+    if (newSubtasks.length === 0) {
+      console.log(`[process-manager] No new subtasks to create for ${parentTaskId.slice(0, 8)}`);
+      return;
+    }
 
-    for (const sub of subtasks) {
+    console.log(`[process-manager] Creating ${newSubtasks.length} new subtasks for ${parentTaskId.slice(0, 8)} (${existingChildren.length} already existed)`);
+
+    // Append new subtasks after the existing set
+    const maxOrder = db.prepare(
+      "SELECT COALESCE(MAX(columnOrder), 0) as maxOrder FROM tasks WHERE parentId = ?"
+    ).get(parentTaskId) as { maxOrder: number };
+    let order = maxOrder.maxOrder + 1;
+
+    for (const sub of newSubtasks) {
       if (!sub.title || typeof sub.title !== "string") continue;
 
       const childLevel = parentTask.level === "gsd" ? "gsd" : "task";
@@ -847,7 +1068,28 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
   }
 
   getLogEntries(taskId: string): LogEntry[] {
-    return getTaskLogEntries(getDb(), taskId);
+    const db = getDb();
+    const rows = db.prepare(
+      "SELECT id, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers FROM task_logs WHERE taskId = ? ORDER BY rowid ASC"
+    ).all(taskId) as Array<{
+      id: string; type: string; timestamp: string; content: string;
+      toolName: string | null; toolArgs: string | null; toolResult: string | null;
+      isCollapsed: number;
+      questionSpec: string | null; questionAnswers: string | null;
+    }>;
+
+    return rows.map((row) => ({
+      id: row.id,
+      type: row.type as LogEntry["type"],
+      timestamp: row.timestamp,
+      content: row.content,
+      ...(row.toolName ? { toolName: row.toolName } : {}),
+      ...(row.toolArgs ? { toolArgs: row.toolArgs } : {}),
+      ...(row.toolResult ? { toolResult: row.toolResult } : {}),
+      ...(row.isCollapsed ? { isCollapsed: true } : {}),
+      ...(row.questionSpec ? { questionSpec: row.questionSpec } : {}),
+      ...(row.questionAnswers ? { questionAnswers: row.questionAnswers } : {}),
+    }));
   }
 
   /**
@@ -878,10 +1120,11 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     const cleanEnv = { ...process.env };
     delete cleanEnv.CLAUDECODE;
 
-    // Read the task's permission mode from the DB
+    // Read the task's permission mode + model from the DB
     const db = getDb();
-    const taskRow = db.prepare("SELECT permissionMode FROM tasks WHERE id = ?").get(taskId) as { permissionMode: string | null } | undefined;
-    const permissionMode = taskRow?.permissionMode || "default";
+    const taskRow = db.prepare("SELECT permissionMode, model FROM tasks WHERE id = ?").get(taskId) as { permissionMode: string | null; model: string | null } | undefined;
+    const permissionMode = taskRow?.permissionMode || "bypassPermissions";
+    const model = taskRow?.model || null;
 
     // Build args
     const args = [
@@ -890,6 +1133,10 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
       "-p", prompt,
       "--permission-mode", permissionMode,
     ];
+
+    if (model) {
+      args.push("--model", model);
+    }
 
     // bypassPermissions needs the dangerously-skip flag
     if (permissionMode === "bypassPermissions") {
@@ -922,13 +1169,14 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
 
     let proc: ChildProcess;
     try {
-      proc = spawnManagedTaskProcess("claude", args, {
+      proc = spawn("claude", args, {
         cwd,
         stdio: ["pipe", "pipe", "pipe"],
         env: cleanEnv,
+        detached: true,
       });
-      // Unref so the child doesn't keep the parent alive on exit.
-      // cleanup() still kills active processes explicitly.
+      // Unref so the process group doesn't keep the parent alive on exit
+      // (cleanup() will kill them explicitly)
       proc.unref();
       console.log(`[process-manager] Spawn succeeded, pid=${proc.pid}`);
 
@@ -1081,6 +1329,30 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     if (data.sessionId) {
       db.prepare("UPDATE tasks SET claudeSessionId = ? WHERE id = ?").run(data.sessionId, taskId);
       console.log(`[process-manager] Stored claudeSessionId=${data.sessionId} for ${taskId.slice(0, 8)}`);
+
+      // Mirror the session ID up to this task's project/GSD parent if the
+      // parent doesn't already own one. This establishes the single-session
+      // model: whichever subtask runs first captures the canonical session
+      // for the entire project, and every later subtask resumes it.
+      const parentRow = db
+        .prepare(
+          "SELECT p.id as id, p.level as level, p.claudeSessionId as claudeSessionId " +
+          "FROM tasks c JOIN tasks p ON c.parentId = p.id WHERE c.id = ?"
+        )
+        .get(taskId) as
+        | { id: string; level: string; claudeSessionId: string | null }
+        | undefined;
+      if (
+        parentRow &&
+        (parentRow.level === "project" || parentRow.level === "gsd") &&
+        !parentRow.claudeSessionId
+      ) {
+        db.prepare("UPDATE tasks SET claudeSessionId = ? WHERE id = ?")
+          .run(data.sessionId, parentRow.id);
+        console.log(
+          `[process-manager] Mirrored claudeSessionId up to parent ${parentRow.id.slice(0, 8)} (${parentRow.level})`,
+        );
+      }
     }
 
     // Check if a question was asked during this turn.
@@ -1219,6 +1491,42 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
    * that's controlled by the turn-aware wrapper so only the LAST text block's
    * question state matters (intermediate questions followed by more work don't count).
    */
+  /**
+   * Called when a structured question block is detected in Claude's output.
+   * Parallel to `handleQuestion`, but stores the typed QuestionSpec[] so the
+   * UI can render the QuestionModal instead of a prose bubble.
+   */
+  handleStructuredQuestion(taskId: string, specs: QuestionSpec[]): void {
+    console.log(
+      `[process-manager] handleStructuredQuestion(${taskId.slice(0, 8)}): ${specs.length} questions`
+    );
+
+    const db = getDb();
+    const now = new Date().toISOString();
+
+    // Build a short activity label from the first question prompt
+    const firstPrompt = specs[0]?.prompt ?? "Waiting for your answers";
+    const label = firstPrompt.length > 100 ? firstPrompt.slice(0, 97) + "..." : firstPrompt;
+    db.prepare("UPDATE tasks SET updatedAt = ?, activityLabel = ?, needsInput = 1 WHERE id = ?")
+      .run(now, label, taskId);
+
+    const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
+    emitTaskEvent({
+      type: "task:question",
+      task: this.normalizeTask(updated),
+      timestamp: now,
+      questionText: `${specs.length} question${specs.length === 1 ? "" : "s"}`,
+    });
+
+    this.addLogEntry(taskId, {
+      id: crypto.randomUUID(),
+      type: "structured_question",
+      timestamp: now,
+      content: specs.map((s, i) => `${i + 1}. ${s.prompt}`).join("\n"),
+      questionSpec: JSON.stringify(specs),
+    });
+  }
+
   handleQuestion(taskId: string, questionText: string): void {
     console.log(`[process-manager] handleQuestion(${taskId.slice(0, 8)}): detected question in output`);
 
@@ -1287,27 +1595,22 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
 
   addLogEntry(taskId: string, entry: LogEntry): void {
     const db = getDb();
-    const result = insertTaskLog(db, taskId, {
-      id: entry.id,
-      type: entry.type,
-      timestamp: entry.timestamp,
-      content: entry.content,
-      toolName: entry.toolName,
-      toolArgs: entry.toolArgs,
-      toolResult: entry.toolResult,
-      isCollapsed: entry.isCollapsed,
-    });
-    if (!result.inserted) {
-      return;
-    }
+    db.prepare(
+      "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    ).run(
+      entry.id, taskId, entry.type, entry.timestamp, entry.content,
+      entry.toolName ?? null, entry.toolArgs ?? null, entry.toolResult ?? null,
+      entry.isCollapsed ? 1 : 0,
+      entry.questionSpec ?? null, entry.questionAnswers ?? null,
+    );
 
     const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task | undefined;
     if (task) {
       emitTaskEvent({
         type: "task:log",
         task: this.normalizeTask(task),
-        timestamp: result.entry.timestamp,
-        logEntry: result.entry,
+        timestamp: entry.timestamp,
+        logEntry: entry,
       });
     }
   }
@@ -1402,15 +1705,67 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
    * so the cron jobs UI shows accurate last-run and history data.
    */
   private recordCronRun(task: Task, costUsd: number, durationMs: number): void {
-    if (!task.cronJobSlug) return;
+    const slug = task.cronJobSlug;
+    if (!slug) return;
 
-    completeCronRunForTask(task, {
-      costUsd,
-      durationMs,
-      result: task.errorMessage ? "failure" : "success",
-      exitCode: task.errorMessage ? 1 : 0,
-      completedAt: new Date().toISOString(),
-    });
+    const db = getDb();
+    const now = new Date().toISOString();
+    const durationSec = Math.round(durationMs / 1000);
+    const result = task.errorMessage ? "failure" : "success";
+    const exitCode = task.errorMessage ? 1 : 0;
+
+    // Check if a running row already exists for this task (inserted by manual run endpoint)
+    try {
+      const existing = db.prepare(
+        `SELECT id FROM cron_runs WHERE taskId = ? AND result = 'running' LIMIT 1`
+      ).get(task.id) as { id: number } | undefined;
+
+      if (existing) {
+        // Update the existing running row with completion data (preserves trigger value)
+        db.prepare(
+          `UPDATE cron_runs SET completedAt = ?, result = ?, durationSec = ?, costUsd = ?, exitCode = ?
+           WHERE id = ?`
+        ).run(now, result, durationSec, costUsd, exitCode, existing.id);
+      } else {
+        // No existing row — insert fresh (handles scheduled runs from external dispatcher)
+        db.prepare(
+          `INSERT INTO cron_runs (jobSlug, taskId, startedAt, completedAt, result, durationSec, costUsd, exitCode, trigger)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'scheduled')`
+        ).run(slug, task.id, task.startedAt || now, now, result, durationSec, costUsd, exitCode);
+      }
+    } catch (err) {
+      console.error(`[process-manager] Failed to record cron_runs for ${slug}:`, err);
+    }
+
+    // Update cron/status/{slug}.json
+    try {
+      const fs = require("fs") as typeof import("fs");
+      const pathMod = require("path") as typeof import("path");
+      const config = getConfig();
+      const statusDir = pathMod.join(config.agenticOsDir, "cron", "status");
+      fs.mkdirSync(statusDir, { recursive: true });
+
+      // Read existing status to preserve run_count/fail_count
+      const statusPath = pathMod.join(statusDir, `${slug}.json`);
+      let existing = { run_count: 0, fail_count: 0 };
+      try {
+        existing = JSON.parse(fs.readFileSync(statusPath, "utf-8"));
+      } catch { /* first run */ }
+
+      const status = {
+        last_run: now,
+        result,
+        duration: durationSec,
+        exit_code: exitCode,
+        run_count: (existing.run_count || 0) + 1,
+        fail_count: (existing.fail_count || 0) + (result === "failure" ? 1 : 0),
+      };
+
+      fs.writeFileSync(statusPath, JSON.stringify(status, null, 2), "utf-8");
+      console.log(`[process-manager] Updated cron status for ${slug}: ${result}`);
+    } catch (err) {
+      console.error(`[process-manager] Failed to update cron status for ${slug}:`, err);
+    }
   }
 
   private handleSpawnError(taskId: string, err: unknown): void {
@@ -1469,6 +1824,10 @@ class ClauseOutputParserWithTurnAwareness {
       onQuestion: (questionText) => {
         this.lastTextWasQuestion = true;
         pm.handleQuestion(taskId, questionText);
+      },
+      onStructuredQuestion: (specs) => {
+        this.lastTextWasQuestion = true;
+        pm.handleStructuredQuestion(taskId, specs);
       },
     });
   }

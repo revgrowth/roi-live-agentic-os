@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
-import type { Task, TaskCreateInput, TaskStatus } from "@/types/task";
+import type { Task, TaskCreateInput } from "@/types/task";
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,10 +29,24 @@ export async function GET(request: NextRequest) {
     const where = conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : "";
     const rows = db
       .prepare(`SELECT * FROM tasks${where} ORDER BY columnOrder ASC`)
-      .all(...params) as Task[];
+      .all(...params) as Array<Task & { dependsOnTaskIds: string | string[] | null }>;
 
-    // Normalize SQLite integer to boolean for needsInput
-    const tasks = rows.map((t) => ({ ...t, needsInput: Boolean(t.needsInput) }));
+    // Normalize SQLite integer to boolean for needsInput, parse JSON fields
+    const tasks: Task[] = rows.map((t) => ({
+      ...t,
+      needsInput: Boolean(t.needsInput),
+      dependsOnTaskIds:
+        typeof t.dependsOnTaskIds === "string" && t.dependsOnTaskIds.length > 0
+          ? (() => {
+              try {
+                const parsed = JSON.parse(t.dependsOnTaskIds as string);
+                return Array.isArray(parsed) ? (parsed as string[]) : null;
+              } catch {
+                return null;
+              }
+            })()
+          : null,
+    }));
 
     return NextResponse.json(tasks);
   } catch (error) {
@@ -50,7 +64,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate input
-    const { title, description, level, projectSlug: bodyProjectSlug, clientId: bodyClientId, parentId: bodyParentId, phaseNumber: bodyPhaseNumber, gsdStep: bodyGsdStep, cronJobSlug: bodyCronJobSlug, permissionMode: bodyPermissionMode, status: bodyStatus } = body as TaskCreateInput & { cronJobSlug?: string; status?: string };
+    const { title, description, level, projectSlug: bodyProjectSlug, clientId: bodyClientId, parentId: bodyParentId, phaseNumber: bodyPhaseNumber, gsdStep: bodyGsdStep, cronJobSlug: bodyCronJobSlug, permissionMode: bodyPermissionMode, status: bodyStatus, dependsOnTaskIds: bodyDependsOnTaskIds } = body as TaskCreateInput & { cronJobSlug?: string; status?: string; dependsOnTaskIds?: string[] };
     if (!title || typeof title !== "string" || title.trim().length === 0) {
       return NextResponse.json(
         { error: "title is required and must be a non-empty string" },
@@ -76,13 +90,10 @@ export async function POST(request: NextRequest) {
     // system queues them when their turn comes. Top-level tasks start as queued
     // so the queue watcher picks them up immediately.
     // Allow explicit status override (e.g., "review" for scoping flow).
-    const validStatuses: TaskStatus[] = ["backlog", "queued", "review"];
-    const initialStatus: TaskStatus =
-      bodyStatus && validStatuses.includes(bodyStatus as TaskStatus)
-        ? (bodyStatus as TaskStatus)
-        : bodyParentId
-          ? "backlog"
-          : "queued";
+    const validStatuses = ["backlog", "queued", "review"];
+    const initialStatus = (bodyStatus && validStatuses.includes(bodyStatus)
+      ? bodyStatus
+      : bodyParentId ? "backlog" : "queued") as Task["status"];
     const task: Task = {
       id: crypto.randomUUID(),
       title: title.trim(),
@@ -111,11 +122,15 @@ export async function POST(request: NextRequest) {
       permissionMode: bodyPermissionMode || "default",
       lastReplyAt: null,
       goalGroup: null,
+      dependsOnTaskIds:
+        Array.isArray(bodyDependsOnTaskIds) && bodyDependsOnTaskIds.length > 0
+          ? bodyDependsOnTaskIds
+          : null,
     };
 
     db.prepare(
-      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode, dependsOnTaskIds)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       task.id,
       task.title,
@@ -139,7 +154,8 @@ export async function POST(request: NextRequest) {
       task.phaseNumber,
       task.gsdStep,
       task.cronJobSlug,
-      task.permissionMode
+      task.permissionMode,
+      task.dependsOnTaskIds ? JSON.stringify(task.dependsOnTaskIds) : null
     );
 
     emitTaskEvent({

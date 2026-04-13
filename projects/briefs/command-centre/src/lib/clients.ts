@@ -29,6 +29,14 @@ export function detectClients(): Client[] {
 }
 
 /**
+ * Return the display name for the root workspace (folder basename).
+ */
+export function getRootName(): string {
+  const config = getConfig();
+  return path.basename(config.agenticOsDir);
+}
+
+/**
  * Resolve the absolute directory for a given client.
  * If clientId is null/undefined, returns the agentic-os root.
  * Throws if the resolved directory does not exist.

@@ -1,17 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { getConfig } from "@/lib/config";
+import { resolvePlanningDir } from "@/lib/config";
 import { parseRoadmap } from "@/lib/gsd-parser";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const { agenticOsDir } = getConfig();
-    const planningDir = path.join(agenticOsDir, ".planning");
+    const projectOverride = request.nextUrl.searchParams.get("project");
+    const resolved = resolvePlanningDir({ overrideSlug: projectOverride });
 
-    if (!fs.existsSync(planningDir)) {
+    if (!resolved) {
       return NextResponse.json({ exists: false });
     }
+
+    const { planningDir } = resolved;
 
     const roadmapPath = path.join(planningDir, "ROADMAP.md");
     if (!fs.existsSync(roadmapPath)) {

@@ -5,9 +5,10 @@ import { getConfig } from "@/lib/config";
 
 const MAX_PREVIEW_SIZE = 1024 * 1024; // 1MB
 
-const TEXT_EXTENSIONS = new Set(["md", "txt", "csv", "json", "html", "log"]);
+const TEXT_EXTENSIONS = new Set(["md", "txt", "csv", "json", "log"]);
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg", "ico"]);
 const BINARY_PREVIEW_EXTENSIONS = new Set(["pdf"]);
+const RAW_TEXT_EXTENSIONS = new Set(["html", "htm"]);
 
 const MIME_TYPES: Record<string, string> = {
   png: "image/png",
@@ -18,6 +19,8 @@ const MIME_TYPES: Record<string, string> = {
   svg: "image/svg+xml",
   ico: "image/x-icon",
   pdf: "application/pdf",
+  html: "text/html; charset=utf-8",
+  htm: "text/html; charset=utf-8",
 };
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -57,6 +60,20 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         "Content-Type": mimeType,
         "Content-Length": stat.size.toString(),
         "Cache-Control": "private, max-age=300",
+      },
+    });
+  }
+
+  // Raw HTML: serve as text/html so iframes can render it directly.
+  // CSP prevents outbound navigation/scripts from escaping the iframe.
+  if (RAW_TEXT_EXTENSIONS.has(ext)) {
+    const html = fs.readFileSync(resolvedPath, "utf-8");
+    return new NextResponse(html, {
+      headers: {
+        "Content-Type": MIME_TYPES[ext],
+        "Cache-Control": "no-store",
+        "Content-Security-Policy":
+          "default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' https: http:; frame-ancestors 'self';",
       },
     });
   }

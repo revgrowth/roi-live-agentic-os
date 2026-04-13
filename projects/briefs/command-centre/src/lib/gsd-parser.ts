@@ -9,7 +9,11 @@ function findPhaseSlug(phasesDir: string, phaseNum: number): string | null {
   return entries.find((e) => e.startsWith(prefix)) || null;
 }
 
-export function parseRoadmap(content: string, phasesDir: string): GsdPhase[] {
+export function parseRoadmap(
+  content: string,
+  phasesDir: string,
+  displayPathPrefix?: string
+): GsdPhase[] {
   const phases: GsdPhase[] = [];
 
   // Extract phase list from ## Phases section
@@ -115,7 +119,9 @@ export function parseRoadmap(content: string, phasesDir: string): GsdPhase[] {
       completedDate: statusInfo.completedDate,
       plansComplete,
       plansTotal: plans.length,
-      phaseDir: phaseSlug ? `.planning/phases/${phaseSlug}` : "",
+      phaseDir: phaseSlug
+        ? `${displayPathPrefix ?? ".planning"}/phases/${phaseSlug}`
+        : "",
     });
   }
 

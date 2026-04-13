@@ -147,6 +147,12 @@ export function getDb(): Database.Database {
     db.exec("ALTER TABLE tasks ADD COLUMN permissionMode TEXT DEFAULT 'default'");
   }
 
+  // Migration: add model column for selecting Claude model per task
+  const modelCol = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
+  if (!modelCol.some((c) => c.name === "model")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN model TEXT");
+  }
+
   // Migration: add conversationId column to tasks for autonomous mode linkage
   const convCol = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
   if (!convCol.some((c) => c.name === "conversationId")) {
@@ -186,6 +192,82 @@ export function getDb(): Database.Database {
   if (!goalCol.some((c) => c.name === "goalGroup")) {
     db.exec("ALTER TABLE tasks ADD COLUMN goalGroup TEXT");
     db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_goalGroup ON tasks(goalGroup)");
+  }
+
+  // Migration: add questionSpec + questionAnswers columns to task_logs for
+  // the structured-question system (pre- and mid-execution).
+  const logCols = db.prepare("PRAGMA table_info(task_logs)").all() as Array<{ name: string }>;
+  if (!logCols.some((c) => c.name === "questionSpec")) {
+    db.exec("ALTER TABLE task_logs ADD COLUMN questionSpec TEXT");
+  }
+  if (!logCols.some((c) => c.name === "questionAnswers")) {
+    db.exec("ALTER TABLE task_logs ADD COLUMN questionAnswers TEXT");
+  }
+
+  // Migration: older installs have a CHECK constraint on task_logs.type that
+  // doesn't include 'structured_question'. SQLite can't alter CHECK
+  // constraints in place, so recreate the table if needed.
+  try {
+    const tableSql = db
+      .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'task_logs'")
+      .get() as { sql: string } | undefined;
+    if (tableSql && !tableSql.sql.includes("structured_question")) {
+      console.log("[db] Migrating task_logs CHECK constraint to include structured_question");
+      db.exec("BEGIN");
+      try {
+        db.exec(`CREATE TABLE task_logs_new (
+          id TEXT PRIMARY KEY,
+          taskId TEXT NOT NULL,
+          type TEXT NOT NULL CHECK (type IN ('text', 'tool_use', 'tool_result', 'question', 'structured_question', 'user_reply', 'system')),
+          timestamp TEXT NOT NULL,
+          content TEXT NOT NULL DEFAULT '',
+          toolName TEXT,
+          toolArgs TEXT,
+          toolResult TEXT,
+          isCollapsed INTEGER DEFAULT 0,
+          surfacedToConversation INTEGER DEFAULT 0,
+          questionSpec TEXT,
+          questionAnswers TEXT,
+          FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE
+        )`);
+        // Copy data — use only columns known to exist in both tables
+        const oldCols = db.prepare("PRAGMA table_info(task_logs)").all() as Array<{ name: string }>;
+        const colNames = oldCols.map((c) => c.name);
+        const shared = [
+          "id", "taskId", "type", "timestamp", "content",
+          "toolName", "toolArgs", "toolResult", "isCollapsed",
+          "surfacedToConversation", "questionSpec", "questionAnswers",
+        ].filter((c) => colNames.includes(c));
+        const colList = shared.join(", ");
+        db.exec(`INSERT INTO task_logs_new (${colList}) SELECT ${colList} FROM task_logs`);
+        db.exec("DROP TABLE task_logs");
+        db.exec("ALTER TABLE task_logs_new RENAME TO task_logs");
+        db.exec("CREATE INDEX IF NOT EXISTS idx_task_logs_taskId ON task_logs(taskId)");
+        db.exec("COMMIT");
+      } catch (err) {
+        db.exec("ROLLBACK");
+        throw err;
+      }
+    }
+  } catch (err) {
+    console.error("[db] Failed to migrate task_logs CHECK constraint:", err);
+  }
+
+  // Migration: add dependsOnTaskIds column — JSON array of task IDs this task depends on
+  try {
+    db.exec("ALTER TABLE tasks ADD COLUMN dependsOnTaskIds TEXT");
+  } catch (err) {
+    // SQLite doesn't support IF NOT EXISTS on ADD COLUMN — swallow duplicate column error
+    const msg = err instanceof Error ? err.message : String(err);
+    if (!/duplicate column/i.test(msg)) throw err;
+  }
+
+  // Migration: add startSnapshot column for diff-aware Files tab
+  try {
+    db.exec("ALTER TABLE tasks ADD COLUMN startSnapshot TEXT");
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (!/duplicate column/i.test(msg)) throw err;
   }
 
   return db;

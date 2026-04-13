@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { getDb } from "@/lib/db";
-import { getConfig } from "@/lib/config";
+import { getConfig, resolvePlanningDir } from "@/lib/config";
 import { parseRoadmap } from "@/lib/gsd-parser";
 import { emitTaskEvent } from "@/lib/event-bus";
 import type { Task, GsdStep } from "@/types/task";
@@ -26,10 +26,18 @@ const STEP_TITLES: Record<GsdStep, string> = {
   verify: "Verify",
 };
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const { agenticOsDir } = getConfig();
-    const planningDir = path.join(agenticOsDir, ".planning");
+    const url = new URL(request.url);
+    const projectOverride = url.searchParams.get("project");
+    const resolved = resolvePlanningDir({ overrideSlug: projectOverride });
+
+    if (!resolved) {
+      return NextResponse.json({ synced: false, reason: "no-planning" });
+    }
+
+    const { planningDir, projectSlug: resolvedSlug } = resolved;
     const roadmapPath = path.join(planningDir, "ROADMAP.md");
 
     if (!fs.existsSync(roadmapPath)) {
@@ -47,21 +55,15 @@ export async function POST() {
       return NextResponse.json({ synced: false, reason: "no-phases" });
     }
 
-    // Determine the project slug from briefs that have level: 3
-    const briefsDir = path.join(agenticOsDir, "projects", "briefs");
+    // Prefer the slug the resolver gave us (the brief owning this .planning/).
+    // Verify the brief actually exists & is level 3.
     let projectSlug: string | null = null;
-
-    if (fs.existsSync(briefsDir)) {
-      const entries = fs.readdirSync(briefsDir, { withFileTypes: true });
-      for (const entry of entries) {
-        if (!entry.isDirectory()) continue;
-        const briefPath = path.join(briefsDir, entry.name, "brief.md");
-        if (!fs.existsSync(briefPath)) continue;
-        const content = fs.readFileSync(briefPath, "utf-8");
-        if (content.includes("level: 3") && content.includes("status: active")) {
-          projectSlug = entry.name;
-          break;
-        }
+    const briefsDir = path.join(agenticOsDir, "projects", "briefs");
+    const candidateBrief = path.join(briefsDir, resolvedSlug, "brief.md");
+    if (fs.existsSync(candidateBrief)) {
+      const content = fs.readFileSync(candidateBrief, "utf-8");
+      if (content.includes("level: 3")) {
+        projectSlug = resolvedSlug;
       }
     }
 

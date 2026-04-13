@@ -1,21 +1,18 @@
 export type TaskStatus = "backlog" | "queued" | "running" | "review" | "done";
 export type TaskLevel = "task" | "project" | "gsd";
 
-/** Human-friendly labels for task depth levels */
-export const LEVEL_LABELS: Record<TaskLevel, string> = {
-  task: "Quick task",
-  project: "Campaign",
-  gsd: "Deep build",
-};
+// Human-friendly labels and hints for task levels now live in `@/lib/levels`
+// to keep a single source of truth across the app.
 
-/** Short descriptions explaining what each level means */
-export const LEVEL_HINTS: Record<TaskLevel, string> = {
-  task: "A single deliverable — write an email, fix a bug, run research",
-  project: "Several related deliverables — a launch needs a page, emails, and social posts",
-  gsd: "Something that needs building in stages — an app, a system, a complex workflow",
-};
 export type GsdStep = "discuss" | "plan" | "execute" | "verify";
 export type PermissionMode = "plan" | "default" | "acceptEdits" | "auto" | "bypassPermissions";
+export type ClaudeModel = "opus" | "sonnet" | "haiku";
+
+export interface Todo {
+  content: string;
+  status: "pending" | "in_progress" | "completed";
+  activeForm?: string;
+}
 
 export const PERMISSION_MODE_LABELS: Record<PermissionMode, string> = {
   plan: "Plan",
@@ -33,7 +30,14 @@ export const PERMISSION_MODE_HINTS: Record<PermissionMode, string> = {
   bypassPermissions: "Everything runs without asking — no safety net",
 };
 
-export type LogEntryType = "text" | "tool_use" | "tool_result" | "question" | "user_reply" | "system";
+export type LogEntryType =
+  | "text"
+  | "tool_use"
+  | "tool_result"
+  | "question"
+  | "structured_question"
+  | "user_reply"
+  | "system";
 
 export interface LogEntry {
   id: string;
@@ -44,6 +48,12 @@ export interface LogEntry {
   toolArgs?: string;
   toolResult?: string;
   isCollapsed?: boolean;
+  /** JSON-serialised QuestionSpec[] when type === "structured_question" */
+  questionSpec?: string;
+  /** JSON-serialised QuestionAnswers once the user has replied */
+  questionAnswers?: string;
+  /** Task ID this entry came from (set when merging parent + subtask logs). */
+  sourceTaskId?: string;
 }
 
 export interface Task {
@@ -73,12 +83,14 @@ export interface Task {
   claudeSessionId: string | null;
   claudePid?: number | null;
   permissionMode: PermissionMode;
+  model?: ClaudeModel | null;
   lastReplyAt: string | null;
   conversationId?: string | null;
   originMessageId?: string | null;
   teamId?: string | null;
   coordinationLevel?: "inject" | "shared_context" | "team" | null;
   goalGroup: string | null;
+  dependsOnTaskIds?: string[] | null;
 }
 
 export interface OutputFile {
@@ -90,6 +102,7 @@ export interface OutputFile {
   extension: string;
   sizeBytes: number | null;
   createdAt: string;
+  diffStatus?: "added" | "modified" | "unchanged";
 }
 
 export interface TaskCreateInput {
@@ -128,6 +141,7 @@ export type TaskUpdateInput = Partial<
     | "phaseNumber"
     | "gsdStep"
     | "permissionMode"
+    | "model"
     | "conversationId"
     | "originMessageId"
     | "teamId"

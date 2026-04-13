@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { getConfig } from "@/lib/config";
+import { resolvePlanningDir } from "@/lib/config";
 import { parseRoadmap } from "@/lib/gsd-parser";
 import type { GsdProject } from "@/types/gsd";
 
@@ -13,14 +13,16 @@ function readFileOrNull(filePath: string): string | null {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const { agenticOsDir } = getConfig();
-    const planningDir = path.join(agenticOsDir, ".planning");
+    const projectOverride = request.nextUrl.searchParams.get("project");
+    const resolved = resolvePlanningDir({ overrideSlug: projectOverride });
 
-    if (!fs.existsSync(planningDir)) {
+    if (!resolved) {
       return NextResponse.json({ hasPlanning: false } as Partial<GsdProject>);
     }
+
+    const { planningDir, projectSlug } = resolved;
 
     const roadmapContent = readFileOrNull(path.join(planningDir, "ROADMAP.md"));
     const stateContent = readFileOrNull(path.join(planningDir, "STATE.md"));
@@ -59,25 +61,10 @@ export async function GET() {
     }
 
     const phasesDir = path.join(planningDir, "phases");
-    const phases = parseRoadmap(roadmapContent, phasesDir);
+    const displayPrefix = `projects/briefs/${projectSlug}/.planning`;
+    const phases = parseRoadmap(roadmapContent, phasesDir, displayPrefix);
 
     const completedPhases = phases.filter((p) => p.status === "complete").length;
-
-    // Find the brief slug for the active GSD project (level: 3 + status: active)
-    let briefSlug: string | null = null;
-    const briefsDir = path.join(agenticOsDir, "projects", "briefs");
-    if (fs.existsSync(briefsDir)) {
-      for (const entry of fs.readdirSync(briefsDir, { withFileTypes: true })) {
-        if (!entry.isDirectory()) continue;
-        const briefPath = path.join(briefsDir, entry.name, "brief.md");
-        if (!fs.existsSync(briefPath)) continue;
-        const content = fs.readFileSync(briefPath, "utf-8");
-        if (content.includes("level: 3") && content.includes("status: active")) {
-          briefSlug = entry.name;
-          break;
-        }
-      }
-    }
 
     const project: GsdProject = {
       name,
@@ -89,7 +76,7 @@ export async function GET() {
       lastUpdated,
       phases,
       hasPlanning: true,
-      briefSlug,
+      briefSlug: projectSlug,
     };
 
     return NextResponse.json(project);

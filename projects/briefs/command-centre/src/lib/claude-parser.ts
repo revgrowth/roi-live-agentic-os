@@ -1,4 +1,5 @@
-import type { LogEntry } from "@/types/task";
+import type { LogEntry, Todo } from "@/types/task";
+import { parseQuestionSpecs, type QuestionSpec } from "@/types/question-spec";
 
 export interface ProgressData {
   costUsd?: number;
@@ -19,6 +20,8 @@ export interface ClaudeParserCallbacks {
   onError: (error: string) => void;
   onLogEntry?: (entry: LogEntry) => void;
   onQuestion?: (questionText: string) => void;
+  onStructuredQuestion?: (specs: QuestionSpec[]) => void;
+  onTodos?: (todos: Todo[]) => void;
 }
 
 /**
@@ -106,10 +109,18 @@ export class ClaudeOutputParser {
         content: fullText,
       });
 
-      // Question detection
-      const questionText = detectQuestion(fullText);
-      if (questionText) {
-        this.callbacks.onQuestion?.(questionText);
+      // Structured question detection takes precedence over prose detection.
+      // Claude is instructed (via the system-prompt addendum) to emit a
+      // fenced ```ask-user-questions block when it needs clarification.
+      const structured = detectStructuredQuestions(fullText);
+      if (structured && structured.length > 0) {
+        this.callbacks.onStructuredQuestion?.(structured);
+      } else {
+        // Fallback: prose question detection
+        const questionText = detectQuestion(fullText);
+        if (questionText) {
+          this.callbacks.onQuestion?.(questionText);
+        }
       }
     }
   }
@@ -127,6 +138,19 @@ export class ClaudeOutputParser {
       toolArgs: JSON.stringify(input),
       isCollapsed: true,
     });
+
+    // Emit a human-readable activity label based on the tool being invoked
+    const activityLabel = buildToolActivityLabel(name, input as Record<string, unknown>);
+    if (activityLabel) {
+      this.callbacks.onProgress({ activityLabel });
+    }
+
+    // Surface TodoWrite calls as a typed todos snapshot. Claude rewrites the
+    // full list each time it updates state, so the latest call wins.
+    if (name === "TodoWrite" && this.callbacks.onTodos) {
+      const todos = parseTodosFromInput(input);
+      if (todos) this.callbacks.onTodos(todos);
+    }
   }
 
   private handleToolResult(parsed: Record<string, unknown>): void {
@@ -193,6 +217,66 @@ export class ClaudeOutputParser {
   /** Whether a result or error has already been processed. */
   get isCompleted(): boolean {
     return this.completed;
+  }
+}
+
+/**
+ * Parse the `todos` array from a TodoWrite tool_use input. Returns null if
+ * the shape doesn't match what we expect.
+ */
+export function parseTodosFromInput(input: unknown): Todo[] | null {
+  if (!input || typeof input !== "object") return null;
+  const raw = (input as Record<string, unknown>).todos;
+  if (!Array.isArray(raw)) return null;
+  const todos: Todo[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const obj = item as Record<string, unknown>;
+    const content = typeof obj.content === "string" ? obj.content : null;
+    const status = obj.status;
+    if (!content) continue;
+    if (status !== "pending" && status !== "in_progress" && status !== "completed") continue;
+    const activeForm = typeof obj.activeForm === "string" ? obj.activeForm : undefined;
+    todos.push({ content, status, activeForm });
+  }
+  return todos.length > 0 ? todos : null;
+}
+
+/**
+ * Detect a structured question block in Claude's output.
+ *
+ * Claude is instructed (via a system-prompt addendum at task spawn time) to
+ * emit typed clarifying questions as a fenced code block with the language
+ * tag `ask-user-questions` containing a JSON array of QuestionSpec objects.
+ *
+ * Example:
+ * ```ask-user-questions
+ * [
+ *   { "id": "tone", "prompt": "What tone?", "type": "select",
+ *     "options": ["Formal", "Casual"], "required": true }
+ * ]
+ * ```
+ *
+ * Returns the parsed specs if a valid block is found, null otherwise.
+ */
+function detectStructuredQuestions(text: string): QuestionSpec[] | null {
+  const fenceRegex = /```ask-user-questions\s*\n([\s\S]*?)\n```/i;
+  const match = text.match(fenceRegex);
+  if (!match || !match[1]) return null;
+  try {
+    const parsed = JSON.parse(match[1].trim());
+    // Accept either a bare array or an object with a "questions" field
+    const raw = Array.isArray(parsed)
+      ? parsed
+      : Array.isArray((parsed as Record<string, unknown>)?.questions)
+        ? (parsed as { questions: unknown[] }).questions
+        : null;
+    if (!raw) return null;
+    const specs = parseQuestionSpecs(raw);
+    return specs.length > 0 ? specs : null;
+  } catch (err) {
+    console.warn("[claude-parser] Failed to parse ask-user-questions block:", err);
+    return null;
   }
 }
 
@@ -269,13 +353,23 @@ function extractActivityLabel(text: string): string | null {
 
   if (!cleaned || cleaned.length < 5) return null;
 
+  // Filter out Claude Code session summary lines (e.g. "✳ Choreographed for 120m 12s · 654 tokens")
+  // Matches: any word + "for" + duration (with or without tokens suffix)
+  cleaned = cleaned
+    .replace(/[^\w\s]*\s*\w+\s+for\s+\d+[hms]\s*\d*[hms\d\s·,]*(?:tokens?)?\s*/gi, "")
+    .trim();
+
+  if (!cleaned || cleaned.length < 5) return null;
+
   // Split into sentences and pick the last substantive one
   const sentences = cleaned.split(/[.!?]+/)
     .map((s) => s.trim())
     .filter((s) => s.length > 8)
     // Skip sentences that are mostly technical
     .filter((s) => !/^(saved|wrote|created|updated|deleted|reading|writing|running|executed)\s+(to|from|at|in)\b/i.test(s))
-    .filter((s) => !/^(Report|Output|File|Log|Result) saved/i.test(s));
+    .filter((s) => !/^(Report|Output|File|Log|Result) saved/i.test(s))
+    // Skip session summary lines with duration pattern (with or without tokens)
+    .filter((s) => !/\bfor\s+\d+[hms]/i.test(s));
 
   // Fallback to any sentence if all were filtered
   const fallbackSentences = cleaned.split(/[.!?]+/).map((s) => s.trim()).filter((s) => s.length > 8);
@@ -285,4 +379,61 @@ function extractActivityLabel(text: string): string | null {
   if (!label || label.length < 5) return null;
 
   return label.length > 100 ? label.slice(0, 97) + "..." : label;
+}
+
+/**
+ * Build a human-readable activity label from a tool_use event.
+ * E.g. Read + file_path → "Reading modal-chat.tsx"
+ */
+function buildToolActivityLabel(name: string, input: Record<string, unknown>): string | null {
+  const str = (key: string) => (typeof input[key] === "string" ? (input[key] as string) : null);
+  const basename = (path: string) => path.split("/").pop() || path;
+  const hostname = (url: string) => { try { return new URL(url).hostname; } catch { return url.slice(0, 40); } };
+  const truncate = (s: string, n: number) => s.length > n ? s.slice(0, n - 1) + "…" : s;
+
+  switch (name) {
+    case "Read": {
+      const fp = str("file_path");
+      return fp ? `Reading ${basename(fp)}` : "Reading file";
+    }
+    case "Grep": {
+      const pat = str("pattern");
+      return pat ? `Searching for '${truncate(pat, 40)}'` : "Searching codebase";
+    }
+    case "Glob": {
+      const pat = str("pattern");
+      return pat ? `Finding files matching '${truncate(pat, 35)}'` : "Finding files";
+    }
+    case "Bash": {
+      const cmd = str("command");
+      return cmd ? `Running ${truncate(cmd, 50)}` : "Running command";
+    }
+    case "Write": {
+      const fp = str("file_path");
+      return fp ? `Writing ${basename(fp)}` : "Writing file";
+    }
+    case "Edit": {
+      const fp = str("file_path");
+      return fp ? `Editing ${basename(fp)}` : "Editing file";
+    }
+    case "WebFetch": {
+      const url = str("url");
+      return url ? `Fetching ${hostname(url)}` : "Fetching URL";
+    }
+    case "WebSearch": {
+      const q = str("query");
+      return q ? `Searching web for '${truncate(q, 35)}'` : "Searching web";
+    }
+    case "Agent":
+    case "Task":
+      return "Delegating to sub-agent";
+    case "Skill": {
+      const s = str("skill");
+      return s ? `Running skill: ${s}` : "Running skill";
+    }
+    case "TodoWrite":
+      return "Updating task list";
+    default:
+      return `Using ${name}`;
+  }
 }
