@@ -44,6 +44,8 @@ CREATE TABLE IF NOT EXISTS cron_runs (
   startedAt TEXT NOT NULL,
   completedAt TEXT,
   result TEXT NOT NULL DEFAULT 'running' CHECK (result IN ('success', 'failure', 'timeout', 'running')),
+  resultSource TEXT CHECK (resultSource IN ('observed', 'inferred')),
+  completionReason TEXT,
   durationSec REAL,
   costUsd REAL,
   exitCode INTEGER,
