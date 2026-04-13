@@ -65,31 +65,31 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CLI-01 | TBD | Pending |
-| CLI-02 | TBD | Pending |
-| CLI-03 | TBD | Pending |
-| CLI-04 | TBD | Pending |
-| OWNR-01 | TBD | Pending |
-| OWNR-02 | TBD | Pending |
-| OWNR-03 | TBD | Pending |
-| OWNR-04 | TBD | Pending |
-| WIN-01 | TBD | Pending |
-| WIN-02 | TBD | Pending |
-| WIN-03 | TBD | Pending |
-| CLNT-01 | TBD | Pending |
-| CLNT-02 | TBD | Pending |
-| CLNT-03 | TBD | Pending |
-| CLNT-04 | TBD | Pending |
-| CLNT-05 | TBD | Pending |
-| CLNT-06 | TBD | Pending |
-| SAFE-01 | TBD | Pending |
-| SAFE-02 | TBD | Pending |
-| SAFE-03 | TBD | Pending |
+| CLI-01 | Phase 5 | Pending |
+| CLI-02 | Phase 5 | Pending |
+| CLI-03 | Phase 5 | Pending |
+| CLI-04 | Phase 5 | Pending |
+| OWNR-01 | Phase 1 | Pending |
+| OWNR-02 | Phase 1 | Pending |
+| OWNR-03 | Phase 1 | Pending |
+| OWNR-04 | Phase 1 | Pending |
+| WIN-01 | Phase 4 | Pending |
+| WIN-02 | Phase 4 | Pending |
+| WIN-03 | Phase 4 | Pending |
+| CLNT-01 | Phase 2 | Pending |
+| CLNT-02 | Phase 2 | Pending |
+| CLNT-03 | Phase 3 | Pending |
+| CLNT-04 | Phase 3 | Pending |
+| CLNT-05 | Phase 3 | Pending |
+| CLNT-06 | Phase 2 | Pending |
+| SAFE-01 | Phase 2 | Pending |
+| SAFE-02 | Phase 1 | Pending |
+| SAFE-03 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 20 total
-- Mapped to phases: 0
-- Unmapped: 20 ⚠️
+- Mapped to phases: 20
+- Unmapped: 0 ✅
 
 ---
 *Requirements defined: 2026-04-13*  

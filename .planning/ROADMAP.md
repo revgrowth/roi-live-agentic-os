@@ -1,166 +1,103 @@
-# Roadmap: Agentic OS Command Centre
-
-**App root:** `projects/briefs/command-centre/` — all source code, configs, and build artifacts live here. Run `npm` commands from this directory.
+# Roadmap: Cron Jobs Hardening
 
 ## Overview
 
-This roadmap delivers a locally hosted dashboard that replaces the terminal for non-technical Agentic OS users. The build follows five phases: first producing copy-paste-ready Google Stitch prompts for every dashboard view to establish a visual source of truth, then proving the end-to-end core loop (create task, spawn agent, see live updates), then surfacing outputs and monitoring, then adding cron scheduling and management tabs, and finally layering client switching over the working system. Each phase delivers a coherent, testable capability.
+This roadmap hardens cron around the actual v1 problem clusters in the project: runtime ownership truth, client workspace containment, client-safe state isolation, quiet Windows daemon execution, and clearer CLI lifecycle operations. The build order starts by making runtime ownership trustworthy, then lets containment work, Windows behavior, and CLI improvements move in parallel where dependencies allow. The stream closes with a regression and user-validation gate, and PR preparation stays after that gate rather than inside it.
 
 ## Phases
 
 **Phase Numbering:**
-- Integer phases (1, 2, 3, 4, 5): Planned milestone work
+- Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-Decimal phases appear between their surrounding integers in numeric order.
-
-- [x] **Phase 1: Design Prompts** - Copy-paste-ready Google Stitch prompts for every dashboard view, grounded in reference research and prompting best practices
-- [x] **Phase 2: Core Loop** - Infrastructure, Kanban board, task execution, and live updates working end-to-end
-- [ ] **Phase 3: Outputs and Monitoring** - Output files surface on cards with preview/download, cost tracking, and detail panel
-- [ ] **Phase 4: Scheduling and Management** - Cron job scheduling plus Context, Brand, and Skills tabs
-- [ ] **Phase 5: Client Switching** - Multi-client scoping across all views
-- [ ] **Phase 6: Task Execution and Detail UI** - Real task execution, task name/description fields, and full-screen task modal with live logs
-
----
-
-## v1.1 Milestone: Settings & System Management
-
-**Goal:** Users can manage their agentic-os configuration and run system scripts entirely from the dashboard — no terminal needed for setup or maintenance tasks.
-
-### v1.1 Phases
-
-- [x] **Phase 7: Settings & Script Runner** - Settings page with env/MCP/settings editors and script execution UI (completed 2026-03-26)
+- [ ] **Phase 1: Runtime Ownership & Run Truth** - Make one visible runtime owner and truthful run outcomes the shared source of cron truth.
+- [ ] **Phase 2: Workspace Execution Containment** - Ensure client jobs run in the selected workspace and cannot leak outputs across boundaries.
+- [ ] **Phase 3: Client State Isolation in UI & History** - Separate root and client job state, logs, and controls end to end.
+- [ ] **Phase 4: Quiet Windows Background Execution** - Remove visible Windows terminal popups without breaking daemon lifecycle behavior.
+- [ ] **Phase 5: Friendly CLI Cron Operations** - Make cron start, status, logs, and stop readable and trustworthy for non-technical users.
+- [ ] **Phase 6: Regression Coverage & User Validation** - Prove the hardening holds across root/client, daemon/UI, and Windows flows before any PR work.
 
 ## Phase Details
 
-### Phase 1: Design Prompts
-**Goal**: Produce copy-paste-ready Google Stitch prompts for every dashboard view so the user can generate designs that match the spec
+### Phase 1: Runtime Ownership & Run Truth
+**Goal**: Users and operators can trust one clear runtime owner and accurate cron run outcomes across the workspace.
 **Depends on**: Nothing (first phase)
-**Requirements**: DESIGN-01, DESIGN-02, DESIGN-03, DESIGN-04
+**Requirements**: [OWNR-01, OWNR-02, OWNR-03, OWNR-04, SAFE-02]
 **Success Criteria** (what must be TRUE):
-  1. User can paste each prompt into Google Stitch and get a design that matches the intended layout, component structure, and aesthetic for that view
-  2. Prompts cover all five views (Board, Cron Jobs, Context, Brand, Skills) plus the client switcher -- one prompt per view/screen
-  3. Each prompt includes design reference aesthetics (Vibe Kanban, OpenClaw, Claude Task Viewer), layout details, component descriptions, colour/typography guidance, and specific view states (empty, loading, running, completed, error)
-  4. A design language document defines shared tokens (colours, typography, spacing, component styles) that all prompts reference for consistency
-**Plans**: 2 plans
+  1. User can see whether cron scheduling is owned by the CLI daemon, the in-process UI runtime, or neither without reading lock files or raw process output.
+  2. CLI and UI show the same runtime owner, leader freshness, and skipped-run reason for the same workspace.
+  3. Running the CLI daemon and UI server at the same time does not create duplicate scheduled runs for the same job.
+  4. Interrupted, recovered, or skipped runs are shown with truthful outcomes instead of being silently reported as successful.
+**Plans**: TBD
+**UI hint**: yes
 
-Plans:
-- [x] 01-01: Research Google Stitch prompting best practices, study design references (Vibe Kanban at vibekanban.com, OpenClaw dashboards, Claude Task Viewer), and establish design language/tokens
-- [x] 01-02: Craft Stitch prompts for all views -- Board, Cron Jobs, Context, Brand, Skills, client switcher -- covering all states (empty, loading, running, completed, error)
-
-### Phase 2: Core Loop
-**Goal**: A user can create a task, watch it execute via a live Kanban board, and see the card move through columns in real time
-**Depends on**: Phase 1 (Stitch-generated designs are the build reference)
-**Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, BOARD-01, BOARD-02, BOARD-03, BOARD-04, BOARD-05, EXEC-01, EXEC-02, EXEC-03, EXEC-04, UI-01, UI-02
+### Phase 2: Workspace Execution Containment
+**Goal**: Client cron execution is fully anchored to the selected workspace instead of inheriting root-scoped behavior.
+**Depends on**: Phase 1
+**Requirements**: [CLNT-01, CLNT-02, CLNT-06, SAFE-01]
 **Success Criteria** (what must be TRUE):
-  1. User can open the dashboard in a browser via a single terminal command and see a Kanban board with five columns
-  2. User can type a plain-language task description and see a card appear on the board
-  3. User can drag cards between columns and the position persists across browser refresh
-  4. When a task runs, the card moves automatically from Queued to Running to Review/Done via live updates -- no manual refresh needed
-  5. Cards visually distinguish between Task, Project, and GSD levels, and Project/GSD cards expand to show child tasks
-**Plans**: 5 plans
+  1. User can run a client cron job and have it execute inside the selected client workspace, not the root workspace.
+  2. Files created by a client cron run land only inside allowed directories for that client workspace.
+  3. A client cron run that attempts to write outside the selected workspace is visibly flagged or failed instead of silently passing.
+  4. Generated client cron wrappers still target the shared root runtime while preserving the selected client workspace during execution.
+**Plans**: TBD
 
-Plans:
-- [x] 02-01: Next.js scaffolding, SQLite schema, REST API, SSE streaming, agentic-os path configuration
-- [x] 02-02: Claude CLI process manager with spawn, state machine, cleanup, and event bus integration
-- [x] 02-03: Kanban board UI with drag-and-drop, task creation, card levels, live SSE subscription, and nav/theme
-- [x] 02-04: [GAP CLOSURE] Optimistic task creation, newest-first ordering, delete button on cards
-- [x] 02-05: [GAP CLOSURE] DragOverlay for smooth dragging, collapsible sidebar, responsive column layout
-
-### Phase 3: Outputs and Monitoring
-**Goal**: The core promise is complete -- users can describe a task, watch it run, and retrieve outputs without touching a terminal
+### Phase 3: Client State Isolation in UI & History
+**Goal**: Root and client cron jobs stay separated across logs, history, and controls even when slugs overlap.
 **Depends on**: Phase 2
-**Requirements**: OUT-01, OUT-02, OUT-03, TRACK-01, TRACK-02, PANEL-01, PANEL-02
+**Requirements**: [CLNT-03, CLNT-04, CLNT-05]
 **Success Criteria** (what must be TRUE):
-  1. Completed task cards display their output files, and new files appear in real time as the agent produces them
-  2. User can preview markdown, text, and CSV files inline and download any output file
-  3. Clicking a card opens a detail panel showing task level, skill used, progress, cost, tokens, duration, and all output files
-  4. A global stats bar shows tasks running, tasks completed, active crons, and today's spend at all times
-**Plans**: 2 plans
+  1. User can inspect a client job's logs and status only within that client context and its own history surfaces.
+  2. Root and client jobs that share the same slug never mix their state, history, or control actions.
+  3. User can run, edit, toggle, delete, and inspect a cron job in the UI while the selected root/client scope is preserved end to end.
+**Plans**: TBD
+**UI hint**: yes
 
-Plans:
-- [x] 03-01: Output file watcher, file listing on cards, inline preview, and download API
-- [x] 03-02: Task detail slide-out panel, cost/token/duration tracking, and global stats bar
-
-### Phase 4: Scheduling and Management
-**Goal**: Users can schedule recurring tasks and browse their agentic-os configuration (context, brand, skills) from the dashboard
-**Depends on**: Phase 3
-**Requirements**: CRON-01, CRON-02, CTX-01, BRAND-01, SKILL-01
+### Phase 4: Quiet Windows Background Execution
+**Goal**: Windows cron daemon and scheduled execution stay invisible in the background without losing control or diagnostics.
+**Depends on**: Phase 1
+**Requirements**: [WIN-01, WIN-02, WIN-03]
 **Success Criteria** (what must be TRUE):
-  1. User can create a recurring task with daily, weekly, monthly, or custom cron schedule
-  2. A dedicated Cron Jobs view shows each job's run history, average duration, average cost, next execution, and active/paused toggle
-  3. User can browse memory/context files, brand context files, and installed skills from dedicated tabs in the dashboard
-**Plans**: 3 plans
+  1. User can start the CLI daemon on Windows without a visible terminal window appearing.
+  2. Daemon-triggered cron runs on Windows do not open visible terminal popups during execution.
+  3. Hidden Windows execution still preserves daemon logging, status inspection, and clean stop behavior.
+**Plans**: TBD
 
-Plans:
-- [x] 04-01-PLAN.md — Cron types, service layer, schema migration, REST API, Zustand store, and Cron Jobs view with job table, run history, create panel, and schedule selector
-- [x] 04-02-PLAN.md — Shared infrastructure: file/skill types with dependency parsing, file service, file/skills APIs, shared markdown preview/editor, slide-out panel, and sidebar routing
-- [x] 04-03-PLAN.md — Context tab, Brand tab, and Skills tab page views consuming shared components from 04-02
-
-### Phase 5: Client Switching
-**Goal**: Multi-client users can scope the entire dashboard to a specific client workspace
-**Depends on**: Phase 4
-**Requirements**: CLIENT-01, CLIENT-02
+### Phase 5: Friendly CLI Cron Operations
+**Goal**: Non-technical users can operate cron from the CLI with clear lifecycle feedback and readable diagnostics.
+**Depends on**: Phase 1
+**Requirements**: [CLI-01, CLI-02, CLI-03, CLI-04]
 **Success Criteria** (what must be TRUE):
-  1. A client switcher in the nav bar lists available client folders and a root option
-  2. Selecting a client scopes board, cron jobs, context, brand, and skills views to that client's subfolder
-**Plans**: 3 plans
+  1. User can start the cron daemon from the CLI and immediately understand whether a daemon was started, already running, or blocked by current runtime state.
+  2. User can inspect cron status from the CLI through structured, human-friendly output that explains runtime owner, leader freshness, PID, workspace count, and recovery hints.
+  3. User can inspect daemon logs from the CLI through readable output with clear headings, recent context, and file path hints.
+  4. User can stop the cron daemon from the CLI and immediately understand what changed or what still needs attention.
+**Plans**: TBD
 
-Plans:
-- [x] 05-01-PLAN.md — Client types, detection module, API endpoint, DB migration, and config helper
-- [x] 05-02-PLAN.md — Client switcher UI, scope bar, board-scoped API filtering, and process manager
-- [ ] 05-03-PLAN.md — Client-scoped filtering for cron, context, brand, and skills views
-
-### Phase 6: Task Execution and Detail UI
-**Goal**: Tasks typed into the dashboard actually execute via Claude Code, with real status updates, live logs streamed to a full-screen task modal, and separate task name/description fields
-**Depends on**: Phase 5
-**Requirements**: EXEC-06-01, EXEC-06-02, EXEC-06-03, EXEC-06-04, EXEC-06-05
+### Phase 6: Regression Coverage & User Validation
+**Goal**: The hardening stream is proven through targeted regression coverage and explicit user validation before any PR preparation.
+**Depends on**: Phase 3, Phase 4, Phase 5
+**Requirements**: [SAFE-03]
 **Success Criteria** (what must be TRUE):
-  1. When a user creates a task, Claude Code actually spawns and executes the work — status transitions (queued -> running -> review -> done) reflect real execution state
-  2. Task creation captures both a short task name (card title) and a longer task description (the full brief sent to Claude)
-  3. Clicking a task opens a full-screen modal (not the 480px slide-out) with output previews, execution logs streamed live, and all task metadata
-  4. Execution logs show real Claude Code stdout/stderr with stage markers as the task progresses
-**Plans**: 3 plans
+  1. Maintainer can run regression coverage for root-vs-client execution, same-slug isolation, runtime leadership, and Windows hidden execution behavior and see it pass.
+  2. User can complete end-to-end validation for root and client cron flows before any PR branch or pull request preparation begins.
+  3. The project ends with a clear pass/fail validation record for containment, ownership, Windows background behavior, and CLI lifecycle flows.
+**Plans**: TBD
 
-Plans:
-- [x] 06-01-PLAN.md — Backend: DB migration, types (LogEntry, description), parser question detection, process manager stdin pipe/reply, reply API, SSE event types
-- [x] 06-02-PLAN.md — Task creation form: inline-expand with name/description fields, Notion-inspired UX, store update
-- [ ] 06-03-PLAN.md — Full-screen task modal: chat-style log view, tool call cards, auto-scroll, reply input, metadata sidebar, logs API
+## Execution Notes
 
-### Phase 7: Settings & Script Runner
-**Goal**: Users can view/edit configuration files (.env, .mcp.json, settings.json) and run system scripts (add-client, update, install-crons, etc.) from a Settings page in the dashboard
-**Depends on**: Phase 6 (v1.0 complete)
-**Milestone**: v1.1
-**Requirements**: SETTINGS-01, SETTINGS-02, SETTINGS-03, SETTINGS-04, SETTINGS-05, SETTINGS-06, SCRIPT-01, SCRIPT-02, SCRIPT-03, SCRIPT-04, SCRIPT-05
-**Success Criteria** (what must be TRUE):
-  1. A Settings page is accessible from the sidebar with four tabs: Scripts, Environment, MCP, and Claude Settings
-  2. Environment tab shows `.env` key-value pairs with masked values, a reveal toggle, and a copy button per row — users can add, edit, and delete entries
-  3. MCP tab shows `.mcp.json` in a syntax-highlighted JSON editor with validation and save
-  4. Claude Settings tab shows `.claude/settings.json` in a syntax-highlighted JSON editor with validation and save
-  5. Scripts tab lists available system scripts with human-readable labels and descriptions
-  6. Scripts that need arguments (e.g. `add-client.sh`) show an input form before execution
-  7. Script execution streams output live to the UI and shows running/success/error status
-  8. Destructive scripts require confirmation before running
-**Plans**: 4 plans
-
-Plans:
-- [x] 07-01-PLAN.md — Settings page scaffold, sidebar routing, tab layout, API routes for reading/writing .env, .mcp.json, and settings.json
-- [x] 07-02-PLAN.md — Environment tab: masked key-value editor with reveal toggle, copy button, add/edit/delete, save to .env
-- [x] 07-03-PLAN.md — MCP and Claude Settings tabs: syntax-highlighted JSON editors with validation and save
-- [x] 07-04-PLAN.md — Scripts tab: script registry, argument forms, live output streaming, confirmation dialogs, status indicators
+- Phase 1 is the dependency anchor because Windows behavior and CLI clarity must sit on top of a stable runtime truth model.
+- After Phase 1, Phase 2, Phase 4, and Phase 5 can be implemented in parallel where practical.
+- Phase 3 should follow Phase 2 because client-safe UI state depends on correct workspace execution and file placement.
+- Phase 6 is the shared regression and user-testing gate, and it happens before any PR preparation.
 
 ## Progress
 
-**Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
-
 | Phase | Plans Complete | Status | Completed |
-|-------|---------------|--------|-----------|
-| 1. Design Prompts | 2/2 | Complete | 2026-03-25 |
-| 2. Core Loop | 5/5 | Complete | 2026-03-26 |
-| 3. Outputs and Monitoring | 2/2 | Complete | 2026-03-26 |
-| 4. Scheduling and Management | 3/3 | Complete | 2026-03-26 |
-| 5. Client Switching | 3/3 | Complete | 2026-03-26 |
-| 6. Task Execution and Detail UI | 2/3 | In Progress | - |
-| **v1.1** | | | |
-| 7. Settings & Script Runner | 4/4 | Complete   | 2026-03-26 |
+|-------|----------------|--------|-----------|
+| 1. Runtime Ownership & Run Truth | 0/TBD | Not started | - |
+| 2. Workspace Execution Containment | 0/TBD | Not started | - |
+| 3. Client State Isolation in UI & History | 0/TBD | Not started | - |
+| 4. Quiet Windows Background Execution | 0/TBD | Not started | - |
+| 5. Friendly CLI Cron Operations | 0/TBD | Not started | - |
+| 6. Regression Coverage & User Validation | 0/TBD | Not started | - |
