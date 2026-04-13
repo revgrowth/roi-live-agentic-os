@@ -836,6 +836,33 @@ function getDefaultCompletionReason(result, resultSource) {
   }
 }
 
+function buildRecoveredCronRunUpdate(completionReason, details = {}) {
+  const result = details.result === "timeout" ? "timeout" : "failure";
+  const durationSec =
+    details.durationSec !== undefined
+      ? details.durationSec
+      : details.durationMs !== undefined
+        ? Math.round(details.durationMs / 1000)
+        : 0;
+  const normalizedCompletionReason =
+    normalizeCronRunCompletionReason(completionReason) || "recovered_inferred_state";
+
+  return {
+    completedAt: details.completedAt || new Date().toISOString(),
+    result,
+    resultSource: "inferred",
+    completionReason: normalizedCompletionReason,
+    durationSec,
+    costUsd: details.costUsd ?? null,
+    exitCode:
+      details.exitCode !== undefined
+        ? details.exitCode
+        : result === "timeout"
+          ? 124
+          : 1,
+  };
+}
+
 function toRuntimeLabel(runtime) {
   switch (runtime) {
     case "daemon":
@@ -1621,6 +1648,7 @@ module.exports = {
   isRuntimeRecordStale,
   writeDaemonPid,
   removeDaemonPid,
+  buildRecoveredCronRunUpdate,
   claimRuntimeLeadership,
   refreshRuntimeHeartbeat,
   releaseRuntimeLeadership,
