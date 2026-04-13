@@ -124,7 +124,7 @@ export default function AutonomousPage() {
       }}>
         {/* Feed — same as the main page */}
         <main style={{ flex: 1, minWidth: 0, paddingRight: 24 }}>
-          <FeedView clientFilter={null} onSwitchTab={switchTab} />
+          <FeedView onSwitchTab={switchTab} />
         </main>
 
         {/* Chat panel — docked right */}

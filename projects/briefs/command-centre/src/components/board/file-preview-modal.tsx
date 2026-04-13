@@ -139,7 +139,7 @@ export function FilePreviewModal({
     );
   };
 
-  const docsLink = `/docs?file=${encodeURIComponent(file.relativePath)}`;
+  const docsLink = `/?tab=docs&file=${encodeURIComponent(file.relativePath)}`;
 
   return (
     <div

@@ -1,7 +1,7 @@
 "use client";
 
 import type { TaskLevel } from "@/types/task";
-import { LEVEL_LABELS } from "@/types/task";
+import { LEVEL_LABELS } from "@/lib/levels";
 
 const levelConfig: Record<
   TaskLevel,
@@ -12,17 +12,20 @@ const levelConfig: Record<
     text: "#5E5E65",
   },
   project: {
-    bg: "#EFF6FF",
-    text: "#1D4ED8",
+    bg: "#EAE8E6",
+    text: "#5E5E65",
   },
   gsd: {
-    bg: "#F5F3FF",
-    text: "#6D28D9",
+    bg: "#EAE8E6",
+    text: "#5E5E65",
   },
 };
 
-export function LevelBadge({ level }: { level: TaskLevel }) {
+export function LevelBadge({ level, projectSlug }: { level: TaskLevel; projectSlug?: string | null }) {
   const config = levelConfig[level];
+  const label = projectSlug
+    ? projectSlug.replace(/-/g, " ")
+    : LEVEL_LABELS[level];
   return (
     <span
       style={{
@@ -35,9 +38,13 @@ export function LevelBadge({ level }: { level: TaskLevel }) {
         backgroundColor: config.bg,
         color: config.text,
         lineHeight: "16px",
+        maxWidth: 200,
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
       }}
     >
-      {LEVEL_LABELS[level]}
+      {label}
     </span>
   );
 }

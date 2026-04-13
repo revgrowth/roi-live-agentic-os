@@ -9,7 +9,7 @@ import {
   Activity, Cpu, Settings,
 } from "lucide-react";
 import type { Task, TaskLevel, LogEntry, OutputFile } from "@/types/task";
-import { LEVEL_LABELS } from "@/types/task";
+import { LEVEL_LABELS } from "@/lib/levels";
 import { useTaskStore } from "@/store/task-store";
 
 const PAGE_SIZE = 50;
