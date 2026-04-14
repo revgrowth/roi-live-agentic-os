@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: ready
-stopped_at: Phase 2 execution complete
-last_updated: "2026-04-14T03:52:17.867Z"
-last_activity: 2026-04-14 -- Phase 02 execution complete
+stopped_at: Phase 3 context gathered
+last_updated: "2026-04-14T04:07:24.308Z"
+last_activity: 2026-04-14 -- Phase 03 context gathered
 progress:
   total_phases: 4
   completed_phases: 2
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 03 (client-workspace-containment) — READY TO DISCUSS
-Plan: Not started
-Status: Phase 03 ready for discussion
-Last activity: 2026-04-14 -- Phase 02 execution complete
+Phase: 03 (client-workspace-containment) — READY TO PLAN
+Plan: Discuss complete
+Status: Phase 03 ready for planning
+Last activity: 2026-04-14 -- Phase 03 context gathered
 
 Progress: [█████░░░░░] 50%
 
@@ -64,6 +64,9 @@ Recent decisions affecting current work:
 - Keep this folder as the recovery target rather than rolling back to an older snapshot.
 - Use `pre-merge` and `pr-cron-hardening` as the trusted references for the broken behaviors.
 - Treat `merge-lab` only as a quick diagnostic checkpoint if needed.
+- Client cron boundary violations must stop immediately and fail.
+- Client cron jobs may write anywhere inside their own client folder.
+- Client cron jobs must not fall back to reading root-only workspace files.
 
 ### Pending Todos
 
@@ -71,12 +74,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- Windows popup behavior may involve both launch scripts and runtime execution wrappers.
-- Client containment may have regressed in more than one layer, including workspace resolution and prompt/file exposure.
+- Client containment may have regressed in more than one layer, including workspace resolution, runtime permissions, and prompt/file exposure.
 - The repo has unrelated local changes, so implementation should avoid touching unrelated work.
 
 ## Session Continuity
 
-Last session: 2026-04-14T03:20:54Z
-Stopped at: Phase 2 execution complete
-Resume file: .planning/ROADMAP.md
+Last session: 2026-04-14T04:07:24.302Z
+Stopped at: Phase 3 context gathered
+Resume file: .planning/phases/03-client-workspace-containment/03-CONTEXT.md
