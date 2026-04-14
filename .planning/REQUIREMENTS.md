@@ -9,9 +9,9 @@ Requirements for the recovery release in this workspace. Each maps to roadmap ph
 
 ### Execution Integrity
 
-- [ ] **EXEC-01**: A single scheduled cron trigger creates exactly one underlying prompt execution
-- [ ] **EXEC-02**: A single scheduled cron run produces exactly one assistant reply sequence in its chat history
-- [ ] **EXEC-03**: Recovery or retry paths do not re-run the same scheduled prompt unless the rerun is explicitly requested
+- [x] **EXEC-01**: A single scheduled cron trigger creates exactly one underlying prompt execution
+- [x] **EXEC-02**: A single scheduled cron run produces exactly one assistant reply sequence in its chat history
+- [x] **EXEC-03**: Recovery or retry paths do not re-run the same scheduled prompt unless the rerun is explicitly requested
 
 ### Windows Background Execution
 
@@ -29,7 +29,7 @@ Requirements for the recovery release in this workspace. Each maps to roadmap ph
 
 - [ ] **SAFE-01**: Existing cron-related features that already work in this folder continue working after the recovery changes
 - [ ] **SAFE-02**: Root workspace cron behavior still works after the client containment fixes are applied
-- [ ] **SAFE-03**: The recovery work records the concrete code path or merge difference that caused each regression, using the trusted reference folders when needed
+- [x] **SAFE-03**: The recovery work records the concrete code path or merge difference that caused each regression, using the trusted reference folders when needed
 
 ## v2 Requirements
 
@@ -58,9 +58,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| EXEC-01 | Phase 1 | Pending |
-| EXEC-02 | Phase 1 | Pending |
-| EXEC-03 | Phase 1 | Pending |
+| EXEC-01 | Phase 1 | Complete |
+| EXEC-02 | Phase 1 | Complete |
+| EXEC-03 | Phase 1 | Complete |
 | WIN-01 | Phase 2 | Pending |
 | WIN-02 | Phase 2 | Pending |
 | WIN-03 | Phase 2 | Pending |
@@ -69,7 +69,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLNT-03 | Phase 3 | Pending |
 | SAFE-01 | Phase 4 | Pending |
 | SAFE-02 | Phase 4 | Pending |
-| SAFE-03 | Phase 1 | Pending |
+| SAFE-03 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 12 total
@@ -78,4 +78,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-13*
-*Last updated: 2026-04-13 after roadmap creation*
+*Last updated: 2026-04-14 after Phase 1 completion*

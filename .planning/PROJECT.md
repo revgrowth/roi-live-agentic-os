@@ -17,14 +17,14 @@ Cron jobs must run once, invisibly in the background on Windows, and only within
 - ✓ CLI scripts already exist for starting, stopping, checking status, and viewing daemon logs — existing
 - ✓ Client workspaces, client switching, and client-specific cron job concepts already exist in the current codebase — existing
 - ✓ The current folder contains newer cron-related features that must be preserved during recovery — existing
+- ✓ A scheduled cron run now executes its underlying prompt once per trigger, so duplicate or triple replies no longer start from duplicate queue events — validated in Phase 1
+- ✓ Retry and completion behavior now follow one runtime-owned path, and the concrete regression drift is documented from the trusted references — validated in Phase 1
 
 ### Active
 
-- [ ] A scheduled cron run executes its underlying prompt exactly once, so one run cannot create duplicate or triple replies in chat history
 - [ ] Windows cron execution started in the background does not show visible PowerShell windows again
 - [ ] A client cron job can only see and act inside its own client folder rather than the whole repository
 - [ ] Regression fixes are applied in this folder without removing or breaking the newer features already present here
-- [ ] The recovery work explains whether the regressions came from an incomplete or incorrect merge path, enough to avoid repeating the same breakage
 
 ### Out of Scope
 
@@ -54,7 +54,8 @@ This repository is a brownfield Agentic OS workspace with an existing codebase m
 | Use `pre-merge` and `pr-cron-hardening` as trusted references | The user confirmed they contain good information for these fixes | ✓ Good |
 | Treat `merge-lab` only as a diagnostic checkpoint | The user does not want it treated as the target implementation | ✓ Good |
 | Preserve all currently working features as the baseline | Recovery must not remove newer work already present in this folder | — Pending |
-| Investigate the regression path enough to avoid repeating it | Understanding whether the break came from an incomplete or wrong merge helps protect future merges | — Pending |
+| Investigate the regression path enough to avoid repeating it | Understanding whether the break came from an incomplete or wrong merge helps protect future merges | ✓ Good |
+| Use one runtime-owned cron completion helper | Split completion ownership caused drift in run history and retry truth | ✓ Good |
 
 ## Evolution
 
@@ -74,4 +75,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-13 after initialization*
+*Last updated: 2026-04-14 after Phase 1 completion*
