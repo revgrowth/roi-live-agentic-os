@@ -1,8 +1,8 @@
-# Roadmap: Cron Jobs Hardening
+# Roadmap: Cron Jobs Hardening Recovery
 
 ## Overview
 
-This roadmap hardens cron around the actual v1 problem clusters in the project: runtime ownership truth, client workspace containment, client-safe state isolation, quiet Windows daemon execution, and clearer CLI lifecycle operations. The build order starts by making runtime ownership trustworthy, then lets containment work, Windows behavior, and CLI improvements move in parallel where dependencies allow. The stream closes with a regression and user-validation gate, and PR preparation stays after that gate rather than inside it.
+This roadmap restores the cron regressions in the current Agentic OS workspace without throwing away the newer features that already exist here. The build order starts by tracing and fixing the duplicate-execution path, then splits into Windows background behavior and client workspace containment, and finishes with a validation gate that proves the current baseline still works.
 
 ## Phases
 
@@ -10,94 +10,65 @@ This roadmap hardens cron around the actual v1 problem clusters in the project: 
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Runtime Ownership & Run Truth** - Make one visible runtime owner and truthful run outcomes the shared source of cron truth.
-- [ ] **Phase 2: Workspace Execution Containment** - Ensure client jobs run in the selected workspace and cannot leak outputs across boundaries.
-- [ ] **Phase 3: Client State Isolation in UI & History** - Separate root and client job state, logs, and controls end to end.
-- [ ] **Phase 4: Quiet Windows Background Execution** - Remove visible Windows terminal popups without breaking daemon lifecycle behavior.
-- [ ] **Phase 5: Friendly CLI Cron Operations** - Make cron start, status, logs, and stop readable and trustworthy for non-technical users.
-- [ ] **Phase 6: Regression Coverage & User Validation** - Prove the hardening holds across root/client, daemon/UI, and Windows flows before any PR work.
+- [ ] **Phase 1: Run Truth & Regression Forensics** - Identify the concrete regression path and restore single execution per scheduled cron trigger.
+- [ ] **Phase 2: Quiet Windows Background Execution** - Return Windows daemon-driven cron execution to hidden background behavior.
+- [ ] **Phase 3: Client Workspace Containment** - Re-establish strict client-only visibility and writes for client cron jobs.
+- [ ] **Phase 4: Baseline Preservation & Regression Validation** - Prove the recovered branch keeps the current feature baseline and root cron behavior intact.
 
 ## Phase Details
 
-### Phase 1: Runtime Ownership & Run Truth
-**Goal**: Users and operators can trust one clear runtime owner and accurate cron run outcomes across the workspace.
+### Phase 1: Run Truth & Regression Forensics
+**Goal**: Restore trustworthy one-run execution behavior and document what diverged from the trusted references.
 **Depends on**: Nothing (first phase)
-**Requirements**: [OWNR-01, OWNR-02, OWNR-03, OWNR-04, SAFE-02]
+**Requirements**: [EXEC-01, EXEC-02, EXEC-03, SAFE-03]
 **Success Criteria** (what must be TRUE):
-  1. User can see whether cron scheduling is owned by the CLI daemon, the in-process UI runtime, or neither without reading lock files or raw process output.
-  2. CLI and UI show the same runtime owner, leader freshness, and skipped-run reason for the same workspace.
-  3. Running the CLI daemon and UI server at the same time does not create duplicate scheduled runs for the same job.
-  4. Interrupted, recovered, or skipped runs are shown with truthful outcomes instead of being silently reported as successful.
-**Plans**: TBD
-**UI hint**: yes
-
-### Phase 2: Workspace Execution Containment
-**Goal**: Client cron execution is fully anchored to the selected workspace instead of inheriting root-scoped behavior.
-**Depends on**: Phase 1
-**Requirements**: [CLNT-01, CLNT-02, CLNT-06, SAFE-01]
-**Success Criteria** (what must be TRUE):
-  1. User can run a client cron job and have it execute inside the selected client workspace, not the root workspace.
-  2. Files created by a client cron run land only inside allowed directories for that client workspace.
-  3. A client cron run that attempts to write outside the selected workspace is visibly flagged or failed instead of silently passing.
-  4. Generated client cron wrappers still target the shared root runtime while preserving the selected client workspace during execution.
+  1. One scheduled cron trigger results in exactly one underlying prompt execution in the current workspace.
+  2. One scheduled cron run produces exactly one assistant reply sequence in chat history.
+  3. Recovery or retry logic no longer replays the same scheduled prompt unless a rerun is explicitly requested.
+  4. The regression path is traced to a concrete code path or merge difference, using `pre-merge` and `pr-cron-hardening` as trusted references when needed.
 **Plans**: TBD
 
-### Phase 3: Client State Isolation in UI & History
-**Goal**: Root and client cron jobs stay separated across logs, history, and controls even when slugs overlap.
-**Depends on**: Phase 2
-**Requirements**: [CLNT-03, CLNT-04, CLNT-05]
-**Success Criteria** (what must be TRUE):
-  1. User can inspect a client job's logs and status only within that client context and its own history surfaces.
-  2. Root and client jobs that share the same slug never mix their state, history, or control actions.
-  3. User can run, edit, toggle, delete, and inspect a cron job in the UI while the selected root/client scope is preserved end to end.
-**Plans**: TBD
-**UI hint**: yes
-
-### Phase 4: Quiet Windows Background Execution
-**Goal**: Windows cron daemon and scheduled execution stay invisible in the background without losing control or diagnostics.
+### Phase 2: Quiet Windows Background Execution
+**Goal**: Make Windows cron daemon and scheduled background execution hidden again without losing observability.
 **Depends on**: Phase 1
 **Requirements**: [WIN-01, WIN-02, WIN-03]
 **Success Criteria** (what must be TRUE):
-  1. User can start the CLI daemon on Windows without a visible terminal window appearing.
-  2. Daemon-triggered cron runs on Windows do not open visible terminal popups during execution.
-  3. Hidden Windows execution still preserves daemon logging, status inspection, and clean stop behavior.
+  1. Starting background cron execution on Windows does not open visible PowerShell windows.
+  2. Scheduled Windows cron runs stay hidden during execution instead of popping up terminal windows.
+  3. Hidden execution still preserves useful logs, status inspection, and clean stop behavior.
 **Plans**: TBD
 
-### Phase 5: Friendly CLI Cron Operations
-**Goal**: Non-technical users can operate cron from the CLI with clear lifecycle feedback and readable diagnostics.
+### Phase 3: Client Workspace Containment
+**Goal**: Ensure client cron runs are scoped to the selected client workspace rather than the repo root.
 **Depends on**: Phase 1
-**Requirements**: [CLI-01, CLI-02, CLI-03, CLI-04]
+**Requirements**: [CLNT-01, CLNT-02, CLNT-03]
 **Success Criteria** (what must be TRUE):
-  1. User can start the cron daemon from the CLI and immediately understand whether a daemon was started, already running, or blocked by current runtime state.
-  2. User can inspect cron status from the CLI through structured, human-friendly output that explains runtime owner, leader freshness, PID, workspace count, and recovery hints.
-  3. User can inspect daemon logs from the CLI through readable output with clear headings, recent context, and file path hints.
-  4. User can stop the cron daemon from the CLI and immediately understand what changed or what still needs attention.
+  1. A client cron job resolves its working scope to the selected client folder only.
+  2. A client cron job cannot read or enumerate files outside its allowed client workspace during prompt preparation or execution.
+  3. Files created by a client cron job land only inside allowed directories for that client workspace.
 **Plans**: TBD
 
-### Phase 6: Regression Coverage & User Validation
-**Goal**: The hardening stream is proven through targeted regression coverage and explicit user validation before any PR preparation.
-**Depends on**: Phase 3, Phase 4, Phase 5
-**Requirements**: [SAFE-03]
+### Phase 4: Baseline Preservation & Regression Validation
+**Goal**: Verify that the fixes preserve the current feature baseline and do not break root workspace cron behavior.
+**Depends on**: Phase 2, Phase 3
+**Requirements**: [SAFE-01, SAFE-02]
 **Success Criteria** (what must be TRUE):
-  1. Maintainer can run regression coverage for root-vs-client execution, same-slug isolation, runtime leadership, and Windows hidden execution behavior and see it pass.
-  2. User can complete end-to-end validation for root and client cron flows before any PR branch or pull request preparation begins.
-  3. The project ends with a clear pass/fail validation record for containment, ownership, Windows background behavior, and CLI lifecycle flows.
+  1. Existing cron-related features that already work in this folder still work after the recovery changes.
+  2. Root workspace cron behavior still works after the client containment fixes are applied.
+  3. The final recovered branch matches the intended behavior from the trusted references where expected, and any intentional differences are explicitly noted.
 **Plans**: TBD
 
 ## Execution Notes
 
-- Phase 1 is the dependency anchor because Windows behavior and CLI clarity must sit on top of a stable runtime truth model.
-- After Phase 1, Phase 2, Phase 4, and Phase 5 can be implemented in parallel where practical.
-- Phase 3 should follow Phase 2 because client-safe UI state depends on correct workspace execution and file placement.
-- Phase 6 is the shared regression and user-testing gate, and it happens before any PR preparation.
+- Phase 1 is the dependency anchor because both Windows execution and client containment depend on understanding the broken execution path first.
+- After Phase 1, Phase 2 and Phase 3 can run in parallel where practical.
+- Phase 4 is the end-to-end validation gate and should happen before any merge or release decision.
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Runtime Ownership & Run Truth | 0/TBD | Not started | - |
-| 2. Workspace Execution Containment | 0/TBD | Not started | - |
-| 3. Client State Isolation in UI & History | 0/TBD | Not started | - |
-| 4. Quiet Windows Background Execution | 0/TBD | Not started | - |
-| 5. Friendly CLI Cron Operations | 0/TBD | Not started | - |
-| 6. Regression Coverage & User Validation | 0/TBD | Not started | - |
+| 1. Run Truth & Regression Forensics | 0/TBD | Not started | - |
+| 2. Quiet Windows Background Execution | 0/TBD | Not started | - |
+| 3. Client Workspace Containment | 0/TBD | Not started | - |
+| 4. Baseline Preservation & Regression Validation | 0/TBD | Not started | - |

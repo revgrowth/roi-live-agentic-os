@@ -58,24 +58,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| EXEC-01 | TBD | Pending |
-| EXEC-02 | TBD | Pending |
-| EXEC-03 | TBD | Pending |
-| WIN-01 | TBD | Pending |
-| WIN-02 | TBD | Pending |
-| WIN-03 | TBD | Pending |
-| CLNT-01 | TBD | Pending |
-| CLNT-02 | TBD | Pending |
-| CLNT-03 | TBD | Pending |
-| SAFE-01 | TBD | Pending |
-| SAFE-02 | TBD | Pending |
-| SAFE-03 | TBD | Pending |
+| EXEC-01 | Phase 1 | Pending |
+| EXEC-02 | Phase 1 | Pending |
+| EXEC-03 | Phase 1 | Pending |
+| WIN-01 | Phase 2 | Pending |
+| WIN-02 | Phase 2 | Pending |
+| WIN-03 | Phase 2 | Pending |
+| CLNT-01 | Phase 3 | Pending |
+| CLNT-02 | Phase 3 | Pending |
+| CLNT-03 | Phase 3 | Pending |
+| SAFE-01 | Phase 4 | Pending |
+| SAFE-02 | Phase 4 | Pending |
+| SAFE-03 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12 ⚠️
+- Mapped to phases: 12
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-13*
-*Last updated: 2026-04-13 after initial definition*
+*Last updated: 2026-04-13 after roadmap creation*
