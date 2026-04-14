@@ -205,6 +205,9 @@ test("executeTask only claims one start for near-simultaneous queued cron calls"
       "./file-diff": {
         captureSnapshot: () => ({}),
       },
+      "./cron-service": {
+        completeCronRunForTask: () => {},
+      },
       "./prompt-tags": {
         expandPromptTags: (prompt) => prompt,
       },
