@@ -58,12 +58,33 @@ git commit -m "release: v{new-version}"
 git tag v{new-version}
 ```
 
-### 6. Confirm
+### 6. Promote to Main
+
+After tagging, offer to create a PR to merge `dev` into `main`:
+
+> "Create a PR to promote this release to main?"
+
+If yes:
+```bash
+gh pr create --base main --head dev --title "release: v{new-version}" --body "Promotes v{new-version} to main.\n\n## Changes\n{changelog summary}"
+```
+
+CI will run on the PR automatically. Once it passes, ask: "CI passed — merge the PR now?"
+
+If yes:
+```bash
+gh pr merge --merge --delete-branch=false
+```
+
+If the user declines either step, that's fine — remind them they can merge manually later.
+
+### 7. Confirm
 
 Tell the user:
 - The new version number
 - A summary of what's in the release
-- Remind them that this doesn't push — they decide when to `git push --tags` or merge to `main`
+- Whether the PR to main was created/merged
+- If no PR was created, remind them to promote `dev` to `main` when ready
 
 ## Rules
 

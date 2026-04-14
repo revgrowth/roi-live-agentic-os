@@ -45,3 +45,11 @@
 ## tool-stitch
 
 ## viz-stitch-design
+
+## ops-new-feature
+
+- 2026-04-14: Added quick-fix mode (`--quick`) for trivial one-file changes. Express branch lifecycle — create, commit, merge, delete in one flow.
+
+## ops-release
+
+- 2026-04-14: Added dev→main PR promotion step after tagging. Uses `gh pr create` and optionally `gh pr merge`. Non-blocking — user can decline.

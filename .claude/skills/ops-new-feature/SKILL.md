@@ -122,6 +122,43 @@ Tell the user:
 
 ---
 
+## Quick-Fix Mode
+
+Triggered when the user says `/new-feature --quick` or "quick fix" for trivial one-file changes.
+
+### 1. Gather Details
+
+Same as the standard flow — get a feature name and description.
+
+### 2. Express Lifecycle
+
+Run the full branch lifecycle in one flow:
+
+```bash
+git checkout -b feature/{feature-name}
+```
+
+Make the change (user directs what to edit), then:
+
+```bash
+# Update changelog
+git add CHANGELOG.md {changed-files}
+git commit -m "fix: {description}"
+
+# Merge back immediately
+git checkout dev
+git merge feature/{feature-name} --no-ff -m "merge: feature/{feature-name} into dev"
+git branch -d feature/{feature-name}
+```
+
+### 3. Confirm
+
+Tell the user the fix is merged to `dev` and the feature branch is cleaned up. Remind them the changelog entry is under Unreleased.
+
+**When NOT to use quick-fix:** If the change touches more than ~3 files, or if it's in Zone 3 (command-centre code), suggest the standard flow instead.
+
+---
+
 ## Rules
 
 - Never create a branch if one with the same name already exists — ask the user what to do

@@ -103,6 +103,29 @@ When the user asks to add a client:
    - `cd {absolute path}/clients/{slug} && claude`
 5. Link to `docs/multi-client-guide.md`.
 
+### Branching Policy
+
+Three zones control how changes flow through the dev/main branching model.
+
+| Zone | Paths | On `dev` | On `feature/*` |
+|------|-------|----------|----------------|
+| **Content** | `projects/`, `brand_context/`, `context/`, `cron/jobs/`, `clients/*/` | Commit directly | Commit directly |
+| **Config** | `.claude/skills/*/SKILL.md`, `AGENTS.md`, `CLAUDE.md`, `.env.example`, `scripts/*.sh` | Advisory: consider feature branch | Commit directly |
+| **Code** | `command-centre/src/**`, `.claude/hooks/*.js`, runtime JS/TS | Strong nudge: use `/new-feature` | Commit directly |
+
+**`main` is always protected:**
+- Requires a PR to merge (no direct push)
+- CI status checks must pass
+- No force pushes, no deletions
+
+**`dev` is the working branch.** Content changes go directly here. Config and code changes should use feature branches that merge back to `dev`.
+
+**Release flow:** Tag on `dev` with `/release`, then promote to `main` via PR. CI runs automatically on the PR.
+
+**Solo defaults:** No PR approval required, auto-merge available on release PRs. Teams can tighten by requiring 1 approval on `main` PRs and disabling auto-merge.
+
+**Quick fixes:** Use `/new-feature --quick` for trivial one-file fixes — creates a branch, makes the change, merges, and cleans up in one flow.
+
 ### Before Major Deliverables
 
 - Load the relevant `brand_context/` files per the Context Matrix below
