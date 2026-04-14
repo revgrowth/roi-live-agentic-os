@@ -15,6 +15,9 @@ param(
     [string]$ArgumentsBase64,
 
     [Parameter()]
+    [string]$EnvironmentBase64 = "",
+
+    [Parameter()]
     [int]$TimeoutSeconds = 0
 )
 
@@ -126,6 +129,21 @@ try {
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
     $startInfo.CreateNoWindow = $true
+
+    if (-not [string]::IsNullOrWhiteSpace($EnvironmentBase64)) {
+        $environmentJson = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($EnvironmentBase64))
+        $decodedEnvironment = ConvertFrom-Json -InputObject $environmentJson
+
+        if ($null -ne $decodedEnvironment) {
+            foreach ($property in $decodedEnvironment.PSObject.Properties) {
+                if ($null -eq $property.Value) {
+                    continue
+                }
+
+                $startInfo.EnvironmentVariables[$property.Name] = [string]$property.Value
+            }
+        }
+    }
 
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $startInfo

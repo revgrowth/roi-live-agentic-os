@@ -11,7 +11,7 @@ $CronUiPath = Join-Path $PSScriptRoot "lib\cron-ui.ps1"
 
 Write-AgenticOsCronBanner `
     -Heading "Starting managed cron daemon" `
-    -Subheading "This terminal stays attached while the daemon is running."
+    -Subheading "This starts the daemon and returns control immediately."
 Write-AgenticOsCronInfo "Launching the shared cron runtime..."
 
 node $ScriptPath start @Arguments

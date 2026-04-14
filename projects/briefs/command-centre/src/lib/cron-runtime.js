@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const matter = require("gray-matter");
 const Database = require("better-sqlite3");
-const { spawn } = require("child_process");
+const { spawn, spawnSync } = require("child_process");
 const { randomUUID } = require("crypto");
 
 const workspaceMarkers = ["AGENTS.md", "CLAUDE.md"];
@@ -35,6 +35,31 @@ const WINDOWS_HIDDEN_RUNNER_PATH = path.resolve(
   "scripts",
   "run-hidden-command.ps1"
 );
+const WINDOWS_GIT_BASH_CANDIDATES = [
+  "C:\\Program Files\\Git\\bin\\bash.exe",
+  "C:\\Program Files\\Git\\usr\\bin\\bash.exe",
+];
+const runtimeHooks = {
+  findCommandOnPath: null,
+  platform: null,
+  notificationSender: null,
+};
+
+function getRuntimePlatform() {
+  return typeof runtimeHooks.platform === "function"
+    ? runtimeHooks.platform()
+    : process.platform;
+}
+
+function setCronRuntimeTestHooks(hooks = {}) {
+  Object.assign(runtimeHooks, hooks);
+}
+
+function resetCronRuntimeTestHooks() {
+  runtimeHooks.findCommandOnPath = null;
+  runtimeHooks.platform = null;
+  runtimeHooks.notificationSender = null;
+}
 
 function normalizeClientId(clientId) {
   if (!clientId || clientId === "root") {
@@ -1270,6 +1295,122 @@ function parseTimeoutToMs(timeoutValue) {
   return 30 * 60 * 1000;
 }
 
+function resolveCommandOnWindowsPath(command, env = process.env) {
+  const normalizedCommand = String(command || "").trim();
+  if (!normalizedCommand) {
+    return null;
+  }
+
+  if (typeof runtimeHooks.findCommandOnPath === "function") {
+    const hookedPath = runtimeHooks.findCommandOnPath(normalizedCommand, env);
+    if (hookedPath) {
+      return hookedPath;
+    }
+  }
+
+  if (path.isAbsolute(normalizedCommand) || normalizedCommand.includes("\\") || normalizedCommand.includes("/")) {
+    return normalizedCommand;
+  }
+
+  try {
+    const lookup = spawnSync("where.exe", [normalizedCommand], {
+      env,
+      encoding: "utf8",
+      windowsHide: true,
+      shell: false,
+    });
+
+    if (lookup.status === 0) {
+      const match = String(lookup.stdout || "")
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .find(Boolean);
+      if (match) {
+        return match;
+      }
+    }
+  } catch {
+    // Best-effort lookup only.
+  }
+
+  return null;
+}
+
+function resolveGitBashPath(env = process.env) {
+  if (env.CLAUDE_CODE_GIT_BASH_PATH) {
+    return env.CLAUDE_CODE_GIT_BASH_PATH;
+  }
+
+  const discoveredPath =
+    resolveCommandOnWindowsPath("bash.exe", env) ||
+    resolveCommandOnWindowsPath("bash", env);
+  const candidates = [discoveredPath, ...WINDOWS_GIT_BASH_CANDIDATES].filter(Boolean);
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
+function resolveWindowsClaudeLaunchPlan({ claudeCommand, env = process.env }) {
+  const configuredCommand = String(claudeCommand || "").trim() || "claude";
+  const normalizedCommand = configuredCommand.toLowerCase();
+  const resolvedCommandPath = resolveCommandOnWindowsPath(configuredCommand, env);
+  const commandToRun = resolvedCommandPath || configuredCommand;
+  const extension = path.extname(commandToRun).toLowerCase();
+  const childEnv = { ...env };
+  const gitBashPath = resolveGitBashPath(childEnv);
+
+  if (gitBashPath && !childEnv.CLAUDE_CODE_GIT_BASH_PATH) {
+    childEnv.CLAUDE_CODE_GIT_BASH_PATH = gitBashPath;
+  }
+
+  if (
+    normalizedCommand === "claude" ||
+    normalizedCommand === "claude.exe" ||
+    extension === ".exe"
+  ) {
+    return {
+      mode: "direct",
+      command: commandToRun,
+      env: childEnv,
+      resolvedCommandPath,
+      extension,
+    };
+  }
+
+  if (extension === ".cmd" || extension === ".bat" || extension === ".ps1") {
+    return {
+      mode: "wrapper",
+      command: commandToRun,
+      env: childEnv,
+      resolvedCommandPath,
+      extension,
+    };
+  }
+
+  return {
+    mode: "direct",
+    command: commandToRun,
+    env: childEnv,
+    resolvedCommandPath,
+    extension,
+  };
+}
+
+function buildWrapperEnvironmentOverrides(env = {}) {
+  const overrides = {};
+  for (const key of ["AGENTIC_OS_DIR", "CLAUDE_CODE_GIT_BASH_PATH"]) {
+    if (env[key]) {
+      overrides[key] = env[key];
+    }
+  }
+  return overrides;
+}
+
 function walkFiles(rootDir, callback, relativePrefix = "") {
   if (!fs.existsSync(rootDir)) {
     return;
@@ -1434,6 +1575,7 @@ function spawnClaudeRunViaHiddenWindowsWrapper(job, cwd, logFilePath, claudeComm
     const tempBase = `${logFilePath}.${process.pid}.${Date.now()}.${randomUUID()}`;
     const stdoutPath = `${tempBase}.stdout`;
     const stderrPath = `${tempBase}.stderr`;
+    const envOverrides = buildWrapperEnvironmentOverrides(env);
     const helperArgs = [
       "-NoProfile",
       "-ExecutionPolicy",
@@ -1453,6 +1595,13 @@ function spawnClaudeRunViaHiddenWindowsWrapper(job, cwd, logFilePath, claudeComm
       "-TimeoutSeconds",
       String(Math.max(1, Math.ceil(parseTimeoutToMs(job.timeout) / 1000))),
     ];
+
+    if (Object.keys(envOverrides).length > 0) {
+      helperArgs.push(
+        "-EnvironmentBase64",
+        Buffer.from(JSON.stringify(envOverrides), "utf8").toString("base64")
+      );
+    }
 
     const child = spawn("powershell.exe", helperArgs, {
       cwd,
@@ -1543,14 +1692,24 @@ function spawnClaudeRunViaHiddenWindowsWrapper(job, cwd, logFilePath, claudeComm
 
 function spawnClaudeRun(job, cwd, logFilePath) {
   return new Promise((resolve, reject) => {
-    const env = { ...process.env };
-    delete env.CLAUDECODE;
-    env.AGENTIC_OS_DIR = cwd;
-    const claudeCommand = env.AGENTIC_OS_CLAUDE_BIN || "claude";
+    const childEnv = { ...process.env };
+    delete childEnv.CLAUDECODE;
+    childEnv.AGENTIC_OS_DIR = cwd;
+    const configuredCommand = childEnv.AGENTIC_OS_CLAUDE_BIN || "claude";
+    const windowsLaunchPlan =
+      getRuntimePlatform() === "win32"
+        ? resolveWindowsClaudeLaunchPlan({ claudeCommand: configuredCommand, env: childEnv })
+        : null;
+    const env = windowsLaunchPlan?.env || childEnv;
+    const claudeCommand = windowsLaunchPlan?.command || configuredCommand;
     const claudeArgs = ["-p", job.prompt, "--model", job.model, "--dangerously-skip-permissions"];
     const timeoutMs = parseTimeoutToMs(job.timeout);
 
-    if (process.platform === "win32" && fs.existsSync(WINDOWS_HIDDEN_RUNNER_PATH)) {
+    if (
+      getRuntimePlatform() === "win32" &&
+      windowsLaunchPlan?.mode === "wrapper" &&
+      fs.existsSync(WINDOWS_HIDDEN_RUNNER_PATH)
+    ) {
       spawnClaudeRunViaHiddenWindowsWrapper(
         job,
         cwd,
@@ -1562,15 +1721,12 @@ function spawnClaudeRun(job, cwd, logFilePath) {
       return;
     }
 
-    const useWindowsCmdShell =
-      process.platform === "win32" && /\.(cmd|bat)$/i.test(String(claudeCommand));
-
     const child = spawn(claudeCommand, claudeArgs, {
-      shell: useWindowsCmdShell,
       cwd,
       env,
       stdio: ["ignore", "pipe", "pipe"],
       windowsHide: true,
+      shell: false,
     });
 
     let stdout = "";
@@ -1858,4 +2014,8 @@ module.exports = {
   executeCronTask,
   runCronJobNow,
   hasActiveCronJobs,
+  resolveGitBashPath,
+  resolveWindowsClaudeLaunchPlan,
+  setCronRuntimeTestHooks,
+  resetCronRuntimeTestHooks,
 };
