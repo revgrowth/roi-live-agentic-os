@@ -1685,49 +1685,112 @@ function walkFiles(rootDir, callback, relativePrefix = "") {
   }
 }
 
-function takeOutputSnapshot(workspaceDir) {
-  const snapshot = new Map();
+function normalizeRelativePathForMatch(relativePath) {
+  return String(relativePath || "").replace(/\\/g, "/");
+}
 
-  for (const rootName of OUTPUT_SCAN_ROOTS) {
-    const rootDir = path.join(workspaceDir, rootName);
-    walkFiles(rootDir, (fullPath, relativePath) => {
-      const stat = fs.statSync(fullPath);
-      snapshot.set(relativePath, `${stat.size}:${stat.mtimeMs}`);
-    }, rootName);
+function isRelativePathInside(relativePath, parentRelativePath) {
+  const normalizedRelativePath = normalizeRelativePathForMatch(relativePath);
+  const normalizedParentPath = normalizeRelativePathForMatch(parentRelativePath);
+
+  if (!normalizedParentPath) {
+    return false;
+  }
+
+  return (
+    normalizedRelativePath === normalizedParentPath ||
+    normalizedRelativePath.startsWith(`${normalizedParentPath}/`)
+  );
+}
+
+function takeFileSnapshot(rootDir, options = {}) {
+  const snapshot = new Map();
+  const {
+    roots = null,
+    excludeRelativePath = null,
+  } = options;
+
+  const recordFile = (fullPath, relativePath) => {
+    if (excludeRelativePath && isRelativePathInside(relativePath, excludeRelativePath)) {
+      return;
+    }
+
+    const stat = fs.statSync(fullPath);
+    snapshot.set(relativePath, `${stat.size}:${stat.mtimeMs}`);
+  };
+
+  if (Array.isArray(roots) && roots.length > 0) {
+    for (const rootName of roots) {
+      const snapshotRootDir = path.join(rootDir, rootName);
+      walkFiles(snapshotRootDir, recordFile, rootName);
+    }
+  } else {
+    walkFiles(rootDir, recordFile);
   }
 
   return snapshot;
 }
 
-function collectOutputFiles(workspaceDir, beforeSnapshot, startMs, endMs) {
+function collectChangedFiles(rootDir, beforeSnapshot, startMs, endMs, options = {}) {
   const files = [];
+  const {
+    roots = null,
+    excludeRelativePath = null,
+  } = options;
 
-  for (const rootName of OUTPUT_SCAN_ROOTS) {
-    const rootDir = path.join(workspaceDir, rootName);
-    walkFiles(rootDir, (fullPath, relativePath) => {
-      const stat = fs.statSync(fullPath);
-      const previous = beforeSnapshot.get(relativePath);
-      const current = `${stat.size}:${stat.mtimeMs}`;
+  const collectFile = (fullPath, relativePath) => {
+    if (excludeRelativePath && isRelativePathInside(relativePath, excludeRelativePath)) {
+      return;
+    }
 
-      if (previous === current) {
-        return;
-      }
+    const stat = fs.statSync(fullPath);
+    const previous = beforeSnapshot.get(relativePath);
+    const current = `${stat.size}:${stat.mtimeMs}`;
 
-      if (stat.mtimeMs < startMs - 2_000 || stat.mtimeMs > endMs + 2_000) {
-        return;
-      }
+    if (previous === current) {
+      return;
+    }
 
-      files.push({
-        fileName: path.basename(fullPath),
-        filePath: fullPath,
-        relativePath,
-        extension: path.extname(fullPath).replace(/^\./, ""),
-        sizeBytes: stat.size,
-      });
-    }, rootName);
+    if (stat.mtimeMs < startMs - 2_000 || stat.mtimeMs > endMs + 2_000) {
+      return;
+    }
+
+    files.push({
+      fileName: path.basename(fullPath),
+      filePath: fullPath,
+      relativePath,
+      extension: path.extname(fullPath).replace(/^\./, ""),
+      sizeBytes: stat.size,
+    });
+  };
+
+  if (Array.isArray(roots) && roots.length > 0) {
+    for (const rootName of roots) {
+      const collectRootDir = path.join(rootDir, rootName);
+      walkFiles(collectRootDir, collectFile, rootName);
+    }
+  } else {
+    walkFiles(rootDir, collectFile);
   }
 
   return files;
+}
+
+function takeOutputSnapshot(workspaceDir) {
+  return takeFileSnapshot(workspaceDir, { roots: OUTPUT_SCAN_ROOTS });
+}
+
+function collectOutputFiles(workspaceDir, beforeSnapshot, startMs, endMs) {
+  return collectChangedFiles(workspaceDir, beforeSnapshot, startMs, endMs, {
+    roots: OUTPUT_SCAN_ROOTS,
+  });
+}
+
+function collectOutsideWorkspaceMutations(agenticOsDir, workspaceDir, beforeSnapshot, startMs, endMs) {
+  const workspaceRelativePath = path.relative(agenticOsDir, workspaceDir);
+  return collectChangedFiles(agenticOsDir, beforeSnapshot, startMs, endMs, {
+    excludeRelativePath: workspaceRelativePath,
+  });
 }
 
 function buildCronExecutionPrompt(job, workspace) {
@@ -1751,7 +1814,7 @@ function buildCronExecutionPrompt(job, workspace) {
 function formatOutputLeakMessage(files) {
   const paths = files.map((file) => file.relativePath).slice(0, 5);
   const suffix = files.length > 5 ? ` (+${files.length - 5} more)` : "";
-  return `Client cron job wrote outside its workspace: ${paths.join(", ")}${suffix}`;
+  return `Client cron job touched files outside its workspace: ${paths.join(", ")}${suffix}`;
 }
 
 function persistTaskOutputs(agenticOsDir, taskId, files) {
@@ -1938,8 +2001,29 @@ function spawnClaudeRunViaHiddenWindowsWrapper(job, cwd, logFilePath, claudeComm
   });
 }
 
-function spawnClaudeRun(job, cwd, logFilePath) {
+function buildCronClaudeArgs(job, workspace) {
+  const prompt = String(job.prompt || "");
+  const model = job.model || "sonnet";
+
+  if (!workspace?.clientId) {
+    return ["-p", prompt, "--model", model, "--dangerously-skip-permissions"];
+  }
+
+  return [
+    "-p",
+    prompt,
+    "--model",
+    model,
+    "--permission-mode",
+    "dontAsk",
+    "--add-dir",
+    workspace.workspaceDir,
+  ];
+}
+
+function spawnClaudeRun(job, workspace, logFilePath) {
   return new Promise((resolve, reject) => {
+    const cwd = workspace.workspaceDir;
     const childEnv = { ...process.env };
     delete childEnv.CLAUDECODE;
     childEnv.AGENTIC_OS_DIR = cwd;
@@ -1950,7 +2034,7 @@ function spawnClaudeRun(job, cwd, logFilePath) {
         : null;
     const env = windowsLaunchPlan?.env || childEnv;
     const claudeCommand = windowsLaunchPlan?.command || configuredCommand;
-    const claudeArgs = ["-p", job.prompt, "--model", job.model, "--dangerously-skip-permissions"];
+    const claudeArgs = buildCronClaudeArgs(job, workspace);
     const timeoutMs = parseTimeoutToMs(job.timeout);
 
     if (
@@ -2086,7 +2170,11 @@ async function executeCronTask(agenticOsDir, taskId) {
   const startIso = new Date().toISOString();
   const startMs = Date.now();
   const beforeSnapshot = takeOutputSnapshot(workspace.workspaceDir);
-  const beforeRootSnapshot = workspace.clientId ? takeOutputSnapshot(agenticOsDir) : null;
+  const beforeRootSnapshot = workspace.clientId
+    ? takeFileSnapshot(agenticOsDir, {
+        excludeRelativePath: path.relative(agenticOsDir, workspace.workspaceDir),
+      })
+    : null;
   const executionJob = {
     ...job,
     prompt: buildCronExecutionPrompt(job, workspace),
@@ -2121,7 +2209,7 @@ async function executeCronTask(agenticOsDir, taskId) {
     }
 
     try {
-      lastRun = await spawnClaudeRun(executionJob, workspace.workspaceDir, logFilePath);
+      lastRun = await spawnClaudeRun(executionJob, workspace, logFilePath);
     } catch (error) {
       lastRun = {
         exitCode: 1,
@@ -2142,7 +2230,15 @@ async function executeCronTask(agenticOsDir, taskId) {
   const durationMs = endMs - startMs;
   const outputs = collectOutputFiles(workspace.workspaceDir, beforeSnapshot, startMs, endMs);
   const leakedRootOutputs =
-    beforeRootSnapshot ? collectOutputFiles(agenticOsDir, beforeRootSnapshot, startMs, endMs) : [];
+    beforeRootSnapshot
+      ? collectOutsideWorkspaceMutations(
+          agenticOsDir,
+          workspace.workspaceDir,
+          beforeRootSnapshot,
+          startMs,
+          endMs
+        )
+      : [];
   const containmentError =
     leakedRootOutputs.length > 0 ? formatOutputLeakMessage(leakedRootOutputs) : null;
   const result = containmentError
@@ -2252,6 +2348,7 @@ module.exports = {
   getManagedRuntimeStatus,
   getRuntimePaths,
   getRuntimeCommands,
+  buildCronClaudeArgs,
   enqueueCronJob,
   completeCronRunForTask,
   executeCronTask,

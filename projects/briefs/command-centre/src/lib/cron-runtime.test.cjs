@@ -19,6 +19,44 @@ function cleanupTempWorkspace(workspaceDir) {
   fs.rmSync(workspaceDir, { recursive: true, force: true });
 }
 
+function createFakeClaudeCommand(workspaceDir, name, lines) {
+  if (process.platform === "win32") {
+    const commandPath = path.join(workspaceDir, `${name}.cmd`);
+    fs.writeFileSync(commandPath, lines.join("\r\n"), "utf-8");
+    return commandPath;
+  }
+
+  const commandPath = path.join(workspaceDir, `${name}.sh`);
+  fs.writeFileSync(commandPath, ["#!/usr/bin/env bash", ...lines].join("\n"), "utf-8");
+  fs.chmodSync(commandPath, 0o755);
+  return commandPath;
+}
+
+function writeCronJob(agenticOsDir, clientId, slug, prompt) {
+  const jobsDir = clientId
+    ? path.join(agenticOsDir, "clients", clientId, "cron", "jobs")
+    : path.join(agenticOsDir, "cron", "jobs");
+  fs.mkdirSync(jobsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(jobsDir, `${slug}.md`),
+    [
+      "---",
+      `name: ${slug}`,
+      "time: 00:00",
+      "days: daily",
+      "active: true",
+      "model: sonnet",
+      "timeout: 30s",
+      "retry: 0",
+      "---",
+      "",
+      prompt,
+      "",
+    ].join("\n"),
+    "utf-8"
+  );
+}
+
 test("buildRecoveredCronRunUpdate preserves inferred recovery truth", () => {
   const recovery = cronRuntime.buildRecoveredCronRunUpdate("recovered_from_stuck_needs_input", {
     durationMs: 4500,
@@ -158,10 +196,56 @@ test("completeCronRunForTask updates the existing running row instead of inserti
   }
 });
 
+test("buildCronClaudeArgs keeps root cron runs on the broad bypass path", () => {
+  const args = cronRuntime.buildCronClaudeArgs(
+    {
+      prompt: "Run the root cron job",
+      model: "sonnet",
+    },
+    {
+      clientId: null,
+      workspaceDir: "C:\\agentic-os",
+    }
+  );
+
+  assert.deepEqual(args, [
+    "-p",
+    "Run the root cron job",
+    "--model",
+    "sonnet",
+    "--dangerously-skip-permissions",
+  ]);
+});
+
+test("buildCronClaudeArgs scopes client cron runs to dontAsk and --add-dir without bypass", () => {
+  const workspaceDir = "C:\\agentic-os\\clients\\acme";
+  const args = cronRuntime.buildCronClaudeArgs(
+    {
+      prompt: "Run the client cron job",
+      model: "sonnet",
+    },
+    {
+      clientId: "acme",
+      workspaceDir,
+    }
+  );
+
+  assert.deepEqual(args, [
+    "-p",
+    "Run the client cron job",
+    "--model",
+    "sonnet",
+    "--permission-mode",
+    "dontAsk",
+    "--add-dir",
+    workspaceDir,
+  ]);
+  assert.equal(args.includes("--dangerously-skip-permissions"), false);
+});
+
 test("scheduled retry attempts are capped at exactly twice even when retry is higher", async () => {
   const workspaceDir = makeTempWorkspace();
   const jobsDir = path.join(workspaceDir, "cron", "jobs");
-  const wrapperPath = path.join(workspaceDir, "fake-claude.cmd");
   const attemptsPath = path.join(workspaceDir, "attempt-count.txt");
   const scheduledFor = new Date().toISOString();
   const originalClaudeBin = process.env.AGENTIC_OS_CLAUDE_BIN;
@@ -187,19 +271,28 @@ test("scheduled retry attempts are capped at exactly twice even when retry is hi
       ].join("\n"),
       "utf-8"
     );
-    fs.writeFileSync(
-      wrapperPath,
-      [
-        "@echo off",
-        "setlocal EnableDelayedExpansion",
-        "set COUNT=0",
-        "if exist attempt-count.txt set /p COUNT=<attempt-count.txt",
-        "set /a COUNT+=1",
-        "> attempt-count.txt echo !COUNT!",
-        "exit /b 1",
-        "",
-      ].join("\r\n"),
-      "utf-8"
+    const wrapperPath = createFakeClaudeCommand(
+      workspaceDir,
+      "fake-claude",
+      process.platform === "win32"
+        ? [
+            "@echo off",
+            "setlocal EnableDelayedExpansion",
+            "set COUNT=0",
+            "if exist attempt-count.txt set /p COUNT=<attempt-count.txt",
+            "set /a COUNT+=1",
+            "> attempt-count.txt echo !COUNT!",
+            "exit /b 1",
+            "",
+          ]
+        : [
+            "set -e",
+            "COUNT=0",
+            "if [ -f attempt-count.txt ]; then COUNT=$(cat attempt-count.txt); fi",
+            "COUNT=$((COUNT + 1))",
+            "printf '%s\\n' \"$COUNT\" > attempt-count.txt",
+            "exit 1",
+          ]
     );
 
     process.env.AGENTIC_OS_CLAUDE_BIN = wrapperPath;
@@ -221,6 +314,120 @@ test("scheduled retry attempts are capped at exactly twice even when retry is hi
     assert.equal(attempts, 2);
     assert.equal(cronRun.result, "failure");
     assert.equal(cronRun.trigger, "scheduled");
+  } finally {
+    if (originalClaudeBin === undefined) {
+      delete process.env.AGENTIC_OS_CLAUDE_BIN;
+    } else {
+      process.env.AGENTIC_OS_CLAUDE_BIN = originalClaudeBin;
+    }
+    cleanupTempWorkspace(workspaceDir);
+  }
+});
+
+test("client cron runs fail when they touch files outside the selected workspace", async () => {
+  const workspaceDir = makeTempWorkspace();
+  const clientId = "acme";
+  const clientDir = path.join(workspaceDir, "clients", clientId);
+  const originalClaudeBin = process.env.AGENTIC_OS_CLAUDE_BIN;
+  const scheduledFor = new Date().toISOString();
+
+  try {
+    fs.writeFileSync(path.join(workspaceDir, "AGENTS.md"), "# root workspace\n", "utf-8");
+    fs.mkdirSync(clientDir, { recursive: true });
+    fs.writeFileSync(path.join(clientDir, "AGENTS.md"), "# client workspace\n", "utf-8");
+    writeCronJob(workspaceDir, clientId, "client-leak-job", "Write outside the workspace.");
+
+    const wrapperPath = createFakeClaudeCommand(workspaceDir, "client-leak-claude", process.platform === "win32"
+      ? [
+          "@echo off",
+          "setlocal",
+          "> ..\\..\\root-leak.txt echo leaked",
+          "exit /b 0",
+          "",
+        ]
+      : [
+          "set -e",
+          "printf 'leaked\\n' > ../../root-leak.txt",
+          "exit 0",
+        ]);
+    process.env.AGENTIC_OS_CLAUDE_BIN = wrapperPath;
+
+    const job = cronRuntime.getCronJob(workspaceDir, "client-leak-job", clientId);
+    const queued = cronRuntime.enqueueCronJob(workspaceDir, job, {
+      trigger: "manual",
+      dedupeByMinute: false,
+      scheduledFor,
+    });
+
+    const result = await cronRuntime.executeCronTask(workspaceDir, queued.task.id);
+    const taskRow = cronRuntime
+      .getDb(workspaceDir)
+      .prepare("SELECT status, errorMessage FROM tasks WHERE id = ?")
+      .get(queued.task.id);
+
+    assert.equal(result.result, "failure");
+    assert.equal(taskRow.status, "review");
+    assert.match(taskRow.errorMessage, /outside its workspace/);
+    assert.match(taskRow.errorMessage, /root-leak\.txt/);
+    assert.equal(fs.existsSync(path.join(workspaceDir, "root-leak.txt")), true);
+  } finally {
+    if (originalClaudeBin === undefined) {
+      delete process.env.AGENTIC_OS_CLAUDE_BIN;
+    } else {
+      process.env.AGENTIC_OS_CLAUDE_BIN = originalClaudeBin;
+    }
+    cleanupTempWorkspace(workspaceDir);
+  }
+});
+
+test("client cron runs allow writes anywhere inside the selected client workspace", async () => {
+  const workspaceDir = makeTempWorkspace();
+  const clientId = "acme";
+  const clientDir = path.join(workspaceDir, "clients", clientId);
+  const safeOutputPath = path.join(clientDir, "projects", "safe-note.txt");
+  const originalClaudeBin = process.env.AGENTIC_OS_CLAUDE_BIN;
+  const scheduledFor = new Date().toISOString();
+
+  try {
+    fs.writeFileSync(path.join(workspaceDir, "AGENTS.md"), "# root workspace\n", "utf-8");
+    fs.mkdirSync(clientDir, { recursive: true });
+    fs.writeFileSync(path.join(clientDir, "AGENTS.md"), "# client workspace\n", "utf-8");
+    writeCronJob(workspaceDir, clientId, "client-safe-job", "Write inside the workspace.");
+
+    const wrapperPath = createFakeClaudeCommand(workspaceDir, "client-safe-claude", process.platform === "win32"
+      ? [
+          "@echo off",
+          "setlocal",
+          "if not exist projects mkdir projects",
+          "> projects\\safe-note.txt echo safe",
+          "exit /b 0",
+          "",
+        ]
+      : [
+          "set -e",
+          "mkdir -p projects",
+          "printf 'safe\\n' > projects/safe-note.txt",
+          "exit 0",
+        ]);
+    process.env.AGENTIC_OS_CLAUDE_BIN = wrapperPath;
+
+    const job = cronRuntime.getCronJob(workspaceDir, "client-safe-job", clientId);
+    const queued = cronRuntime.enqueueCronJob(workspaceDir, job, {
+      trigger: "manual",
+      dedupeByMinute: false,
+      scheduledFor,
+    });
+
+    const result = await cronRuntime.executeCronTask(workspaceDir, queued.task.id);
+    const taskRow = cronRuntime
+      .getDb(workspaceDir)
+      .prepare("SELECT status, errorMessage FROM tasks WHERE id = ?")
+      .get(queued.task.id);
+
+    assert.equal(result.result, "success");
+    assert.equal(taskRow.status, "done");
+    assert.equal(taskRow.errorMessage, null);
+    assert.equal(fs.existsSync(safeOutputPath), true);
   } finally {
     if (originalClaudeBin === undefined) {
       delete process.env.AGENTIC_OS_CLAUDE_BIN;
