@@ -230,3 +230,94 @@ test("scheduled retry attempts are capped at exactly twice even when retry is hi
     cleanupTempWorkspace(workspaceDir);
   }
 });
+
+test("resolveWindowsClaudeLaunchPlan keeps plain claude and exe paths on the direct launch path", () => {
+  const bashPath = path.join(os.tmpdir(), "cron-runtime-test-bash.exe");
+
+  try {
+    fs.writeFileSync(bashPath, "", "utf-8");
+    cronRuntime.setCronRuntimeTestHooks({
+      findCommandOnPath(command) {
+        if (command === "claude" || command === "claude.exe") {
+          return "C:\\Users\\gmsal\\.local\\bin\\claude.exe";
+        }
+        if (command === "bash.exe" || command === "bash") {
+          return bashPath;
+        }
+        return null;
+      },
+    });
+
+    const plainPlan = cronRuntime.resolveWindowsClaudeLaunchPlan({
+      claudeCommand: "claude",
+      env: {},
+    });
+    const exePlan = cronRuntime.resolveWindowsClaudeLaunchPlan({
+      claudeCommand: "C:\\Users\\gmsal\\.local\\bin\\claude.exe",
+      env: {},
+    });
+
+    assert.equal(plainPlan.mode, "direct");
+    assert.equal(plainPlan.env.CLAUDE_CODE_GIT_BASH_PATH, bashPath);
+    assert.equal(exePlan.mode, "direct");
+    assert.equal(exePlan.command, "C:\\Users\\gmsal\\.local\\bin\\claude.exe");
+  } finally {
+    cronRuntime.resetCronRuntimeTestHooks();
+    fs.rmSync(bashPath, { force: true });
+  }
+});
+
+test("resolveWindowsClaudeLaunchPlan uses the wrapper path for .cmd overrides", () => {
+  const bashPath = path.join(os.tmpdir(), "cron-runtime-test-wrapper-bash.exe");
+
+  try {
+    fs.writeFileSync(bashPath, "", "utf-8");
+    cronRuntime.setCronRuntimeTestHooks({
+      findCommandOnPath(command) {
+        if (command === "bash.exe" || command === "bash") {
+          return bashPath;
+        }
+        return null;
+      },
+    });
+
+    const launchPlan = cronRuntime.resolveWindowsClaudeLaunchPlan({
+      claudeCommand: "C:\\tools\\fake-claude.cmd",
+      env: {},
+    });
+
+    assert.equal(launchPlan.mode, "wrapper");
+    assert.equal(launchPlan.extension, ".cmd");
+    assert.equal(launchPlan.env.CLAUDE_CODE_GIT_BASH_PATH, bashPath);
+  } finally {
+    cronRuntime.resetCronRuntimeTestHooks();
+    fs.rmSync(bashPath, { force: true });
+  }
+});
+
+test("resolveGitBashPath preserves CLAUDE_CODE_GIT_BASH_PATH or discovers bash.exe", () => {
+  const discoveredBashPath = path.join(os.tmpdir(), "cron-runtime-test-discovered-bash.exe");
+
+  try {
+    fs.writeFileSync(discoveredBashPath, "", "utf-8");
+    cronRuntime.setCronRuntimeTestHooks({
+      findCommandOnPath(command) {
+        if (command === "bash.exe" || command === "bash") {
+          return discoveredBashPath;
+        }
+        return null;
+      },
+    });
+
+    assert.equal(
+      cronRuntime.resolveGitBashPath({
+        CLAUDE_CODE_GIT_BASH_PATH: "C:\\Custom\\Git\\bin\\bash.exe",
+      }),
+      "C:\\Custom\\Git\\bin\\bash.exe"
+    );
+    assert.equal(cronRuntime.resolveGitBashPath({}), discoveredBashPath);
+  } finally {
+    cronRuntime.resetCronRuntimeTestHooks();
+    fs.rmSync(discoveredBashPath, { force: true });
+  }
+});
