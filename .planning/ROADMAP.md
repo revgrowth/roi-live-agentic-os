@@ -46,7 +46,7 @@ This roadmap restores the cron regressions in the current Agentic OS workspace w
   1. A client cron job resolves its working scope to the selected client folder only.
   2. A client cron job cannot read or enumerate files outside its allowed client workspace during prompt preparation or execution.
   3. Files created by a client cron job land only inside allowed directories for that client workspace.
-**Plans**: TBD
+**Plans**: 03-01, 03-02
 
 ### Phase 4: Baseline Preservation & Regression Validation
 **Goal**: Verify that the fixes preserve the current feature baseline and do not break root workspace cron behavior.
@@ -70,5 +70,5 @@ This roadmap restores the cron regressions in the current Agentic OS workspace w
 |-------|----------------|--------|-----------|
 | 1. Run Truth & Regression Forensics | 2/2 | Complete | 2026-04-14 |
 | 2. Quiet Windows Background Execution | 2/2 | Complete | 2026-04-14 |
-| 3. Client Workspace Containment | 0/TBD | Not started | - |
+| 3. Client Workspace Containment | 0/2 | Planned | - |
 | 4. Baseline Preservation & Regression Validation | 0/TBD | Not started | - |
