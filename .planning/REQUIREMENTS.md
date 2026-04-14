@@ -21,9 +21,9 @@ Requirements for the recovery release in this workspace. Each maps to roadmap ph
 
 ### Client Workspace Containment
 
-- [ ] **CLNT-01**: A client cron job resolves its working scope to the selected client workspace instead of the repo root
-- [ ] **CLNT-02**: A client cron job cannot read or enumerate files outside its allowed client workspace during prompt preparation or execution
-- [ ] **CLNT-03**: Files created by a client cron job are written only inside allowed directories for that client workspace
+- [x] **CLNT-01**: A client cron job resolves its working scope to the selected client workspace instead of the repo root
+- [x] **CLNT-02**: A client cron job cannot read or enumerate files outside its allowed client workspace during prompt preparation or execution
+- [x] **CLNT-03**: Files created by a client cron job are written only inside allowed directories for that client workspace
 
 ### Regression Safety
 
@@ -64,9 +64,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WIN-01 | Phase 2 | Complete |
 | WIN-02 | Phase 2 | Complete |
 | WIN-03 | Phase 2 | Complete |
-| CLNT-01 | Phase 3 | Pending |
-| CLNT-02 | Phase 3 | Pending |
-| CLNT-03 | Phase 3 | Pending |
+| CLNT-01 | Phase 3 | Complete |
+| CLNT-02 | Phase 3 | Complete |
+| CLNT-03 | Phase 3 | Complete |
 | SAFE-01 | Phase 4 | Pending |
 | SAFE-02 | Phase 4 | Pending |
 | SAFE-03 | Phase 1 | Complete |
@@ -78,4 +78,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-13*
-*Last updated: 2026-04-14 after Phase 2 completion*
+*Last updated: 2026-04-14 after Phase 3 completion*

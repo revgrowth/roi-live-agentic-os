@@ -12,7 +12,7 @@ This roadmap restores the cron regressions in the current Agentic OS workspace w
 
 - [x] **Phase 1: Run Truth & Regression Forensics** - Identify the concrete regression path and restore single execution per scheduled cron trigger.
 - [x] **Phase 2: Quiet Windows Background Execution** - Return Windows daemon-driven cron execution to hidden background behavior.
-- [ ] **Phase 3: Client Workspace Containment** - Re-establish strict client-only visibility and writes for client cron jobs.
+- [x] **Phase 3: Client Workspace Containment** - Re-establish strict client-only visibility and writes for client cron jobs.
 - [ ] **Phase 4: Baseline Preservation & Regression Validation** - Prove the recovered branch keeps the current feature baseline and root cron behavior intact.
 
 ## Phase Details
@@ -46,7 +46,7 @@ This roadmap restores the cron regressions in the current Agentic OS workspace w
   1. A client cron job resolves its working scope to the selected client folder only.
   2. A client cron job cannot read or enumerate files outside its allowed client workspace during prompt preparation or execution.
   3. Files created by a client cron job land only inside allowed directories for that client workspace.
-**Plans**: 03-01, 03-02
+**Plans**: 2/2 plans complete
 
 ### Phase 4: Baseline Preservation & Regression Validation
 **Goal**: Verify that the fixes preserve the current feature baseline and do not break root workspace cron behavior.
@@ -70,5 +70,5 @@ This roadmap restores the cron regressions in the current Agentic OS workspace w
 |-------|----------------|--------|-----------|
 | 1. Run Truth & Regression Forensics | 2/2 | Complete | 2026-04-14 |
 | 2. Quiet Windows Background Execution | 2/2 | Complete | 2026-04-14 |
-| 3. Client Workspace Containment | 0/2 | Planned | - |
+| 3. Client Workspace Containment | 2/2 | Complete | 2026-04-14 |
 | 4. Baseline Preservation & Regression Validation | 0/TBD | Not started | - |

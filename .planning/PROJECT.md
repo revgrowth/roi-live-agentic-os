@@ -21,10 +21,11 @@ Cron jobs must run once, invisibly in the background on Windows, and only within
 - ✓ Retry and completion behavior now follow one runtime-owned path, and the concrete regression drift is documented from the trusted references — validated in Phase 1
 - ✓ Windows cron start now returns immediately and scheduled Windows cron runs use the hidden direct Claude path again for the normal `claude` / `.exe` case — validated in Phase 2
 - ✓ Hidden Windows cron outcomes now keep status, logs, and desktop notifications aligned, including execution-blocking failures — validated in Phase 2
+- ✓ Client cron runs now launch with a real client-only Claude boundary instead of inheriting root bypass permissions — validated in Phase 3
+- ✓ Client cron runs now fail clearly if they touch files outside their own client workspace, while still allowing writes anywhere inside that client folder — validated in Phase 3
 
 ### Active
 
-- [ ] A client cron job can only see and act inside its own client folder rather than the whole repository
 - [ ] Regression fixes are applied in this folder without removing or breaking the newer features already present here
 
 ### Out of Scope
@@ -59,6 +60,8 @@ This repository is a brownfield Agentic OS workspace with an existing codebase m
 | Use one runtime-owned cron completion helper | Split completion ownership caused drift in run history and retry truth | ✓ Good |
 | Restore Windows cron launches to a direct hidden Claude path for normal runs | The PowerShell wrapper became the main Windows regression drift from the trusted references | ✓ Good |
 | Surface blocking Windows cron failures through the same finalization path as normal completions | Hidden background runs must not fail silently | ✓ Good |
+| Client cron runs must carry their own Claude launch boundary | Prompt text alone was too weak to stop cross-workspace access | ✓ Good |
+| Outside-workspace client mutations must fail through the normal cron failure path | Boundary breaks need truthful status, logs, and notifications | ✓ Good |
 
 ## Evolution
 
@@ -78,4 +81,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-14 after Phase 2 completion*
+*Last updated: 2026-04-14 after Phase 3 completion*
