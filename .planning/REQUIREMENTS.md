@@ -1,63 +1,56 @@
-# Requirements: Cron Jobs Hardening
+# Requirements: Cron Jobs Hardening Recovery
 
-**Defined:** 2026-04-13  
-**Core Value:** Cron jobs must feel reliable, understandable, and safely contained whether they run from the root workspace or from a client workspace.
+**Defined:** 2026-04-13
+**Core Value:** Cron jobs must run once, invisibly in the background on Windows, and only within the correct workspace boundary without breaking the features that already work in this folder.
 
 ## v1 Requirements
 
-### CLI Experience
+Requirements for the recovery release in this workspace. Each maps to roadmap phases.
 
-- [ ] **CLI-01**: User can start the cron daemon from the CLI and immediately understand whether a daemon was started, already running, or blocked by another runtime state
-- [ ] **CLI-02**: User can inspect cron status from the CLI through structured, human-friendly output that shows runtime owner, leader state, PID, heartbeat freshness, and workspace count
-- [ ] **CLI-03**: User can inspect daemon logs from the CLI through readable output with clear headings, recent context, and file path hints
-- [ ] **CLI-04**: User can stop the cron daemon from the CLI and immediately understand what changed
+### Execution Integrity
 
-### Runtime Ownership
-
-- [ ] **OWNR-01**: User can tell whether cron scheduling is currently owned by the CLI daemon, the in-process UI runtime, or neither
-- [ ] **OWNR-02**: User sees consistent ownership state in both the CLI and the UI for the same workspace
-- [ ] **OWNR-03**: User does not get duplicate scheduled cron execution when the CLI daemon and UI server are both running
-- [ ] **OWNR-04**: User can understand when a cron run was skipped because another run or runtime already owned execution
+- [ ] **EXEC-01**: A single scheduled cron trigger creates exactly one underlying prompt execution
+- [ ] **EXEC-02**: A single scheduled cron run produces exactly one assistant reply sequence in its chat history
+- [ ] **EXEC-03**: Recovery or retry paths do not re-run the same scheduled prompt unless the rerun is explicitly requested
 
 ### Windows Background Execution
 
-- [ ] **WIN-01**: User can start the CLI daemon on Windows without a visible terminal window appearing
-- [ ] **WIN-02**: User can let a daemon-triggered cron job run on Windows without visible terminal popups during execution
-- [ ] **WIN-03**: Windows hidden-background behavior preserves daemon logging, status reporting, and clean stop behavior
+- [ ] **WIN-01**: User can start background cron execution on Windows without visible PowerShell windows opening
+- [ ] **WIN-02**: Scheduled Windows cron runs stay hidden during execution instead of showing PowerShell popups
+- [ ] **WIN-03**: Hidden Windows cron runs still preserve usable status, logs, and stop behavior
 
-### Client Isolation
+### Client Workspace Containment
 
-- [ ] **CLNT-01**: User can run a client cron job and have it execute inside the selected client workspace, not the root workspace
-- [ ] **CLNT-02**: User can run a client cron job and have any generated outputs land only inside allowed directories of that client workspace
-- [ ] **CLNT-03**: User can view client cron logs and status files only inside that client's workspace and history views
-- [ ] **CLNT-04**: User can inspect root and client cron jobs with the same slug without the UI mixing their state, history, or controls
-- [ ] **CLNT-05**: User can run, edit, toggle, delete, and inspect a cron job in the UI while the selected client scope is preserved end to end
-- [ ] **CLNT-06**: Generated client cron wrappers correctly target the shared root runtime while preserving the selected client workspace for execution
+- [ ] **CLNT-01**: A client cron job resolves its working scope to the selected client workspace instead of the repo root
+- [ ] **CLNT-02**: A client cron job cannot read or enumerate files outside its allowed client workspace during prompt preparation or execution
+- [ ] **CLNT-03**: Files created by a client cron job are written only inside allowed directories for that client workspace
 
-### Safety and Verification
+### Regression Safety
 
-- [ ] **SAFE-01**: User gets a visible warning or failure state if a client cron run writes outside the selected client workspace
-- [ ] **SAFE-02**: User can trust cron run history because interrupted or partially recovered runs are not silently reported as successful
-- [ ] **SAFE-03**: Regression coverage exists for root-vs-client execution, same-slug isolation, runtime leadership, and Windows hidden execution behavior
+- [ ] **SAFE-01**: Existing cron-related features that already work in this folder continue working after the recovery changes
+- [ ] **SAFE-02**: Root workspace cron behavior still works after the client containment fixes are applied
+- [ ] **SAFE-03**: The recovery work records the concrete code path or merge difference that caused each regression, using the trusted reference folders when needed
 
 ## v2 Requirements
 
-### Convenience Improvements
+Deferred improvements beyond the immediate recovery scope.
 
-- **CONV-01**: User can create or edit cron jobs through natural-language guidance
-- **CONV-02**: User can duplicate or template common cron job setups
-- **CONV-03**: User can preview when a schedule will run before saving
-- **CONV-04**: User can inspect richer cross-workspace summaries and cost analytics for cron jobs
+### Cron UX
+
+- **CRONUX-01**: CLI cron commands present richer, easier-to-scan summaries for non-technical users
+- **CRONUX-02**: Runtime ownership between UI and daemon is surfaced more clearly across all cron views
 
 ## Out of Scope
 
+Explicitly excluded. Documented to prevent scope creep.
+
 | Feature | Reason |
 |---------|--------|
-| Replacing the cron system with an OS scheduler | Preserve the existing shared runtime model |
-| Building a cloud or remote cron service | This project is limited to the local Agentic OS runtime |
-| Broad redesign of the full task system | This stream is specifically about cron behavior and cron UX |
-| Full visual automation builder | Too large for a hardening stream |
-| Deep performance analytics | Nice to have later, not required for trust and containment |
+| Full cron architecture rewrite | Recovery should preserve the current architecture where possible |
+| Treating `merge-lab` as the target implementation | It is only a secondary diagnostic reference |
+| Rolling this folder back to an older snapshot | The user wants to keep the newer features already present here |
+| Broad non-cron refactors across the repo | Only supporting fixes required for the regressions should be included |
+| New cloud or OS-native scheduler backends | Not needed to restore the broken local behavior |
 
 ## Traceability
 
@@ -65,32 +58,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CLI-01 | Phase 5 | Pending |
-| CLI-02 | Phase 5 | Pending |
-| CLI-03 | Phase 5 | Pending |
-| CLI-04 | Phase 5 | Pending |
-| OWNR-01 | Phase 1 | Pending |
-| OWNR-02 | Phase 1 | Pending |
-| OWNR-03 | Phase 1 | Pending |
-| OWNR-04 | Phase 1 | Pending |
-| WIN-01 | Phase 4 | Pending |
-| WIN-02 | Phase 4 | Pending |
-| WIN-03 | Phase 4 | Pending |
-| CLNT-01 | Phase 2 | Pending |
-| CLNT-02 | Phase 2 | Pending |
-| CLNT-03 | Phase 3 | Pending |
-| CLNT-04 | Phase 3 | Pending |
-| CLNT-05 | Phase 3 | Pending |
-| CLNT-06 | Phase 2 | Pending |
-| SAFE-01 | Phase 2 | Pending |
-| SAFE-02 | Phase 1 | Pending |
-| SAFE-03 | Phase 6 | Pending |
+| EXEC-01 | TBD | Pending |
+| EXEC-02 | TBD | Pending |
+| EXEC-03 | TBD | Pending |
+| WIN-01 | TBD | Pending |
+| WIN-02 | TBD | Pending |
+| WIN-03 | TBD | Pending |
+| CLNT-01 | TBD | Pending |
+| CLNT-02 | TBD | Pending |
+| CLNT-03 | TBD | Pending |
+| SAFE-01 | TBD | Pending |
+| SAFE-02 | TBD | Pending |
+| SAFE-03 | TBD | Pending |
 
 **Coverage:**
-- v1 requirements: 20 total
-- Mapped to phases: 20
-- Unmapped: 0 ✅
+- v1 requirements: 12 total
+- Mapped to phases: 0
+- Unmapped: 12 ⚠️
 
 ---
-*Requirements defined: 2026-04-13*  
+*Requirements defined: 2026-04-13*
 *Last updated: 2026-04-13 after initial definition*
