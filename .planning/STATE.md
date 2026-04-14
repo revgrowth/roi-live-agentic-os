@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: ready
-stopped_at: Phase 3 completed
-last_updated: "2026-04-14T04:33:58.820Z"
-last_activity: 2026-04-14 -- Phase 03 completed
+stopped_at: Phase 4 context captured
+last_updated: "2026-04-14T01:42:30.7873878-03:00"
+last_activity: 2026-04-14 -- Phase 04 context captured
 progress:
   total_phases: 4
   completed_phases: 3
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-14)
 
 ## Current Position
 
-Phase: 04 (baseline-preservation-&-regression-validation) — READY TO DISCUSS
+Phase: 04 (baseline-preservation-&-regression-validation) — READY TO PLAN
 Plan: TBD
-Status: Phase 03 completed and verified
-Last activity: 2026-04-14 -- Phase 03 completed
+Status: Phase 04 context captured
+Last activity: 2026-04-14 -- Phase 04 context captured
 
 Progress: [███████░░░] 75%
 
@@ -70,6 +70,9 @@ Recent decisions affecting current work:
 - Client cron jobs must not fall back to reading root-only workspace files.
 - Client cron runs now use a real client-only Claude launch boundary instead of the root bypass path.
 - Outside-workspace client writes now fail through the shared cron outcome path.
+- Phase 4 baseline scope is limited to the repaired cron behaviors rather than a broader app sweep.
+- Root workspace proof for Phase 4 should come from automated tests only.
+- Reference drift should only be changed when the current behavior is not the desired behavior.
 
 ### Pending Todos
 
@@ -77,11 +80,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- Phase 4 still needs to confirm that the new client containment does not break the broader current baseline or root cron behavior.
+- Phase 4 still needs planning and execution to prove that the repaired cron behavior stays intact and that root cron behavior still works after containment.
 - The repo has unrelated local changes, so implementation should avoid touching unrelated work.
 
 ## Session Continuity
 
-Last session: 2026-04-14T04:33:58.820Z
-Stopped at: Phase 3 completed
-Resume file: .planning/phases/03-client-workspace-containment/03-VERIFICATION.md
+Last session: 2026-04-14T01:42:30.7873878-03:00
+Stopped at: Phase 4 context captured
+Resume file: .planning/phases/04-baseline-preservation-regression-validation/04-CONTEXT.md
