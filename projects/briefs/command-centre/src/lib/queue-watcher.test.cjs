@@ -106,6 +106,67 @@ test("initQueueWatcher skips queued cron tasks when the daemon is already the le
   }
 });
 
+test("initQueueWatcher only dispatches one start when task:created and task:status both arrive", async () => {
+  const workspaceDir = makeTempWorkspace();
+  const db = cronRuntime.getDb(workspaceDir);
+  const listeners = [];
+  const executeCalls = [];
+  const activeTaskIds = new Set();
+  const originalSetInterval = global.setInterval;
+
+  try {
+    global.setInterval = () => ({ unref() {} });
+
+    const { initQueueWatcher } = loadQueueWatcherModule({
+      "./db": { getDb: () => db },
+      "./event-bus": {
+        emitTaskEvent: () => {},
+        onTaskEvent: (listener) => {
+          listeners.push(listener);
+        },
+      },
+      "./process-manager": {
+        processManager: {
+          executeTask: async (taskId) => {
+            executeCalls.push(taskId);
+            activeTaskIds.add(taskId);
+          },
+          hasActiveSession: (taskId) => activeTaskIds.has(taskId),
+        },
+      },
+      "./cron-system-status": {
+        getCronSystemStatus: () => ({ runtime: "in-process" }),
+      },
+      "./cron-scheduler": {
+        getInProcessCronRuntimeIdentifier: () => "in-process-test",
+      },
+    });
+
+    initQueueWatcher();
+    assert.equal(listeners.length, 1);
+
+    const queuedTaskEvent = {
+      timestamp: new Date().toISOString(),
+      task: {
+        id: "task-double-event",
+        status: "queued",
+        cronJobSlug: "test-job",
+      },
+    };
+
+    listeners[0]({ type: "task:created", ...queuedTaskEvent });
+    listeners[0]({ type: "task:status", ...queuedTaskEvent });
+
+    await Promise.resolve();
+
+    assert.deepEqual(executeCalls, ["task-double-event"]);
+  } finally {
+    global.setInterval = originalSetInterval;
+    db.close();
+    cleanupTempWorkspace(workspaceDir);
+  }
+});
+
 test("initQueueWatcher records inferred recovery for terminal cron rows instead of success", async () => {
   const workspaceDir = makeTempWorkspace();
   const db = cronRuntime.getDb(workspaceDir);
