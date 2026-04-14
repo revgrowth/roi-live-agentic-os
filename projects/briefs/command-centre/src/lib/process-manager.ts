@@ -39,6 +39,8 @@ class ProcessManager {
   private lastProgressEmit = new Map<string, number>();
   /** Track which tasks are waiting for user reply (process exited, awaiting --continue) */
   private waitingForReply = new Set<string>();
+  /** Track tasks that have claimed execution before a live Claude session exists */
+  private startingTasks = new Set<string>();
 
   constructor() {
     const cleanup = () => this.cleanup();
@@ -65,7 +67,11 @@ class ProcessManager {
 
   /** Check if this task has an active in-memory session (managed by processManager) */
   hasActiveSession(taskId: string): boolean {
-    return this.sessions.has(taskId) || this.waitingForReply.has(taskId);
+    return (
+      this.sessions.has(taskId) ||
+      this.waitingForReply.has(taskId) ||
+      this.startingTasks.has(taskId)
+    );
   }
 
   /**
@@ -74,309 +80,318 @@ class ProcessManager {
   async executeTask(taskId: string): Promise<void> {
     console.log(`[process-manager] executeTask called for ${taskId}`);
 
-    if (this.sessions.has(taskId)) {
+    if (this.hasActiveSession(taskId)) {
       console.warn(`[process-manager] Task ${taskId} is already running, skipping`);
       return;
     }
 
-    const db = getDb();
-    const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task | undefined;
+    this.startingTasks.add(taskId);
 
-    if (!task) {
-      console.error(`[process-manager] Task ${taskId} not found in database`);
-      return;
-    }
+    try {
+      const db = getDb();
+      const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task | undefined;
 
-    // If this is a parent task that already has children (subtasks were created
-    // at goal-entry time by scope-goal), don't execute the parent itself.
-    // Just set it to "running" and let the auto-queue system manage children.
-    if (!task.parentId && (task.level === "project" || task.level === "task")) {
-      const childCount = db.prepare(
-        "SELECT COUNT(*) as count FROM tasks WHERE parentId = ?"
-      ).get(taskId) as { count: number };
+      if (!task) {
+        console.error(`[process-manager] Task ${taskId} not found in database`);
+        return;
+      }
 
-      if (childCount.count > 0) {
-        const now = new Date().toISOString();
-        const backlogChildren = db.prepare(
-          "SELECT * FROM tasks WHERE parentId = ? AND status = 'backlog' ORDER BY columnOrder ASC"
-        ).all(taskId) as Task[];
+      const now = new Date().toISOString();
 
-        // Queue the first child(ren)
-        if (backlogChildren.length > 0) {
-          const hasDeps = backlogChildren.some(c => {
-            const match = c.description?.match(/\[depends_on:\s*([\d,\s]+)\]\s*$/);
-            return match ? match[1].split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n)).length > 0 : false;
-          });
+      const claimed = db.prepare(
+        "UPDATE tasks SET status = ?, startedAt = COALESCE(startedAt, ?), updatedAt = ?, activityLabel = ?, errorMessage = NULL, needsInput = 0 WHERE id = ? AND status = 'queued'"
+      ).run("running", now, now, "Starting Claude session...", taskId);
 
-          if (hasDeps) {
-            // Queue all independent children (no dependencies)
-            for (const child of backlogChildren) {
-              const depMatch = child.description?.match(/\[depends_on:\s*([\d,\s]+)\]\s*$/);
-              const deps = depMatch ? depMatch[1].split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n)) : [];
-              if (deps.length === 0) {
-                db.prepare("UPDATE tasks SET status = 'queued', updatedAt = ? WHERE id = ?").run(now, child.id);
-                const updatedChild = db.prepare("SELECT * FROM tasks WHERE id = ?").get(child.id) as Task;
-                emitTaskEvent({ type: "task:status", task: { ...updatedChild, needsInput: Boolean(updatedChild.needsInput) }, timestamp: now });
+      if (!claimed.changes) {
+        console.warn(`[process-manager] Task ${taskId} is no longer queued, skipping duplicate start`);
+        return;
+      }
+
+      // If this is a parent task that already has children (subtasks were created
+      // at goal-entry time by scope-goal), don't execute the parent itself.
+      // Just set it to "running" and let the auto-queue system manage children.
+      if (!task.parentId && (task.level === "project" || task.level === "task")) {
+        const childCount = db.prepare(
+          "SELECT COUNT(*) as count FROM tasks WHERE parentId = ?"
+        ).get(taskId) as { count: number };
+
+        if (childCount.count > 0) {
+          const backlogChildren = db.prepare(
+            "SELECT * FROM tasks WHERE parentId = ? AND status = 'backlog' ORDER BY columnOrder ASC"
+          ).all(taskId) as Task[];
+
+          // Queue the first child(ren)
+          if (backlogChildren.length > 0) {
+            const hasDeps = backlogChildren.some(c => {
+              const match = c.description?.match(/\[depends_on:\s*([\d,\s]+)\]\s*$/);
+              return match ? match[1].split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n)).length > 0 : false;
+            });
+
+            if (hasDeps) {
+              // Queue all independent children (no dependencies)
+              for (const child of backlogChildren) {
+                const depMatch = child.description?.match(/\[depends_on:\s*([\d,\s]+)\]\s*$/);
+                const deps = depMatch ? depMatch[1].split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n)) : [];
+                if (deps.length === 0) {
+                  db.prepare("UPDATE tasks SET status = 'queued', updatedAt = ? WHERE id = ?").run(now, child.id);
+                  const updatedChild = db.prepare("SELECT * FROM tasks WHERE id = ?").get(child.id) as Task;
+                  emitTaskEvent({ type: "task:status", task: { ...updatedChild, needsInput: Boolean(updatedChild.needsInput) }, timestamp: now });
+                }
               }
+            } else {
+              // Sequential: queue first child only
+              const first = backlogChildren[0];
+              db.prepare("UPDATE tasks SET status = 'queued', updatedAt = ? WHERE id = ?").run(now, first.id);
+              const updatedFirst = db.prepare("SELECT * FROM tasks WHERE id = ?").get(first.id) as Task;
+              emitTaskEvent({ type: "task:status", task: { ...updatedFirst, needsInput: Boolean(updatedFirst.needsInput) }, timestamp: now });
             }
-          } else {
-            // Sequential: queue first child only
-            const first = backlogChildren[0];
-            db.prepare("UPDATE tasks SET status = 'queued', updatedAt = ? WHERE id = ?").run(now, first.id);
-            const updatedFirst = db.prepare("SELECT * FROM tasks WHERE id = ?").get(first.id) as Task;
-            emitTaskEvent({ type: "task:status", task: { ...updatedFirst, needsInput: Boolean(updatedFirst.needsInput) }, timestamp: now });
           }
-        }
 
-        // Set parent to "running" as a container
-        db.prepare(
-          "UPDATE tasks SET status = 'running', startedAt = ?, updatedAt = ?, activityLabel = ? WHERE id = ?"
-        ).run(now, now, `0/${childCount.count} subtasks done — first task queued`, taskId);
-        const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
-        emitTaskEvent({ type: "task:status", task: { ...updatedParent, needsInput: Boolean(updatedParent.needsInput) }, timestamp: now });
+          // Set parent to "running" as a container
+          db.prepare(
+            "UPDATE tasks SET status = 'running', startedAt = ?, updatedAt = ?, activityLabel = ? WHERE id = ?"
+          ).run(now, now, `0/${childCount.count} subtasks done — first task queued`, taskId);
+          const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
+          emitTaskEvent({ type: "task:status", task: { ...updatedParent, needsInput: Boolean(updatedParent.needsInput) }, timestamp: now });
 
-        console.log(`[process-manager] Task ${taskId} has ${childCount.count} children — running as container, not executing`);
-        return;
-      }
-    }
-
-    const now = new Date().toISOString();
-
-    // Update status to running, clear needsInput
-    db.prepare("UPDATE tasks SET status = ?, startedAt = ?, updatedAt = ?, activityLabel = ?, errorMessage = NULL, needsInput = 0 WHERE id = ?").run(
-      "running", now, now, "Starting Claude session...", taskId
-    );
-
-    // Clear stale log entries from previous runs
-    db.prepare("DELETE FROM task_logs WHERE taskId = ?").run(taskId);
-    // Clear stale output files from previous runs
-    db.prepare("DELETE FROM task_outputs WHERE taskId = ?").run(taskId);
-
-    // Log the user's original goal as the first chat entry.
-    // Use the task description (the full goal text) or fall back to the title.
-    // This ensures the chat shows what the user typed, not the system prompt.
-    const userGoalText = task.description || task.title;
-    this.addLogEntry(taskId, {
-      id: crypto.randomUUID(),
-      type: "user_reply",
-      timestamp: now,
-      content: userGoalText,
-    });
-
-    const updatedTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
-    emitTaskEvent({ type: "task:status", task: this.normalizeTask(updatedTask), timestamp: now });
-
-    // Start file watcher scoped to this task's project
-    try {
-      await fileWatcher.startWatching(taskId, task.projectSlug, task.clientId);
-    } catch (err) {
-      console.error(`[process-manager] fileWatcher.startWatching failed:`, err);
-    }
-
-    // Capture baseline snapshot for diff-aware Files tab
-    try {
-      const fsSnap = require("fs") as typeof import("fs");
-      const pathSnap = require("path") as typeof import("path");
-      const { captureSnapshot } = require("./file-diff") as typeof import("./file-diff");
-      const snapConfig = getConfig();
-      const snapCwd = task.clientId ? getClientAgenticOsDir(task.clientId) : snapConfig.agenticOsDir;
-      if (task.projectSlug) {
-        const projDir = pathSnap.join(snapCwd, "projects", "briefs", task.projectSlug);
-        if (fsSnap.existsSync(projDir)) {
-          const snapshot = captureSnapshot(projDir);
-          db.prepare("UPDATE tasks SET startSnapshot = ? WHERE id = ?").run(JSON.stringify(snapshot), taskId);
+          console.log(`[process-manager] Task ${taskId} has ${childCount.count} children — running as container, not executing`);
+          return;
         }
       }
-    } catch (err) {
-      console.error(`[process-manager] snapshot capture failed:`, err);
-    }
 
-    // Build the initial prompt
-    const config = getConfig();
-    const cwd = task.clientId ? getClientAgenticOsDir(task.clientId) : config.agenticOsDir;
+      // Clear stale log entries from previous runs
+      db.prepare("DELETE FROM task_logs WHERE taskId = ?").run(taskId);
+      // Clear stale output files from previous runs
+      db.prepare("DELETE FROM task_outputs WHERE taskId = ?").run(taskId);
 
-    if (task.clientId) {
-      const fs = await import("fs");
-      if (!fs.existsSync(cwd)) {
-        this.handleTaskError(taskId, `Client directory not found: clients/${task.clientId}`);
-        return;
-      }
-    }
-
-    // Detect available context sources in the working directory
-    const fs = require("fs") as typeof import("fs");
-    const pathMod = require("path") as typeof import("path");
-    const contextSources: { type: string; label: string; path?: string }[] = [];
-
-    // Check for shared instruction files in the working directory
-    const agentsMdPath = pathMod.join(cwd, "AGENTS.md");
-    if (fs.existsSync(agentsMdPath)) {
-      contextSources.push({ type: "system", label: "AGENTS.md", path: "AGENTS.md" });
-    }
-
-    // Check for CLAUDE.md (loaded by Claude CLI and used as the compatibility wrapper)
-    const claudeMdPath = pathMod.join(cwd, "CLAUDE.md");
-    if (fs.existsSync(claudeMdPath)) {
-      contextSources.push({ type: "system", label: "CLAUDE.md", path: "CLAUDE.md" });
-    }
-
-    // Check for SOUL.md and USER.md
-    for (const contextFile of ["SOUL.md", "USER.md", "learnings.md"]) {
-      const filePath = pathMod.join(cwd, "context", contextFile);
-      if (fs.existsSync(filePath)) {
-        contextSources.push({ type: "system", label: contextFile, path: `context/${contextFile}` });
-      }
-    }
-
-    // Check for brand context files
-    const brandDir = pathMod.join(cwd, "brand_context");
-    if (fs.existsSync(brandDir)) {
-      try {
-        const brandFiles = fs.readdirSync(brandDir).filter((f: string) => f.endsWith(".md"));
-        for (const bf of brandFiles) {
-          const fullPath = pathMod.join(brandDir, bf);
-          const stat = fs.statSync(fullPath);
-          if (stat.size > 0) {
-            contextSources.push({ type: "brand", label: bf, path: `brand_context/${bf}` });
-          }
-        }
-      } catch { /* ignore */ }
-    }
-
-    // Build prompt — detect special task types first
-    let prompt = "";
-    const isSlashCommand = task.description?.match(/^Run \/[\w:.-]+/);
-    const taskRow = db.prepare("SELECT gsdStep, phaseNumber FROM tasks WHERE id = ?").get(taskId) as { gsdStep: string | null; phaseNumber: number | null } | undefined;
-    const gsdStep = taskRow?.gsdStep;
-    const gsdPhaseNumber = taskRow?.phaseNumber;
-    const isTopLevelParent = !task.parentId;
-
-    // Single-session-per-project: if this task's parent already owns a live
-    // Claude session, we resume INTO that session instead of spawning fresh.
-    // All project/GSD subtasks share one conversation memory so the integrator
-    // step at the end of the project can compose everything without any
-    // cross-process context plumbing.
-    let resumeParentSession = false;
-    let parentSessionId: string | null = null;
-    if (task.parentId) {
-      const parentRow = db
-        .prepare(
-          "SELECT id, level, claudeSessionId FROM tasks WHERE id = ?"
-        )
-        .get(task.parentId) as
-        | { id: string; level: string; claudeSessionId: string | null }
-        | undefined;
-      if (
-        parentRow &&
-        (parentRow.level === "project" || parentRow.level === "gsd") &&
-        parentRow.claudeSessionId
-      ) {
-        resumeParentSession = true;
-        parentSessionId = parentRow.claudeSessionId;
-      }
-    }
-
-    if (isSlashCommand) {
-      // Slash command task — pass the description as-is (e.g. "Run /start-here", "Run /gsd:plan-phase 6")
-      prompt = task.description!;
-    } else if (gsdStep) {
-      // Target the explicit phase number the user clicked so each GSD step
-      // button ends up running the right command (e.g. /gsd:plan-phase 3)
-      // instead of the ambiguous "current phase".
-      const phaseArg = gsdPhaseNumber != null ? ` ${gsdPhaseNumber}` : "";
-      const gsdPrompts: Record<string, string> = {
-        discuss: `Run /gsd:discuss-phase${phaseArg}. Ask the user interactive questions — do NOT use --auto. Wait for their replies.`,
-        plan: `Run /gsd:plan-phase${phaseArg}.`,
-        execute: `Run /gsd:execute-phase${phaseArg}.`,
-        verify: `Run /gsd:verify-work${phaseArg}.`,
-      };
-      prompt = gsdPrompts[gsdStep] || task.title;
-    } else if (task.level === "project" && isTopLevelParent) {
-      // Project scoping — interactive conversation with brand context
-      prompt = this.buildProjectScopingPrompt(task, cwd);
-    } else if (task.level === "gsd" && isTopLevelParent) {
-      // GSD project — run /gsd:new-project which handles interviews, research, and roadmap creation
-      prompt = `Run /gsd:new-project "${task.title}"${task.description ? `\n\nContext from user: ${task.description}` : ""}`;
-    } else if (resumeParentSession && parentSessionId) {
-      // Resume path: parent already has a live session holding the brief,
-      // brand context, and every previous subtask's full transcript in
-      // Claude's own memory. Skip the brief/sibling prepends entirely — we
-      // just queue the next turn as "do this subtask."
-      prompt = task.description
-        ? `Next subtask: ${task.title}\n\n${task.description}`
-        : `Next subtask: ${task.title}`;
-      contextSources.push({
-        type: "system",
-        label: "Resumed from project session",
+      // Log the user's original goal as the first chat entry.
+      // Use the task description (the full goal text) or fall back to the title.
+      // This ensures the chat shows what the user typed, not the system prompt.
+      const userGoalText = task.description || task.title;
+      this.addLogEntry(taskId, {
+        id: crypto.randomUUID(),
+        type: "user_reply",
+        timestamp: now,
+        content: userGoalText,
       });
-      // Mirror the parent's session ID onto this child row so the existing
-      // spawnClaudeTurn --resume lookup (which reads from the task row) finds
-      // it. Any later user reply to this subtask will also resolve to the
-      // same session via the standard reply path.
-      db.prepare("UPDATE tasks SET claudeSessionId = ? WHERE id = ?")
-        .run(parentSessionId, taskId);
-    } else {
-      if (task.projectSlug) {
-        const briefPath = pathMod.join(cwd, "projects", "briefs", task.projectSlug, "brief.md");
-        try {
-          if (fs.existsSync(briefPath)) {
-            const briefContent = fs.readFileSync(briefPath, "utf-8");
-            prompt += `[Project Context: ${task.projectSlug}]\n${briefContent}\n\n---\n\n`;
-            contextSources.push({ type: "project", label: `brief.md (${task.projectSlug})`, path: `projects/briefs/${task.projectSlug}/brief.md` });
-          }
-        } catch { /* proceed without context */ }
-      }
-      // Sibling context — only relevant when we're NOT resuming a shared
-      // parent session. If the parent owns a session, Claude's own memory
-      // already contains everything the sibling manifest would describe.
+
+      const updatedTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
+      emitTaskEvent({ type: "task:status", task: this.normalizeTask(updatedTask), timestamp: now });
+
+      // Start file watcher scoped to this task's project
       try {
-        const siblingBlock = buildSiblingContextBlock(task);
-        if (siblingBlock) {
-          prompt += `${siblingBlock}\n\n---\n\n`;
-          contextSources.push({ type: "system", label: "Sibling task context" });
+        await fileWatcher.startWatching(taskId, task.projectSlug, task.clientId);
+      } catch (err) {
+        console.error(`[process-manager] fileWatcher.startWatching failed:`, err);
+      }
+
+      // Capture baseline snapshot for diff-aware Files tab
+      try {
+        const fsSnap = require("fs") as typeof import("fs");
+        const pathSnap = require("path") as typeof import("path");
+        const { captureSnapshot } = require("./file-diff") as typeof import("./file-diff");
+        const snapConfig = getConfig();
+        const snapCwd = task.clientId ? getClientAgenticOsDir(task.clientId) : snapConfig.agenticOsDir;
+        if (task.projectSlug) {
+          const projDir = pathSnap.join(snapCwd, "projects", "briefs", task.projectSlug);
+          if (fsSnap.existsSync(projDir)) {
+            const snapshot = captureSnapshot(projDir);
+            db.prepare("UPDATE tasks SET startSnapshot = ? WHERE id = ?").run(JSON.stringify(snapshot), taskId);
+          }
         }
       } catch (err) {
-        console.error("[process-manager] buildSiblingContextBlock failed:", err);
+        console.error(`[process-manager] snapshot capture failed:`, err);
       }
-      prompt += task.description ? `Task: ${task.title}\n\n${task.description}` : task.title;
+
+      // Build the initial prompt
+      const config = getConfig();
+      const cwd = task.clientId ? getClientAgenticOsDir(task.clientId) : config.agenticOsDir;
+
+      if (task.clientId) {
+        const fs = await import("fs");
+        if (!fs.existsSync(cwd)) {
+          this.handleTaskError(taskId, `Client directory not found: clients/${task.clientId}`);
+          return;
+        }
+      }
+
+      // Detect available context sources in the working directory
+      const fs = require("fs") as typeof import("fs");
+      const pathMod = require("path") as typeof import("path");
+      const contextSources: { type: string; label: string; path?: string }[] = [];
+
+      // Check for shared instruction files in the working directory
+      const agentsMdPath = pathMod.join(cwd, "AGENTS.md");
+      if (fs.existsSync(agentsMdPath)) {
+        contextSources.push({ type: "system", label: "AGENTS.md", path: "AGENTS.md" });
+      }
+
+      // Check for CLAUDE.md (loaded by Claude CLI and used as the compatibility wrapper)
+      const claudeMdPath = pathMod.join(cwd, "CLAUDE.md");
+      if (fs.existsSync(claudeMdPath)) {
+        contextSources.push({ type: "system", label: "CLAUDE.md", path: "CLAUDE.md" });
+      }
+
+      // Check for SOUL.md and USER.md
+      for (const contextFile of ["SOUL.md", "USER.md", "learnings.md"]) {
+        const filePath = pathMod.join(cwd, "context", contextFile);
+        if (fs.existsSync(filePath)) {
+          contextSources.push({ type: "system", label: contextFile, path: `context/${contextFile}` });
+        }
+      }
+
+      // Check for brand context files
+      const brandDir = pathMod.join(cwd, "brand_context");
+      if (fs.existsSync(brandDir)) {
+        try {
+          const brandFiles = fs.readdirSync(brandDir).filter((f: string) => f.endsWith(".md"));
+          for (const bf of brandFiles) {
+            const fullPath = pathMod.join(brandDir, bf);
+            const stat = fs.statSync(fullPath);
+            if (stat.size > 0) {
+              contextSources.push({ type: "brand", label: bf, path: `brand_context/${bf}` });
+            }
+          }
+        } catch { /* ignore */ }
+      }
+
+      // Build prompt — detect special task types first
+      let prompt = "";
+      const isSlashCommand = task.description?.match(/^Run \/[\w:.-]+/);
+      const taskRow = db.prepare("SELECT gsdStep, phaseNumber FROM tasks WHERE id = ?").get(taskId) as { gsdStep: string | null; phaseNumber: number | null } | undefined;
+      const gsdStep = taskRow?.gsdStep;
+      const gsdPhaseNumber = taskRow?.phaseNumber;
+      const isTopLevelParent = !task.parentId;
+
+      // Single-session-per-project: if this task's parent already owns a live
+      // Claude session, we resume INTO that session instead of spawning fresh.
+      // All project/GSD subtasks share one conversation memory so the integrator
+      // step at the end of the project can compose everything without any
+      // cross-process context plumbing.
+      let resumeParentSession = false;
+      let parentSessionId: string | null = null;
+      if (task.parentId) {
+        const parentRow = db
+          .prepare(
+            "SELECT id, level, claudeSessionId FROM tasks WHERE id = ?"
+          )
+          .get(task.parentId) as
+          | { id: string; level: string; claudeSessionId: string | null }
+          | undefined;
+        if (
+          parentRow &&
+          (parentRow.level === "project" || parentRow.level === "gsd") &&
+          parentRow.claudeSessionId
+        ) {
+          resumeParentSession = true;
+          parentSessionId = parentRow.claudeSessionId;
+        }
+      }
+
+      if (isSlashCommand) {
+        // Slash command task — pass the description as-is (e.g. "Run /start-here", "Run /gsd:plan-phase 6")
+        prompt = task.description!;
+      } else if (gsdStep) {
+        // Target the explicit phase number the user clicked so each GSD step
+        // button ends up running the right command (e.g. /gsd:plan-phase 3)
+        // instead of the ambiguous "current phase".
+        const phaseArg = gsdPhaseNumber != null ? ` ${gsdPhaseNumber}` : "";
+        const gsdPrompts: Record<string, string> = {
+          discuss: `Run /gsd:discuss-phase${phaseArg}. Ask the user interactive questions — do NOT use --auto. Wait for their replies.`,
+          plan: `Run /gsd:plan-phase${phaseArg}.`,
+          execute: `Run /gsd:execute-phase${phaseArg}.`,
+          verify: `Run /gsd:verify-work${phaseArg}.`,
+        };
+        prompt = gsdPrompts[gsdStep] || task.title;
+      } else if (task.level === "project" && isTopLevelParent) {
+        // Project scoping — interactive conversation with brand context
+        prompt = this.buildProjectScopingPrompt(task, cwd);
+      } else if (task.level === "gsd" && isTopLevelParent) {
+        // GSD project — run /gsd:new-project which handles interviews, research, and roadmap creation
+        prompt = `Run /gsd:new-project "${task.title}"${task.description ? `\n\nContext from user: ${task.description}` : ""}`;
+      } else if (resumeParentSession && parentSessionId) {
+        // Resume path: parent already has a live session holding the brief,
+        // brand context, and every previous subtask's full transcript in
+        // Claude's own memory. Skip the brief/sibling prepends entirely — we
+        // just queue the next turn as "do this subtask."
+        prompt = task.description
+          ? `Next subtask: ${task.title}\n\n${task.description}`
+          : `Next subtask: ${task.title}`;
+        contextSources.push({
+          type: "system",
+          label: "Resumed from project session",
+        });
+        // Mirror the parent's session ID onto this child row so the existing
+        // spawnClaudeTurn --resume lookup (which reads from the task row) finds
+        // it. Any later user reply to this subtask will also resolve to the
+        // same session via the standard reply path.
+        db.prepare("UPDATE tasks SET claudeSessionId = ? WHERE id = ?")
+          .run(parentSessionId, taskId);
+      } else {
+        if (task.projectSlug) {
+          const briefPath = pathMod.join(cwd, "projects", "briefs", task.projectSlug, "brief.md");
+          try {
+            if (fs.existsSync(briefPath)) {
+              const briefContent = fs.readFileSync(briefPath, "utf-8");
+              prompt += `[Project Context: ${task.projectSlug}]\n${briefContent}\n\n---\n\n`;
+              contextSources.push({ type: "project", label: `brief.md (${task.projectSlug})`, path: `projects/briefs/${task.projectSlug}/brief.md` });
+            }
+          } catch { /* proceed without context */ }
+        }
+        // Sibling context — only relevant when we're NOT resuming a shared
+        // parent session. If the parent owns a session, Claude's own memory
+        // already contains everything the sibling manifest would describe.
+        try {
+          const siblingBlock = buildSiblingContextBlock(task);
+          if (siblingBlock) {
+            prompt += `${siblingBlock}\n\n---\n\n`;
+            contextSources.push({ type: "system", label: "Sibling task context" });
+          }
+        } catch (err) {
+          console.error("[process-manager] buildSiblingContextBlock failed:", err);
+        }
+        prompt += task.description ? `Task: ${task.title}\n\n${task.description}` : task.title;
+      }
+
+      // Inject session activity summary for wrap-up and session-aware tasks.
+      // Skip when resuming a parent session — that session already has today's
+      // context in its own memory and doesn't need a cross-task summary.
+      const needsSessionContext =
+        !resumeParentSession && this.isSessionContextTask(task);
+      console.log(`[process-manager] Session context check for "${task.title}" (desc: "${task.description?.slice(0, 50)}"): ${needsSessionContext}`);
+      if (needsSessionContext) {
+        const sessionSummary = this.buildSessionSummary(cwd, taskId);
+        console.log(`[process-manager] Session summary length: ${sessionSummary.length} chars`);
+        prompt = `IMPORTANT: The following session activity summary contains the complete record of what was done today across ALL tasks in the Command Centre. Use this as your primary source of truth for the session wrap-up — do NOT rely solely on git status or your own conversation history, as you are running in a fresh context window without visibility into other task conversations.\n\n${sessionSummary}\nNow proceed with the task:\n\n${prompt}`;
+        contextSources.push({ type: "system", label: "Session Activity Summary" });
+      }
+
+      // Persist context sources to DB
+      if (contextSources.length > 0) {
+        db.prepare("UPDATE tasks SET contextSources = ? WHERE id = ?")
+          .run(JSON.stringify(contextSources), taskId);
+      }
+
+      // Expand @tag references in the prompt against context/prompt-tags.md
+      try {
+        const { expandPromptTags } = require("./prompt-tags") as typeof import("./prompt-tags");
+        prompt = expandPromptTags(prompt, task.clientId);
+      } catch (err) {
+        console.error(`[process-manager] prompt tag expansion failed:`, err);
+      }
+
+      // Append the structured-question addendum so Claude emits typed
+      // clarifying questions as fenced blocks instead of prose.
+      prompt = prompt + STRUCTURED_QUESTION_ADDENDUM;
+
+      // Spawn the turn. When resuming a parent-owned session, flag
+      // isContinuation=true so spawnClaudeTurn routes through the --resume
+      // branch and picks up the parent's session ID (mirrored onto this row
+      // above).
+      this.spawnClaudeTurn(taskId, prompt, cwd, resumeParentSession);
+    } finally {
+      this.startingTasks.delete(taskId);
     }
-
-    // Inject session activity summary for wrap-up and session-aware tasks.
-    // Skip when resuming a parent session — that session already has today's
-    // context in its own memory and doesn't need a cross-task summary.
-    const needsSessionContext =
-      !resumeParentSession && this.isSessionContextTask(task);
-    console.log(`[process-manager] Session context check for "${task.title}" (desc: "${task.description?.slice(0, 50)}"): ${needsSessionContext}`);
-    if (needsSessionContext) {
-      const sessionSummary = this.buildSessionSummary(cwd, taskId);
-      console.log(`[process-manager] Session summary length: ${sessionSummary.length} chars`);
-      prompt = `IMPORTANT: The following session activity summary contains the complete record of what was done today across ALL tasks in the Command Centre. Use this as your primary source of truth for the session wrap-up — do NOT rely solely on git status or your own conversation history, as you are running in a fresh context window without visibility into other task conversations.\n\n${sessionSummary}\nNow proceed with the task:\n\n${prompt}`;
-      contextSources.push({ type: "system", label: "Session Activity Summary" });
-    }
-
-    // Persist context sources to DB
-    if (contextSources.length > 0) {
-      db.prepare("UPDATE tasks SET contextSources = ? WHERE id = ?")
-        .run(JSON.stringify(contextSources), taskId);
-    }
-
-    // Expand @tag references in the prompt against context/prompt-tags.md
-    try {
-      const { expandPromptTags } = require("./prompt-tags") as typeof import("./prompt-tags");
-      prompt = expandPromptTags(prompt, task.clientId);
-    } catch (err) {
-      console.error(`[process-manager] prompt tag expansion failed:`, err);
-    }
-
-    // Append the structured-question addendum so Claude emits typed
-    // clarifying questions as fenced blocks instead of prose.
-    prompt = prompt + STRUCTURED_QUESTION_ADDENDUM;
-
-    // Spawn the turn. When resuming a parent-owned session, flag
-    // isContinuation=true so spawnClaudeTurn routes through the --resume
-    // branch and picks up the parent's session ID (mirrored onto this row
-    // above).
-    this.spawnClaudeTurn(taskId, prompt, cwd, resumeParentSession);
   }
 
   /**
@@ -1063,6 +1078,7 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     }
     this.sessions.clear();
     this.waitingForReply.clear();
+    this.startingTasks.clear();
     this.lastProgressEmit.clear();
     fileWatcher.cleanupAll();
   }

@@ -70,6 +70,13 @@ export function initQueueWatcher(): void {
       }
     }
 
+    if (processManager.hasActiveSession(event.task.id)) {
+      console.log(
+        `[queue-watcher] Skipping queued task ${event.task.id} from ${event.type} because it is already active`
+      );
+      return;
+    }
+
     console.log(`[queue-watcher] Task ${event.task.id} entered queued status (via ${event.type}), triggering execution`);
     processManager.executeTask(event.task.id).catch((err) => {
       console.error(`[queue-watcher] Failed to execute task ${event.task.id}:`, err);
