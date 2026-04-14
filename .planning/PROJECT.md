@@ -19,10 +19,11 @@ Cron jobs must run once, invisibly in the background on Windows, and only within
 - ✓ The current folder contains newer cron-related features that must be preserved during recovery — existing
 - ✓ A scheduled cron run now executes its underlying prompt once per trigger, so duplicate or triple replies no longer start from duplicate queue events — validated in Phase 1
 - ✓ Retry and completion behavior now follow one runtime-owned path, and the concrete regression drift is documented from the trusted references — validated in Phase 1
+- ✓ Windows cron start now returns immediately and scheduled Windows cron runs use the hidden direct Claude path again for the normal `claude` / `.exe` case — validated in Phase 2
+- ✓ Hidden Windows cron outcomes now keep status, logs, and desktop notifications aligned, including execution-blocking failures — validated in Phase 2
 
 ### Active
 
-- [ ] Windows cron execution started in the background does not show visible PowerShell windows again
 - [ ] A client cron job can only see and act inside its own client folder rather than the whole repository
 - [ ] Regression fixes are applied in this folder without removing or breaking the newer features already present here
 
@@ -56,6 +57,8 @@ This repository is a brownfield Agentic OS workspace with an existing codebase m
 | Preserve all currently working features as the baseline | Recovery must not remove newer work already present in this folder | — Pending |
 | Investigate the regression path enough to avoid repeating it | Understanding whether the break came from an incomplete or wrong merge helps protect future merges | ✓ Good |
 | Use one runtime-owned cron completion helper | Split completion ownership caused drift in run history and retry truth | ✓ Good |
+| Restore Windows cron launches to a direct hidden Claude path for normal runs | The PowerShell wrapper became the main Windows regression drift from the trusted references | ✓ Good |
+| Surface blocking Windows cron failures through the same finalization path as normal completions | Hidden background runs must not fail silently | ✓ Good |
 
 ## Evolution
 
@@ -75,4 +78,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-14 after Phase 1 completion*
+*Last updated: 2026-04-14 after Phase 2 completion*

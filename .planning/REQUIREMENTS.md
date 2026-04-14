@@ -15,9 +15,9 @@ Requirements for the recovery release in this workspace. Each maps to roadmap ph
 
 ### Windows Background Execution
 
-- [ ] **WIN-01**: User can start background cron execution on Windows without visible PowerShell windows opening
-- [ ] **WIN-02**: Scheduled Windows cron runs stay hidden during execution instead of showing PowerShell popups
-- [ ] **WIN-03**: Hidden Windows cron runs still preserve usable status, logs, and stop behavior
+- [x] **WIN-01**: User can start background cron execution on Windows without visible PowerShell windows opening
+- [x] **WIN-02**: Scheduled Windows cron runs stay hidden during execution instead of showing PowerShell popups
+- [x] **WIN-03**: Hidden Windows cron runs still preserve usable status, logs, and stop behavior
 
 ### Client Workspace Containment
 
@@ -61,9 +61,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXEC-01 | Phase 1 | Complete |
 | EXEC-02 | Phase 1 | Complete |
 | EXEC-03 | Phase 1 | Complete |
-| WIN-01 | Phase 2 | Pending |
-| WIN-02 | Phase 2 | Pending |
-| WIN-03 | Phase 2 | Pending |
+| WIN-01 | Phase 2 | Complete |
+| WIN-02 | Phase 2 | Complete |
+| WIN-03 | Phase 2 | Complete |
 | CLNT-01 | Phase 3 | Pending |
 | CLNT-02 | Phase 3 | Pending |
 | CLNT-03 | Phase 3 | Pending |
@@ -78,4 +78,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-13*
-*Last updated: 2026-04-14 after Phase 1 completion*
+*Last updated: 2026-04-14 after Phase 2 completion*
