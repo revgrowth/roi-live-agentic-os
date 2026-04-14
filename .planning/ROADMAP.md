@@ -26,7 +26,7 @@ This roadmap restores the cron regressions in the current Agentic OS workspace w
   2. One scheduled cron run produces exactly one assistant reply sequence in chat history.
   3. Recovery or retry logic no longer replays the same scheduled prompt unless a rerun is explicitly requested.
   4. The regression path is traced to a concrete code path or merge difference, using `pre-merge` and `pr-cron-hardening` as trusted references when needed.
-**Plans**: TBD
+**Plans**: 01-01, 01-02
 
 ### Phase 2: Quiet Windows Background Execution
 **Goal**: Make Windows cron daemon and scheduled background execution hidden again without losing observability.
@@ -68,7 +68,7 @@ This roadmap restores the cron regressions in the current Agentic OS workspace w
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Run Truth & Regression Forensics | 0/TBD | Not started | - |
+| 1. Run Truth & Regression Forensics | 2/2 | Planned | - |
 | 2. Quiet Windows Background Execution | 0/TBD | Not started | - |
 | 3. Client Workspace Containment | 0/TBD | Not started | - |
 | 4. Baseline Preservation & Regression Validation | 0/TBD | Not started | - |
