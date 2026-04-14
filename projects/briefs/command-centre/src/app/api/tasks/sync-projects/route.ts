@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { getDb } from "@/lib/db";
-import { getConfig, getClientAgenticOsDir } from "@/lib/config";
+import { getConfig, getClientAgenticOsDir, resolvePlanningDir } from "@/lib/config";
 import { emitTaskEvent } from "@/lib/event-bus";
 import { parseRoadmap } from "@/lib/gsd-parser";
 import type { Task, GsdStep } from "@/types/task";
@@ -85,12 +85,13 @@ export async function POST(request: NextRequest) {
         synced++;
       }
 
-      // For GSD projects, sync phases from ROADMAP.md
+      // For GSD projects, sync phases from the brief's own .planning/ROADMAP.md
       if (level === "gsd" && parentTask) {
-        const planningDir = path.join(config.agenticOsDir, ".planning");
-        const roadmapPath = path.join(planningDir, "ROADMAP.md");
+        const resolved = resolvePlanningDir({ baseDir, overrideSlug: parsed.slug });
+        const planningDir = resolved?.planningDir ?? "";
+        const roadmapPath = planningDir ? path.join(planningDir, "ROADMAP.md") : "";
 
-        if (fs.existsSync(roadmapPath)) {
+        if (planningDir && fs.existsSync(roadmapPath)) {
           const roadmapContent = fs.readFileSync(roadmapPath, "utf-8");
           const phasesDir = path.join(planningDir, "phases");
           const phases = parseRoadmap(roadmapContent, phasesDir);
@@ -140,36 +141,60 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // Update parent activity label with phase progress
+          // Update parent activity label with phase progress.
+          // IMPORTANT: never force status back to 'running' — if the user has
+          // manually marked the project done (or review), respect that and
+          // only refresh the activity label. Forcing status here would
+          // resurrect completed GSD projects on every sync.
           const donePhases = phases.filter((p) => p.status === "complete").length;
           const activityLabel = `${donePhases}/${phases.length} phases complete`;
-          db.prepare(
-            "UPDATE tasks SET activityLabel = ?, status = 'running', updatedAt = ? WHERE id = ?"
-          ).run(activityLabel, new Date().toISOString(), parentTask.id);
+          const currentStatus = parentTask.status;
+          if (currentStatus === "done" || currentStatus === "review") {
+            db.prepare(
+              "UPDATE tasks SET activityLabel = ?, updatedAt = ? WHERE id = ?"
+            ).run(activityLabel, new Date().toISOString(), parentTask.id);
+          } else {
+            db.prepare(
+              "UPDATE tasks SET activityLabel = ?, status = 'running', updatedAt = ? WHERE id = ?"
+            ).run(activityLabel, new Date().toISOString(), parentTask.id);
+          }
         }
       }
 
-      // For Level 2 projects, sync deliverables from brief as child tasks
+      // For Level 2 projects, sync deliverables from brief as child tasks.
+      // IMPORTANT: only run this on the FIRST sync (when no children exist yet).
+      // After initial creation the subtask table is authoritative — re-parsing
+      // brief.md on every sync causes duplicate rows whenever Claude rewrites
+      // a bullet with slightly different phrasing, and can leak prompt-prefix
+      // artifacts ("[Project Context: ...]") into the subtask list.
       if (level === "project" && parentTask) {
-        const deliverables = parseDeliverables(content);
-        const existingChildren = db.prepare(
-          "SELECT title FROM tasks WHERE parentId = ?"
-        ).all(parentTask.id) as Array<{ title: string }>;
-        const existingTitles = new Set(existingChildren.map((c) => c.title));
-        const now = new Date().toISOString();
+        const existingCount = db.prepare(
+          "SELECT COUNT(*) as cnt FROM tasks WHERE parentId = ?"
+        ).get(parentTask.id) as { cnt: number };
 
-        for (let i = 0; i < deliverables.length; i++) {
-          if (existingTitles.has(deliverables[i])) continue;
+        if (existingCount.cnt === 0) {
+          const deliverables = parseDeliverables(content)
+            // Drop garbage: prompt-prefix artifacts, empty strings, dupes.
+            .map((d) => d.trim())
+            .filter((d) => d.length > 0 && !d.startsWith("[Project Context:"));
+          const seen = new Set<string>();
+          const now = new Date().toISOString();
+          let order = 0;
 
-          const taskId = crypto.randomUUID();
-          db.prepare(
-            `INSERT INTO tasks (id, title, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, needsInput, permissionMode)
-             VALUES (?, ?, 'backlog', 'task', ?, ?, ?, ?, ?, ?, 0, 'default')`
-          ).run(
-            taskId, deliverables[i],
-            parentTask.id, parentTask.projectSlug, i,
-            now, now, parentTask.clientId,
-          );
+          for (const title of deliverables) {
+            if (seen.has(title)) continue;
+            seen.add(title);
+
+            const taskId = crypto.randomUUID();
+            db.prepare(
+              `INSERT INTO tasks (id, title, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, needsInput, permissionMode)
+               VALUES (?, ?, 'backlog', 'task', ?, ?, ?, ?, ?, ?, 0, 'default')`
+            ).run(
+              taskId, title,
+              parentTask.id, parentTask.projectSlug, order++,
+              now, now, parentTask.clientId,
+            );
+          }
         }
       }
     }

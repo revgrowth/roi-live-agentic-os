@@ -178,10 +178,6 @@ export async function GET(request: NextRequest) {
     const briefsDir = path.join(baseDir, "projects", "briefs");
     const activeProjects: DashboardSummary["activeProjects"] = [];
 
-    // Check if .planning/ exists (indicates an active GSD project)
-    const planningDir = path.join(baseDir, ".planning");
-    const hasPlanningDir = fs.existsSync(planningDir) && fs.existsSync(path.join(planningDir, "PROJECT.md"));
-
     if (fs.existsSync(briefsDir)) {
       const entries = fs.readdirSync(briefsDir, { withFileTypes: true });
       for (const entry of entries) {
@@ -215,16 +211,20 @@ export async function GET(request: NextRequest) {
            WHERE projectSlug = ? AND status != 'done'${clientCondition}`
         ).get(entry.name, ...clientParams) as { count: number };
 
-        // A GSD project (level 3) is active if .planning/ exists
-        const isGsdWithPlanning = level === 3 && hasPlanningDir;
+        // A GSD project (level 3) is active if its own .planning/ exists
+        const briefPlanningDir = path.join(briefsDir, entry.name, ".planning");
+        const briefHasPlanning =
+          fs.existsSync(briefPlanningDir) &&
+          fs.existsSync(path.join(briefPlanningDir, "PROJECT.md"));
+        const isGsdWithPlanning = level === 3 && briefHasPlanning;
 
         // For GSD projects, use phase progress instead of brief checkboxes
         let completedItems = checked;
         let totalItems = checked + unchecked;
         if (isGsdWithPlanning) {
           try {
-            const roadmapPath = path.join(planningDir, "ROADMAP.md");
-            const phasesDir = path.join(planningDir, "phases");
+            const roadmapPath = path.join(briefPlanningDir, "ROADMAP.md");
+            const phasesDir = path.join(briefPlanningDir, "phases");
             if (fs.existsSync(roadmapPath)) {
               const roadmap = fs.readFileSync(roadmapPath, "utf-8");
               const gsdPhases = parseRoadmap(roadmap, phasesDir);

@@ -35,19 +35,19 @@ function timeAgo(dateStr: string): string {
  * Show Claude's actual compute time, not wall-clock.
  * Only adds live elapsed when the task has been recently updated (< 5 min),
  * indicating Claude is actively processing. Otherwise shows static durationMs.
+ * Uses updatedAt (set when each turn starts) as the turn-start proxy, not
+ * startedAt which reflects when the task was first created.
  */
 function formatLiveClaudeTime(task: Task): string {
   const accumulated = task.durationMs ?? 0;
-  if (!task.startedAt) return formatDuration(accumulated);
-  const start = new Date(task.startedAt).getTime();
-  if (isNaN(start)) return formatDuration(accumulated);
 
   const lastUpdate = new Date(task.updatedAt).getTime();
-  if (Date.now() - lastUpdate > 5 * 60 * 1000) {
+  if (isNaN(lastUpdate) || Date.now() - lastUpdate > 5 * 60 * 1000) {
     return formatDuration(accumulated);
   }
 
-  const currentTurnMs = Math.max(0, Date.now() - start);
+  // Task was recently updated — add live elapsed for the current turn only
+  const currentTurnMs = Math.max(0, Date.now() - lastUpdate);
   return formatDuration(accumulated + currentTurnMs);
 }
 

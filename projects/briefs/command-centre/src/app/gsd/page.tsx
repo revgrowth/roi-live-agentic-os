@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Archive, ArrowLeft, X } from "lucide-react";
+import { Archive, ArrowLeft, X, ArrowUp } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { PhasePipeline } from "@/components/gsd/phase-pipeline";
 import { PhaseDetail } from "@/components/gsd/phase-detail";
 import { ContentViewer } from "@/components/context/content-viewer";
+import { useTaskStore } from "@/store/task-store";
 import type { GsdProject } from "@/types/gsd";
 
 export default function GsdPage() {
@@ -19,6 +20,12 @@ export default function GsdPage() {
   const [viewingFile, setViewingFile] = useState<string | null>(null);
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [archiving, setArchiving] = useState(false);
+  const [pendingCommand, setPendingCommand] = useState("");
+  const [pendingLabel, setPendingLabel] = useState("");
+  const [isSendingCommand, setIsSendingCommand] = useState(false);
+  const commandInputRef = useRef<HTMLInputElement>(null);
+  const createTask = useTaskStore((s) => s.createTask);
+  const updateTask = useTaskStore((s) => s.updateTask);
 
   const loadProject = useCallback((keepSelection?: boolean) => {
     fetch("/api/gsd")
@@ -66,6 +73,32 @@ export default function GsdPage() {
       setArchiving(false);
     }
   }, [project?.briefSlug, router]);
+
+  const handlePhaseCommand = useCallback((command: string, label: string) => {
+    setPendingCommand(command);
+    setPendingLabel(label);
+    // Focus the input after React renders
+    setTimeout(() => commandInputRef.current?.focus(), 0);
+  }, []);
+
+  const handleSendCommand = useCallback(async () => {
+    const cmd = pendingCommand.trim();
+    if (!cmd || isSendingCommand) return;
+    setIsSendingCommand(true);
+    try {
+      const title = pendingLabel || cmd;
+      await createTask(title, cmd, "task");
+      const tasks = useTaskStore.getState().tasks;
+      const newTask = tasks.find((t) => t.title === title && t.status === "backlog");
+      if (newTask) {
+        await updateTask(newTask.id, { status: "queued" });
+      }
+      setPendingCommand("");
+      setPendingLabel("");
+    } finally {
+      setIsSendingCommand(false);
+    }
+  }, [pendingCommand, pendingLabel, isSendingCommand, createTask, updateTask]);
 
   if (loading) {
     return (
@@ -349,7 +382,83 @@ export default function GsdPage() {
 
         {/* Phase detail */}
         {selectedPhaseData && (
-          <PhaseDetail phase={selectedPhaseData} onViewFile={handleViewFile} onPhaseUpdated={handlePhaseUpdated} />
+          <PhaseDetail phase={selectedPhaseData} onViewFile={handleViewFile} onPhaseUpdated={handlePhaseUpdated} onCommand={handlePhaseCommand} />
+        )}
+
+        {/* Command bar — appears when a phase action is clicked */}
+        {pendingCommand && (
+          <div
+            style={{
+              position: "sticky",
+              bottom: 16,
+              background: "#f3f0ee",
+              border: "1px solid #e5e1dc",
+              borderRadius: 10,
+              padding: "10px 12px",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              boxShadow: "0 -4px 20px rgba(0, 0, 0, 0.06)",
+            }}
+          >
+            <input
+              ref={commandInputRef}
+              value={pendingCommand}
+              onChange={(e) => setPendingCommand(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") { e.preventDefault(); handleSendCommand(); }
+                if (e.key === "Escape") { setPendingCommand(""); setPendingLabel(""); }
+              }}
+              style={{
+                flex: 1,
+                fontSize: 14,
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontWeight: 500,
+                color: "#6D28D9",
+                backgroundColor: "transparent",
+                border: "none",
+                outline: "none",
+                padding: "4px 0",
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => { setPendingCommand(""); setPendingLabel(""); }}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 4,
+                color: "#9C9CA0",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <X size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={handleSendCommand}
+              disabled={isSendingCommand}
+              style={{
+                width: 28,
+                height: 26,
+                borderRadius: 6,
+                border: "none",
+                background: isSendingCommand
+                  ? "#e8e4df"
+                  : "linear-gradient(135deg, #93452A, #B25D3F)",
+                color: isSendingCommand ? "#5E5E65" : "#FFFFFF",
+                cursor: isSendingCommand ? "default" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <ArrowUp size={14} />
+            </button>
+          </div>
         )}
       </div>
 
@@ -398,25 +507,25 @@ export default function GsdPage() {
               <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                 <span style={stepNumStyle}>1</span>
                 <span style={stepTextStyle}>
-                  <strong>.planning/</strong> moves into <strong>projects/briefs/{project.briefSlug}/planning-archive/</strong>
+                  The brief&apos;s status changes from <strong>active</strong> to <strong>complete</strong>
                 </span>
               </div>
               <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                 <span style={stepNumStyle}>2</span>
                 <span style={stepTextStyle}>
-                  The brief&apos;s status changes from <strong>active</strong> to <strong>complete</strong>
+                  <strong>projects/briefs/{project.briefSlug}/.planning/</strong> stays in place as a self-contained historical record
                 </span>
               </div>
               <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                 <span style={stepNumStyle}>3</span>
                 <span style={stepTextStyle}>
-                  The project disappears from Active Projects and frees up the .planning/ slot for a new GSD project
+                  The project disappears from Active Projects. You can start another GSD project anytime — each one owns its own planning folder.
                 </span>
               </div>
             </div>
 
             <p style={{ fontFamily: "var(--font-inter), Inter, sans-serif", fontSize: 13, color: "#9C9CA0", lineHeight: 1.6, margin: "0 0 4px" }}>
-              Nothing is deleted. All planning artifacts, phase plans, and research are preserved in the archive folder.
+              Nothing moves or is deleted. Every planning artifact stays exactly where it already lives inside the brief folder.
             </p>
 
             <div style={{ display: "flex", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>

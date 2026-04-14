@@ -8,15 +8,22 @@ import { ModalChat } from "./modal-chat";
 import { ReplyInput } from "./reply-input";
 import { ModalFilePreview } from "./modal-file-preview";
 import { ModalNewTaskForm } from "./modal-new-task-form";
+import { ProjectDashboard } from "./project-dashboard";
 import { PanelOutputs } from "../panel/panel-outputs";
+import { QuestionModal } from "@/components/shared/question-modal";
+import {
+  parseQuestionSpecs,
+  type QuestionSpec,
+  type QuestionAnswers,
+} from "@/types/question-spec";
 
 // Stable reference to avoid infinite re-render loop in Zustand selector
 const EMPTY_LOG_ENTRIES: LogEntry[] = [];
 
-type ModalTab = "activity" | "files";
+type ModalTab = "conversation" | "files";
 
 const TAB_CONFIG: { key: ModalTab; label: string }[] = [
-  { key: "activity", label: "Activity" },
+  { key: "conversation", label: "Conversation" },
   { key: "files", label: "Files" },
 ];
 
@@ -28,8 +35,14 @@ export function TaskModal() {
 
   const [isVisible, setIsVisible] = useState(false);
   const [activeFile, setActiveFile] = useState<OutputFile | null>(null);
-  const [activeTab, setActiveTab] = useState<ModalTab>("activity");
+  const [activeTab, setActiveTab] = useState<ModalTab>("conversation");
   const [newTaskAttachment, setNewTaskAttachment] = useState<{ fileName: string; relativePath: string } | null>(null);
+  // Tracks which HTML outputs we've already auto-previewed for each task so we
+  // don't re-open them if the user navigates away. Keyed by `${taskId}:${id}`.
+  const autoPreviewedRef = useRef<Set<string>>(new Set());
+  // Tracks whether the user has manually interacted with the file preview for
+  // a given task — if so, we stop auto-opening new HTML outputs for that task.
+  const userDismissedAutoPreviewRef = useRef<Set<string>>(new Set());
 
   // Resizable panel
   const [panelWidth, setPanelWidth] = useState(580);
@@ -72,24 +85,36 @@ export function TaskModal() {
     ? tasks.find((t) => t.id === viewingTaskId)
     : null;
 
-  // Get child tasks for parent tasks (level !== "task")
+  // Get child tasks for parent tasks (level !== "task").
+  // Match GoalCard's join: any task whose parentId === viewingTaskId, OR any
+  // task that shares the same projectSlug (catches legacy wizard children
+  // that were created with parentId: null before the backfill landed).
   const isParentTask = task && task.level !== "task";
   const childTasks = isParentTask
-    ? tasks.filter((t) => t.parentId === viewingTaskId).sort((a, b) => a.columnOrder - b.columnOrder)
+    ? tasks
+        .filter(
+          (t) =>
+            t.parentId === viewingTaskId ||
+            (task!.projectSlug && t.projectSlug === task!.projectSlug && t.id !== task!.id)
+        )
+        .sort((a, b) => a.columnOrder - b.columnOrder)
     : [];
 
   // Navigate into a subtask without closing the modal
   const navigateToChild = useCallback((childId: string) => {
     setNavStack((prev) => [...prev, childId]);
+    // Clear the auto-preview dismissal for the child so its HTML outputs can
+    // auto-open when we land on it.
+    userDismissedAutoPreviewRef.current.delete(childId);
     setActiveFile(null);
-    setActiveTab("activity");
+    setActiveTab("conversation");
   }, []);
 
   // Navigate back to parent
   const navigateBack = useCallback(() => {
     setNavStack((prev) => prev.slice(0, -1));
     setActiveFile(null);
-    setActiveTab("activity");
+    setActiveTab("conversation");
   }, []);
 
   const hasNavHistory = navStack.length > 0;
@@ -99,14 +124,14 @@ export function TaskModal() {
     if (!selectedTaskId) {
       setIsVisible(false);
       setActiveFile(null);
-      setActiveTab("activity");
+      setActiveTab("conversation");
       setNewTaskAttachment(null);
       setNavStack([]);
       return;
     }
 
     setActiveFile(null);
-    setActiveTab("activity");
+    setActiveTab("conversation");
     setNewTaskAttachment(null);
     setNavStack([]);
 
@@ -129,6 +154,37 @@ export function TaskModal() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isParentTask, childTasks.map((c) => c.id).join(","), fetchLogEntries]);
 
+  // Auto-preview: when the currently-viewed task produces an HTML output,
+  // automatically open it in the file preview (Vibe Kanban-style). We only
+  // do this once per output, and we stop auto-previewing for a task if the
+  // user has manually closed a preview for that task.
+  const allOutputFiles = useTaskStore((s) => s.outputFiles);
+  const currentOutputs = viewingTaskId ? allOutputFiles[viewingTaskId] : undefined;
+  useEffect(() => {
+    if (!viewingTaskId || !currentOutputs || currentOutputs.length === 0) return;
+    if (userDismissedAutoPreviewRef.current.has(viewingTaskId)) return;
+    if (activeFile) return; // Don't override a file the user is already viewing
+
+    // Find the most recent HTML output we haven't auto-previewed yet
+    const htmlOutputs = currentOutputs.filter((f) =>
+      /\.(html?|htm)$/i.test(f.fileName)
+    );
+    if (htmlOutputs.length === 0) return;
+
+    // Sort newest first — OutputFile has createdAt
+    const sorted = [...htmlOutputs].sort((a, b) => {
+      const ta = new Date(a.createdAt).getTime();
+      const tb = new Date(b.createdAt).getTime();
+      return tb - ta;
+    });
+    const latest = sorted[0];
+    const key = `${viewingTaskId}:${latest.id}`;
+    if (autoPreviewedRef.current.has(key)) return;
+
+    autoPreviewedRef.current.add(key);
+    setActiveFile(latest);
+  }, [viewingTaskId, currentOutputs, activeFile]);
+
   // Read logs directly from the store — single source of truth
   const allLogEntries = useTaskStore((s) => s.logEntries);
   const logEntries = (viewingTaskId ? allLogEntries[viewingTaskId] : undefined) ?? EMPTY_LOG_ENTRIES;
@@ -147,6 +203,9 @@ export function TaskModal() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         if (activeFile) {
+          if (viewingTaskId) {
+            userDismissedAutoPreviewRef.current.add(viewingTaskId);
+          }
           setActiveFile(null);
         } else if (newTaskAttachment) {
           setNewTaskAttachment(null);
@@ -159,7 +218,7 @@ export function TaskModal() {
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [selectedTaskId, closePanel, activeFile, newTaskAttachment, hasNavHistory, navigateBack]);
+  }, [selectedTaskId, closePanel, activeFile, newTaskAttachment, hasNavHistory, navigateBack, viewingTaskId]);
 
   // Optimistic reply handler
   const appendLogEntry = useTaskStore((s) => s.appendLogEntry);
@@ -189,6 +248,66 @@ export function TaskModal() {
     setNewTaskAttachment(null);
     closePanel();
   }, [closePanel]);
+
+  // Detect a pending structured-question block on the currently viewed task.
+  // We look at the most recent structured_question log entry and show the
+  // QuestionModal overlay if it hasn't been answered yet and needsInput=1.
+  const pendingStructured: { entryId: string; specs: QuestionSpec[] } | null =
+    (() => {
+      if (!task || task.needsInput !== true) return null;
+      for (let i = logEntries.length - 1; i >= 0; i--) {
+        const e = logEntries[i];
+        if (e.type === "structured_question") {
+          if (e.questionAnswers) return null; // already answered
+          try {
+            const specs = e.questionSpec
+              ? parseQuestionSpecs(JSON.parse(e.questionSpec))
+              : [];
+            if (specs.length > 0) return { entryId: e.id, specs };
+          } catch {
+            /* fall through */
+          }
+          return null;
+        }
+      }
+      return null;
+    })();
+
+  const [structuredAnswers, setStructuredAnswers] = useState<QuestionAnswers>({});
+  const [structuredSubmitting, setStructuredSubmitting] = useState(false);
+  const pendingEntryId = pendingStructured?.entryId ?? null;
+
+  // Reset answers when a new pending structured question appears
+  useEffect(() => {
+    if (!pendingStructured) {
+      setStructuredAnswers({});
+      return;
+    }
+    const seed: QuestionAnswers = {};
+    for (const q of pendingStructured.specs) {
+      seed[q.id] = q.type === "multiselect" ? [] : "";
+    }
+    setStructuredAnswers(seed);
+  }, [pendingEntryId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleStructuredSubmit = useCallback(async () => {
+    if (!pendingStructured || !viewingTaskId || structuredSubmitting) return;
+    setStructuredSubmitting(true);
+    try {
+      const res = await fetch(`/api/tasks/${viewingTaskId}/reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ structuredAnswers }),
+      });
+      if (!res.ok) {
+        console.error("[TaskModal] structured reply failed:", res.status);
+      }
+    } catch (err) {
+      console.error("[TaskModal] structured reply error:", err);
+    } finally {
+      setStructuredSubmitting(false);
+    }
+  }, [pendingStructured, viewingTaskId, structuredAnswers, structuredSubmitting]);
 
   if (!selectedTaskId || !task) return null;
 
@@ -301,7 +420,7 @@ export function TaskModal() {
         )}
 
         {/* Description (if exists and not just working directory) */}
-        {displayDescription && !activeFile && !newTaskAttachment && (
+        {displayDescription && !isParentTask && !activeFile && !newTaskAttachment && (
           <div
             style={{
               padding: "10px 24px",
@@ -374,28 +493,109 @@ export function TaskModal() {
             <ModalFilePreview
               fileName={activeFile.fileName}
               relativePath={activeFile.relativePath}
-              onBack={() => setActiveFile(null)}
+              onBack={() => {
+                if (viewingTaskId) {
+                  userDismissedAutoPreviewRef.current.add(viewingTaskId);
+                }
+                setActiveFile(null);
+              }}
               onNewTask={handleNewTaskFromOutput}
+              onSelectFile={(path) => {
+                const name = path.split("/").pop() ?? path;
+                setActiveFile({
+                  ...activeFile,
+                  fileName: name,
+                  relativePath: path,
+                  filePath: path,
+                  extension: name.includes(".") ? name.split(".").pop() ?? "" : "",
+                });
+              }}
             />
-          ) : activeTab === "activity" ? (
-            <>
-              <ModalChat
-                taskId={task.id}
+          ) : activeTab === "conversation" ? (
+            isParentTask ? (
+              <ProjectDashboard
+                task={task}
+                childTasks={childTasks}
+                childLogEntries={childLogEntries}
                 logEntries={logEntries}
                 isRunning={isRunning}
                 needsInput={task.needsInput === true}
                 status={task.status}
-                childTasks={childTasks}
-                childLogEntries={childLogEntries}
-              />
-              <ReplyInput
-                taskId={task.id}
-                isVisible={showReplyInput}
-                needsInput={task.needsInput === true}
-                taskStatus={task.status}
+                showReplyInput={showReplyInput}
+                onViewSubtask={navigateToChild}
                 onOptimisticReply={handleOptimisticReply}
+                onPreviewFile={(f) => {
+                  setActiveFile({
+                    id: `chat-preview-${f.relativePath}`,
+                    taskId: task.id,
+                    fileName: f.fileName,
+                    filePath: f.relativePath,
+                    relativePath: f.relativePath,
+                    extension: f.extension,
+                    sizeBytes: null,
+                    createdAt: new Date().toISOString(),
+                  });
+                }}
+                briefDescription={displayDescription}
+                onOpenBrief={
+                  task.projectSlug
+                    ? () => {
+                        const briefPath = `projects/briefs/${task.projectSlug}/brief.md`;
+                        setActiveFile({
+                          id: `brief-${task.projectSlug}`,
+                          taskId: task.id,
+                          fileName: "brief.md",
+                          filePath: briefPath,
+                          relativePath: briefPath,
+                          extension: "md",
+                          sizeBytes: null,
+                          createdAt: new Date().toISOString(),
+                        });
+                      }
+                    : undefined
+                }
               />
-            </>
+            ) : (
+              <>
+                <ModalChat
+                  taskId={task.id}
+                  logEntries={logEntries}
+                  isRunning={isRunning}
+                  needsInput={task.needsInput === true}
+                  status={task.status}
+                  childTasks={childTasks}
+                  childLogEntries={childLogEntries}
+                  activePreviewPath={null}
+                  onPreviewFile={(f) => {
+                    setActiveFile({
+                      id: `chat-preview-${f.relativePath}`,
+                      taskId: task.id,
+                      fileName: f.fileName,
+                      filePath: f.relativePath,
+                      relativePath: f.relativePath,
+                      extension: f.extension,
+                      sizeBytes: null,
+                      createdAt: new Date().toISOString(),
+                    });
+                  }}
+                  activityLabel={task.activityLabel}
+                  startedAt={task.startedAt}
+                  costUsd={task.costUsd}
+                  tokensUsed={task.tokensUsed}
+                  errorMessage={task.errorMessage}
+                  durationMs={task.durationMs}
+                />
+                <ReplyInput
+                  taskId={task.id}
+                  isVisible={showReplyInput}
+                  needsInput={task.needsInput === true}
+                  taskStatus={task.status}
+                  initialPermissionMode={task.permissionMode ?? "bypassPermissions"}
+                  initialModel={task.model ?? null}
+                  onOptimisticReply={handleOptimisticReply}
+                />
+              </>
+            )
           ) : activeTab === "files" ? (
             <div style={{ flex: 1, overflowY: "auto" }}>
               <PanelOutputs taskId={task.id} onFileClick={handleFileClick} />
@@ -404,6 +604,21 @@ export function TaskModal() {
         </div>
         </div>
       </div>
+
+      {/* Structured-question overlay — blocks the task panel until answered */}
+      {pendingStructured && (
+        <QuestionModal
+          open
+          variant="overlay"
+          questions={pendingStructured.specs}
+          value={structuredAnswers}
+          onChange={setStructuredAnswers}
+          title="Claude has a few questions"
+          subtitle="Answer these so Claude can continue the task."
+          submitLabel={structuredSubmitting ? "Sending…" : "Send answers"}
+          onSubmit={handleStructuredSubmit}
+        />
+      )}
     </>
   );
 }

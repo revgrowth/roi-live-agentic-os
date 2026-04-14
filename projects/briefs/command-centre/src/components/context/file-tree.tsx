@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { FileText, Folder, FolderOpen } from "lucide-react";
 import type { FileNode } from "@/types/file";
 import { useClientId, appendClientId } from "@/hooks/use-client-id";
-import { asFileNodes, fetchFileNodes } from "@/lib/file-node-response";
+import { getFileIcon, getFileIconColor } from "@/lib/file-icons";
 
 interface FileTreeProps {
   onSelectFile: (path: string) => void;
@@ -21,8 +21,9 @@ export function FileTree({ onSelectFile, selectedPath }: FileTreeProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchFileNodes(appendClientId("/api/files?dir=context", clientId))
-      .then((nodes) => {
+    fetch(appendClientId("/api/files?dir=context", clientId))
+      .then((r) => r.json())
+      .then((nodes: FileNode[]) => {
         setRootNodes(nodes);
         setLoading(false);
       })
@@ -42,21 +43,11 @@ export function FileTree({ onSelectFile, selectedPath }: FileTreeProps) {
             const isMemory = dirPath === "context/memory" || dirPath.endsWith("/memory");
             const url = appendClientId(`/api/files?dir=${encodeURIComponent(dirPath)}${isMemory ? "&limit=30" : ""}`, clientId);
             fetch(url)
-              .then(async (r) => {
-                if (!r.ok) return [];
-                const payload: unknown = await r.json();
-                return asFileNodes(payload);
-              })
-              .then((children) => {
+              .then((r) => r.json())
+              .then((children: FileNode[]) => {
                 setChildrenMap((prev) => ({ ...prev, [dirPath]: children }));
                 if (isMemory) {
                   setMemoryTotal(children.length >= 30 ? 999 : children.length);
-                }
-              })
-              .catch(() => {
-                setChildrenMap((prev) => ({ ...prev, [dirPath]: [] }));
-                if (isMemory) {
-                  setMemoryTotal(0);
                 }
               });
           }
@@ -71,19 +62,11 @@ export function FileTree({ onSelectFile, selectedPath }: FileTreeProps) {
     (dirPath: string) => {
       const newLimit = memoryLimit + 30;
       fetch(appendClientId(`/api/files?dir=${encodeURIComponent(dirPath)}&limit=${newLimit}`, clientId))
-        .then(async (r) => {
-          if (!r.ok) return [];
-          const payload: unknown = await r.json();
-          return asFileNodes(payload);
-        })
-        .then((children) => {
+        .then((r) => r.json())
+        .then((children: FileNode[]) => {
           setChildrenMap((prev) => ({ ...prev, [dirPath]: children }));
           setMemoryLimit(newLimit);
           if (children.length < newLimit) setMemoryTotal(children.length);
-        })
-        .catch(() => {
-          setChildrenMap((prev) => ({ ...prev, [dirPath]: [] }));
-          setMemoryTotal(0);
         });
     },
     [memoryLimit, clientId]
@@ -131,7 +114,10 @@ export function FileTree({ onSelectFile, selectedPath }: FileTreeProps) {
               <Folder size={16} style={{ color: "#5E5E65", flexShrink: 0 }} />
             )
           ) : (
-            <FileText size={16} style={{ color: "#5E5E65", flexShrink: 0 }} />
+            (() => {
+              const Icon = getFileIcon(node.name);
+              return <Icon size={16} style={{ color: getFileIconColor(node.name), flexShrink: 0 }} />;
+            })()
           )}
           <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
             {node.name}

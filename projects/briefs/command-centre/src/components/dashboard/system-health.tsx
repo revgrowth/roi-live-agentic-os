@@ -46,7 +46,7 @@ export function SystemHealth({ system }: SystemHealthProps) {
         </Link>
 
         {/* Brand context */}
-        <Link href="/docs" style={linkRowStyle}>
+        <Link href="/?tab=docs" style={linkRowStyle}>
           <Palette size={14} color="#5E5E65" style={{ flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={statValueStyle}>

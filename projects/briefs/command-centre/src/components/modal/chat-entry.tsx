@@ -1,10 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { FileText, FolderOpen, Wrench, ChevronDown, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  FileText,
+  FilePlus2,
+  FileEdit,
+  FolderOpen,
+  Search,
+  Terminal,
+  Globe,
+  Sparkles,
+  ListChecks,
+  MessageSquare,
+  User as UserIcon,
+  Info,
+  ChevronDown,
+  ChevronRight,
+  Wrench,
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { LogEntry } from "@/types/task";
+import type { LogEntry, PermissionMode } from "@/types/task";
+import { PERMISSION_MODE_LABELS } from "@/types/task";
+import {
+  parseQuestionSpecs,
+  serializeAnswersToProse,
+  type QuestionSpec,
+  type QuestionAnswers,
+} from "@/types/question-spec";
+import { QuestionModal } from "@/components/shared/question-modal";
+
+/* ─────────────────────────────── shared bits ─────────────────────────────── */
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
@@ -22,8 +48,8 @@ function Timestamp({ iso }: { iso: string }) {
       style={{
         fontSize: 10,
         fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-        color: "#5E5E65",
-        opacity: 0.5,
+        color: "#9C9CA0",
+        opacity: 0.8,
       }}
     >
       {formatTime(iso)}
@@ -32,280 +58,801 @@ function Timestamp({ iso }: { iso: string }) {
 }
 
 const markdownComponents = {
-  p: ({ children }: { children?: React.ReactNode }) => <p style={{ margin: "6px 0" }}>{children}</p>,
-  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
-    <a href={href} style={{ color: "#93452A", textDecoration: "underline" }} target="_blank" rel="noopener noreferrer">{children}</a>
+  p: ({ children }: { children?: React.ReactNode }) => (
+    <p style={{ margin: "6px 0" }}>{children}</p>
   ),
-  code: ({ children, className: cn }: { children?: React.ReactNode; className?: string }) => cn
-    ? <code style={{ fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace", fontSize: 13 }}>{children}</code>
-    : <code style={{ backgroundColor: "rgba(0,0,0,0.06)", padding: "1px 4px", borderRadius: 3, fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace", fontSize: 13 }}>{children}</code>,
-  pre: ({ children }: { children?: React.ReactNode }) => <pre style={{ backgroundColor: "rgba(0,0,0,0.04)", padding: 12, borderRadius: 6, overflow: "auto", margin: "8px 0", fontSize: 13 }}>{children}</pre>,
-  ul: ({ children }: { children?: React.ReactNode }) => <ul style={{ paddingLeft: 20, margin: "4px 0" }}>{children}</ul>,
-  ol: ({ children }: { children?: React.ReactNode }) => <ol style={{ paddingLeft: 20, margin: "4px 0" }}>{children}</ol>,
-  li: ({ children }: { children?: React.ReactNode }) => <li style={{ margin: "2px 0" }}>{children}</li>,
-  h1: ({ children }: { children?: React.ReactNode }) => <h1 style={{ fontSize: 18, fontWeight: 700, margin: "12px 0 6px" }}>{children}</h1>,
-  h2: ({ children }: { children?: React.ReactNode }) => <h2 style={{ fontSize: 16, fontWeight: 700, margin: "10px 0 4px" }}>{children}</h2>,
-  h3: ({ children }: { children?: React.ReactNode }) => <h3 style={{ fontSize: 14, fontWeight: 600, margin: "8px 0 4px" }}>{children}</h3>,
-  blockquote: ({ children }: { children?: React.ReactNode }) => <blockquote style={{ borderLeft: "3px solid #93452A", paddingLeft: 12, margin: "6px 0", color: "#5E5E65", fontStyle: "italic" }}>{children}</blockquote>,
-  table: ({ children }: { children?: React.ReactNode }) => <table style={{ width: "100%", borderCollapse: "collapse", margin: "8px 0", fontSize: 13 }}>{children}</table>,
-  th: ({ children }: { children?: React.ReactNode }) => <th style={{ padding: "4px 8px", textAlign: "left" as const, fontWeight: 600, borderBottom: "1px solid rgba(0,0,0,0.1)" }}>{children}</th>,
-  td: ({ children }: { children?: React.ReactNode }) => <td style={{ padding: "4px 8px", borderBottom: "1px solid rgba(0,0,0,0.05)" }}>{children}</td>,
-  hr: () => <hr style={{ border: "none", borderTop: "1px solid rgba(218, 193, 185, 0.3)", margin: "12px 0" }} />,
+  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
+    <a
+      href={href}
+      style={{ color: "#93452A", textDecoration: "underline" }}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {children}
+    </a>
+  ),
+  code: ({
+    children,
+    className: cn,
+  }: {
+    children?: React.ReactNode;
+    className?: string;
+  }) =>
+    cn ? (
+      <code
+        style={{
+          fontFamily:
+            "var(--font-space-grotesk), Space Grotesk, monospace",
+          fontSize: 13,
+        }}
+      >
+        {children}
+      </code>
+    ) : (
+      <code
+        style={{
+          backgroundColor: "rgba(0,0,0,0.06)",
+          padding: "1px 5px",
+          borderRadius: 3,
+          fontFamily:
+            "var(--font-space-grotesk), Space Grotesk, monospace",
+          fontSize: 13,
+        }}
+      >
+        {children}
+      </code>
+    ),
+  pre: ({ children }: { children?: React.ReactNode }) => (
+    <pre
+      style={{
+        backgroundColor: "rgba(0,0,0,0.04)",
+        padding: 12,
+        borderRadius: 6,
+        overflow: "auto",
+        margin: "8px 0",
+        fontSize: 13,
+      }}
+    >
+      {children}
+    </pre>
+  ),
+  ul: ({ children }: { children?: React.ReactNode }) => (
+    <ul style={{ paddingLeft: 20, margin: "4px 0" }}>{children}</ul>
+  ),
+  ol: ({ children }: { children?: React.ReactNode }) => (
+    <ol style={{ paddingLeft: 20, margin: "4px 0" }}>{children}</ol>
+  ),
+  li: ({ children }: { children?: React.ReactNode }) => (
+    <li style={{ margin: "2px 0" }}>{children}</li>
+  ),
+  h1: ({ children }: { children?: React.ReactNode }) => (
+    <h1 style={{ fontSize: 18, fontWeight: 700, margin: "12px 0 6px" }}>
+      {children}
+    </h1>
+  ),
+  h2: ({ children }: { children?: React.ReactNode }) => (
+    <h2 style={{ fontSize: 16, fontWeight: 700, margin: "10px 0 4px" }}>
+      {children}
+    </h2>
+  ),
+  h3: ({ children }: { children?: React.ReactNode }) => (
+    <h3 style={{ fontSize: 14, fontWeight: 600, margin: "8px 0 4px" }}>
+      {children}
+    </h3>
+  ),
+  blockquote: ({ children }: { children?: React.ReactNode }) => (
+    <blockquote
+      style={{
+        borderLeft: "3px solid #93452A",
+        paddingLeft: 12,
+        margin: "6px 0",
+        color: "#5E5E65",
+        fontStyle: "italic",
+      }}
+    >
+      {children}
+    </blockquote>
+  ),
+  table: ({ children }: { children?: React.ReactNode }) => (
+    <table
+      style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        margin: "8px 0",
+        fontSize: 13,
+      }}
+    >
+      {children}
+    </table>
+  ),
+  th: ({ children }: { children?: React.ReactNode }) => (
+    <th
+      style={{
+        padding: "4px 8px",
+        textAlign: "left" as const,
+        fontWeight: 600,
+        borderBottom: "1px solid rgba(0,0,0,0.1)",
+      }}
+    >
+      {children}
+    </th>
+  ),
+  td: ({ children }: { children?: React.ReactNode }) => (
+    <td
+      style={{
+        padding: "4px 8px",
+        borderBottom: "1px solid rgba(0,0,0,0.05)",
+      }}
+    >
+      {children}
+    </td>
+  ),
+  hr: () => (
+    <hr
+      style={{
+        border: "none",
+        borderTop: "1px solid rgba(218, 193, 185, 0.3)",
+        margin: "12px 0",
+      }}
+    />
+  ),
 };
+
+/** Single compact row used for tool calls, system events, thinking, etc.
+ *  Matches the Vibe Kanban style: small icon + one-line label, muted. */
+function CompactRow({
+  icon: Icon,
+  label,
+  detail,
+  accent,
+  rightSlot,
+  onClick,
+}: {
+  icon: React.ComponentType<{ size?: number; color?: string; style?: React.CSSProperties }>;
+  label: string;
+  detail?: string | null;
+  accent?: string;
+  rightSlot?: React.ReactNode;
+  onClick?: () => void;
+}) {
+  const color = accent ?? "#5E5E65";
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "4px 2px",
+        fontSize: 13,
+        fontFamily: "var(--font-inter), Inter, sans-serif",
+        color: "#1B1C1B",
+        cursor: onClick ? "pointer" : "default",
+        lineHeight: 1.4,
+      }}
+    >
+      <Icon size={14} color={color} style={{ flexShrink: 0 }} />
+      <span style={{ color: "#1B1C1B" }}>{label}</span>
+      {detail && (
+        <span style={{ color: "#9C9CA0", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {detail}
+        </span>
+      )}
+      {rightSlot}
+    </div>
+  );
+}
+
+/* ─────────────────────────────── text group ─────────────────────────────── */
 
 /**
  * Render a group of consecutive Claude text entries.
- * Short "working" entries (< 200 chars) are shown muted/compact.
- * Substantial entries get full markdown rendering with a card background.
+ * Vibe-Kanban style: plain prose, no bubble, no background — the assistant's
+ * voice is the "default" voice of the stream. User messages are the only
+ * thing that gets a box.
  */
-export function TextGroup({ entries }: { entries: LogEntry[] }) {
+/** Detect whether an inline code string looks like a file path. */
+const FILE_PATH_RE = /^[.\w/-]+\.\w{1,10}$/;
+const PREVIEWABLE_CODE_EXTS = new Set([
+  "md", "txt", "csv", "json", "html", "log", "yml", "yaml", "toml",
+  "ts", "tsx", "js", "jsx", "py", "rs", "go", "sql", "sh", "css",
+]);
+
+function looksLikeFilePath(text: string): boolean {
+  if (!FILE_PATH_RE.test(text)) return false;
+  const dot = text.lastIndexOf(".");
+  if (dot < 0) return false;
+  const ext = text.slice(dot + 1).toLowerCase();
+  return PREVIEWABLE_CODE_EXTS.has(ext);
+}
+
+export function TextGroup({
+  entries,
+  onPreviewFile,
+}: {
+  entries: LogEntry[];
+  onPreviewFile?: (file: { relativePath: string; extension: string; fileName: string }) => void;
+}) {
+  const [previewingPath, setPreviewingPath] = useState<{ relativePath: string; extension: string } | null>(null);
+
+  // Build markdown components with file-path-aware inline code
+  const components = {
+    ...markdownComponents,
+    code: ({
+      children,
+      className: cn,
+    }: {
+      children?: React.ReactNode;
+      className?: string;
+    }) => {
+      const text = typeof children === "string" ? children : String(children ?? "");
+      // Inline code (not inside a pre/code block) that looks like a file path
+      if (!cn && looksLikeFilePath(text)) {
+        const parts = text.split("/");
+        const fileName = parts[parts.length - 1];
+        const dot = fileName.lastIndexOf(".");
+        const ext = dot >= 0 ? fileName.slice(dot + 1).toLowerCase() : "";
+        const isActive = previewingPath?.relativePath === text;
+        return (
+          <code
+            onClick={() => {
+              if (isActive) {
+                setPreviewingPath(null);
+              } else {
+                setPreviewingPath({ relativePath: text, extension: ext });
+              }
+            }}
+            style={{
+              backgroundColor: isActive ? "rgba(147, 69, 42, 0.12)" : "rgba(147, 69, 42, 0.06)",
+              padding: "1px 5px",
+              borderRadius: 3,
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace",
+              fontSize: 13,
+              color: "#93452A",
+              cursor: "pointer",
+              textDecoration: "underline",
+              textDecorationColor: "rgba(147, 69, 42, 0.3)",
+              textUnderlineOffset: 2,
+            }}
+          >
+            {children}
+          </code>
+        );
+      }
+      // Default inline code rendering
+      return cn ? (
+        <code style={{ fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace", fontSize: 13 }}>
+          {children}
+        </code>
+      ) : (
+        <code style={{ backgroundColor: "rgba(0,0,0,0.06)", padding: "1px 5px", borderRadius: 3, fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace", fontSize: 13 }}>
+          {children}
+        </code>
+      );
+    },
+  };
+
   return (
     <>
-      {entries.map((entry) => {
-        const isSubstantial = entry.content.length > 200;
-
-        if (!isSubstantial) {
-          return (
-            <div key={entry.id} style={{ width: "100%", display: "flex", alignItems: "baseline", gap: 8 }}>
-              <div
-                className="chat-markdown"
-                style={{
-                  fontSize: 13,
-                  fontFamily: "var(--font-inter), Inter, sans-serif",
-                  color: "#5E5E65",
-                  lineHeight: 1.5,
-                }}
-              >
-                <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                  {entry.content}
-                </ReactMarkdown>
-              </div>
-              <Timestamp iso={entry.timestamp} />
-            </div>
-          );
-        }
-
-        return (
-          <div key={entry.id} style={{ width: "100%" }}>
-            <div
-              className="chat-markdown"
-              style={{
-                backgroundColor: "#F9F8F7",
-                borderRadius: "0.5rem",
-                border: "1px solid rgba(218, 193, 185, 0.15)",
-                padding: "16px 20px",
-                fontSize: 14,
-                fontFamily: "var(--font-inter), Inter, sans-serif",
-                color: "#1B1C1B",
-                lineHeight: 1.6,
-              }}
+      {entries.map((entry) => (
+        <div
+          key={entry.id}
+          className="chat-markdown"
+          style={{
+            width: "100%",
+            padding: "2px 2px",
+            fontSize: 13,
+            fontFamily: "var(--font-inter), Inter, sans-serif",
+            color: "#1B1C1B",
+            lineHeight: 1.6,
+          }}
+        >
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+            {entry.content}
+          </ReactMarkdown>
+        </div>
+      ))}
+      {previewingPath && (
+        <div style={{ width: "100%", marginTop: 4, marginBottom: 4 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "6px 10px",
+              background: "#f3f0ee",
+              border: "1px solid #93452A",
+              borderBottom: "none",
+              borderRadius: "6px 6px 0 0",
+              fontSize: 11,
+              fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace",
+              color: "#93452A",
+              fontWeight: 500,
+            }}
+          >
+            <span>{previewingPath.relativePath.split("/").pop()}</span>
+            <button
+              onClick={() => setPreviewingPath(null)}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#93452A", padding: 0, display: "flex" }}
             >
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                {entry.content}
-              </ReactMarkdown>
-            </div>
-            <Timestamp iso={entry.timestamp} />
+              <ChevronDown size={12} />
+            </button>
           </div>
-        );
-      })}
+          <InlinePreviewPanel
+            relativePath={previewingPath.relativePath}
+            extension={previewingPath.extension}
+            accentColor="#93452A"
+            borderRadius="0 0 6px 6px"
+          />
+        </div>
+      )}
     </>
   );
 }
 
-/**
- * Extract a human-readable label from a tool_use entry.
- */
-function extractToolLabel(entry: LogEntry): string {
-  const name = entry.toolName || "Tool";
-  let detail = "";
-  if (entry.toolArgs) {
-    try {
-      const parsed = JSON.parse(entry.toolArgs);
-      // Read/Write/Edit — show file path
-      if (parsed.file_path) {
-        const parts = String(parsed.file_path).split("/");
-        detail = parts.slice(-2).join("/");
-      } else if (parsed.path) {
-        const parts = String(parsed.path).split("/");
-        detail = parts.slice(-2).join("/");
-      } else if (parsed.pattern) {
-        detail = String(parsed.pattern);
-      } else if (parsed.command) {
-        const cmd = String(parsed.command);
-        detail = cmd.length > 50 ? cmd.slice(0, 50) + "..." : cmd;
-      } else {
-        const firstKey = Object.keys(parsed)[0];
-        if (firstKey) {
-          const val = String(parsed[firstKey]);
-          detail = val.length > 50 ? val.slice(0, 50) + "..." : val;
-        }
+/* ─────────────────────────────── file output ─────────────────────────────── */
+
+/** True when the tool_use represents a file write or edit that we want to
+ *  surface as its own inline card. */
+export function isFileOutputEntry(entry: LogEntry): boolean {
+  if (entry.type !== "tool_use") return false;
+  const name = (entry.toolName || "").toLowerCase();
+  return (
+    name === "write" ||
+    name === "edit" ||
+    name === "multiedit" ||
+    name === "notebookedit"
+  );
+}
+
+type FileOutputInfo = {
+  absolutePath: string;
+  relativePath: string;
+  breadcrumb: string[];
+  fileName: string;
+  extension: string;
+  op: "create" | "edit";
+  linesAdded: number | null;
+  linesChanged: number | null;
+};
+
+export function parseFileOutput(entry: LogEntry): FileOutputInfo | null {
+  if (!entry.toolArgs) return null;
+  let args: Record<string, unknown>;
+  try {
+    args = JSON.parse(entry.toolArgs);
+  } catch {
+    return null;
+  }
+
+  const absolutePath =
+    typeof args.file_path === "string"
+      ? args.file_path
+      : typeof args.path === "string"
+      ? args.path
+      : null;
+  if (!absolutePath) return null;
+
+  const rootMarker = "/agentic-os/";
+  const idx = absolutePath.indexOf(rootMarker);
+  const relativePath =
+    idx >= 0 ? absolutePath.slice(idx + rootMarker.length) : absolutePath;
+
+  const parts = relativePath.split("/").filter(Boolean);
+  const fileName = parts[parts.length - 1] || relativePath;
+  const breadcrumb = parts.slice(0, -1);
+  const extDot = fileName.lastIndexOf(".");
+  const extension = extDot >= 0 ? fileName.slice(extDot + 1).toLowerCase() : "";
+
+  const name = (entry.toolName || "").toLowerCase();
+  const op: "create" | "edit" = name === "write" ? "create" : "edit";
+
+  let linesAdded: number | null = null;
+  let linesChanged: number | null = null;
+
+  if (op === "create" && typeof args.content === "string") {
+    linesAdded = args.content.split("\n").length;
+  } else if (op === "edit") {
+    if (typeof args.new_string === "string") {
+      const newLines = args.new_string.split("\n").length;
+      const oldLines =
+        typeof args.old_string === "string"
+          ? args.old_string.split("\n").length
+          : 0;
+      linesChanged = Math.max(newLines, oldLines);
+      linesAdded = newLines - oldLines;
+    } else if (Array.isArray(args.edits)) {
+      let total = 0;
+      for (const edit of args.edits as Array<{
+        new_string?: string;
+        old_string?: string;
+      }>) {
+        const n =
+          typeof edit.new_string === "string"
+            ? edit.new_string.split("\n").length
+            : 0;
+        const o =
+          typeof edit.old_string === "string"
+            ? edit.old_string.split("\n").length
+            : 0;
+        total += Math.max(n, o);
       }
-    } catch {
-      detail = entry.toolArgs.slice(0, 50);
+      linesChanged = total;
     }
   }
-  return detail ? `${name}: ${detail}` : name;
+
+  return {
+    absolutePath,
+    relativePath,
+    breadcrumb,
+    fileName,
+    extension,
+    op,
+    linesAdded,
+    linesChanged,
+  };
 }
 
-/**
- * Categorise a tool_use entry for the business summary.
- */
-function categoriseTool(entry: LogEntry): "context" | "output" | "action" {
-  const name = (entry.toolName || "").toLowerCase();
-  const args = entry.toolArgs || "";
+const PREVIEWABLE_EXTS = new Set(["md", "txt", "csv", "json", "html", "htm", "log"]);
+const HTML_EXTS = new Set(["html", "htm"]);
 
-  // Read-like tools = context loading
-  if (name === "read" || name === "glob" || name === "grep" || name === "webfetch" || name === "websearch") {
-    return "context";
-  }
+/** Shared inline preview panel used by FileOutputCard and TextGroup. */
+function InlinePreviewPanel({
+  relativePath,
+  extension,
+  accentColor,
+  borderRadius,
+}: {
+  relativePath: string;
+  extension: string;
+  accentColor: string;
+  borderRadius?: string;
+}) {
+  const [content, setContent] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const isHtml = HTML_EXTS.has(extension);
 
-  // Write/Edit = output
-  if (name === "write" || name === "edit") {
-    return "output";
-  }
+  useEffect(() => {
+    if (isHtml) { setLoading(false); return; }
+    fetch(`/api/files/preview?path=${encodeURIComponent(relativePath)}`)
+      .then(async (r) => {
+        if (!r.ok) { setContent(null); return; }
+        const ct = r.headers.get("content-type") || "";
+        if (ct.includes("application/json")) {
+          const j = await r.json();
+          setContent(j.content ?? null);
+        } else {
+          setContent(await r.text());
+        }
+      })
+      .catch(() => setContent(null))
+      .finally(() => setLoading(false));
+  }, [relativePath, isHtml]);
 
-  // Bash with git, npm build, etc = action
-  if (name === "bash") {
-    if (args.includes("git") || args.includes("npm") || args.includes("node")) return "action";
-    // Bash reads (cat, ls) = context
-    if (args.includes("cat ") || args.includes("ls ") || args.includes("head ")) return "context";
-    return "action";
-  }
-
-  return "action";
+  return (
+    <div
+      style={{
+        border: `1px solid ${accentColor}`,
+        borderTop: "none",
+        borderRadius: borderRadius ?? "0 0 6px 6px",
+        background: "#FBFAF9",
+        maxHeight: isHtml ? 500 : 300,
+        overflowY: isHtml ? "hidden" : "auto",
+        padding: isHtml ? 0 : 12,
+        fontSize: 12,
+        fontFamily: extension === "md" ? "var(--font-inter), Inter, sans-serif" : "var(--font-space-grotesk), Space Grotesk, monospace",
+        lineHeight: 1.6,
+        color: "#333",
+      }}
+    >
+      {loading ? (
+        <span style={{ color: "#9C9CA0", fontSize: 11, padding: isHtml ? 12 : 0 }}>Loading…</span>
+      ) : isHtml ? (
+        <iframe
+          src={`/api/files/preview?path=${encodeURIComponent(relativePath)}`}
+          title={relativePath}
+          sandbox="allow-scripts allow-same-origin"
+          style={{
+            width: "100%",
+            height: 500,
+            border: "none",
+            borderRadius: borderRadius ?? "0 0 6px 6px",
+            display: "block",
+          }}
+        />
+      ) : content != null ? (
+        extension === "md" ? (
+          <div className="chat-markdown">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+              {content}
+            </ReactMarkdown>
+          </div>
+        ) : (
+          <pre style={{ margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{content}</pre>
+        )
+      ) : (
+        <span style={{ color: "#9C9CA0", fontSize: 11 }}>Unable to load preview</span>
+      )}
+    </div>
+  );
 }
 
-/**
- * A collapsed summary of tool operations, grouped by category.
- * Shows "Context loaded", "Files created/edited", "Actions run" with expand toggle.
- */
-export function ToolSummaryBlock({ entries }: { entries: LogEntry[] }) {
+export function FileOutputCard({
+  entry,
+  onPreview,
+  isActive,
+}: {
+  entry: LogEntry;
+  onPreview?: (info: { relativePath: string; extension: string }) => void;
+  isActive?: boolean;
+}) {
   const [expanded, setExpanded] = useState(false);
 
-  const contextItems: string[] = [];
-  const outputItems: string[] = [];
-  const actionItems: string[] = [];
+  const info = parseFileOutput(entry);
+  if (!info) return null;
 
-  for (const entry of entries) {
-    if (entry.type !== "tool_use") continue;
-    const category = categoriseTool(entry);
-    const label = extractToolLabel(entry);
-    if (category === "context") contextItems.push(label);
-    else if (category === "output") outputItems.push(label);
-    else actionItems.push(label);
-  }
+  const Icon = info.op === "create" ? FilePlus2 : FileEdit;
+  const accentColor = info.op === "create" ? "#5a9a5a" : "#93452A";
+  const lineBadge =
+    info.op === "create" && info.linesAdded != null
+      ? `+${info.linesAdded} lines`
+      : info.linesAdded != null
+      ? `${info.linesAdded >= 0 ? "+" : ""}${info.linesAdded} lines`
+      : info.linesChanged != null
+      ? `~${info.linesChanged} lines`
+      : null;
 
-  const hasSummary = contextItems.length > 0 || outputItems.length > 0 || actionItems.length > 0;
-  if (!hasSummary) return null;
-
-  const chipStyle: React.CSSProperties = {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 5,
-    padding: "3px 10px",
-    borderRadius: "0.375rem",
-    fontSize: 12,
-    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-    fontWeight: 500,
-    backgroundColor: "#F6F3F1",
-    color: "#5E5E65",
-    whiteSpace: "nowrap",
-  };
+  const previewable = PREVIEWABLE_EXTS.has(info.extension);
 
   return (
     <div style={{ width: "100%" }}>
-      {/* Collapsed summary chips */}
-      <div
+      <button
+        onClick={() => {
+          if (previewable) setExpanded((e) => !e);
+        }}
+        disabled={!previewable}
+        title={
+          previewable
+            ? `Preview ${info.fileName}`
+            : `Preview not available for .${info.extension || "?"} files`
+        }
         style={{
           display: "flex",
-          flexWrap: "wrap",
-          gap: 6,
           alignItems: "center",
+          gap: 10,
+          width: "100%",
+          padding: "8px 12px",
+          border: expanded || isActive
+            ? `1px solid ${accentColor}`
+            : "1px solid #EAE8E6",
+          borderRadius: expanded ? "6px 6px 0 0" : 6,
+          background: "#FBFAF9",
+          cursor: previewable ? "pointer" : "default",
+          textAlign: "left",
+          transition: "border-color 120ms ease, background 120ms ease",
         }}
       >
-        {contextItems.length > 0 && (
-          <span style={chipStyle}>
-            <FolderOpen size={12} />
-            {contextItems.length} file{contextItems.length !== 1 ? "s" : ""} read
-          </span>
-        )}
-        {outputItems.length > 0 && (
-          <span style={{ ...chipStyle, backgroundColor: "#FFDBCF", color: "#390C00" }}>
-            <FileText size={12} />
-            {outputItems.length} file{outputItems.length !== 1 ? "s" : ""} written
-          </span>
-        )}
-        {actionItems.length > 0 && (
-          <span style={chipStyle}>
-            <Wrench size={12} />
-            {actionItems.length} action{actionItems.length !== 1 ? "s" : ""}
-          </span>
-        )}
-        <button
-          onClick={() => setExpanded(!expanded)}
+        <Icon size={14} color={accentColor} style={{ flexShrink: 0 }} />
+        <span
           style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "2px 4px",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 3,
-            fontSize: 11,
-            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-            color: "#93452A",
+            flex: 1,
+            minWidth: 0,
+            fontSize: 13,
+            fontFamily:
+              "var(--font-space-grotesk), Space Grotesk, monospace",
+            color: "#1B1C1B",
             fontWeight: 500,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           }}
         >
-          {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-          {expanded ? "Hide" : "Details"}
-        </button>
-      </div>
+          {info.fileName}
+        </span>
+        {lineBadge && (
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: accentColor,
+              fontFamily:
+                "var(--font-space-grotesk), Space Grotesk, monospace",
+              flexShrink: 0,
+            }}
+          >
+            {lineBadge}
+          </span>
+        )}
+        {previewable && (
+          expanded
+            ? <ChevronDown size={14} color="#9C9CA0" style={{ flexShrink: 0 }} />
+            : <ChevronRight size={14} color="#9C9CA0" style={{ flexShrink: 0 }} />
+        )}
+      </button>
+      {expanded && (
+        <InlinePreviewPanel
+          relativePath={info.relativePath}
+          extension={info.extension}
+          accentColor={accentColor}
+        />
+      )}
+    </div>
+  );
+}
 
-      {/* Expanded detail list */}
+/* ─────────────────────────────── tool rows ─────────────────────────────── */
+
+type ToolVisual = {
+  Icon: React.ComponentType<{ size?: number; color?: string; style?: React.CSSProperties }>;
+  label: string;
+  color: string;
+};
+
+function toolVisual(name: string): ToolVisual {
+  const n = name.toLowerCase();
+  if (n === "read") return { Icon: FileText, label: "Read", color: "#5E5E65" };
+  if (n === "glob") return { Icon: Search, label: "Search", color: "#5E5E65" };
+  if (n === "grep") return { Icon: Search, label: "Search", color: "#5E5E65" };
+  if (n === "ls") return { Icon: FolderOpen, label: "List", color: "#5E5E65" };
+  if (n === "bash") return { Icon: Terminal, label: "Bash", color: "#5E5E65" };
+  if (n === "webfetch") return { Icon: Globe, label: "Fetch", color: "#5E5E65" };
+  if (n === "websearch") return { Icon: Globe, label: "Search", color: "#5E5E65" };
+  if (n === "todowrite") return { Icon: ListChecks, label: "Updated Todos", color: "#5E5E65" };
+  if (n === "task" || n === "agent") return { Icon: Sparkles, label: "Agent", color: "#6D28D9" };
+  if (n === "skill") return { Icon: Sparkles, label: "Skill", color: "#6D28D9" };
+  return { Icon: Wrench, label: name || "Tool", color: "#5E5E65" };
+}
+
+/** Extract a short human-readable detail from a tool_use entry (file path,
+ *  command, pattern, etc.). Returns null when there's nothing useful. */
+function toolDetail(entry: LogEntry): string | null {
+  if (!entry.toolArgs) return null;
+  try {
+    const args = JSON.parse(entry.toolArgs) as Record<string, unknown>;
+    const name = (entry.toolName || "").toLowerCase();
+
+    if (name === "todowrite") {
+      if (Array.isArray(args.todos)) return `${args.todos.length} items`;
+      return null;
+    }
+    if (typeof args.file_path === "string") {
+      const p = args.file_path.split("/").slice(-2).join("/");
+      return p;
+    }
+    if (typeof args.path === "string") {
+      const p = args.path.split("/").slice(-2).join("/");
+      return p;
+    }
+    if (typeof args.pattern === "string") return args.pattern;
+    if (typeof args.query === "string")
+      return args.query.length > 60 ? args.query.slice(0, 60) + "…" : args.query;
+    if (typeof args.url === "string") {
+      try {
+        return new URL(args.url).hostname.replace(/^www\./, "");
+      } catch {
+        return args.url;
+      }
+    }
+    if (typeof args.skill === "string") return args.skill;
+    if (typeof args.command === "string") {
+      const cmd = args.command.trim();
+      return cmd.length > 60 ? cmd.slice(0, 60) + "…" : cmd;
+    }
+    if (typeof args.description === "string") {
+      const d = args.description.trim();
+      return d.length > 60 ? d.slice(0, 60) + "…" : d;
+    }
+    if (typeof args.subagent_type === "string") return args.subagent_type;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/** A compact single-line row for a tool_use entry (used inside expanded
+ *  tool summary blocks — intentionally small/muted). */
+function ToolRow({ entry }: { entry: LogEntry }) {
+  const visual = toolVisual(entry.toolName || "");
+  const detail = toolDetail(entry);
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "2px 0",
+        fontSize: 11,
+        fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+        color: "#b5b3b0",
+        lineHeight: 1.3,
+      }}
+    >
+      <visual.Icon size={11} color="#c4c0bb" style={{ flexShrink: 0 }} />
+      <span>{visual.label}</span>
+      {detail && (
+        <span style={{ color: "#c4c0bb", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          · {detail}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/** Renders a group of consecutive tool_use / tool_result entries as a
+ *  collapsible summary. Collapsed by default — shows "Used N tools" with
+ *  a short preview of tool names. Expand to see the full list. */
+export function ToolSummaryBlock({ entries }: { entries: LogEntry[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const rows = entries.filter(
+    (e) => e.type === "tool_use" && !isFileOutputEntry(e),
+  );
+  if (rows.length === 0) return null;
+
+  // Build a compact summary: "Read, Search, Bash" (deduplicated)
+  const toolNames: string[] = [];
+  const seen = new Set<string>();
+  for (const entry of rows) {
+    const v = toolVisual(entry.toolName || "");
+    if (!seen.has(v.label)) {
+      seen.add(v.label);
+      toolNames.push(v.label);
+    }
+  }
+  const summary = toolNames.length <= 4
+    ? toolNames.join(", ")
+    : toolNames.slice(0, 3).join(", ") + ` +${toolNames.length - 3} more`;
+
+  return (
+    <div style={{ width: "100%" }}>
+      <button
+        type="button"
+        onClick={() => setExpanded((e) => !e)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "2px 2px",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          fontSize: 11,
+          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+          color: "#b5b3b0",
+          fontWeight: 500,
+          lineHeight: 1.4,
+        }}
+      >
+        {expanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
+        <Wrench size={10} style={{ flexShrink: 0 }} />
+        <span>
+          Used {rows.length} tool{rows.length === 1 ? "" : "s"}
+        </span>
+        {!expanded && (
+          <span style={{ color: "#c4c0bb" }}>
+            {summary}
+          </span>
+        )}
+      </button>
       {expanded && (
         <div
           style={{
-            marginTop: 8,
-            padding: "10px 14px",
-            backgroundColor: "#F9F8F7",
-            borderRadius: "0.375rem",
-            border: "1px solid #EAE8E6",
-            fontSize: 12,
-            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-            color: "#5E5E65",
-            lineHeight: 1.8,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            paddingLeft: 18,
+            marginTop: 2,
           }}
         >
-          {contextItems.length > 0 && (
-            <div>
-              <div style={{ fontWeight: 600, color: "#1B1C1B", marginBottom: 2 }}>Context loaded</div>
-              {contextItems.map((item, i) => (
-                <div key={i} style={{ paddingLeft: 12 }}>{item}</div>
-              ))}
-            </div>
-          )}
-          {outputItems.length > 0 && (
-            <div style={{ marginTop: contextItems.length > 0 ? 8 : 0 }}>
-              <div style={{ fontWeight: 600, color: "#1B1C1B", marginBottom: 2 }}>Files created / edited</div>
-              {outputItems.map((item, i) => (
-                <div key={i} style={{ paddingLeft: 12 }}>{item}</div>
-              ))}
-            </div>
-          )}
-          {actionItems.length > 0 && (
-            <div style={{ marginTop: (contextItems.length > 0 || outputItems.length > 0) ? 8 : 0 }}>
-              <div style={{ fontWeight: 600, color: "#1B1C1B", marginBottom: 2 }}>Actions</div>
-              {actionItems.map((item, i) => (
-                <div key={i} style={{ paddingLeft: 12 }}>{item}</div>
-              ))}
-            </div>
-          )}
+          {rows.map((entry) => (
+            <ToolRow key={entry.id} entry={entry} />
+          ))}
         </div>
       )}
     </div>
   );
 }
+
+/* ─────────────────────────────── questions ─────────────────────────────── */
 
 function QuestionEntry({ entry }: { entry: LogEntry }) {
   return (
@@ -317,7 +864,7 @@ function QuestionEntry({ entry }: { entry: LogEntry }) {
           backgroundColor: "#FFF5F3",
           padding: "12px 16px",
           borderRadius: "0 0.5rem 0.5rem 0",
-          fontSize: 14,
+          fontSize: 13,
           fontFamily: "var(--font-inter), Inter, sans-serif",
           color: "#1B1C1B",
           lineHeight: 1.6,
@@ -332,77 +879,326 @@ function QuestionEntry({ entry }: { entry: LogEntry }) {
   );
 }
 
-function UserReplyEntry({ entry }: { entry: LogEntry }) {
+function StructuredQuestionEntry({
+  entry,
+  taskId,
+  readOnly,
+}: {
+  entry: LogEntry;
+  taskId?: string;
+  readOnly?: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  let specs: QuestionSpec[] = [];
+  try {
+    if (entry.questionSpec) {
+      specs = parseQuestionSpecs(JSON.parse(entry.questionSpec));
+    }
+  } catch {
+    /* ignore */
+  }
+
+  let answers: QuestionAnswers | null = null;
+  try {
+    if (entry.questionAnswers) {
+      answers = JSON.parse(entry.questionAnswers) as QuestionAnswers;
+    }
+  } catch {
+    /* ignore */
+  }
+
+  const answered = answers !== null || submitted;
+  const count = specs.length;
+  // Structured questions are always interactive when unanswered — readOnly
+  // only gates the free-text reply input, not inline question forms.
+  const canShowForm = !answered && taskId && count > 0;
+
+  if (count === 0) return null;
+
+  const handleSubmit = async (formAnswers: QuestionAnswers) => {
+    if (!taskId) return;
+    const prose = serializeAnswersToProse(specs, formAnswers);
+    try {
+      await fetch(`/api/tasks/${taskId}/reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: prose }),
+      });
+      setSubmitted(true);
+    } catch {
+      /* allow retry */
+    }
+  };
+
+  const summary = answered
+    ? `${count} question${count === 1 ? "" : "s"} answered`
+    : `${count} question${count === 1 ? "" : "s"} — waiting for your reply`;
+
   return (
-    <div
-      style={{
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-end",
-      }}
-    >
+    <div style={{ width: "100%" }}>
       <div
         style={{
-          maxWidth: "70%",
-          backgroundColor: "rgba(147, 69, 42, 0.06)",
-          border: "1px solid rgba(218, 193, 185, 0.3)",
-          color: "#1B1C1B",
-          borderRadius: "0.75rem 0.75rem 0.25rem 0.75rem",
+          borderLeft: `3px solid ${answered ? "#1B7F3A" : "#93452A"}`,
+          backgroundColor: answered ? "#F1F8F3" : "#FFF5F3",
           padding: "10px 14px",
+          borderRadius: "0 0.5rem 0.5rem 0",
+          fontFamily: "var(--font-inter), Inter, sans-serif",
+          color: "#1B1C1B",
         }}
       >
-        <span
+        {/* Header — always visible */}
+        <button
+          onClick={() => setExpanded((e) => !e)}
           style={{
-            fontSize: 14,
-            fontFamily: "var(--font-inter), Inter, sans-serif",
-            lineHeight: 1.6,
-            whiteSpace: "pre-wrap",
+            background: "none",
+            border: "none",
+            padding: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 600,
+            color: answered ? "#1B7F3A" : "#93452A",
+            fontFamily:
+              "var(--font-space-grotesk), Space Grotesk, sans-serif",
           }}
         >
-          {entry.content}
-        </span>
+          {(expanded || canShowForm) ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          {summary}
+        </button>
+
+        {/* Interactive form — shown inline when unanswered */}
+        {canShowForm && (
+          <div style={{ marginTop: 12 }}>
+            <QuestionModal
+              questions={specs}
+              variant="inline"
+              hideFooter={false}
+              submitLabel="Reply"
+              onSubmit={handleSubmit}
+            />
+          </div>
+        )}
+
+        {/* Read-only answers — shown when answered and expanded */}
+        {answered && expanded && (
+          <div
+            style={{
+              marginTop: 10,
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+            }}
+          >
+            {specs.map((spec) => {
+              const answer = answers?.[spec.id];
+              const displayAnswer = Array.isArray(answer)
+                ? answer.join(", ")
+                : typeof answer === "string"
+                ? answer
+                : "";
+              return (
+                <div key={spec.id} style={{ fontSize: 13, lineHeight: 1.5 }}>
+                  <div style={{ color: "#5E5E65", fontWeight: 500 }}>
+                    {spec.prompt}
+                  </div>
+                  <div
+                    style={{
+                      color: displayAnswer ? "#1B1C1B" : "#9C9CA0",
+                      marginTop: 2,
+                      whiteSpace: "pre-wrap",
+                      fontStyle: displayAnswer ? "normal" : "italic",
+                    }}
+                  >
+                    {displayAnswer || "(no answer)"}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
       <Timestamp iso={entry.timestamp} />
     </div>
   );
 }
 
-function SystemEntry({ entry }: { entry: LogEntry }) {
+/* ─────────────────────────────── user reply ─────────────────────────────── */
+
+/** Vibe-Kanban-style user message: full-width bordered card, header with
+ *  a person icon + "You" label, content below in a clean block. */
+/** Strip injected context blocks (brand context, user context, system prompts) from user messages */
+function stripInjectedContext(text: string): string {
+  let cleaned = text;
+  // Remove brand/user context blocks: --- BRAND & USER CONTEXT --- ... --- END CONTEXT ---
+  cleaned = cleaned.replace(/\n*--- BRAND & USER CONTEXT ---[\s\S]*?--- END CONTEXT ---\n*/g, "");
+  // Remove session activity summary prefix injected for wrap-up tasks
+  cleaned = cleaned.replace(/^IMPORTANT: The following session activity summary[\s\S]*?Now proceed with the task:\n*/m, "");
+  // Remove structured question addendum
+  cleaned = cleaned.replace(/\n*---\nIMPORTANT:.*structured question protocol[\s\S]*$/m, "");
+  // Remove project scoping system prompt prefix
+  cleaned = cleaned.replace(/^You are scoping a Level \d+ (?:planned |GSD )?project[\s\S]*?(?:CRITICAL:.*\n)*/m, "");
+  // Remove GSD project prompt prefix
+  cleaned = cleaned.replace(/^Run \/gsd:new-project[\s\S]*$/m, "");
+  // Remove any remaining brand context blocks that weren't in the standard wrapper
+  cleaned = cleaned.replace(/\n*--- (?:BRAND|USER) (?:&|AND) [\s\S]*?---\n*/gi, "");
+  return cleaned.trim();
+}
+
+function UserReplyEntry({ entry, permissionMode }: { entry: LogEntry; permissionMode?: PermissionMode }) {
+  const [collapsed, setCollapsed] = useState(false);
+  const displayContent = stripInjectedContext(entry.content);
+
   return (
-    <div style={{ width: "100%", textAlign: "center" }}>
-      <span
+    <div
+      style={{
+        width: "100%",
+        border: "1px solid #EAE8E6",
+        borderRadius: 8,
+        backgroundColor: "#FFFFFF",
+        padding: "10px 14px 12px",
+      }}
+    >
+      {/* Header: icon + You label + permission mode + (collapse) */}
+      <div
         style={{
-          fontSize: 12,
-          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-          color: "#5E5E65",
-          fontStyle: "italic",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: collapsed ? 0 : 6,
         }}
       >
-        {entry.content}
-      </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <UserIcon size={14} color="#5E5E65" />
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              fontFamily:
+                "var(--font-space-grotesk), Space Grotesk, sans-serif",
+              color: "#1B1C1B",
+            }}
+          >
+            You
+          </span>
+          {permissionMode && (
+            <span
+              style={{
+                fontSize: 10,
+                fontFamily: "'DM Mono', monospace",
+                fontWeight: 500,
+                color:
+                  permissionMode === "plan" ? "#16A34A"
+                  : permissionMode === "bypassPermissions" || permissionMode === "acceptEdits" || permissionMode === "auto" ? "#DC2626"
+                  : "#7C3AED",
+                background:
+                  permissionMode === "plan" ? "rgba(22, 163, 74, 0.08)"
+                  : permissionMode === "bypassPermissions" || permissionMode === "acceptEdits" || permissionMode === "auto" ? "rgba(220, 38, 38, 0.08)"
+                  : "rgba(124, 58, 237, 0.08)",
+                padding: "2px 6px",
+                borderRadius: 3,
+              }}
+            >
+              {PERMISSION_MODE_LABELS[permissionMode]?.toLowerCase() ?? permissionMode} mode
+            </span>
+          )}
+          <Timestamp iso={entry.timestamp} />
+        </div>
+        <button
+          type="button"
+          onClick={() => setCollapsed((c) => !c)}
+          title={collapsed ? "Expand" : "Collapse"}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 22,
+            height: 22,
+            border: "none",
+            borderRadius: 4,
+            background: "transparent",
+            color: "#9C9CA0",
+            cursor: "pointer",
+          }}
+        >
+          {collapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
+        </button>
+      </div>
+      {!collapsed && (
+        <div
+          style={{
+            fontSize: 13,
+            fontFamily: "var(--font-inter), Inter, sans-serif",
+            color: "#1B1C1B",
+            lineHeight: 1.6,
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {displayContent}
+        </div>
+      )}
     </div>
   );
 }
 
-/**
- * Single entry renderer — used for non-grouped entries.
- */
-export function ChatEntry({ entry }: { entry: LogEntry }) {
+/* ─────────────────────────────── system ─────────────────────────────── */
+
+function SystemEntry({ entry }: { entry: LogEntry }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "2px 2px",
+        fontSize: 11,
+        fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+        color: "#b5b3b0",
+        lineHeight: 1.4,
+      }}
+    >
+      <Info size={11} color="#c4c0bb" style={{ flexShrink: 0 }} />
+      <span>{entry.content}</span>
+    </div>
+  );
+}
+
+/* ─────────────────────────────── dispatch ─────────────────────────────── */
+
+/** Single entry renderer — used for non-grouped entries. */
+export function ChatEntry({
+  entry,
+  permissionMode,
+  taskId,
+  readOnly,
+}: {
+  entry: LogEntry;
+  permissionMode?: PermissionMode;
+  taskId?: string;
+  readOnly?: boolean;
+}) {
   switch (entry.type) {
     case "text":
       return <TextGroup entries={[entry]} />;
     case "tool_use":
     case "tool_result":
-      // These are handled by ToolSummaryBlock in grouped rendering
+      // Handled by ToolSummaryBlock in grouped rendering
       return null;
     case "question":
       return <QuestionEntry entry={entry} />;
+    case "structured_question":
+      return <StructuredQuestionEntry entry={entry} taskId={taskId} readOnly={readOnly} />;
     case "user_reply":
-      return <UserReplyEntry entry={entry} />;
+      return <UserReplyEntry entry={entry} permissionMode={permissionMode} />;
     case "system":
       return <SystemEntry entry={entry} />;
     default:
       return null;
   }
 }
+
+/** Small helper used by MessageSquare icon imports (avoid unused warning). */
+export const _thinkingIcon = MessageSquare;

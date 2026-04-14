@@ -148,14 +148,18 @@ function autoQueueNextPhase(db: Database.Database, completedChild: Task, now: st
   const currentPhase = completedChild.phaseNumber;
   if (currentPhase == null) return;
 
-  // Try to read total phases from .planning/ROADMAP.md
+  // Try to read total phases from the owning project's .planning/ROADMAP.md
   let totalPhases = 0;
   try {
     const fs = require("fs") as typeof import("fs");
     const path = require("path") as typeof import("path");
-    const config = require("@/lib/config").getConfig();
-    const roadmapPath = path.join(config.agenticOsDir, ".planning", "ROADMAP.md");
-    if (fs.existsSync(roadmapPath)) {
+    const { resolvePlanningDir } = require("@/lib/config") as typeof import("@/lib/config");
+    // Walk up from the completed child to find its GSD parent for the slug
+    const parent = db.prepare("SELECT projectSlug FROM tasks WHERE id = ?")
+      .get(completedChild.parentId) as { projectSlug: string | null } | undefined;
+    const resolved = resolvePlanningDir({ overrideSlug: parent?.projectSlug ?? null });
+    const roadmapPath = resolved ? path.join(resolved.planningDir, "ROADMAP.md") : "";
+    if (roadmapPath && fs.existsSync(roadmapPath)) {
       const content = fs.readFileSync(roadmapPath, "utf-8");
       // Count phase headings (## Phase N or ### Phase N)
       const phaseMatches = content.match(/^#{2,3}\s+Phase\s+\d+/gm);
@@ -308,9 +312,20 @@ export async function PATCH(
 
     // Kill running process when task is manually marked done
     if (body.status === "done" && processManager.hasActiveSession(id)) {
-      processManager.cancelTask(id).catch(() => {});
-      // Re-set status to done since cancelTask sets it to review
-      db.prepare("UPDATE tasks SET status = 'done', completedAt = COALESCE(completedAt, ?) WHERE id = ?").run(now, id);
+      processManager.addLogEntry(id, {
+        id: crypto.randomUUID(),
+        type: "system" as const,
+        timestamp: now,
+        content: "Process terminated — task marked as done.",
+        toolName: undefined,
+        toolArgs: undefined,
+        toolResult: undefined,
+        isCollapsed: false,
+        questionSpec: undefined,
+        questionAnswers: undefined,
+      });
+      // Kill process only — don't touch DB or emit SSE (we already set status=done above)
+      await processManager.killSession(id).catch(() => {});
     }
 
     // Auto-queue unblocked siblings when a child task is marked done

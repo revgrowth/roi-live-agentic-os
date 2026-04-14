@@ -4,19 +4,47 @@ import type { Client } from "@/types/client";
 
 interface ClientStore {
   clients: Client[];
-  selectedClientId: string | null; // null = Root (all clients)
+  rootName: string;
+  /**
+   * Feed-only visibility filter.
+   * null  = show all clients in Feed
+   * []    = show nothing
+   * [...] = show only the listed client slugs (supports "_root")
+   */
+  activeClientSlugs: string[] | null;
+  /**
+   * Global app scope used by workspace-level UI like cron, docs, and context.
+   * null = root workspace / all clients
+   */
+  selectedClientId: string | null;
   isLoading: boolean;
   error: string | null;
 
   fetchClients: () => Promise<void>;
+  toggleClient: (slug: string) => void;
+  setAllActive: () => void;
+  isClientActive: (slug: string) => boolean;
   setSelectedClient: (clientId: string | null) => void;
   getSelectedClient: () => Client | null;
+}
+
+function normalizeClientId(clientId: string | null): string | null {
+  if (!clientId || clientId === "root") {
+    return null;
+  }
+  return clientId;
+}
+
+function getDefaultFeedScope(clientId: string | null): string[] | null {
+  return clientId ? [clientId] : null;
 }
 
 export const useClientStore = create<ClientStore>()(
   persist(
     (set, get) => ({
       clients: [],
+      rootName: "Root",
+      activeClientSlugs: null,
       selectedClientId: null,
       isLoading: false,
       error: null,
@@ -26,8 +54,17 @@ export const useClientStore = create<ClientStore>()(
         try {
           const res = await fetch("/api/clients");
           if (!res.ok) throw new Error("Failed to fetch clients");
-          const clients = await res.json();
-          set({ clients, isLoading: false });
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            set({ clients: data, isLoading: false });
+            return;
+          }
+
+          set({
+            clients: data.clients ?? [],
+            rootName: data.rootName ?? "Root",
+            isLoading: false,
+          });
         } catch (err) {
           set({
             error: err instanceof Error ? err.message : "Unknown error",
@@ -36,8 +73,43 @@ export const useClientStore = create<ClientStore>()(
         }
       },
 
+      toggleClient: (slug: string) => {
+        const { activeClientSlugs, clients } = get();
+        const allSlugs = ["_root", ...clients.map((c) => c.slug)];
+
+        let next: string[] | null;
+        if (activeClientSlugs === null) {
+          next = allSlugs.filter((s) => s !== slug);
+        } else if (activeClientSlugs.includes(slug)) {
+          next = activeClientSlugs.filter((s) => s !== slug);
+        } else {
+          next = [...activeClientSlugs, slug];
+        }
+
+        const nextSelection = next;
+        if (Array.isArray(nextSelection) && allSlugs.every((s) => nextSelection.includes(s))) {
+          next = null;
+        }
+
+        set({ activeClientSlugs: next });
+      },
+
+      setAllActive: () => {
+        set({ activeClientSlugs: null });
+      },
+
+      isClientActive: (slug: string) => {
+        const { activeClientSlugs } = get();
+        if (activeClientSlugs === null) return true;
+        return activeClientSlugs.includes(slug);
+      },
+
       setSelectedClient: (clientId: string | null) => {
-        set({ selectedClientId: clientId });
+        const normalized = normalizeClientId(clientId);
+        set({
+          selectedClientId: normalized,
+          activeClientSlugs: getDefaultFeedScope(normalized),
+        });
       },
 
       getSelectedClient: () => {
@@ -48,7 +120,19 @@ export const useClientStore = create<ClientStore>()(
     }),
     {
       name: "command-centre-client",
-      partialize: (state) => ({ selectedClientId: state.selectedClientId }),
+      partialize: (state) => ({
+        activeClientSlugs: state.activeClientSlugs,
+        selectedClientId: state.selectedClientId,
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+
+        state.selectedClientId = normalizeClientId(state.selectedClientId ?? null);
+
+        if (state.activeClientSlugs === undefined) {
+          state.activeClientSlugs = getDefaultFeedScope(state.selectedClientId);
+        }
+      },
     }
   )
 );

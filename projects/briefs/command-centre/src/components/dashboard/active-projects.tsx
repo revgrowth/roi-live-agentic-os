@@ -17,9 +17,9 @@ interface ActiveProjectsProps {
 }
 
 const LEVEL_INFO: Record<number, { bg: string; text: string; label: string }> = {
-  1: { bg: "rgba(107, 142, 107, 0.1)", text: "#6B8E6B", label: "Quick task" },
-  2: { bg: "rgba(147, 69, 42, 0.1)", text: "#93452A", label: "Campaign" },
-  3: { bg: "rgba(59, 130, 246, 0.1)", text: "#3B82F6", label: "Deep build" },
+  1: { bg: "rgba(107, 142, 107, 0.1)", text: "#6B8E6B", label: "Task" },
+  2: { bg: "rgba(147, 69, 42, 0.1)", text: "#93452A", label: "Planned project" },
+  3: { bg: "rgba(59, 130, 246, 0.1)", text: "#3B82F6", label: "GSD project" },
 };
 
 export function ActiveProjects({ activeProjects }: ActiveProjectsProps) {

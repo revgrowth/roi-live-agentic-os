@@ -1,23 +1,32 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 interface GreetingHeaderProps {
   userName: string | null;
 }
 
 export function GreetingHeader({ userName }: GreetingHeaderProps) {
-  const now = new Date();
-  const hour = now.getHours();
+  // Compute greeting + date only after mount so the server-rendered HTML
+  // (which doesn't know the user's local time) matches the first client
+  // paint. Prevents hydration mismatches.
+  const [state, setState] = useState<{ greeting: string; dateStr: string } | null>(null);
 
-  let greeting: string;
-  if (hour < 12) greeting = "Good morning";
-  else if (hour < 17) greeting = "Good afternoon";
-  else greeting = "Good evening";
+  useEffect(() => {
+    const now = new Date();
+    const hour = now.getHours();
+    const greeting =
+      hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+    const dateStr = now.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    });
+    setState({ greeting, dateStr });
+  }, []);
 
-  const dateStr = now.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
+  const greeting = state?.greeting ?? "Hello";
+  const dateStr = state?.dateStr ?? "";
 
   return (
     <div style={{ marginBottom: 32 }}>
@@ -31,7 +40,7 @@ export function GreetingHeader({ userName }: GreetingHeaderProps) {
           margin: 0,
         }}
       >
-        {greeting}{userName ? `, ${userName}` : ""}.
+        <span suppressHydrationWarning>{greeting}{userName ? `, ${userName}` : ""}.</span>
       </h1>
       <p
         style={{
@@ -39,9 +48,11 @@ export function GreetingHeader({ userName }: GreetingHeaderProps) {
           fontSize: 14,
           color: "#5E5E65",
           marginTop: 8,
+          minHeight: "1.2em",
         }}
+        suppressHydrationWarning
       >
-        Here&apos;s your snapshot for {dateStr}.
+        {dateStr ? `Here's your snapshot for ${dateStr}.` : "\u00a0"}
       </p>
     </div>
   );

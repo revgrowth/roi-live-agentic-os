@@ -1,14 +1,14 @@
 # /start-here
 
-The entry point for every session. Detects state and routes accordingly.
+The onboarding entry point for first-time users.
 
-## Mode Detection
+## Guard
 
-Check whether `brand_context/` exists and contains populated files.
-- No brand_context/ files → First-run mode
-- Files exist → Returning mode
+Check whether `brand_context/` contains populated `.md` files.
+- **Files exist** → respond "You're already set up. Just tell me what you're working on." and **stop**. Do not continue to any steps below.
+- **No files** → continue to First-Run Mode below.
 
-**Skill selection check (both modes):** Read `.claude/skills/_catalog/installed.json`. If `selection_pending` is `true` (or the field is missing), the user hasn't chosen their skills yet. After completing the current mode's flow, run Step 8 (Skill Selection) before finishing — even in Returning mode.
+**Skill selection check:** Read `.claude/skills/_catalog/installed.json`. If `selection_pending` is `true` (or the field is missing), the user hasn't chosen their skills yet. Run Step 8 (Skill Selection) before finishing.
 
 ## Always (both modes)
 
@@ -20,6 +20,26 @@ Create today's memory file per CLAUDE.md's **Daily Memory** section:
 ---
 
 ## First-Run Mode
+
+### Step 0: GitHub Backup Check
+
+**Run this every session (first-run AND returning), before anything else.**
+
+Check whether the user's data is backed up to their own GitHub repo:
+1. Run `git remote -v` and inspect the `origin` URL.
+2. If `origin` contains `simonc602/agentic-os` (the upstream template), the user hasn't set up their own repo yet.
+3. If there is no `origin` at all, same situation.
+
+**If not configured:**
+> "Before we get started — your brand data, client files, and project outputs all live locally right now. If anything happens to this machine, they're gone. Let's back them up to a private GitHub repo that only you can access."
+
+Then guide them:
+- If `gh` CLI is available and authenticated: offer to create a private repo automatically (`gh repo create my-agentic-os --private --source=. --remote=origin`), rename the old origin to `upstream`, and push.
+- If `gh` is not available: give manual steps — create a private repo on GitHub, then run `git remote rename origin upstream && git remote add origin <their-url> && git push -u origin main`.
+- Reassure: "This is a **private** repo — only you can see it. Your brand voice, client data, and business content stay completely private."
+- After setup: "You're backed up. I'll remind you to push at the end of each session."
+
+**If already configured (origin is NOT the upstream):** skip silently.
 
 ### Step 1: Project Scan + Intro
 
@@ -75,7 +95,11 @@ Do NOT present all four at once.
 > **Empathetic** — leads with understanding, validates the struggle. *"Scaling alone is exhausting. You shouldn't need a team of 10 to get there."*
 
 "You can pick one, mix a couple, or describe it your own way."
-→ Wait for answer.
+
+Then add one follow-up line:
+> "If you're starting from zero and want a more thorough voice extraction, I can run you through our Agentic Academy playbook in Step 5 (~10-15 min) — otherwise we'll keep it quick."
+
+→ Wait for answer. Capture both the tone answer and a **deep_voice_flow** flag: `yes` if they opted in, `no` if they declined, `unset` if they didn't express a preference.
 
 Capture all answers. You'll use them to build brand_context/.
 
@@ -124,6 +148,13 @@ Read each skill's SKILL.md for the full methodology:
 - `.claude/skills/mkt-brand-voice/SKILL.md` → produces `voice-profile.md` + `samples.md`
 - `.claude/skills/mkt-positioning/SKILL.md` → produces `positioning.md`
 - `.claude/skills/mkt-icp/SKILL.md` → produces `icp.md`
+
+**Brand voice routing (pass through the `deep_voice_flow` flag from Q4):**
+- If the user provided a URL in Step 3 that scraped successfully, or pasted usable copy in Step 4 → route into **Auto-Scrape** / **Extract**. Do not mention Playbook.
+- Otherwise route into **Build mode**. Inside Build:
+  - `deep_voice_flow = yes` → go directly into the Playbook variant (`references/playbook-questions.md`). Don't re-ask the quick-vs-deep fork.
+  - `deep_voice_flow = unset` → offer Playbook as the default: *"You're starting from zero on voice — want to run the Agentic Academy playbook (~20-25 min, deeper) or keep it to a quick 8-question setup?"* Route based on their answer.
+  - `deep_voice_flow = no` → go directly into Quick Build (`references/build-questions.md`). Don't mention Playbook again.
 
 Create `context/learnings.md` with sections matching installed skill folder names (e.g., `## mkt-brand-voice`).
 
@@ -251,82 +282,6 @@ End with ONE recommendation based on their business context:
 "Given you're [situation], I'd start with [skill] — [reason]."
 
 Do NOT present a menu and ask them to pick. Recommend.
-
----
-
-## Returning Mode
-
-### Step 1: Run session checks
-
-Check freshness, gaps, available skills per CLAUDE.md Session Start protocol.
-
-### Step 2: Session recap + capabilities + goal question
-
-Read the most recent `context/memory/*.md` file(s) to understand what happened last session. Scan `.claude/skills/` to know what's installed.
-
-Open with three things:
-
-**1. Last session recap (1-2 sentences)**
-Pull from the most recent memory file. What did they work on? What was produced?
-Example: "Last time we built out your email sequence for the course launch — three emails, all in your voice."
-
-If no memory files exist, skip the recap.
-
-**2. High-level capabilities (grouped by business goal, not skill names)**
-Scan installed skills and translate them into what the user can actually *do*. Group by outcome, not by skill folder name. Keep it to 2-4 lines max.
-
-Example:
-```
-Right now I can help you with:
-- **Brand & messaging** — refine your voice, positioning, or audience profile
-- **Content creation** — emails, landing pages, blog posts in your voice
-- **Strategy** — keyword planning, competitor analysis
-- **System** — build new skills, wrap up sessions
-```
-
-Only show categories where at least one skill is installed. Use plain language, not skill names. If there's only one category (e.g. just foundation + meta), keep it to one line.
-
-**3. Goal question**
-End with: "What are you working on today?" or a contextual variant based on the recap (e.g. "Want to keep going on the launch sequence, or something different?").
-
-### Step 3: Scope the Work
-
-Once the user states their goal, **always** offer the three levels so they can pick the right approach. Present it naturally after acknowledging their goal:
-
-> "Great — before we dive in, how structured do you want this?"
->
-> 1. **Single task** — I'll just get it done. Best for one-off deliverables or quick asks.
-> 2. **Planned project** — I'll scope it out first (goal, deliverables, what 'done' looks like), write a brief, and we work from that. Best when there are multiple deliverables or it'll span a few sessions.
-> 3. **GSD project** — Full structured planning with phases, milestones, and verification. Best for complex builds with dependencies.
->
-> "If you're not sure, just say go and I'll treat it as a single task."
-
-**If the user picks 1 (or just says "go" / doesn't specify)** → proceed directly. This is Level 1 — output goes to `projects/{category}/`.
-
-**If the user picks 2 (planned project)**, run a brief scoping conversation:
-- What's the goal? (one sentence)
-- What are the deliverables? (checklist)
-- How will you know it's done? (acceptance criteria)
-- Any timeline or constraints?
-
-Save as `projects/briefs/{project-name}/brief.md` with frontmatter (`project`, `status: active`, `level: 2`, `created`). Then start working on the first deliverable.
-
-**If the user picks 3 (GSD project):**
-- First check if `.planning/` already exists in the current workspace
-- **If it does** → tell the user: "You've got an existing GSD project in `.planning/`. You'll need to archive it before starting a new one. Want me to run `/archive-gsd` now?" If yes, run the archive command, then proceed to `/gsd:new-project`.
-- **If it doesn't** → proceed directly to `/gsd:new-project`.
-
-**If the user is unsure about their goal entirely** → recommend the highest-leverage next action based on what's missing, what learnings suggest, or what naturally follows from the last session. Then offer the levels once they've picked a direction.
-
-### Step 4: Execute
-
-Route to the relevant skill and begin work. Mention stale files or gaps only if directly relevant to their stated goal (once, with opportunity framing).
-
-Do NOT:
-- Summarise their brand back to them unprompted
-- Default to recommending brand/foundation tasks
-- Assume they want to create or refine brand context
-- List individual skill names unless the user asks for specifics
 
 ---
 

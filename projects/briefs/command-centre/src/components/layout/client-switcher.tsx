@@ -16,6 +16,7 @@ export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSw
 
   const {
     clients,
+    rootName,
     selectedClientId,
     isLoading,
     error,
@@ -43,7 +44,7 @@ export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSw
   }, [isOpen]);
 
   const selectedClient = getSelectedClient();
-  const displayName = selectedClient ? selectedClient.name : "Root";
+  const displayName = selectedClient ? selectedClient.name : rootName;
 
   const handleSelect = (clientId: string | null) => {
     setSelectedClient(clientId);
@@ -259,7 +260,7 @@ export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSw
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <Globe size={16} style={{ color: selectedClientId === null ? "#390C00" : "#5E5E65" }} />
               <div style={{ textAlign: "left" }}>
-                <div style={{ fontWeight: 500 }}>Root</div>
+                  <div style={{ fontWeight: 500 }}>{rootName}</div>
                 <div
                   style={{
                     fontSize: 11,

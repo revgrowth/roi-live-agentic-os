@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { X, ChevronDown, Trash2 } from "lucide-react";
+import { X, ChevronDown, Trash2, Check, Terminal, Copy } from "lucide-react";
 import type { Task, TaskStatus, PermissionMode } from "@/types/task";
 import { PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
+import { LevelBadge } from "@/components/board/level-badge";
 
 const statusColorMap: Record<string, string> = {
   backlog: "#5E5E65",
@@ -106,6 +107,26 @@ export function ModalHeader({
             >
               {task.title}
             </span>
+
+            <LevelBadge level={task.level} />
+            {task.level === "gsd" && task.phaseNumber != null && task.gsdStep && (
+              <span
+                style={{
+                  display: "inline-block",
+                  fontSize: 11,
+                  fontWeight: 500,
+                  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                  padding: "2px 8px",
+                  borderRadius: 4,
+                  backgroundColor: "#F5F3FF",
+                  color: "#6D28D9",
+                  lineHeight: "16px",
+                  flexShrink: 0,
+                }}
+              >
+                Phase {task.phaseNumber} · {task.gsdStep}
+              </span>
+            )}
 
             {/* Status selector */}
             <div ref={statusRef} style={{ position: "relative", flexShrink: 0 }}>
@@ -287,8 +308,76 @@ export function ModalHeader({
           </div>
         </div>
 
-        {/* Right: delete + close */}
+        {/* Right: reopen + resume + mark complete (GSD step only) + delete + close */}
         <div style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0, alignSelf: "flex-start" }}>
+          {task.status === "done" && (
+            <button
+              onClick={() => {
+                updateTask(task.id, { status: "queued" });
+              }}
+              title="Reopen — moves back to Claude's Turn"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                marginRight: 4,
+                padding: "5px 10px",
+                border: "none",
+                borderRadius: 6,
+                backgroundColor: "rgba(147, 69, 42, 0.08)",
+                color: "#93452A",
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "background-color 150ms ease",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(147, 69, 42, 0.15)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(147, 69, 42, 0.08)";
+              }}
+            >
+              Reopen
+            </button>
+          )}
+          {task.claudeSessionId && (
+            <ResumeButton sessionId={task.claudeSessionId} />
+          )}
+          {task.phaseNumber != null && task.gsdStep && task.status !== "done" && (
+            <button
+              onClick={() => {
+                updateTask(task.id, { status: "done" });
+              }}
+              title={`Mark Phase ${task.phaseNumber} ${task.gsdStep} as complete`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                marginRight: 4,
+                padding: "5px 10px",
+                border: "none",
+                borderRadius: 6,
+                backgroundColor: "rgba(107, 142, 107, 0.1)",
+                color: "#6B8E6B",
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "background-color 150ms ease",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(107, 142, 107, 0.2)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(107, 142, 107, 0.1)";
+              }}
+            >
+              <Check size={12} />
+              Mark complete
+            </button>
+          )}
           <button
             onClick={() => {
               deleteTask(task.id);
@@ -345,5 +434,48 @@ export function ModalHeader({
       {/* Bottom separator */}
       <div style={{ height: 1, backgroundColor: "#EAE8E6" }} />
     </div>
+  );
+}
+
+function ResumeButton({ sessionId }: { sessionId: string }) {
+  const [copied, setCopied] = useState(false);
+  const command = `claude --resume ${sessionId}`;
+
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(command);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }}
+      title={copied ? "Copied!" : command}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 4,
+        marginRight: 4,
+        padding: "5px 10px",
+        border: "none",
+        borderRadius: 6,
+        backgroundColor: copied ? "rgba(107, 142, 107, 0.1)" : "rgba(147, 69, 42, 0.06)",
+        color: copied ? "#6B8E6B" : "#93452A",
+        fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+        fontSize: 11,
+        fontWeight: 600,
+        cursor: "pointer",
+        transition: "all 150ms ease",
+      }}
+      onMouseEnter={(e) => {
+        if (!copied) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(147, 69, 42, 0.12)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.backgroundColor = copied
+          ? "rgba(107, 142, 107, 0.1)"
+          : "rgba(147, 69, 42, 0.06)";
+      }}
+    >
+      {copied ? <Copy size={12} /> : <Terminal size={12} />}
+      {copied ? "Copied" : "Resume"}
+    </button>
   );
 }

@@ -5,7 +5,7 @@ import { ArrowLeft, FileText } from "lucide-react";
 import type { TaskLevel } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 
-import { LEVEL_LABELS, LEVEL_HINTS } from "@/types/task";
+import { LEVEL_LABELS, LEVEL_HINTS } from "@/lib/levels";
 
 const levels: { value: TaskLevel; label: string; hint: string }[] = [
   { value: "task", label: LEVEL_LABELS.task, hint: LEVEL_HINTS.task },
@@ -30,7 +30,7 @@ export function ModalNewTaskForm({
   const [level, setLevel] = useState<TaskLevel>("task");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createTask = useTaskStore((s) => s.createTask);
-  const updateTask = useTaskStore((s) => s.updateTask);
+
 
   const descRef = useRef<HTMLTextAreaElement>(null);
 
@@ -66,30 +66,11 @@ export function ModalNewTaskForm({
       : firstSentence.slice(0, 57).replace(/\s+\S*$/, "") + "...";
 
     createTask(fallbackTitle, fullDescription, level, projectSlug).then(() => {
-      // AI title generation in background
-      fetch("/api/tasks/generate-title", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: fullDescription }),
-      })
-        .then((res) => res.ok ? res.json() : null)
-        .then((data) => {
-          if (data?.title && data.title !== fallbackTitle) {
-            const tasks = useTaskStore.getState().tasks;
-            const created = tasks.find(
-              (t) => t.title === fallbackTitle && t.description === fullDescription
-            );
-            if (created && (Date.now() - new Date(created.createdAt).getTime()) < 30000) {
-              updateTask(created.id, { title: data.title });
-            }
-          }
-        })
-        .catch(() => { /* fallback title is fine */ });
       onCreated();
     }).finally(() => {
       setIsSubmitting(false);
     });
-  }, [description, level, attachedFile, projectSlug, isSubmitting, createTask, updateTask, onCreated]);
+  }, [description, level, attachedFile, projectSlug, isSubmitting, createTask, onCreated]);
 
   return (
     <div

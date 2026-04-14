@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { getDb } from "@/lib/db";
-import { getConfig } from "@/lib/config";
+import { resolvePlanningDir } from "@/lib/config";
 import { parseRoadmap } from "@/lib/gsd-parser";
 import { emitTaskEvent } from "@/lib/event-bus";
 import type { Task, GsdStep } from "@/types/task";
@@ -35,14 +35,20 @@ export async function POST(
       );
     }
 
-    // Read ROADMAP.md
-    const { agenticOsDir } = getConfig();
-    const planningDir = path.join(agenticOsDir, ".planning");
+    // Read ROADMAP.md — prefer the parent task's projectSlug
+    const resolved = resolvePlanningDir({ overrideSlug: parent.projectSlug });
+    if (!resolved) {
+      return NextResponse.json(
+        { error: "No .planning/ROADMAP.md found for this project" },
+        { status: 404 }
+      );
+    }
+    const { planningDir } = resolved;
     const roadmapPath = path.join(planningDir, "ROADMAP.md");
 
     if (!fs.existsSync(roadmapPath)) {
       return NextResponse.json(
-        { error: "No .planning/ROADMAP.md found" },
+        { error: "No ROADMAP.md found in the project's .planning/" },
         { status: 404 }
       );
     }

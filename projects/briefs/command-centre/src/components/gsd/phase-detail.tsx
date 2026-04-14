@@ -9,6 +9,8 @@ interface PhaseDetailProps {
   phase: GsdPhase;
   onViewFile: (path: string) => void;
   onPhaseUpdated?: () => void;
+  /** When provided, phase action buttons fill a command bar instead of creating tasks directly. */
+  onCommand?: (command: string, label: string) => void;
 }
 
 function PlanRow({ plan, phaseDir, onViewFile }: { plan: GsdPlan; phaseDir: string; onViewFile: (p: string) => void }) {
@@ -113,7 +115,7 @@ const gsdActions: ReadonlyArray<{
   { key: "verify", label: "Verify", icon: ShieldCheck, command: "verify-work", color: "#6B8E6B", bg: "rgba(107, 142, 107, 0.08)" },
 ];
 
-export function PhaseDetail({ phase, onViewFile, onPhaseUpdated }: PhaseDetailProps) {
+export function PhaseDetail({ phase, onViewFile, onPhaseUpdated, onCommand }: PhaseDetailProps) {
   const [criteriaExpanded, setCriteriaExpanded] = useState(false);
   const [launchingAction, setLaunchingAction] = useState<string | null>(null);
   const [markingComplete, setMarkingComplete] = useState(false);
@@ -138,24 +140,30 @@ export function PhaseDetail({ phase, onViewFile, onPhaseUpdated }: PhaseDetailPr
   }, [phase.number, markingComplete, onPhaseUpdated]);
 
   const handleGsdAction = useCallback(async (action: (typeof gsdActions)[number]) => {
+    const phaseNum = phase.number;
+    const command = `/gsd:${action.command} ${phaseNum}`;
+    const label = `${action.label} Phase ${phaseNum}: ${phase.name}`;
+
+    // If parent provides a command handler, fill the command bar instead
+    if (onCommand) {
+      onCommand(command, label);
+      return;
+    }
+
+    // Fallback: create + queue a task directly
     if (launchingAction) return;
     setLaunchingAction(action.key);
     try {
-      const phaseNum = phase.number;
-      const command = `/gsd:${action.command}`;
-      const title = `${action.label} Phase ${phaseNum}: ${phase.name}`;
-      const description = `${command} ${phaseNum}`;
-      await createTask(title, description, "task");
-      // Find the just-created task and queue it
+      await createTask(label, command, "task");
       const tasks = useTaskStore.getState().tasks;
-      const newTask = tasks.find((t) => t.title === title && t.status === "backlog");
+      const newTask = tasks.find((t) => t.title === label && t.status === "backlog");
       if (newTask) {
         await updateTask(newTask.id, { status: "queued" });
       }
     } finally {
       setLaunchingAction(null);
     }
-  }, [phase.number, phase.name, createTask, updateTask, launchingAction]);
+  }, [phase.number, phase.name, createTask, updateTask, launchingAction, onCommand]);
 
   const statusLabel = phase.status === "complete" ? "Complete" : phase.status === "in-progress" ? "In Progress" : "Not Started";
   const statusColor = phase.status === "complete" ? "#6B8E6B" : phase.status === "in-progress" ? "#93452A" : "#9C9CA0";

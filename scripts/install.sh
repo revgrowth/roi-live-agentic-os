@@ -133,7 +133,178 @@ success "All prerequisites met"
 echo ""
 
 # =============================================================================
-# 3. Create .env from .env.example if missing
+# 3. Set up YOUR private GitHub repository
+# =============================================================================
+# Agentic OS stores your brand voice, client data, session memory, and project
+# outputs. Backing this up to your own private GitHub repo keeps it safe and
+# means you can pull framework updates from upstream without losing your work.
+#
+# This step runs every time install.sh is called. If a personal repo is already
+# configured it skips silently.
+# =============================================================================
+
+setup_github_repo() {
+    local UPSTREAM_OWNER="simonc602"
+    local UPSTREAM_REPO="agentic-os"
+
+    # Detect current origin
+    local ORIGIN_URL=""
+    ORIGIN_URL=$(git -C "$REPO_ROOT" remote get-url origin 2>/dev/null || echo "")
+
+    # Check if origin points to the upstream (template) repo
+    local IS_UPSTREAM=0
+    if [[ "$ORIGIN_URL" == *"${UPSTREAM_OWNER}/${UPSTREAM_REPO}"* ]]; then
+        IS_UPSTREAM=1
+    fi
+
+    # If origin is already the user's own repo (not upstream), skip
+    if [[ -n "$ORIGIN_URL" ]] && [[ $IS_UPSTREAM -eq 0 ]]; then
+        success "GitHub repo configured: $ORIGIN_URL"
+        return 0
+    fi
+
+    # No origin, or origin is still the upstream template repo
+    echo ""
+    printf "${CYAN}${BOLD}═══════════════════════════════════════════════${NC}\n"
+    printf "${CYAN}${BOLD}  Back up your data to GitHub${NC}\n"
+    printf "${CYAN}${BOLD}═══════════════════════════════════════════════${NC}\n"
+    echo ""
+    echo "  Agentic OS stores your brand voice, client data, and project"
+    echo "  outputs locally. To keep it safe, you should back it up to"
+    printf "  your own ${BOLD}private${NC} GitHub repository.\n"
+    echo ""
+    printf "  ${DIM}Only you can access a private repo — your business data${NC}\n"
+    printf "  ${DIM}stays private. The upstream Agentic OS repo is kept as a${NC}\n"
+    printf "  ${DIM}separate remote so you can still pull framework updates.${NC}\n"
+    echo ""
+
+    # Check if gh CLI is available
+    if ! command -v gh &>/dev/null; then
+        warn "GitHub CLI (gh) not found."
+        echo ""
+        echo "  To set up your private repo manually:"
+        echo ""
+        echo "    1. Create a new PRIVATE repo on GitHub (e.g. my-agentic-os)"
+        echo "    2. Run these commands:"
+        echo ""
+        if [[ $IS_UPSTREAM -eq 1 ]]; then
+            echo "       git remote rename origin upstream"
+            echo "       git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git"
+        else
+            echo "       git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git"
+        fi
+        echo "       git push -u origin main"
+        echo ""
+        echo "  Or install the GitHub CLI for automatic setup:"
+        echo "    brew install gh  (macOS)  |  winget install GitHub.cli  (Windows)"
+        echo ""
+        printf "  ${DIM}You can re-run this installer anytime to complete this step.${NC}\n"
+        echo ""
+        return 0
+    fi
+
+    # Check if user is authenticated with gh
+    if ! gh auth status &>/dev/null 2>&1; then
+        warn "GitHub CLI found but not authenticated."
+        echo ""
+        echo "  Run: gh auth login"
+        echo "  Then re-run this installer to set up your private repo."
+        echo ""
+        return 0
+    fi
+
+    # Get GitHub username
+    local GH_USER=""
+    GH_USER=$(gh api user --jq '.login' 2>/dev/null || echo "")
+    if [[ -z "$GH_USER" ]]; then
+        warn "Could not determine your GitHub username."
+        return 0
+    fi
+
+    echo "  Logged in as: ${BOLD}${GH_USER}${NC}"
+    echo ""
+
+    # Ask user if they want to create a repo now
+    printf "  Create a private GitHub repo to back up your data? ${BOLD}[Y/n]${NC} "
+    read -r REPLY
+    REPLY="${REPLY:-Y}"
+
+    if [[ ! "$REPLY" =~ ^[Yy] ]]; then
+        warn "Skipped — you can re-run the installer anytime to set this up."
+        echo ""
+        return 0
+    fi
+
+    # Ask for repo name
+    local DEFAULT_REPO="agentic-os"
+    printf "  Repo name? ${DIM}[${DEFAULT_REPO}]${NC} "
+    read -r REPO_NAME
+    REPO_NAME="${REPO_NAME:-$DEFAULT_REPO}"
+
+    echo ""
+    info "Creating private repo: ${GH_USER}/${REPO_NAME}..."
+    echo ""
+
+    # Create the private repo on GitHub
+    if gh repo create "${REPO_NAME}" --private --source="$REPO_ROOT" --remote=origin 2>/dev/null; then
+        # If upstream was the old origin, it's already been handled by --source
+        # But let's make sure upstream remote exists for pulling updates
+        if [[ $IS_UPSTREAM -eq 1 ]]; then
+            # gh repo create with --source may have replaced origin already
+            # Ensure upstream remote points to the template repo
+            git -C "$REPO_ROOT" remote remove upstream 2>/dev/null || true
+            git -C "$REPO_ROOT" remote add upstream "$ORIGIN_URL" 2>/dev/null || true
+        fi
+        success "Private repo created: https://github.com/${GH_USER}/${REPO_NAME}"
+        echo ""
+
+        # Push current state
+        info "Pushing your data to your private repo..."
+        if git -C "$REPO_ROOT" push -u origin main 2>/dev/null; then
+            success "All data backed up"
+        else
+            # Try pushing current branch if main doesn't exist
+            local CURRENT_BRANCH
+            CURRENT_BRANCH=$(git -C "$REPO_ROOT" branch --show-current 2>/dev/null || echo "main")
+            git -C "$REPO_ROOT" push -u origin "$CURRENT_BRANCH" 2>/dev/null || true
+            success "Data pushed to ${CURRENT_BRANCH}"
+        fi
+
+        echo ""
+        printf "  ${GREEN}${BOLD}Your data is safe.${NC} Only you can access this repo.\n"
+        echo ""
+        echo "  To pull framework updates later:"
+        echo "    git pull upstream main"
+        echo ""
+    else
+        # Repo might already exist
+        local EXISTING_URL="https://github.com/${GH_USER}/${REPO_NAME}.git"
+        warn "Could not create repo (it may already exist)."
+        echo ""
+        echo "  Connecting to: ${EXISTING_URL}"
+
+        if [[ $IS_UPSTREAM -eq 1 ]]; then
+            git -C "$REPO_ROOT" remote rename origin upstream 2>/dev/null || true
+        fi
+        git -C "$REPO_ROOT" remote remove origin 2>/dev/null || true
+        git -C "$REPO_ROOT" remote add origin "$EXISTING_URL" 2>/dev/null || true
+
+        if git -C "$REPO_ROOT" push -u origin main 2>/dev/null; then
+            success "Connected and backed up to: ${EXISTING_URL}"
+        else
+            local CURRENT_BRANCH
+            CURRENT_BRANCH=$(git -C "$REPO_ROOT" branch --show-current 2>/dev/null || echo "main")
+            git -C "$REPO_ROOT" push -u origin "$CURRENT_BRANCH" 2>/dev/null || warn "Push failed — check repo permissions"
+        fi
+        echo ""
+    fi
+}
+
+setup_github_repo
+echo ""
+
+# =============================================================================
+# 4. Create .env from .env.example if missing (was step 3)
 # =============================================================================
 info "Checking environment..."
 echo ""

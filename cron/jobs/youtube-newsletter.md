@@ -1,14 +1,15 @@
 ---
-name: "YouTube Newsletter"
-time: "09:00"
-days: "daily"
-active: "true"
-model: "opus"
-timeout: "15m"
-notify: "on_finish"
-description: "Check @simonscrapes for new videos and generate a newsletter from the transcript"
+name: YouTube Newsletter
+time: '09:00'
+days: daily
+active: 'false'
+model: opus
+timeout: 15m
+notify: on_finish
+description: >-
+  Check @simonscrapes for new videos and generate a newsletter from the
+  transcript
 ---
-
 You are running as a scheduled cron job for Agentic OS.
 
 ## Task

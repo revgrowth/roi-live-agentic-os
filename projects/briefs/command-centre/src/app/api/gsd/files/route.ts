@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { getConfig } from "@/lib/config";
+import { resolvePlanningDir } from "@/lib/config";
 
 interface PlanningFile {
   name: string;
@@ -24,14 +24,15 @@ interface PhaseFiles {
  */
 export async function GET(request: NextRequest) {
   try {
-    const { agenticOsDir } = getConfig();
-    const planningDir = path.join(agenticOsDir, ".planning");
+    const { searchParams } = new URL(request.url);
+    const projectOverride = searchParams.get("project");
+    const resolved = resolvePlanningDir({ overrideSlug: projectOverride });
 
-    if (!fs.existsSync(planningDir)) {
+    if (!resolved) {
       return NextResponse.json({ error: "No .planning directory found" }, { status: 404 });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { planningDir } = resolved;
     const fileParam = searchParams.get("file");
     const phaseParam = searchParams.get("phase");
 

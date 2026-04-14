@@ -4,9 +4,44 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Paperclip, X, Image, FileType, FileText, Sunrise, Moon, AlertTriangle, ChevronDown, Zap, ClipboardList, Layers } from "lucide-react";
 import type { TaskLevel, PermissionMode } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
+import { useClientStore } from "@/store/client-store";
+import type { ScopeResult } from "@/app/api/tasks/scope-goal/route";
+import type { QuestionSpec } from "@/types/question-spec";
 
 import { SlashCommandMenu } from "@/components/shared/slash-command-menu";
+import type { TagItem } from "@/components/shared/slash-command-menu";
 import type { SlashCommand } from "@/lib/slash-commands";
+import { GoalChips, recordTagUsage } from "./goal-chips";
+
+// Minimal fallback questions — mirrors server-side fallbackQuestions but
+// kept local so the client can synthesise a scope result when scope-goal
+// is unreachable or keyword-routing skips the round-trip entirely.
+function clientFallbackQuestions(level: "project" | "gsd"): QuestionSpec[] {
+  if (level === "project") {
+    return [
+      { id: "audience", prompt: "Who is the primary audience or user for this?", type: "text", required: true },
+      { id: "success", prompt: "What does success look like — how will you know it's done well?", type: "multiline" },
+      { id: "constraints", prompt: "Are there existing assets, tools, or constraints we should work within?", type: "multiline" },
+      { id: "deadline", prompt: "Is there a deadline or timeline we need to hit?", type: "text" },
+    ];
+  }
+  return [
+    { id: "flows", prompt: "What are the core user flows this needs to support?", type: "multiline", required: true },
+    { id: "constraints", prompt: "What are the non-negotiable constraints (compliance, performance, budget)?", type: "multiline" },
+    { id: "integrations", prompt: "Which existing systems does this need to integrate with?", type: "multiline" },
+    { id: "success", prompt: "What does success look like in 90 days?", type: "multiline" },
+  ];
+}
+
+function synthesizeFallbackScope(level: "project" | "gsd"): ScopeResult {
+  return {
+    level,
+    confidence: 0.75,
+    overlaps: [],
+    questions: clientFallbackQuestions(level),
+    suggestedSubtasks: [],
+  };
+}
 
 interface Attachment {
   fileName: string;
@@ -29,34 +64,12 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-import { PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS, LEVEL_LABELS } from "@/types/task";
+import { LEVEL_LABELS, LEVEL_HINTS } from "@/lib/levels";
 
-const permissionModes: { value: PermissionMode; label: string; hint: string }[] = [
-  { value: "default", label: PERMISSION_MODE_LABELS.default, hint: PERMISSION_MODE_HINTS.default },
-  { value: "bypassPermissions", label: PERMISSION_MODE_LABELS.bypassPermissions, hint: PERMISSION_MODE_HINTS.bypassPermissions },
-];
-
-const MODE_BG: Record<PermissionMode, string> = {
-  plan: "#E0E7FF",
-  default: "#F3F4F6",
-  acceptEdits: "#FEF3C7",
-  auto: "#D1FAE5",
-  bypassPermissions: "#FEE2E2",
-};
-
-const MODE_TEXT: Record<PermissionMode, string> = {
-  plan: "#3730A3",
-  default: "#374151",
-  acceptEdits: "#92400E",
-  auto: "#065F46",
-  bypassPermissions: "#991B1B",
-};
-
-const LEVEL_COLORS: Record<TaskLevel, { bg: string; text: string }> = {
-  task: { bg: "#E8E6E4", text: "#5E5E65" },
-  project: { bg: "#FFDBCF", text: "#390C00" },
-  gsd: { bg: "#DBEAFE", text: "#1E40AF" },
-};
+// Command Centre always launches tasks in bypassPermissions ("yolo") mode.
+// The picker UI was removed so there is no longer a default vs. full-auto
+// choice — every task runs with --dangerously-skip-permissions.
+const FIXED_PERMISSION_MODE: PermissionMode = "bypassPermissions";
 
 interface GsdStatus {
   exists: boolean;
@@ -70,22 +83,32 @@ type ScopingState =
   | { phase: "picking"; description: string }
   | { phase: "error"; message: string };
 
-export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }) {
+export function TaskCreateInput({
+  projectSlug,
+  onRoutingDecision,
+  pickSeed,
+}: {
+  projectSlug?: string | null;
+  onRoutingDecision?: (decision: ScopeResult, goal: string) => void;
+  /** Externally triggered: when `nonce` changes, open the inline picker with `description`. */
+  pickSeed?: { description: string; nonce: number } | null;
+}) {
   const [description, setDescription] = useState("");
-  const [permissionMode, setPermissionMode] = useState<PermissionMode>("default");
+  const [planFirst, setPlanFirst] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Routing: when levelOverride is null the dropdown shows "Auto" and submit
+  // calls /api/tasks/scope-goal. When an explicit level is selected, submit
+  // bypasses routing and queues directly at that level.
+  const [routingPending, setRoutingPending] = useState(false);
+
   // Scoping state
   const [scopingState, setScopingState] = useState<ScopingState>({ phase: "idle" });
-  const [levelOverride, setLevelOverride] = useState<TaskLevel | null>(null);
+  const [levelOverride, setLevelOverride] = useState<TaskLevel>("task");
   const [showLevelOverride, setShowLevelOverride] = useState(false);
   const [confirmationBadge, setConfirmationBadge] = useState<string | null>(null);
 
-  // Level picker modal state
-  const [pickedLevel, setPickedLevel] = useState<TaskLevel | null>(null);
-  const [notes, setNotes] = useState("");
-  const notesRef = useRef<HTMLTextAreaElement>(null);
 
   // Attachments state
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -101,8 +124,21 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
   const [showSlashMenu, setShowSlashMenu] = useState(false);
   const [slashQuery, setSlashQuery] = useState("");
 
+  // @-tag prompt snippets
+  const [showTagMenu, setShowTagMenu] = useState(false);
+  const [tagQuery, setTagQuery] = useState("");
+  const [promptTags, setPromptTags] = useState<TagItem[]>([]);
+
   const descRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
+
+  // Fetch prompt tags on mount
+  useEffect(() => {
+    fetch("/api/prompt-tags")
+      .then((r) => r.json())
+      .then((data) => setPromptTags((data.tags ?? []).map((t: { name: string; body: string; category?: string; description?: string }) => ({ name: t.name, body: t.body, category: t.category, description: t.description }))))
+      .catch(() => {});
+  }, []);
 
   // Auto-grow textarea
   const adjustTextareaHeight = useCallback(() => {
@@ -129,6 +165,15 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [description, attachments.length, scopingState.phase]);
+
+  // External pick-seed trigger: open the inline picker with the given description.
+  const pickSeedNonce = pickSeed?.nonce;
+  useEffect(() => {
+    if (!pickSeed || !pickSeed.description) return;
+    setScopingState({ phase: "picking", description: pickSeed.description });
+    setIsExpanded(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pickSeedNonce]);
 
   // Clear confirmation badge after 3s
   useEffect(() => {
@@ -217,62 +262,43 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
       } catch { /* non-critical */ }
     }
 
-    // Create task as "queued" — goes straight to Claude's Turn
-    await createTask(fallbackTitle, fullDescription, level, taskProjectSlug, undefined, permissionMode);
+    // Plan-first only applies to single tasks — projects and GSD have their
+    // own planning built in, so we ignore the toggle for them.
+    const effectivePermissionMode: PermissionMode =
+      level === "task" && planFirst ? "plan" : FIXED_PERMISSION_MODE;
 
-    // AI title generation in background
-    fetch("/api/tasks/generate-title", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: fullDescription }),
-    })
-      .then((res) => res.ok ? res.json() : null)
-      .then((data) => {
-        if (data?.title && data.title !== fallbackTitle) {
-          const tasks = useTaskStore.getState().tasks;
-          const created = tasks.find(
-            (t) => t.title === fallbackTitle && t.description === fullDescription
-          );
-          // Only update title within 30s of creation — after that, lock the title
-          if (created && (Date.now() - new Date(created.createdAt).getTime()) < 30000) {
-            updateTask(created.id, { title: data.title });
-          }
-        }
-      })
-      .catch(() => { /* fallback title is fine */ });
-  }, [createTask, updateTask, permissionMode, projectSlug]);
+    // Create task as "queued" — goes straight to Claude's Turn
+    await createTask(fallbackTitle, fullDescription, level, taskProjectSlug, undefined, effectivePermissionMode);
+
+    // Remember last routing decision for next time
+    try { localStorage.setItem("cc.last-route", level); } catch { /* ignore */ }
+
+    // Plan-first is per-launch — reset so the next task defaults to full-auto
+    setPlanFirst(false);
+  }, [createTask, planFirst, projectSlug]);
 
   /** Handle level selection from the modal */
   const handleLevelSelect = useCallback(async (level: TaskLevel) => {
     if (scopingState.phase !== "picking") return;
-    let desc = scopingState.description;
-    if (notes.trim()) {
-      desc += `\n\nNotes: ${notes.trim()}`;
-    }
+    const desc = scopingState.description;
 
     setScopingState({ phase: "idle" });
     setIsExpanded(false);
-    setNotes("");
-    setPickedLevel(null);
     setConfirmationBadge(`Queued — ${LEVEL_LABELS[level]}`);
     setIsSubmitting(true);
     await createWithLevel(desc, level);
     setIsSubmitting(false);
-  }, [scopingState, notes, createWithLevel]);
+  }, [scopingState, createWithLevel]);
 
   // Keyboard shortcuts for level picker modal
   useEffect(() => {
     if (scopingState.phase !== "picking") return;
     const handler = (e: KeyboardEvent) => {
-      // Don't intercept if user is typing in notes textarea
-      if (document.activeElement === notesRef.current) return;
       if (e.key === "1") handleLevelSelect("task");
       else if (e.key === "2") handleLevelSelect("project");
       else if (e.key === "3") handleLevelSelect("gsd");
       else if (e.key === "Escape") {
         setScopingState({ phase: "idle" });
-        setPickedLevel(null);
-        setNotes("");
       }
     };
     document.addEventListener("keydown", handler);
@@ -281,7 +307,7 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
 
   const handleSubmit = useCallback(async () => {
     const trimmedDesc = description.trim();
-    if (!trimmedDesc || isSubmitting) return;
+    if (!trimmedDesc || isSubmitting || routingPending) return;
     setGsdStatus(null);
 
     // Build description with attachment paths
@@ -292,26 +318,52 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
       fullDescription = fullDescription + attachmentBlock;
     }
 
-    // Clear form immediately
-    setDescription("");
-    setAttachments([]);
-
-    // If user has overridden the level, skip the modal
-    if (levelOverride) {
+    // Task — fast path, no scoping needed
+    if (levelOverride === "task") {
+      setDescription("");
+      setAttachments([]);
       setIsExpanded(false);
-      const level = levelOverride;
-      setLevelOverride(null);
+      setLevelOverride("task");
       setShowLevelOverride(false);
-      setConfirmationBadge(`Queued — ${LEVEL_LABELS[level]}`);
+      setConfirmationBadge(`Queued — ${LEVEL_LABELS.task}`);
       setIsSubmitting(true);
-      await createWithLevel(fullDescription, level);
+      await createWithLevel(fullDescription, "task");
       setIsSubmitting(false);
       return;
     }
 
-    // Show level picker modal
-    setScopingState({ phase: "picking", description: fullDescription });
-  }, [description, attachments, isSubmitting, levelOverride, createWithLevel]);
+    // Project / GSD — call scope-goal for the wizard / guardrail
+    setRoutingPending(true);
+    try {
+      const currentClientId = useClientStore.getState().selectedClientId;
+      const res = await fetch("/api/tasks/scope-goal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ goal: fullDescription, clientId: currentClientId ?? null }),
+      });
+      if (!res.ok) throw new Error(`scope-goal failed: ${res.status}`);
+      const scopeResult = (await res.json()) as ScopeResult;
+      // Honour the user's explicit level pick
+      scopeResult.level = levelOverride;
+      setLevelOverride("task");
+      setShowLevelOverride(false);
+      onRoutingDecision?.(scopeResult, fullDescription);
+      setDescription("");
+      setAttachments([]);
+      setIsExpanded(false);
+    } catch (err) {
+      console.error("[TaskCreateInput] scope-goal failed, using fallback", err);
+      const fallback = synthesizeFallbackScope(levelOverride as "project" | "gsd");
+      setLevelOverride("task");
+      setShowLevelOverride(false);
+      onRoutingDecision?.(fallback, fullDescription);
+      setDescription("");
+      setAttachments([]);
+      setIsExpanded(false);
+    } finally {
+      setRoutingPending(false);
+    }
+  }, [description, attachments, isSubmitting, routingPending, levelOverride, createWithLevel, onRoutingDecision]);
 
   const handleQuickStart = useCallback(async (type: "start-here" | "wrap-up") => {
     if (quickStarting) return;
@@ -355,14 +407,30 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
     if (value.startsWith("/")) {
       setShowSlashMenu(true);
       setSlashQuery(value);
+      setShowTagMenu(false);
     } else {
       setShowSlashMenu(false);
       setSlashQuery("");
     }
+    // Detect @tag trigger — look for @ followed by partial word at cursor position
+    const el = descRef.current;
+    if (el) {
+      const cursor = el.selectionStart ?? value.length;
+      const before = value.slice(0, cursor);
+      const match = before.match(/(^|[\s])@([\w\/-]*)$/);
+      if (match && !value.startsWith("/")) {
+        setShowTagMenu(true);
+        setTagQuery(match[2]);
+        setShowSlashMenu(false);
+      } else {
+        setShowTagMenu(false);
+        setTagQuery("");
+      }
+    }
   }, []);
 
   const shouldExpand = isExpanded || description.trim().length > 0 || attachments.length > 0;
-  const hasGsdConflict = gsdStatus?.exists === true && scopingState.phase === "idle" && levelOverride === "gsd";
+  const hasGsdConflict = gsdStatus?.exists === true && scopingState.phase === "idle";
 
   return (
     <div
@@ -445,6 +513,33 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
             anchor="below"
           />
         )}
+        {showTagMenu && promptTags.length > 0 && (
+          <SlashCommandMenu
+            query={tagQuery}
+            onSelect={() => {}}
+            onClose={() => { setShowTagMenu(false); setTagQuery(""); }}
+            anchor="below"
+            mode="tag"
+            tagItems={promptTags.filter((t) => !tagQuery || t.name.toLowerCase().includes(tagQuery.toLowerCase()))}
+            onTagSelect={(tag) => {
+              // Replace the @partial with @tag-name in the textarea
+              const el = descRef.current;
+              if (el) {
+                const cursor = el.selectionStart ?? description.length;
+                const before = description.slice(0, cursor);
+                const after = description.slice(cursor);
+                const replaced = before.replace(/(^|[\s])@[\w\/-]*$/, `$1@${tag.name} `);
+                setDescription(replaced + after);
+              } else {
+                setDescription((prev) => prev + `@${tag.name} `);
+              }
+              recordTagUsage(tag.name);
+              setShowTagMenu(false);
+              setTagQuery("");
+              descRef.current?.focus();
+            }}
+          />
+        )}
       </div>
 
       {/* Quick-start buttons — visible when collapsed */}
@@ -501,6 +596,17 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
             {quickStarting === "wrap-up" ? "Wrapping up..." : "Wrap Up"}
           </button>
         </div>
+      )}
+
+      {/* Goal chips — prompt tag shortcuts below the textarea */}
+      {shouldExpand && (
+        <GoalChips onInsert={(text) => {
+          setDescription((prev) => text + prev);
+          setTimeout(() => {
+            descRef.current?.focus();
+            adjustTextareaHeight();
+          }, 0);
+        }} />
       )}
 
       {/* Expandable bottom section */}
@@ -635,46 +741,29 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
               alignItems: "center",
             }}
           >
-            {/* Left: permission mode + attach + level override */}
+            {/* Left: yolo badge + attach + level override */}
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {/* Permission mode selector */}
+              {/* YOLO mode indicator — permissions picker removed; tasks always run with --dangerously-skip-permissions */}
               <div
+                title="All tasks run in yolo mode — permissions are skipped"
                 style={{
-                  display: "flex",
-                  gap: 2,
-                  backgroundColor: "#EAE8E6",
-                  borderRadius: 6,
-                  padding: 2,
-                  height: 32,
+                  display: "inline-flex",
                   alignItems: "center",
+                  gap: 4,
+                  height: 28,
+                  padding: "0 10px",
+                  borderRadius: 6,
+                  backgroundColor: "#FEE2E2",
+                  color: "#991B1B",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
                 }}
               >
-                {permissionModes.map((m) => (
-                  <button
-                    key={m.value}
-                    onClick={() => setPermissionMode(m.value)}
-                    title={m.hint}
-                    style={{
-                      padding: "0 10px",
-                      fontSize: 11,
-                      fontWeight: 500,
-                      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                      border: "none",
-                      cursor: "pointer",
-                      borderRadius: 4,
-                      height: 28,
-                      backgroundColor: permissionMode === m.value
-                        ? MODE_BG[m.value]
-                        : "transparent",
-                      color: permissionMode === m.value
-                        ? MODE_TEXT[m.value]
-                        : "#9C9CA0",
-                      transition: "all 150ms ease",
-                    }}
-                  >
-                    {m.label}
-                  </button>
-                ))}
+                <Zap size={11} />
+                Yolo
               </div>
 
               {/* Attach file button */}
@@ -729,62 +818,51 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
                 )}
               </button>
 
-              {/* Level override dropdown */}
+              {/* Level dropdown */}
               <div style={{ position: "relative" }}>
                 <button
                   onClick={() => setShowLevelOverride(!showLevelOverride)}
+                  title="Task level"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 4,
-                    padding: "4px 8px",
+                    padding: "4px 10px",
                     fontSize: 11,
                     fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
                     border: "none",
                     borderRadius: 4,
-                    backgroundColor: levelOverride ? LEVEL_COLORS[levelOverride].bg : "#F6F3F1",
-                    color: levelOverride ? LEVEL_COLORS[levelOverride].text : "#9C9CA0",
+                    backgroundColor: "#F6F3F1",
+                    color: "#1B1C1B",
                     cursor: "pointer",
                     fontWeight: 500,
+                    height: 28,
                   }}
                 >
-                  {levelOverride ? LEVEL_LABELS[levelOverride] : "Level"}
+                  {LEVEL_LABELS[levelOverride]}
                   <ChevronDown size={10} />
                 </button>
                 {showLevelOverride && (
                   <div style={{
                     position: "absolute",
-                    bottom: "100%",
+                    top: "100%",
                     left: 0,
-                    marginBottom: 4,
+                    marginTop: 4,
                     backgroundColor: "#FFFFFF",
                     borderRadius: 8,
                     boxShadow: "0 4px 16px rgba(147, 69, 42, 0.12)",
                     border: "1px solid rgba(218, 193, 185, 0.2)",
                     padding: 6,
                     zIndex: 100,
-                    width: 260,
+                    width: 280,
                   }}>
-                    <div style={{
-                      fontSize: 10,
-                      color: "#9C9CA0",
-                      fontFamily: "var(--font-inter), Inter, sans-serif",
-                      padding: "4px 8px 6px",
-                    }}>
-                      Optional — skip to pick after submit
-                    </div>
-                    {([
-                      { level: "task" as TaskLevel, desc: "One-off deliverable, no planning" },
-                      { level: "project" as TaskLevel, desc: "Multi-deliverable with a brief and scope" },
-                      { level: "gsd" as TaskLevel, desc: "Phased build with milestones and verification" },
-                    ]).map((opt) => (
+                    {(["task", "project", "gsd"] as TaskLevel[]).map((level) => (
                       <button
-                        key={opt.level}
+                        key={level}
                         onClick={async () => {
-                          const newLevel = levelOverride === opt.level ? null : opt.level;
-                          setLevelOverride(newLevel);
+                          setLevelOverride(level);
                           setShowLevelOverride(false);
-                          if (newLevel === "gsd") {
+                          if (level === "gsd") {
                             try {
                               const res = await fetch("/api/gsd/status");
                               const data = await res.json();
@@ -802,14 +880,14 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
                           fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
                           border: "none",
                           borderRadius: 5,
-                          backgroundColor: levelOverride === opt.level ? LEVEL_COLORS[opt.level].bg : "transparent",
-                          color: LEVEL_COLORS[opt.level].text,
+                          backgroundColor: levelOverride === level ? "#F6F3F1" : "transparent",
+                          color: "#1B1C1B",
                           cursor: "pointer",
                           textAlign: "left",
                           fontWeight: 500,
                         }}
                       >
-                        <div>{LEVEL_LABELS[opt.level]}</div>
+                        <div>{LEVEL_LABELS[level]}</div>
                         <div style={{
                           fontSize: 10,
                           fontWeight: 400,
@@ -817,19 +895,55 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
                           fontFamily: "var(--font-inter), Inter, sans-serif",
                           marginTop: 1,
                         }}>
-                          {opt.desc}
+                          {LEVEL_HINTS[level]}
                         </div>
                       </button>
                     ))}
                   </div>
                 )}
               </div>
+
+              {/* Plan-first checkbox — only applies to single tasks.
+                  Projects and GSD projects have their own planning built in.
+                  Sits in the left cluster so it's left-aligned. */}
+              {levelOverride === "task" && (
+                <label
+                  title="Have Claude draft a plan before executing (single tasks only)"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "0 8px",
+                    height: 28,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    color: planFirst ? "#93452A" : "#9C9CA0",
+                    cursor: "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={planFirst}
+                    onChange={(e) => setPlanFirst(e.target.checked)}
+                    style={{
+                      width: 13,
+                      height: 13,
+                      accentColor: "#93452A",
+                      cursor: "pointer",
+                      margin: 0,
+                    }}
+                  />
+                  Start with planning mode
+                </label>
+              )}
             </div>
 
             {/* Submit button */}
             <button
               onClick={handleSubmit}
-              disabled={!description.trim() || isSubmitting}
+              disabled={!description.trim() || isSubmitting || routingPending}
               style={{
                 background: description.trim()
                   ? "linear-gradient(135deg, #93452A, #B25D3F)"
@@ -841,33 +955,31 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
                 fontSize: 13,
                 fontWeight: 600,
                 fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                cursor: description.trim() ? "pointer" : "default",
-                opacity: isSubmitting ? 0.6 : 1,
+                cursor: description.trim() && !routingPending ? "pointer" : "default",
+                opacity: isSubmitting || routingPending ? 0.6 : 1,
                 transition: "all 150ms ease",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
               }}
             >
-              Send to Claude
+              {routingPending && (
+                <span
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: "50%",
+                    border: "2px solid rgba(255,255,255,0.4)",
+                    borderTopColor: "#FFFFFF",
+                    animation: "spin 800ms linear infinite",
+                    display: "inline-block",
+                  }}
+                />
+              )}
+              {routingPending ? "Routing…" : "Send to Claude"}
             </button>
           </div>
 
-          {/* Permission mode hint */}
-          <div
-            style={{
-              display: "flex",
-              gap: 16,
-              fontSize: 11,
-              fontFamily: "var(--font-inter), Inter, sans-serif",
-              color: "#9C9CA0",
-              marginTop: 6,
-              paddingLeft: 2,
-              minHeight: 16,
-            }}
-          >
-            <span />
-            <span style={{ color: MODE_TEXT[permissionMode] }}>
-              {permissionModes.find((m) => m.value === permissionMode)?.hint}
-            </span>
-          </div>
         </div>
       </div>
 
@@ -888,8 +1000,6 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
           }}
           onClick={() => {
             setScopingState({ phase: "idle" });
-            setPickedLevel(null);
-            setNotes("");
           }}
         >
           <div
@@ -940,7 +1050,7 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
               {
                 level: "task" as TaskLevel,
                 icon: Zap,
-                title: "Single task",
+                title: "Task",
                 desc: "I'll just get it done. Best for one-off deliverables.",
                 key: "1",
               },
@@ -961,39 +1071,28 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
             ]).map((opt) => (
               <div key={opt.level}>
                 <button
-                  onClick={() => {
-                    setPickedLevel(opt.level);
-                    setTimeout(() => notesRef.current?.focus(), 50);
-                  }}
+                  onClick={() => handleLevelSelect(opt.level)}
                   style={{
                     display: "flex",
                     alignItems: "flex-start",
                     gap: 12,
                     width: "100%",
                     padding: "12px 14px",
-                    border: pickedLevel === opt.level
-                      ? "1px solid rgba(147, 69, 42, 0.4)"
-                      : "1px solid rgba(218, 193, 185, 0.2)",
+                    border: "1px solid rgba(218, 193, 185, 0.2)",
                     borderRadius: 8,
-                    marginBottom: pickedLevel === opt.level ? 0 : 8,
-                    backgroundColor: pickedLevel === opt.level
-                      ? "rgba(147, 69, 42, 0.04)"
-                      : "transparent",
+                    marginBottom: 8,
+                    backgroundColor: "transparent",
                     cursor: "pointer",
                     textAlign: "left",
                     transition: "all 100ms ease",
                   }}
                   onMouseEnter={(e) => {
-                    if (pickedLevel !== opt.level) {
-                      e.currentTarget.style.backgroundColor = "rgba(147, 69, 42, 0.04)";
-                      e.currentTarget.style.borderColor = "rgba(147, 69, 42, 0.3)";
-                    }
+                    e.currentTarget.style.backgroundColor = "rgba(147, 69, 42, 0.04)";
+                    e.currentTarget.style.borderColor = "rgba(147, 69, 42, 0.3)";
                   }}
                   onMouseLeave={(e) => {
-                    if (pickedLevel !== opt.level) {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.2)";
-                    }
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.2)";
                   }}
                 >
                   <opt.icon size={18} color="#93452A" style={{ flexShrink: 0, marginTop: 1 }} />
@@ -1024,100 +1123,12 @@ export function TaskCreateInput({ projectSlug }: { projectSlug?: string | null }
                     </div>
                   </div>
                 </button>
-
-                {/* Notes area — shown when this level is selected */}
-                {pickedLevel === opt.level && (
-                  <div
-                    style={{
-                      padding: "10px 14px 14px",
-                      marginBottom: 8,
-                      borderLeft: "1px solid rgba(147, 69, 42, 0.2)",
-                      borderRight: "1px solid rgba(147, 69, 42, 0.2)",
-                      borderBottom: "1px solid rgba(147, 69, 42, 0.2)",
-                      borderRadius: "0 0 8px 8px",
-                      backgroundColor: "rgba(147, 69, 42, 0.02)",
-                    }}
-                  >
-                    <textarea
-                      ref={notesRef}
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Add notes or context (optional)"
-                      style={{
-                        width: "100%",
-                        fontSize: 12,
-                        fontFamily: "var(--font-inter)",
-                        border: "1px solid rgba(218, 193, 185, 0.3)",
-                        borderRadius: 6,
-                        padding: "8px 10px",
-                        minHeight: 60,
-                        maxHeight: 120,
-                        resize: "vertical",
-                        outline: "none",
-                        backgroundColor: "#FAFAF9",
-                        boxSizing: "border-box",
-                      }}
-                      onKeyDown={(e) => {
-                        if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-                          e.preventDefault();
-                          handleLevelSelect(opt.level);
-                        }
-                      }}
-                    />
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        marginTop: 8,
-                        gap: 8,
-                      }}
-                    >
-                      <button
-                        onClick={() => {
-                          setPickedLevel(null);
-                          setNotes("");
-                        }}
-                        style={{
-                          fontSize: 12,
-                          color: "#9C9CA0",
-                          fontFamily: "var(--font-space-grotesk)",
-                          background: "none",
-                          border: "1px solid rgba(218, 193, 185, 0.3)",
-                          borderRadius: 6,
-                          padding: "6px 12px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Back
-                      </button>
-                      <button
-                        onClick={() => handleLevelSelect(opt.level)}
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 600,
-                          fontFamily: "var(--font-space-grotesk)",
-                          color: "#FFFFFF",
-                          background: "linear-gradient(135deg, #93452A, #B25D3F)",
-                          border: "none",
-                          borderRadius: 6,
-                          padding: "6px 16px",
-                          cursor: "pointer",
-                          transition: "opacity 150ms ease",
-                        }}
-                      >
-                        Go
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             ))}
 
             <button
               onClick={() => {
                 setScopingState({ phase: "idle" });
-                setPickedLevel(null);
-                setNotes("");
               }}
               style={{
                 fontSize: 12,

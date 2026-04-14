@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { FileText, Folder, FolderOpen } from "lucide-react";
 import type { FileNode } from "@/types/file";
 import { useClientId, appendClientId } from "@/hooks/use-client-id";
-import { asFileNodes, fetchFileNodes } from "@/lib/file-node-response";
+import { getFileIcon, getFileIconColor } from "@/lib/file-icons";
 
 interface DocsFileTreeProps {
   onSelectFile: (path: string) => void;
@@ -88,7 +88,6 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
         { label: "brand_context", dir: "brand_context", defaultExpanded: true },
         { label: "docs", dir: "docs", defaultExpanded: true },
         { label: "projects", dir: "projects", defaultExpanded: true },
-        { label: ".planning", dir: ".planning", defaultExpanded: false },
       ];
 
       const [rootFileResults, ...dirResults] = await Promise.all([
@@ -100,7 +99,8 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
           )
         ),
         ...sectionDefs.map((s) =>
-          fetchFileNodes(appendClientId(`/api/files?dir=${encodeURIComponent(s.dir)}`, clientId))
+          fetch(appendClientId(`/api/files?dir=${encodeURIComponent(s.dir)}`, clientId))
+            .then((r) => (r.ok ? r.json() : []))
             .catch(() => [])
         ),
       ]);
@@ -168,6 +168,57 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
     });
   }, []);
 
+  // Auto-expand all ancestor directories (and their containing section)
+  // whenever selectedPath changes so the tree scrolls/reveals the target.
+  useEffect(() => {
+    if (!selectedPath) return;
+    const parts = selectedPath.split("/").filter(Boolean);
+    if (parts.length === 0) return;
+
+    // Expand the containing section (top-level dir like "projects", "docs")
+    setExpandedSections((prev) => {
+      if (prev.has(parts[0])) return prev;
+      const next = new Set(prev);
+      next.add(parts[0]);
+      return next;
+    });
+
+    // Every ancestor directory of selectedPath
+    const ancestors: string[] = [];
+    for (let i = 1; i < parts.length; i++) {
+      ancestors.push(parts.slice(0, i).join("/"));
+    }
+    // Also include the path itself if it's a directory (no extension)
+    const looksLikeDir = !parts[parts.length - 1].includes(".");
+    if (looksLikeDir) ancestors.push(parts.join("/"));
+
+    if (ancestors.length === 0) return;
+
+    setExpandedDirs((prev) => {
+      let changed = false;
+      const next = new Set(prev);
+      for (const a of ancestors) {
+        if (!next.has(a)) {
+          next.add(a);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+
+    // Lazy-load children for ancestors that don't have them yet
+    for (const a of ancestors) {
+      if (!childrenMap[a]) {
+        fetch(appendClientId(`/api/files?dir=${encodeURIComponent(a)}`, clientId))
+          .then((r) => (r.ok ? r.json() : []))
+          .then((children: FileNode[]) => {
+            setChildrenMap((prev) => (prev[a] ? prev : { ...prev, [a]: children }));
+          })
+          .catch(() => {});
+      }
+    }
+  }, [selectedPath, clientId, childrenMap]);
+
   const toggleDir = useCallback(
     (dirPath: string) => {
       setExpandedDirs((prev) => {
@@ -178,16 +229,9 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
           next.add(dirPath);
           if (!childrenMap[dirPath]) {
             fetch(appendClientId(`/api/files?dir=${encodeURIComponent(dirPath)}`, clientId))
-              .then(async (r) => {
-                if (!r.ok) return [];
-                const payload: unknown = await r.json();
-                return asFileNodes(payload);
-              })
-              .then((children) => {
+              .then((r) => r.json())
+              .then((children: FileNode[]) => {
                 setChildrenMap((prev) => ({ ...prev, [dirPath]: children }));
-              })
-              .catch(() => {
-                setChildrenMap((prev) => ({ ...prev, [dirPath]: [] }));
               });
           }
         }
@@ -278,16 +322,9 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
           );
           if (expandedDirs.has(targetDir)) {
             fetch(appendClientId(`/api/files?dir=${encodeURIComponent(targetDir)}`, clientId))
-              .then(async (r) => {
-                if (!r.ok) return [];
-                const payload: unknown = await r.json();
-                return asFileNodes(payload);
-              })
-              .then((children) => {
+              .then((r) => r.json())
+              .then((children: FileNode[]) => {
                 setChildrenMap((prev) => ({ ...prev, [targetDir]: children }));
-              })
-              .catch(() => {
-                setChildrenMap((prev) => ({ ...prev, [targetDir]: [] }));
               });
           }
           if (selectedPath === sourcePath) {
@@ -436,7 +473,10 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
               <Folder size={16} style={{ color: isDragOver ? "#93452A" : "#5E5E65", flexShrink: 0 }} />
             )
           ) : (
-            <FileText size={16} style={{ color: "#5E5E65", flexShrink: 0 }} />
+            (() => {
+              const Icon = getFileIcon(node.name);
+              return <Icon size={16} style={{ color: getFileIconColor(node.name), flexShrink: 0 }} />;
+            })()
           )}
           <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
             {node.name}
