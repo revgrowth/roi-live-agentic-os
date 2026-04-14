@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { spawn } from "child_process";
 import { getDb } from "@/lib/db";
 import { hasGsdSignal, hasProjectSignal } from "@/lib/level-signals";
 import { parseQuestionSpecs, type QuestionSpec } from "@/types/question-spec";
 import { gatherContext, type ContextSource } from "@/lib/gather-context";
+import { runClaudeTextPrompt } from "@/lib/run-claude-text-prompt";
 
 interface ActiveProject {
   slug: string;
@@ -448,47 +448,9 @@ Return ONLY valid JSON (no markdown, no explanation):
 }
 
 function runClaude(prompt: string): Promise<string | null> {
-  return new Promise((resolve) => {
-    const timeout = setTimeout(() => {
-      try {
-        proc.kill("SIGTERM");
-      } catch {
-        /* gone */
-      }
-      resolve(null);
-    }, 15000);
-
-    const cleanEnv = { ...process.env };
-    delete cleanEnv.CLAUDECODE;
-
-    const proc = spawn(
-      "claude",
-      ["-p", prompt, "--output-format", "text", "--model", "haiku"],
-      {
-        stdio: ["pipe", "pipe", "pipe"],
-        env: cleanEnv,
-      }
-    );
-
-    if (proc.stdin) proc.stdin.end();
-
-    let stdout = "";
-    proc.stdout?.on("data", (chunk: Buffer) => {
-      stdout += chunk.toString();
-    });
-
-    proc.on("close", (code) => {
-      clearTimeout(timeout);
-      if (code === 0 && stdout.trim()) {
-        resolve(stdout.trim());
-      } else {
-        resolve(null);
-      }
-    });
-
-    proc.on("error", () => {
-      clearTimeout(timeout);
-      resolve(null);
-    });
+  return runClaudeTextPrompt({
+    prompt,
+    model: "haiku",
+    timeoutMs: 15_000,
   });
 }

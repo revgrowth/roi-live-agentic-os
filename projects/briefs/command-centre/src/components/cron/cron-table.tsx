@@ -132,13 +132,15 @@ export function CronJobsView() {
             color: "#FFFFFF",
             fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
             fontWeight: 600,
-            padding: "8px 16px",
+            height: 34,
+            padding: "0 16px",
             borderRadius: "0.375rem",
             border: "none",
             cursor: "pointer",
             fontSize: 13,
-            display: "flex",
+            display: "inline-flex",
             alignItems: "center",
+            justifyContent: "center",
             gap: 6,
           }}
         >
@@ -225,11 +227,15 @@ export function CronJobsView() {
                   color: "#FFFFFF",
                   fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
                   fontWeight: 600,
-                  padding: "10px 20px",
+                  height: 36,
+                  padding: "0 20px",
                   borderRadius: "0.375rem",
                   border: "none",
                   cursor: "pointer",
                   fontSize: 14,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 Create First Job

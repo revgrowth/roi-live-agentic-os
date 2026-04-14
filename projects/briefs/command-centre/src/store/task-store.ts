@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Task, TaskLevel, TaskUpdateInput, OutputFile, LogEntry } from "@/types/task";
 import type { TaskEvent } from "@/lib/event-bus";
+import { isLegacyCronFallbackLogEntry, isLegacyCronFallbackLogSet } from "@/lib/task-logs";
 import { useClientStore } from "./client-store";
 
 // SSE dedup: track IDs we created so SSE echoes are suppressed
@@ -432,6 +433,11 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       case "task:updated":
       case "task:status":
       case "task:progress":
+        if (event.type === "task:status" && isLegacyCronFallbackLogSet(get().logEntries[event.task.id] || [])) {
+          queueMicrotask(() => {
+            void get().fetchLogEntries(event.task.id);
+          });
+        }
         set((state) => ({
           tasks: state.tasks.map((t) => {
             if (t.id !== event.task.id) return t;
@@ -514,20 +520,33 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   },
 
   appendLogEntry: (taskId: string, entry: LogEntry) => {
+    const existing = get().logEntries[taskId] || [];
+    const shouldRefreshLegacyCronLogs =
+      !isLegacyCronFallbackLogEntry(entry) &&
+      !entry.id.startsWith("local-") &&
+      isLegacyCronFallbackLogSet(existing);
+
+    if (shouldRefreshLegacyCronLogs) {
+      queueMicrotask(() => {
+        void get().fetchLogEntries(taskId);
+      });
+      return;
+    }
+
     set((state) => {
-      const existing = state.logEntries[taskId] || [];
+      const existingEntries = state.logEntries[taskId] || [];
       // Deduplicate: skip if this entry ID already exists (from initial fetch)
-      if (existing.some((e) => e.id === entry.id)) return state;
+      if (existingEntries.some((e) => e.id === entry.id)) return state;
       // Deduplicate user_reply: optimistic entry uses "local-" ID, server uses a different UUID.
       // Match by type + content to prevent double display.
       if (entry.type === "user_reply") {
-        const isDuplicate = existing.some(
+        const isDuplicate = existingEntries.some(
           (e) => e.type === "user_reply" && e.content === entry.content
         );
         if (isDuplicate) return state;
       }
       return {
-        logEntries: { ...state.logEntries, [taskId]: [...existing, entry] },
+        logEntries: { ...state.logEntries, [taskId]: [...existingEntries, entry] },
       };
     });
   },

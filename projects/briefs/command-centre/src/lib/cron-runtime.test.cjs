@@ -213,6 +213,9 @@ test("buildCronClaudeArgs keeps root cron runs on the broad bypass path", () => 
     "Run the root cron job",
     "--model",
     "sonnet",
+    "--output-format",
+    "stream-json",
+    "--verbose",
     "--dangerously-skip-permissions",
   ]);
 });
@@ -235,12 +238,94 @@ test("buildCronClaudeArgs scopes client cron runs to dontAsk and --add-dir witho
     "Run the client cron job",
     "--model",
     "sonnet",
+    "--output-format",
+    "stream-json",
+    "--verbose",
     "--permission-mode",
     "dontAsk",
     "--add-dir",
     workspaceDir,
   ]);
   assert.equal(args.includes("--dangerously-skip-permissions"), false);
+});
+
+test("executeCronTask keeps a prose cron question as one assistant message and marks the run as needs_input", async () => {
+  const workspaceDir = makeTempWorkspace();
+  const scheduledFor = new Date().toISOString();
+  const originalClaudeBin = process.env.AGENTIC_OS_CLAUDE_BIN;
+
+  try {
+    fs.writeFileSync(path.join(workspaceDir, "AGENTS.md"), "# test workspace\n", "utf-8");
+    writeCronJob(
+      workspaceDir,
+      null,
+      "needs-input-job",
+      "Ask one follow-up question and stop."
+    );
+
+    const wrapperPath = createFakeClaudeCommand(
+      workspaceDir,
+      "fake-claude-needs-input",
+      process.platform === "win32"
+        ? [
+            "@echo off",
+            "setlocal",
+            "echo {\"type\":\"assistant\",\"message\":{\"content\":[{\"type\":\"text\",\"text\":\"The mock file is already there. What should I test next?\"}]}}",
+            "echo {\"type\":\"result\",\"cost_usd\":0.42}",
+            "exit /b 0",
+            "",
+          ]
+        : [
+            "set -e",
+            "printf '%s\\n' '{\"type\":\"assistant\",\"message\":{\"content\":[{\"type\":\"text\",\"text\":\"The mock file is already there. What should I test next?\"}]}}'",
+            "printf '%s\\n' '{\"type\":\"result\",\"cost_usd\":0.42}'",
+            "exit 0",
+          ]
+    );
+
+    process.env.AGENTIC_OS_CLAUDE_BIN = wrapperPath;
+
+    const job = cronRuntime.getCronJob(workspaceDir, "needs-input-job", null);
+    const queued = cronRuntime.enqueueCronJob(workspaceDir, job, {
+      trigger: "scheduled",
+      scheduledFor,
+    });
+
+    const result = await cronRuntime.executeCronTask(workspaceDir, queued.task.id);
+    const db = cronRuntime.getDb(workspaceDir);
+    const taskRow = db
+      .prepare("SELECT status, needsInput, completedAt, errorMessage, activityLabel FROM tasks WHERE id = ?")
+      .get(queued.task.id);
+    const cronRun = db
+      .prepare("SELECT result, completionReason, costUsd FROM cron_runs WHERE taskId = ?")
+      .get(queued.task.id);
+    const logRows = db
+      .prepare("SELECT type, content FROM task_logs WHERE taskId = ? ORDER BY rowid ASC")
+      .all(queued.task.id);
+
+    assert.equal(result.result, "failure");
+    assert.equal(taskRow.status, "review");
+    assert.equal(taskRow.needsInput, 1);
+    assert.equal(taskRow.completedAt, null);
+    assert.equal(taskRow.errorMessage, null);
+    assert.equal(taskRow.activityLabel, "The mock file is already there. What should I test next?");
+    assert.equal(cronRun.result, "failure");
+    assert.equal(cronRun.completionReason, "needs_input");
+    assert.equal(cronRun.costUsd, 0.42);
+    assert.deepEqual(logRows, [
+      {
+        type: "text",
+        content: "The mock file is already there. What should I test next?",
+      },
+    ]);
+  } finally {
+    if (originalClaudeBin === undefined) {
+      delete process.env.AGENTIC_OS_CLAUDE_BIN;
+    } else {
+      process.env.AGENTIC_OS_CLAUDE_BIN = originalClaudeBin;
+    }
+    cleanupTempWorkspace(workspaceDir);
+  }
 });
 
 test("scheduled retry attempts are capped at exactly twice even when retry is higher", async () => {
@@ -314,6 +399,79 @@ test("scheduled retry attempts are capped at exactly twice even when retry is hi
     assert.equal(attempts, 2);
     assert.equal(cronRun.result, "failure");
     assert.equal(cronRun.trigger, "scheduled");
+  } finally {
+    if (originalClaudeBin === undefined) {
+      delete process.env.AGENTIC_OS_CLAUDE_BIN;
+    } else {
+      process.env.AGENTIC_OS_CLAUDE_BIN = originalClaudeBin;
+    }
+    cleanupTempWorkspace(workspaceDir);
+  }
+});
+
+test("executeCronTask claims a queued cron task once so a second dispatcher skips", async () => {
+  const workspaceDir = makeTempWorkspace();
+  const attemptsPath = path.join(workspaceDir, "attempt-count.txt");
+  const scheduledFor = new Date().toISOString();
+  const originalClaudeBin = process.env.AGENTIC_OS_CLAUDE_BIN;
+
+  try {
+    fs.writeFileSync(path.join(workspaceDir, "AGENTS.md"), "# test workspace\n", "utf-8");
+    writeCronJob(workspaceDir, null, "single-claim-job", "Succeed once so the second runtime dispatcher must skip cleanly.");
+
+    const wrapperPath = createFakeClaudeCommand(
+      workspaceDir,
+      "fake-claude-success",
+      process.platform === "win32"
+        ? [
+            "@echo off",
+            "setlocal EnableDelayedExpansion",
+            "set COUNT=0",
+            "if exist attempt-count.txt set /p COUNT=<attempt-count.txt",
+            "set /a COUNT+=1",
+            "> attempt-count.txt echo !COUNT!",
+            "ping -n 2 127.0.0.1 >nul",
+            "echo success",
+            "exit /b 0",
+            "",
+          ]
+        : [
+            "set -e",
+            "COUNT=0",
+            "if [ -f attempt-count.txt ]; then COUNT=$(cat attempt-count.txt); fi",
+            "COUNT=$((COUNT + 1))",
+            "printf '%s\\n' \"$COUNT\" > attempt-count.txt",
+            "sleep 1",
+            "printf 'success\\n'",
+            "exit 0",
+          ]
+    );
+
+    process.env.AGENTIC_OS_CLAUDE_BIN = wrapperPath;
+
+    const job = cronRuntime.getCronJob(workspaceDir, "single-claim-job", null);
+    const queued = cronRuntime.enqueueCronJob(workspaceDir, job, {
+      trigger: "manual",
+      dedupeByMinute: false,
+      scheduledFor,
+    });
+
+    const [first, second] = await Promise.all([
+      cronRuntime.executeCronTask(workspaceDir, queued.task.id),
+      cronRuntime.executeCronTask(workspaceDir, queued.task.id),
+    ]);
+
+    const attempts = Number(fs.readFileSync(attemptsPath, "utf-8").trim());
+    const outcomes = [first.result, second.result].sort();
+    const cronRuns = cronRuntime
+      .getDb(workspaceDir)
+      .prepare("SELECT result FROM cron_runs WHERE taskId = ?")
+      .all(queued.task.id);
+
+    assert.equal(attempts, 1);
+    assert.deepEqual(outcomes, ["skipped", "success"]);
+    assert.equal(cronRuns.length, 1);
+    assert.equal(cronRuns[0].result, "success");
   } finally {
     if (originalClaudeBin === undefined) {
       delete process.env.AGENTIC_OS_CLAUDE_BIN;

@@ -20,7 +20,8 @@ import { ScriptList } from "@/components/settings/script-list";
 import { EnvEditor } from "@/components/settings/env-editor";
 import { JsonEditor } from "@/components/settings/json-editor";
 import { ClientSwitcher } from "@/components/layout/client-switcher";
-import { ScopeBar } from "@/components/layout/scope-bar";
+import { useTaskStore } from "@/store/task-store";
+import { useClientStore } from "@/store/client-store";
 type Tab = "feed" | "scheduled" | "skills" | "docs" | "settings";
 
 /** Skills tab content */
@@ -188,6 +189,11 @@ function CommandCentreBody() {
   const router = useRouter();
   const tabParam = searchParams.get("tab");
   const fileParam = searchParams.get("file");
+  const taskParam = searchParams.get("task");
+  const searchParamsString = searchParams.toString();
+  const fetchTasks = useTaskStore((s) => s.fetchTasks);
+  const openPanel = useTaskStore((s) => s.openPanel);
+  const setSelectedClient = useClientStore((s) => s.setSelectedClient);
 
   const [activeTab, setActiveTab] = useState<Tab>(
     (VALID_TABS.includes(tabParam as Tab) ? (tabParam as Tab) : "feed")
@@ -200,6 +206,44 @@ function CommandCentreBody() {
       setActiveTab(tabParam as Tab);
     }
   }, [tabParam]);
+
+  useEffect(() => {
+    if (!taskParam) return;
+
+    let cancelled = false;
+
+    const openDeepLinkedTask = async () => {
+      setActiveTab("feed");
+
+      try {
+        const res = await fetch(`/api/tasks/${encodeURIComponent(taskParam)}`);
+        if (!res.ok) return;
+
+        const task = await res.json();
+        if (cancelled) return;
+
+        setSelectedClient(task.clientId ?? null);
+        await fetchTasks();
+        if (cancelled) return;
+
+        openPanel(task.id);
+      } finally {
+        if (cancelled) return;
+
+        const params = new URLSearchParams(searchParamsString);
+        params.delete("task");
+        params.set("tab", "feed");
+        const nextQuery = params.toString();
+        router.replace(nextQuery ? `/?${nextQuery}` : "/");
+      }
+    };
+
+    void openDeepLinkedTask();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [taskParam, searchParamsString, router, fetchTasks, openPanel, setSelectedClient]);
   const switchTab = useCallback(
     (tab: string) => {
       setActiveTab(tab as Tab);
@@ -298,8 +342,6 @@ function CommandCentreBody() {
           <ClientSwitcher direction="down" />
         </div>
       </div>
-
-      <ScopeBar />
       <BrandContextBanner />
 
       {/* Content */}

@@ -2,9 +2,9 @@
   "app": {
     "id": "AgenticOS.Notifications",
     "displayName": "Agentic OS",
-    "shortcutName": "Agentic OS Notifications",
+    "shortcutName": "Agentic OS",
     "assetVersion": "v4",
-    "attribution": "Agentic OS",
+    "attribution": "",
     "defaultDuration": "short",
     "defaultLayout": "compact"
   },
@@ -62,32 +62,40 @@
     "interactive": {
       "waiting": {
         "status": "Needs input",
-        "subject": "{project}",
-        "detail": "Claude is paused until you reply.",
+        "subject": "",
+        "detail": "",
+        "folder": "{folderLabel}",
+        "job": "{jobLabel}",
         "variant": "info",
         "duration": "long",
         "layout": "compact"
       },
       "permission": {
         "status": "Permission required",
-        "subject": "{project}",
-        "detail": "{rawMessage}",
+        "subject": "",
+        "detail": "",
+        "folder": "{folderLabel}",
+        "job": "{jobLabel}",
         "variant": "warning",
         "duration": "long",
         "layout": "compact"
       },
       "actionRequired": {
         "status": "Needs attention",
-        "subject": "{project}",
-        "detail": "{rawMessage}",
+        "subject": "",
+        "detail": "",
+        "folder": "{folderLabel}",
+        "job": "{jobLabel}",
         "variant": "warning",
         "duration": "long",
         "layout": "compact"
       },
       "complete": {
         "status": "Task complete",
-        "subject": "{project}",
-        "detail": "Job #{seq} finished in {duration}.",
+        "subject": "",
+        "detail": "",
+        "folder": "{folderLabel}",
+        "job": "{jobLabel}",
         "variant": "success",
         "duration": "short",
         "layout": "compact"

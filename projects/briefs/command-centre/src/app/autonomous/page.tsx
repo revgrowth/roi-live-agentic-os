@@ -7,7 +7,6 @@ import { useGsdSync } from "@/hooks/use-gsd-sync";
 import { useSSE } from "@/hooks/use-sse";
 import { FeedView } from "@/components/board/feed-view";
 import { BrandContextBanner } from "@/components/board/brand-context-banner";
-import { ScopeBar } from "@/components/layout/scope-bar";
 import { ChatPanel } from "@/components/autonomous/chat-panel";
 import { TaskModal } from "@/components/modal/task-modal";
 import type { DashboardSummary } from "@/types/dashboard";
@@ -111,8 +110,6 @@ export default function AutonomousPage() {
         </div>
         {usage && <TokenBadge usage={usage} weekCost={weekCost} />}
       </header>
-
-      <ScopeBar />
       <BrandContextBanner />
 
       {/* Content: Feed (left) + Chat panel (right) */}

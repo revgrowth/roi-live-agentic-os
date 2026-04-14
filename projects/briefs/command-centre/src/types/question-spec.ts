@@ -31,6 +31,11 @@ export interface QuestionSpec {
 /** Answer map keyed by QuestionSpec.id */
 export type QuestionAnswers = Record<string, string | string[]>;
 
+export interface ExtractedQuestionSpecs {
+  specs: QuestionSpec[];
+  matchedText: string;
+}
+
 /**
  * Validate and sanitize raw JSON into a QuestionSpec[]. Unknown types
  * fall back to "text". Returns an empty list if the input is malformed.
@@ -69,6 +74,64 @@ export function parseQuestionSpecs(raw: unknown): QuestionSpec[] {
     out.push(spec);
   }
   return out;
+}
+
+function parseQuestionSpecsPayload(payload: string): QuestionSpec[] {
+  try {
+    const parsed = JSON.parse(payload.trim());
+    const raw = Array.isArray(parsed)
+      ? parsed
+      : Array.isArray((parsed as Record<string, unknown>)?.questions)
+        ? (parsed as { questions: unknown[] }).questions
+        : null;
+    return raw ? parseQuestionSpecs(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Detect typed question payloads embedded in plain text.
+ *
+ * Supports:
+ * - ```ask-user-questions fences
+ * - generic fenced JSON blocks
+ * - raw JSON array/object strings
+ */
+export function extractQuestionSpecsFromText(text: string): ExtractedQuestionSpecs | null {
+  const taggedFence = text.match(/```ask-user-questions\s*\r?\n([\s\S]*?)\r?\n```/i);
+  if (taggedFence?.[0] && taggedFence[1]) {
+    const specs = parseQuestionSpecsPayload(taggedFence[1]);
+    if (specs.length > 0) {
+      return { specs, matchedText: taggedFence[0] };
+    }
+  }
+
+  const genericFenceRegex = /```(?:json|javascript|js|ts|tsx)?\s*\r?\n([\s\S]*?)\r?\n```/gi;
+  for (const match of text.matchAll(genericFenceRegex)) {
+    const matchedText = match[0];
+    const payload = match[1];
+    if (!matchedText || !payload) continue;
+    const specs = parseQuestionSpecsPayload(payload);
+    if (specs.length > 0) {
+      return { specs, matchedText };
+    }
+  }
+
+  const trimmed = text.trim();
+  if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+    const specs = parseQuestionSpecsPayload(trimmed);
+    if (specs.length > 0) {
+      return { specs, matchedText: trimmed };
+    }
+  }
+
+  return null;
+}
+
+export function stripQuestionSpecsFromText(text: string, matchedText?: string): string {
+  const cleaned = matchedText ? text.replace(matchedText, "") : text;
+  return cleaned.replace(/\n{3,}/g, "\n\n").trim();
 }
 
 /**

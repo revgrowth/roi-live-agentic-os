@@ -44,6 +44,7 @@ const PDF_EXTENSIONS = new Set(["pdf"]);
 const RUN_COMPLETION_REASON_LABELS: Record<string, string> = {
   completed: "Normal completion",
   failed: "Normal failure",
+  needs_input: "Needs input",
   timed_out: "Normal timeout",
   recovered_inferred_state: "Recovered state",
   recovered_missing_task: "Recovered missing job",
@@ -63,8 +64,16 @@ function truncateFilename(name: string, maxLen = 28): string {
   return name.slice(0, maxLen - 3) + "...";
 }
 
-function getRunResultBadge(result: CronRun["result"]) {
-  switch (result) {
+function getRunResultBadge(run: CronRun) {
+  if (run.completionReason === "needs_input") {
+    return {
+      label: "Needs input",
+      backgroundColor: "#FFF7ED",
+      color: "#C2410C",
+    };
+  }
+
+  switch (run.result) {
     case "success":
       return { label: "Success", backgroundColor: "#ECFDF5", color: "#10B981" };
     case "failure":
@@ -218,7 +227,7 @@ export function RunHistory({ runs, jobSlug, prompt }: RunHistoryProps) {
 
       {/* Rows */}
       {runs.map((run) => {
-        const badge = getRunResultBadge(run.result);
+        const badge = getRunResultBadge(run);
         return (
           <div
             key={run.id}

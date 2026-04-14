@@ -6,6 +6,7 @@ import { Check, X, CheckCircle2, Paperclip, Download, Eye, FileText, Play, Arrow
 import { useTaskStore } from "@/store/task-store";
 import type { Task, LogEntry, TaskLevel, PermissionMode, ClaudeModel, Todo } from "@/types/task";
 import { PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS } from "@/types/task";
+import { getPendingTaskQuestionPreview } from "@/lib/task-logs";
 import { PermissionPicker } from "@/components/shared/permission-picker";
 import { ModelPicker } from "@/components/shared/model-picker";
 import { TasksPopover } from "@/components/shared/tasks-popover";
@@ -589,17 +590,10 @@ function SubtasksList({
 
         // Only surface a waiting-on-input preview if we're actually in needs state.
         const logs = childLogEntries?.[st.id] || [];
-        let questionPreview: string | null = null;
-        if (displayState === "needs") {
-          for (let i = logs.length - 1; i >= 0; i--) {
-            const e = logs[i];
-            if ((e.type === "question" || e.type === "structured_question") && !e.questionAnswers) {
-              questionPreview = e.content.slice(0, 110) || "Claude is asking for input";
-              break;
-            }
-          }
-          if (!questionPreview) questionPreview = "Waiting for your reply";
-        }
+        const questionPreview =
+          displayState === "needs"
+            ? getPendingTaskQuestionPreview(logs, true, 110)
+            : null;
 
         // Per-state visual tokens (one source of truth).
         const visuals: Record<DisplayState, {

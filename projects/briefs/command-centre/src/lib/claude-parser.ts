@@ -1,5 +1,9 @@
 import type { LogEntry, Todo } from "@/types/task";
-import { parseQuestionSpecs, type QuestionSpec } from "@/types/question-spec";
+import {
+  extractQuestionSpecsFromText,
+  stripQuestionSpecsFromText,
+  type QuestionSpec,
+} from "@/types/question-spec";
 
 export interface ProgressData {
   costUsd?: number;
@@ -93,7 +97,11 @@ export class ClaudeOutputParser {
     if (textBlocks.length === 0) return;
 
     const lastText = textBlocks[textBlocks.length - 1].text as string;
-    const activityLabel = extractActivityLabel(lastText);
+    const structured = detectStructuredQuestions(lastText);
+    const visibleLastText = structured
+      ? stripStructuredQuestionBlock(lastText, structured.matchedText)
+      : lastText;
+    const activityLabel = extractActivityLabel(visibleLastText);
 
     if (activityLabel) {
       this.callbacks.onProgress({ activityLabel });
@@ -101,26 +109,27 @@ export class ClaudeOutputParser {
 
     // Emit log entry for text content
     const fullText = textBlocks.map((b) => b.text as string).join("");
-    if (fullText.trim()) {
+    const structuredFromFullText = structured ?? detectStructuredQuestions(fullText);
+    const visibleText = structuredFromFullText
+      ? stripStructuredQuestionBlock(fullText, structuredFromFullText.matchedText)
+      : fullText;
+
+    if (visibleText.trim()) {
       this.callbacks.onLogEntry?.({
         id: crypto.randomUUID(),
         type: "text",
         timestamp: new Date().toISOString(),
-        content: fullText,
+        content: visibleText,
       });
+    }
 
-      // Structured question detection takes precedence over prose detection.
-      // Claude is instructed (via the system-prompt addendum) to emit a
-      // fenced ```ask-user-questions block when it needs clarification.
-      const structured = detectStructuredQuestions(fullText);
-      if (structured && structured.length > 0) {
-        this.callbacks.onStructuredQuestion?.(structured);
-      } else {
-        // Fallback: prose question detection
-        const questionText = detectQuestion(fullText);
-        if (questionText) {
-          this.callbacks.onQuestion?.(questionText);
-        }
+    if (structuredFromFullText && structuredFromFullText.specs.length > 0) {
+      this.callbacks.onStructuredQuestion?.(structuredFromFullText.specs);
+    } else {
+      // Fallback: prose question detection
+      const questionText = detectQuestion(visibleText);
+      if (questionText) {
+        this.callbacks.onQuestion?.(questionText);
       }
     }
   }
@@ -259,25 +268,15 @@ export function parseTodosFromInput(input: unknown): Todo[] | null {
  *
  * Returns the parsed specs if a valid block is found, null otherwise.
  */
-function detectStructuredQuestions(text: string): QuestionSpec[] | null {
-  const fenceRegex = /```ask-user-questions\s*\n([\s\S]*?)\n```/i;
-  const match = text.match(fenceRegex);
-  if (!match || !match[1]) return null;
-  try {
-    const parsed = JSON.parse(match[1].trim());
-    // Accept either a bare array or an object with a "questions" field
-    const raw = Array.isArray(parsed)
-      ? parsed
-      : Array.isArray((parsed as Record<string, unknown>)?.questions)
-        ? (parsed as { questions: unknown[] }).questions
-        : null;
-    if (!raw) return null;
-    const specs = parseQuestionSpecs(raw);
-    return specs.length > 0 ? specs : null;
-  } catch (err) {
-    console.warn("[claude-parser] Failed to parse ask-user-questions block:", err);
-    return null;
-  }
+function detectStructuredQuestions(
+  text: string
+): { specs: QuestionSpec[]; matchedText: string } | null {
+  const extracted = extractQuestionSpecsFromText(text);
+  return extracted && extracted.specs.length > 0 ? extracted : null;
+}
+
+function stripStructuredQuestionBlock(text: string, matchedText: string): string {
+  return stripQuestionSpecsFromText(text, matchedText);
 }
 
 /**

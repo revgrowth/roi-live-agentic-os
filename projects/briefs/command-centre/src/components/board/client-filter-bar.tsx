@@ -53,9 +53,9 @@ export function ClientFilterBar({
     <div
       style={{
         display: "flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "2px 0",
+        alignItems: "flex-end",
+        gap: 10,
+        padding: "0",
       }}
     >
       {/* New Goal button — far left */}
@@ -65,8 +65,10 @@ export function ClientFilterBar({
           style={{
             display: "inline-flex",
             alignItems: "center",
+            justifyContent: "center",
             gap: 5,
-            padding: "5px 12px",
+            height: 30,
+            padding: "0 12px",
             fontSize: 11,
             fontWeight: 600,
             fontFamily: MONO,
@@ -89,7 +91,15 @@ export function ClientFilterBar({
 
       {/* Client filter dropdown */}
       {clients.length > 0 && (
-        <div ref={ref} style={{ position: "relative" }}>
+        <div
+          ref={ref}
+          style={{
+            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
           <div
             style={{
               fontSize: 10,
@@ -107,8 +117,10 @@ export function ClientFilterBar({
             style={{
               display: "inline-flex",
               alignItems: "center",
+              justifyContent: "center",
               gap: 5,
-              padding: "5px 10px",
+              height: 30,
+              padding: "0 10px",
               fontSize: 11,
               fontFamily: MONO,
               fontWeight: 500,

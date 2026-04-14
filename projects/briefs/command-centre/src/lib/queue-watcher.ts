@@ -1,6 +1,7 @@
 import { onTaskEvent, emitTaskEvent, type TaskEvent } from "./event-bus";
 import { processManager } from "./process-manager";
 import { getDb } from "./db";
+import { getConfig } from "./config";
 import { getCronSystemStatus } from "./cron-system-status";
 import { getInProcessCronRuntimeIdentifier } from "./cron-scheduler";
 import type { CronRunCompletionReason } from "@/types/cron";
@@ -9,6 +10,7 @@ import type { Task } from "@/types/task";
 const cronRuntime = require("./cron-runtime.js");
 
 let initialized = false;
+const startingCronTaskIds = new Set<string>();
 
 function getRecoveredCronRunCompletionReason(
   row: {
@@ -36,6 +38,43 @@ function getRecoveredCronRunCompletionReason(
   return fallback;
 }
 
+function shouldSkipQueuedCronTaskBecauseDaemonIsLeader(taskId: string): boolean {
+  const runtimeStatus = getCronSystemStatus(getInProcessCronRuntimeIdentifier());
+  if (runtimeStatus.runtime === "daemon") {
+    console.log(
+      `[queue-watcher] Skipping queued cron task ${taskId} because daemon runtime is leader`
+    );
+    return true;
+  }
+
+  return false;
+}
+
+// Cron tasks are runtime-owned so UI-led and daemon-led execution share the same
+// cronRuntime path. Interactive tasks remain process-manager-owned.
+function dispatchQueuedCronTask(taskId: string, source: string): void {
+  if (startingCronTaskIds.has(taskId)) {
+    console.log(
+      `[queue-watcher] Skipping queued cron task ${taskId} from ${source} because runtime dispatch already started`
+    );
+    return;
+  }
+
+  startingCronTaskIds.add(taskId);
+  const agenticOsDir = getConfig().agenticOsDir;
+  console.log(
+    `[queue-watcher] Cron task ${taskId} entered queued status (via ${source}), triggering runtime execution`
+  );
+
+  cronRuntime.executeCronTask(agenticOsDir, taskId)
+    .catch((err: unknown) => {
+      console.error(`[queue-watcher] Failed to execute queued cron task ${taskId}:`, err);
+    })
+    .finally(() => {
+      startingCronTaskIds.delete(taskId);
+    });
+}
+
 /**
  * Initialize the queue watcher.
  * Listens for task events and auto-executes tasks that enter 'queued' status.
@@ -61,13 +100,12 @@ export function initQueueWatcher(): void {
     if (event.task.status !== "queued") return;
 
     if (event.task.cronJobSlug) {
-      const runtimeStatus = getCronSystemStatus(getInProcessCronRuntimeIdentifier());
-      if (runtimeStatus.runtime === "daemon") {
-        console.log(
-          `[queue-watcher] Skipping queued cron task ${event.task.id} because daemon runtime is leader`
-        );
+      if (shouldSkipQueuedCronTaskBecauseDaemonIsLeader(event.task.id)) {
         return;
       }
+
+      dispatchQueuedCronTask(event.task.id, event.type);
+      return;
     }
 
     if (processManager.hasActiveSession(event.task.id)) {
@@ -189,10 +227,7 @@ export function initQueueWatcher(): void {
           .all() as Task[];
 
         for (const task of queuedCronTasks) {
-          if (processManager.hasActiveSession(task.id)) continue;
-          processManager.executeTask(task.id).catch((err) => {
-            console.error(`[queue-watcher] Failed to execute queued cron task ${task.id}:`, err);
-          });
+          dispatchQueuedCronTask(task.id, "reaper");
         }
       }
 

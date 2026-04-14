@@ -167,8 +167,9 @@ export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSw
           background: "transparent",
           cursor: "pointer",
           fontFamily: "var(--font-inter), Inter, sans-serif",
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: 500,
+          lineHeight: 1.2,
           color: "#1C1B1F",
           transition: "background 150ms ease",
           margin: collapsed ? "0 auto" : 0,
@@ -196,7 +197,14 @@ export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSw
             <Globe size={16} style={{ color: "#5E5E65", flexShrink: 0 }} />
           )}
           {!collapsed && (
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <span
+              style={{
+                display: "block",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
               {displayName}
             </span>
           )}
@@ -246,7 +254,7 @@ export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSw
               background: selectedClientId === null ? "#FFDBCF" : "transparent",
               cursor: "pointer",
               fontFamily: "var(--font-inter), Inter, sans-serif",
-              fontSize: 14,
+              fontSize: 13,
               color: selectedClientId === null ? "#390C00" : "#5E5E65",
               transition: "background 150ms ease",
             }}
@@ -257,15 +265,27 @@ export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSw
               if (selectedClientId !== null) e.currentTarget.style.backgroundColor = "transparent";
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flex: 1 }}>
               <Globe size={16} style={{ color: selectedClientId === null ? "#390C00" : "#5E5E65" }} />
-              <div style={{ textAlign: "left" }}>
-                  <div style={{ fontWeight: 500 }}>{rootName}</div>
+              <div style={{ textAlign: "left", minWidth: 0, flex: 1 }}>
                 <div
                   style={{
-                    fontSize: 11,
+                    fontWeight: 500,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {rootName}
+                </div>
+                <div
+                  style={{
+                    fontSize: 10,
                     color: selectedClientId === null ? "#390C00" : "#5E5E65",
                     opacity: 0.7,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   All clients
@@ -301,7 +321,7 @@ export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSw
                 background: selectedClientId === client.slug ? "#FFDBCF" : "transparent",
                 cursor: "pointer",
                 fontFamily: "var(--font-inter), Inter, sans-serif",
-                fontSize: 14,
+                fontSize: 13,
                 color: selectedClientId === client.slug ? "#390C00" : "#5E5E65",
                 transition: "background 150ms ease",
               }}
@@ -322,18 +342,29 @@ export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSw
                     flexShrink: 0,
                   }}
                 />
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <span
+                  style={{
+                    display: "block",
+                    flex: 1,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {client.name}
                 </span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                 <span
                   style={{
                     fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                    fontSize: 12,
+                    fontSize: 11,
                     color: selectedClientId === client.slug ? "#390C00" : "#5E5E65",
                     opacity: 0.6,
                     whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    maxWidth: 92,
                   }}
                 >
                   clients/{client.slug}

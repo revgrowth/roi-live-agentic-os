@@ -4,13 +4,11 @@ import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { ArrowUp } from "lucide-react";
 import type { Task, LogEntry, PermissionMode } from "@/types/task";
 import { ChatEntry, TextGroup, ToolSummaryBlock, FileOutputCard, isFileOutputEntry, parseFileOutput } from "./chat-entry";
+import { shouldShowTaskErrorBanner } from "@/lib/task-logs";
 import {
-  parseQuestionSpecs,
-  serializeAnswersToProse,
-  type QuestionSpec,
-  type QuestionAnswers,
+  extractQuestionSpecsFromText,
+  stripQuestionSpecsFromText,
 } from "@/types/question-spec";
-import { QuestionModal } from "@/components/shared/question-modal";
 
 /* ── Claude-style spinner verbs ─────────────────────────────────────── */
 
@@ -314,7 +312,21 @@ function groupEntries(entries: LogEntry[]): RenderItem[] {
     }
   };
 
-  for (const entry of entries) {
+  for (const originalEntry of entries) {
+    let entry = originalEntry;
+    if (entry.type === "text") {
+      const extracted = extractQuestionSpecsFromText(entry.content);
+      if (extracted) {
+        const cleaned = stripQuestionSpecsFromText(entry.content, extracted.matchedText);
+        if (!cleaned) {
+          continue;
+        }
+        if (cleaned !== entry.content) {
+          entry = { ...entry, content: cleaned };
+        }
+      }
+    }
+
     if (entry.type === "text") {
       flushToolGroup();
       currentTextGroup.push(entry);
@@ -717,43 +729,16 @@ export function ModalChat({
         .slice(0, 160)
     : null;
 
-  // Detect pending structured questions for inline rendering at the bottom
-  // of the chat — more prominent than relying on the timeline entry alone.
-  const pendingStructuredEntry = useMemo(() => {
+  const hasPendingStructuredQuestion = useMemo(() => {
     for (let i = logEntries.length - 1; i >= 0; i--) {
       const e = logEntries[i];
       if (e.type === "structured_question" && !e.questionAnswers) {
-        try {
-          const specs = e.questionSpec
-            ? parseQuestionSpecs(JSON.parse(e.questionSpec))
-            : [];
-          if (specs.length > 0) return { entryId: e.id, specs, content: e.content };
-        } catch { /* ignore */ }
+        return true;
       }
     }
-    return null;
+    return false;
   }, [logEntries]);
-
-  const [inlineSubmitted, setInlineSubmitted] = useState(false);
-  // Reset submitted state when the pending question changes
-  useEffect(() => {
-    setInlineSubmitted(false);
-  }, [pendingStructuredEntry?.entryId]);
-
-  const handleInlineQuestionSubmit = useCallback(async (answers: QuestionAnswers) => {
-    if (!taskId || !pendingStructuredEntry) return;
-    const prose = serializeAnswersToProse(pendingStructuredEntry.specs, answers);
-    try {
-      await fetch(`/api/tasks/${taskId}/reply`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: prose }),
-      });
-      setInlineSubmitted(true);
-    } catch { /* allow retry */ }
-  }, [taskId, pendingStructuredEntry]);
-
-  const showInlineQuestionForm = pendingStructuredEntry && !inlineSubmitted;
+  const showErrorBanner = shouldShowTaskErrorBanner(logEntries, errorMessage);
 
   return (
     <div
@@ -1033,7 +1018,7 @@ export function ModalChat({
         {isRunning && !needsInput && <SpinnerVerb startedAt={startedAt} activityLabel={activityLabel} />}
 
         {/* Error banner — shown when task failed */}
-        {errorMessage && <ErrorBanner message={errorMessage} />}
+        {showErrorBanner && errorMessage && <ErrorBanner message={errorMessage} />}
 
         {/* Completed verb — shown when task is done, with total work time */}
         {!isRunning && (status === "done" || status === "review") && totalWorkSeconds != null && totalWorkSeconds > 0 && (
@@ -1046,32 +1031,9 @@ export function ModalChat({
           />
         )}
 
-        {/* Inline structured question form */}
-        {showInlineQuestionForm && (
-          <div style={{ padding: "8px 0" }}>
-            {pendingStructuredEntry.content && (
-              <div style={{
-                fontSize: 13,
-                fontFamily: "var(--font-inter), Inter, sans-serif",
-                color: "#1B1C1B",
-                marginBottom: 12,
-                fontWeight: 500,
-              }}>
-                {pendingStructuredEntry.content}
-              </div>
-            )}
-            <QuestionModal
-              questions={pendingStructuredEntry.specs}
-              variant="inline"
-              hideFooter={false}
-              submitLabel="Reply"
-              onSubmit={handleInlineQuestionSubmit}
-            />
-          </div>
-        )}
-
-        {/* Question indicator — only show when no structured form is visible */}
-        {needsInput === true && logEntries.length > 0 && !showInlineQuestionForm && (
+        {/* Question indicator — hide when the structured question is already
+            rendered inline in the timeline entry itself. */}
+        {needsInput === true && logEntries.length > 0 && !hasPendingStructuredQuestion && (
           <div
             style={{
               fontSize: 12,

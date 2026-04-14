@@ -1,21 +1,31 @@
+import fs from "fs";
+import path from "path";
 import { NextRequest, NextResponse } from "next/server";
 import { processManager } from "@/lib/process-manager";
 import { getDb } from "@/lib/db";
+import { getClientAgenticOsDir } from "@/lib/config";
 import { emitTaskEvent } from "@/lib/event-bus";
 import type { Task, LogEntry } from "@/types/task";
+import type { Message } from "@/types/chat";
+import { buildCronTaskLogEntries, mergeTaskLogsWithConversation, type CronRunLog } from "@/lib/task-logs";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const db = getDb();
+  const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id) as Task | undefined;
+
+  if (!task) {
+    return NextResponse.json([]);
+  }
 
   // First try direct logs for this task
   let entries = processManager.getLogEntries(id);
 
   // If no logs and this is a parent/container task, aggregate child task logs
   if (entries.length === 0) {
-    const db = getDb();
     const childCount = db.prepare(
       "SELECT COUNT(*) as count FROM tasks WHERE parentId = ?"
     ).get(id) as { count: number };
@@ -69,6 +79,79 @@ export async function GET(
           ...(row.questionSpec ? { questionSpec: row.questionSpec } : {}),
           ...(row.questionAnswers ? { questionAnswers: row.questionAnswers } : {}),
         });
+      }
+    }
+  }
+
+  if (task.conversationId) {
+    const messageRows = db.prepare(
+      "SELECT * FROM messages WHERE conversationId = ? ORDER BY createdAt ASC"
+    ).all(task.conversationId) as Array<{
+      id: string;
+      conversationId: string;
+      taskId: string | null;
+      role: Message["role"];
+      content: string;
+      metadata: string | null;
+      parentMessageId: string | null;
+      createdAt: string;
+    }>;
+
+    const conversationMessages: Message[] = messageRows.map((row) => ({
+      id: row.id,
+      conversationId: row.conversationId,
+      taskId: row.taskId,
+      role: row.role,
+      content: row.content,
+      metadata: row.metadata ? JSON.parse(row.metadata) : null,
+      parentMessageId: row.parentMessageId,
+      createdAt: row.createdAt,
+    }));
+
+    entries = mergeTaskLogsWithConversation(entries, conversationMessages, {
+      originMessageId: task.originMessageId,
+    });
+  }
+
+  if (entries.length === 0 && task.cronJobSlug) {
+    const logFilePath = path.join(
+      getClientAgenticOsDir(task.clientId ?? null),
+      "cron",
+      "logs",
+      `${task.cronJobSlug}.log`
+    );
+
+    let cronLogContent = "";
+    try {
+      cronLogContent = fs.readFileSync(logFilePath, "utf-8");
+    } catch {
+      cronLogContent = "";
+    }
+
+    if (cronLogContent.length > 0) {
+      const currentRun = db.prepare(
+        `SELECT id, jobSlug, taskId, startedAt, completedAt, result, trigger, clientId, scheduledFor
+         FROM cron_runs
+         WHERE taskId = ?
+         ORDER BY id DESC
+         LIMIT 1`
+      ).get(task.id) as CronRunLog | undefined;
+
+      if (currentRun) {
+        const jobRuns = db.prepare(
+          `SELECT id, jobSlug, taskId, startedAt, completedAt, result, trigger, clientId, scheduledFor
+           FROM cron_runs
+           WHERE jobSlug = ?
+             AND COALESCE(clientId, '') = COALESCE(?, '')
+           ORDER BY startedAt ASC, id ASC`
+        ).all(task.cronJobSlug, task.clientId ?? null) as CronRunLog[];
+
+        entries = buildCronTaskLogEntries(
+          cronLogContent,
+          currentRun,
+          jobRuns,
+          task.id
+        );
       }
     }
   }

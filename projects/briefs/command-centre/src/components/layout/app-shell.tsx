@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Sidebar } from "./sidebar";
-import { ScopeBar } from "./scope-bar";
 
 export function AppShell({ children, title }: { children: React.ReactNode; title?: string }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -52,7 +51,6 @@ export function AppShell({ children, title }: { children: React.ReactNode; title
             {title || "Command Centre"}
           </h2>
         </header>
-        <ScopeBar />
         <div style={{ padding: "0 24px 24px", display: "flex", flexDirection: "column", gap: 16, marginTop: 16 }}>
           {children}
         </div>

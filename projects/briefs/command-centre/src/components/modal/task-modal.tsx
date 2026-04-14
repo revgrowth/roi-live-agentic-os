@@ -312,9 +312,8 @@ export function TaskModal() {
   if (!selectedTaskId || !task) return null;
 
   const isRunning = task.status === "running";
-  const isCronTask = Boolean(task.cronJobSlug);
   const hasBeenExecuted = task.status === "running" || task.status === "review" || task.status === "done";
-  const showReplyInput = !isCronTask && (hasBeenExecuted || task.needsInput === true);
+  const showReplyInput = hasBeenExecuted || task.needsInput === true;
 
   // Filter "Working directory:" from description
   const displayDescription = task.description

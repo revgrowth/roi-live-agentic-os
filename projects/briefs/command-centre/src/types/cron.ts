@@ -4,6 +4,7 @@ export type CronRunResultSource = "observed" | "inferred";
 export type CronRunCompletionReason =
   | "completed"
   | "failed"
+  | "needs_input"
   | "timed_out"
   | "recovered_inferred_state"
   | "recovered_missing_task"

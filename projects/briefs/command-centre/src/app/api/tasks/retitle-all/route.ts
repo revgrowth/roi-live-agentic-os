@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { spawn } from "child_process";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
 import type { Task } from "@/types/task";
+import { runClaudeTextPrompt } from "@/lib/run-claude-text-prompt";
 
 /**
  * POST /api/tasks/retitle-all
@@ -201,47 +201,9 @@ Return ONLY valid JSON — an array of objects matching the input order:
 }
 
 function runClaude(prompt: string): Promise<string | null> {
-  return new Promise((resolve) => {
-    const timeout = setTimeout(() => {
-      try {
-        proc.kill("SIGTERM");
-      } catch {
-        /* gone */
-      }
-      resolve(null);
-    }, 60000);
-
-    const cleanEnv = { ...process.env };
-    delete cleanEnv.CLAUDECODE;
-
-    const proc = spawn(
-      "claude",
-      ["-p", prompt, "--output-format", "text", "--model", "haiku"],
-      {
-        stdio: ["pipe", "pipe", "pipe"],
-        env: cleanEnv,
-      }
-    );
-
-    if (proc.stdin) proc.stdin.end();
-
-    let stdout = "";
-    proc.stdout?.on("data", (chunk: Buffer) => {
-      stdout += chunk.toString();
-    });
-
-    proc.on("close", (code) => {
-      clearTimeout(timeout);
-      if (code === 0 && stdout.trim()) {
-        resolve(stdout.trim());
-      } else {
-        resolve(null);
-      }
-    });
-
-    proc.on("error", () => {
-      clearTimeout(timeout);
-      resolve(null);
-    });
+  return runClaudeTextPrompt({
+    prompt,
+    model: "haiku",
+    timeoutMs: 60_000,
   });
 }

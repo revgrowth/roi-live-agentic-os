@@ -1464,13 +1464,17 @@ async function finalizeCronExecutionOutcome(agenticOsDir, job, taskId, payload =
     errorMessage: payload.errorMessage || null,
     durationMs,
     completedAt,
+    status: payload.status,
     activityLabel:
       payload.activityLabel ||
-      (result === "success"
-        ? "Scheduled job completed"
-        : result === "timeout"
-          ? `Timed out after ${job?.timeout || DEFAULT_TIMEOUT}`
-          : `Failed with exit code ${exitCode}`),
+      (payload.needsInput
+        ? "Waiting for your reply"
+        : result === "success"
+          ? "Scheduled job completed"
+          : result === "timeout"
+            ? `Timed out after ${job?.timeout || DEFAULT_TIMEOUT}`
+            : `Failed with exit code ${exitCode}`),
+    needsInput: Boolean(payload.needsInput),
   });
 
   completeCronRunForTask(agenticOsDir, updatedTask, {
@@ -1482,6 +1486,7 @@ async function finalizeCronExecutionOutcome(agenticOsDir, job, taskId, payload =
     scheduledFor: payload.scheduledFor,
     resultSource: payload.resultSource,
     completionReason: payload.completionReason,
+    costUsd: payload.costUsd,
   });
 
   let notification = {
@@ -1838,10 +1843,12 @@ function persistTaskOutputs(agenticOsDir, taskId, files) {
   }
 }
 
-function markTaskRunning(agenticOsDir, taskId) {
+// Cron tasks are claimed by the runtime itself so UI-led and daemon-led
+// dispatchers follow the same single-owner execution contract.
+function claimQueuedCronTask(agenticOsDir, taskId) {
   const db = getDb(agenticOsDir);
   const now = new Date().toISOString();
-  db.prepare(
+  const claimed = db.prepare(
     `UPDATE tasks
      SET status = 'running',
          startedAt = COALESCE(startedAt, ?),
@@ -1849,15 +1856,24 @@ function markTaskRunning(agenticOsDir, taskId) {
          activityLabel = 'Running scheduled job...',
          errorMessage = NULL,
          needsInput = 0
-     WHERE id = ?`
+     WHERE id = ?
+       AND status = 'queued'`
   ).run(now, now, taskId);
+
+  if (!claimed.changes) {
+    return null;
+  }
+
   return db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId);
 }
 
 function finalizeTask(agenticOsDir, taskId, payload) {
   const db = getDb(agenticOsDir);
   const completedAt = payload.completedAt || new Date().toISOString();
-  const nextStatus = payload.result === "success" ? "done" : "review";
+  const nextStatus =
+    payload.status ||
+    (payload.needsInput ? "review" : payload.result === "success" ? "done" : "review");
+  const completedAtValue = payload.needsInput ? null : completedAt;
   db.prepare(
     `UPDATE tasks
      SET status = ?,
@@ -1866,23 +1882,418 @@ function finalizeTask(agenticOsDir, taskId, payload) {
          durationMs = ?,
          errorMessage = ?,
          activityLabel = ?,
+         needsInput = ?,
          claudePid = NULL
      WHERE id = ?`
   ).run(
     nextStatus,
     completedAt,
-    completedAt,
+    completedAtValue,
     payload.durationMs,
     payload.errorMessage || null,
     payload.activityLabel || (payload.result === "success" ? "Completed" : "Failed"),
+    payload.needsInput ? 1 : 0,
     taskId
   );
 
   return db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId);
 }
 
-function spawnClaudeRunViaHiddenWindowsWrapper(job, cwd, logFilePath, claudeCommand, claudeArgs, env) {
+function normalizeCronTaskLogContent(type, content) {
+  const normalizedLineEndings = String(content ?? "").replace(/\r\n?/g, "\n");
+  if (type === "text" || type === "question" || type === "user_reply" || type === "system") {
+    return normalizedLineEndings.trim();
+  }
+  return normalizedLineEndings;
+}
+
+function insertCronTaskLog(agenticOsDir, taskId, entry) {
+  const normalizedContent = normalizeCronTaskLogContent(entry.type, entry.content);
+  if (!normalizedContent) {
+    return;
+  }
+
+  const db = getDb(agenticOsDir);
+  db.prepare(
+    "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  ).run(
+    entry.id || randomUUID(),
+    taskId,
+    entry.type,
+    entry.timestamp || new Date().toISOString(),
+    normalizedContent,
+    entry.toolName || null,
+    entry.toolArgs || null,
+    entry.toolResult || null,
+    entry.isCollapsed ? 1 : 0,
+    entry.questionSpec || null,
+    entry.questionAnswers || null
+  );
+}
+
+function parseCronQuestionSpecs(raw) {
+  const validTypes = new Set(["text", "multiline", "select", "multiselect"]);
+  const list = Array.isArray(raw)
+    ? raw
+    : raw && Array.isArray(raw.questions)
+      ? raw.questions
+      : null;
+
+  if (!list) {
+    return [];
+  }
+
+  return list
+    .filter((item) => item && typeof item === "object")
+    .map((item) => {
+      const spec = item;
+      if (
+        typeof spec.id !== "string" ||
+        typeof spec.prompt !== "string" ||
+        !validTypes.has(spec.type)
+      ) {
+        return null;
+      }
+
+      return {
+        id: spec.id,
+        prompt: spec.prompt,
+        type: spec.type,
+        required: Boolean(spec.required),
+        ...(Array.isArray(spec.options)
+          ? {
+              options: spec.options.filter((option) => typeof option === "string"),
+            }
+          : {}),
+      };
+    })
+    .filter(Boolean);
+}
+
+function detectCronStructuredQuestions(text) {
+  const fenceRegex = /```ask-user-questions\s*\n([\s\S]*?)\n```/i;
+  const match = String(text || "").match(fenceRegex);
+  if (!match || !match[1]) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(match[1].trim());
+    const specs = parseCronQuestionSpecs(parsed);
+    return specs.length > 0 ? specs : null;
+  } catch {
+    return null;
+  }
+}
+
+function detectCronQuestion(text) {
+  const trimmed = String(text || "").trim();
+  const lines = trimmed.split("\n").filter((line) => line.trim());
+  const lastLine = lines[lines.length - 1]?.trim() || "";
+
+  if (lastLine.endsWith("?")) {
+    return lastLine;
+  }
+
+  const lastFewLines = lines.slice(-4).map((line) => line.trim());
+  for (const line of lastFewLines) {
+    if (line.endsWith("?") && line.length > 10) {
+      return line;
+    }
+  }
+
+  const questionPatterns = [
+    /would you like me to/i,
+    /shall I/i,
+    /do you want me to/i,
+    /please (confirm|choose|select|specify|provide)/i,
+    /which (one|option|approach)/i,
+    /let me know (if|when|what|which|how)/i,
+    /needs? your (approval|input|confirmation|permission|review)/i,
+    /you should be seeing a prompt/i,
+    /waiting for (your|you to)/i,
+    /paste (it |.{0,20} )here/i,
+    /if you'd (rather|like to|prefer)/i,
+    /alternatively,? (you can|if you)/i,
+    /approve (it|the|this)/i,
+    /ready when you are/i,
+    /once you (approve|confirm|provide|add|set)/i,
+  ];
+
+  const searchText = lastFewLines.join(" ");
+  for (const pattern of questionPatterns) {
+    if (pattern.test(searchText)) {
+      for (const line of [...lastFewLines].reverse()) {
+        if (pattern.test(line)) {
+          return line;
+        }
+      }
+      return lastFewLines[lastFewLines.length - 1] || lastLine;
+    }
+  }
+
+  return null;
+}
+
+function extractCronActivityLabel(text) {
+  let cleaned = String(text || "")
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/\[SILENT\]/gi, "")
+    .replace(/`[^`]+`/g, "")
+    .replace(/[#*_~]/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/(?:\/[\w.-]+){2,}/g, "")
+    .replace(/[\w.-]+\/[\w.-]+\/[\w.-]+/g, "")
+    .replace(/\b\w+\.(md|json|ts|tsx|js|jsx|py|sh|yaml|yml|csv|txt|log|pdf|png|svg)\b/gi, "")
+    .replace(/\n+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!cleaned || cleaned.length < 5) {
+    return null;
+  }
+
+  cleaned = cleaned
+    .replace(/[^\w\s]*\s*\w+\s+for\s+\d+[hms]\s*\d*[hms\d\s·,]*(?:tokens?)?\s*/gi, "")
+    .trim();
+
+  if (!cleaned || cleaned.length < 5) {
+    return null;
+  }
+
+  const sentences = cleaned
+    .split(/[.!?]+/)
+    .map((sentence) => sentence.trim())
+    .filter((sentence) => sentence.length > 8)
+    .filter((sentence) => !/^(saved|wrote|created|updated|deleted|reading|writing|running|executed)\s+(to|from|at|in)\b/i.test(sentence))
+    .filter((sentence) => !/^(Report|Output|File|Log|Result) saved/i.test(sentence))
+    .filter((sentence) => !/\bfor\s+\d+[hms]/i.test(sentence));
+
+  const fallbackSentences = cleaned
+    .split(/[.!?]+/)
+    .map((sentence) => sentence.trim())
+    .filter((sentence) => sentence.length > 8);
+  const pool = sentences.length > 0 ? sentences : fallbackSentences;
+  const label = pool.length > 0 ? pool[pool.length - 1] : cleaned;
+
+  if (!label || label.length < 5) {
+    return null;
+  }
+
+  return label.length > 100 ? `${label.slice(0, 97)}...` : label;
+}
+
+function buildCronToolActivityLabel(name, input) {
+  const str = (key) => (typeof input?.[key] === "string" ? input[key] : null);
+  const basename = (filePath) => filePath.split("/").pop() || filePath;
+  const truncate = (value, limit) => (value.length > limit ? `${value.slice(0, limit - 1)}…` : value);
+  const hostname = (url) => {
+    try {
+      return new URL(url).hostname;
+    } catch {
+      return String(url || "").slice(0, 40);
+    }
+  };
+
+  switch (name) {
+    case "Read": {
+      const filePath = str("file_path");
+      return filePath ? `Reading ${basename(filePath)}` : "Reading file";
+    }
+    case "Grep": {
+      const pattern = str("pattern");
+      return pattern ? `Searching for '${truncate(pattern, 40)}'` : "Searching codebase";
+    }
+    case "Glob": {
+      const pattern = str("pattern");
+      return pattern ? `Finding files matching '${truncate(pattern, 35)}'` : "Finding files";
+    }
+    case "Bash": {
+      const command = str("command");
+      return command ? `Running ${truncate(command, 50)}` : "Running command";
+    }
+    case "Write": {
+      const filePath = str("file_path");
+      return filePath ? `Writing ${basename(filePath)}` : "Writing file";
+    }
+    case "Edit": {
+      const filePath = str("file_path");
+      return filePath ? `Editing ${basename(filePath)}` : "Editing file";
+    }
+    case "WebFetch": {
+      const url = str("url");
+      return url ? `Fetching ${hostname(url)}` : "Fetching URL";
+    }
+    case "WebSearch": {
+      const query = str("query");
+      return query ? `Searching web for '${truncate(query, 35)}'` : "Searching web";
+    }
+    case "TodoWrite":
+      return "Updating task list";
+    default:
+      return name ? `Using ${name}` : null;
+  }
+}
+
+function createCronClaudeStreamState(taskId) {
+  return {
+    taskId,
+    stdoutBuffer: "",
+    stderrBuffer: "",
+    lastTextWasQuestion: false,
+    latestQuestionLabel: null,
+    latestActivityLabel: null,
+    resultCostUsd: 0,
+  };
+}
+
+function handleCronClaudeJsonLine(agenticOsDir, taskId, line, state) {
+  const trimmed = String(line || "").trim();
+  if (!trimmed) {
+    return;
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch {
+    return;
+  }
+
+  switch (parsed.type) {
+    case "assistant": {
+      const content = Array.isArray(parsed.message?.content) ? parsed.message.content : [];
+      const textBlocks = content.filter((block) => block?.type === "text" && typeof block.text === "string");
+      if (textBlocks.length === 0) {
+        return;
+      }
+
+      const fullText = textBlocks.map((block) => block.text).join("");
+      insertCronTaskLog(agenticOsDir, taskId, {
+        type: "text",
+        content: fullText,
+        timestamp: new Date().toISOString(),
+      });
+
+      state.lastTextWasQuestion = false;
+
+      const activityLabel = extractCronActivityLabel(fullText);
+      if (activityLabel) {
+        state.latestActivityLabel = activityLabel;
+      }
+
+      const structuredQuestions = detectCronStructuredQuestions(fullText);
+      if (structuredQuestions && structuredQuestions.length > 0) {
+        state.lastTextWasQuestion = true;
+        state.latestQuestionLabel = structuredQuestions[0].prompt || "Waiting for your answers";
+        insertCronTaskLog(agenticOsDir, taskId, {
+          type: "structured_question",
+          timestamp: new Date().toISOString(),
+          content: structuredQuestions.map((spec, index) => `${index + 1}. ${spec.prompt}`).join("\n"),
+          questionSpec: JSON.stringify(structuredQuestions),
+        });
+        return;
+      }
+
+      const questionText = detectCronQuestion(fullText);
+      if (questionText) {
+        state.lastTextWasQuestion = true;
+        state.latestQuestionLabel = questionText;
+      }
+      return;
+    }
+    case "tool_use": {
+      const name = typeof parsed.name === "string" ? parsed.name : "unknown_tool";
+      insertCronTaskLog(agenticOsDir, taskId, {
+        type: "tool_use",
+        timestamp: new Date().toISOString(),
+        content: name,
+        toolName: name,
+        toolArgs: JSON.stringify(parsed.input ?? {}),
+        isCollapsed: true,
+      });
+
+      const activityLabel = buildCronToolActivityLabel(name, parsed.input ?? {});
+      if (activityLabel) {
+        state.latestActivityLabel = activityLabel;
+      }
+      return;
+    }
+    case "tool_result": {
+      const content = parsed.content;
+      let resultText = "";
+      if (typeof content === "string") {
+        resultText = content;
+      } else if (Array.isArray(content)) {
+        resultText = content
+          .filter((block) => block?.type === "text" && typeof block.text === "string")
+          .map((block) => block.text)
+          .join("");
+      }
+
+      insertCronTaskLog(agenticOsDir, taskId, {
+        type: "tool_result",
+        timestamp: new Date().toISOString(),
+        content: resultText || "(no output)",
+        toolResult: resultText || undefined,
+      });
+      return;
+    }
+    case "result":
+      state.resultCostUsd = typeof parsed.cost_usd === "number" ? parsed.cost_usd : 0;
+      return;
+    case "error":
+      state.stderrBuffer += typeof parsed.error === "string"
+        ? parsed.error
+        : typeof parsed.message === "string"
+          ? parsed.message
+          : "";
+      return;
+    default:
+      return;
+  }
+}
+
+function consumeCronClaudeStdout(agenticOsDir, taskId, chunk, state) {
+  const text = String(chunk || "");
+  if (!text) {
+    return;
+  }
+
+  state.stdoutBuffer += text;
+
+  while (true) {
+    const newlineIndex = state.stdoutBuffer.indexOf("\n");
+    if (newlineIndex === -1) {
+      break;
+    }
+
+    const line = state.stdoutBuffer.slice(0, newlineIndex);
+    state.stdoutBuffer = state.stdoutBuffer.slice(newlineIndex + 1);
+    handleCronClaudeJsonLine(agenticOsDir, taskId, line, state);
+  }
+}
+
+function flushCronClaudeStdout(agenticOsDir, taskId, state) {
+  const leftover = state.stdoutBuffer.trim();
+  state.stdoutBuffer = "";
+  if (leftover) {
+    handleCronClaudeJsonLine(agenticOsDir, taskId, leftover, state);
+  }
+}
+
+function spawnClaudeRunViaHiddenWindowsWrapper(
+  agenticOsDir,
+  taskId,
+  job,
+  cwd,
+  logFilePath,
+  claudeCommand,
+  claudeArgs,
+  env
+) {
   return new Promise((resolve, reject) => {
+    const streamState = createCronClaudeStreamState(taskId);
     const tempBase = `${logFilePath}.${process.pid}.${Date.now()}.${randomUUID()}`;
     const stdoutPath = `${tempBase}.stdout`;
     const stderrPath = `${tempBase}.stderr`;
@@ -1943,6 +2354,7 @@ function spawnClaudeRunViaHiddenWindowsWrapper(job, cwd, logFilePath, claudeComm
       if (streamName === "stdout") {
         stdout += delta;
         stdoutLength = text.length;
+        consumeCronClaudeStdout(agenticOsDir, taskId, delta, streamState);
       } else {
         stderr += delta;
         stderrLength = text.length;
@@ -1979,6 +2391,7 @@ function spawnClaudeRunViaHiddenWindowsWrapper(job, cwd, logFilePath, claudeComm
       settled = true;
       clearInterval(pollHandle);
       flushBufferedOutput();
+      flushCronClaudeStdout(agenticOsDir, taskId, streamState);
       cleanupTempFiles();
       reject(error);
     });
@@ -1988,14 +2401,18 @@ function spawnClaudeRunViaHiddenWindowsWrapper(job, cwd, logFilePath, claudeComm
       settled = true;
       clearInterval(pollHandle);
       flushBufferedOutput();
+      flushCronClaudeStdout(agenticOsDir, taskId, streamState);
       cleanupTempFiles();
 
-      const combinedStderr = [stderr, wrapperStderr.trim()].filter(Boolean).join("\n");
+      const combinedStderr = [stderr, streamState.stderrBuffer.trim(), wrapperStderr.trim()]
+        .filter(Boolean)
+        .join("\n");
       resolve({
         exitCode: code || 0,
         timedOut: code === 124,
         stdout,
         stderr: combinedStderr,
+        streamState,
       });
     });
   });
@@ -2006,7 +2423,16 @@ function buildCronClaudeArgs(job, workspace) {
   const model = job.model || "sonnet";
 
   if (!workspace?.clientId) {
-    return ["-p", prompt, "--model", model, "--dangerously-skip-permissions"];
+    return [
+      "-p",
+      prompt,
+      "--model",
+      model,
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--dangerously-skip-permissions",
+    ];
   }
 
   return [
@@ -2014,6 +2440,9 @@ function buildCronClaudeArgs(job, workspace) {
     prompt,
     "--model",
     model,
+    "--output-format",
+    "stream-json",
+    "--verbose",
     "--permission-mode",
     "dontAsk",
     "--add-dir",
@@ -2021,8 +2450,9 @@ function buildCronClaudeArgs(job, workspace) {
   ];
 }
 
-function spawnClaudeRun(job, workspace, logFilePath) {
+function spawnClaudeRun(agenticOsDir, taskId, job, workspace, logFilePath) {
   return new Promise((resolve, reject) => {
+    const streamState = createCronClaudeStreamState(taskId);
     const cwd = workspace.workspaceDir;
     const childEnv = { ...process.env };
     delete childEnv.CLAUDECODE;
@@ -2043,6 +2473,8 @@ function spawnClaudeRun(job, workspace, logFilePath) {
       fs.existsSync(WINDOWS_HIDDEN_RUNNER_PATH)
     ) {
       spawnClaudeRunViaHiddenWindowsWrapper(
+        agenticOsDir,
+        taskId,
         job,
         cwd,
         logFilePath,
@@ -2070,6 +2502,7 @@ function spawnClaudeRun(job, workspace, logFilePath) {
       const text = chunk.toString();
       if (streamName === "stdout") {
         stdout += text;
+        consumeCronClaudeStdout(agenticOsDir, taskId, text, streamState);
       } else {
         stderr += text;
       }
@@ -2081,6 +2514,7 @@ function spawnClaudeRun(job, workspace, logFilePath) {
     child.on("error", (error) => {
       if (settled) return;
       settled = true;
+      flushCronClaudeStdout(agenticOsDir, taskId, streamState);
       reject(error);
     });
 
@@ -2105,11 +2539,13 @@ function spawnClaudeRun(job, workspace, logFilePath) {
       if (settled) return;
       settled = true;
       clearTimeout(timeoutHandle);
+      flushCronClaudeStdout(agenticOsDir, taskId, streamState);
       resolve({
         exitCode: timedOut ? 124 : (code || 0),
         timedOut,
         stdout,
-        stderr,
+        stderr: [stderr, streamState.stderrBuffer.trim()].filter(Boolean).join("\n"),
+        streamState,
       });
     });
   });
@@ -2117,9 +2553,20 @@ function spawnClaudeRun(job, workspace, logFilePath) {
 
 async function executeCronTask(agenticOsDir, taskId) {
   const db = getDb(agenticOsDir);
-  const originalTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId);
-  if (!originalTask || !originalTask.cronJobSlug) {
+  const queuedTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId);
+  if (!queuedTask || !queuedTask.cronJobSlug) {
     throw new Error(`Queued cron task not found: ${taskId}`);
+  }
+
+  const originalTask = claimQueuedCronTask(agenticOsDir, taskId);
+  if (!originalTask || !originalTask.cronJobSlug) {
+    return {
+      task: db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId),
+      result: "skipped",
+      exitCode: null,
+      durationMs: 0,
+      skipped: true,
+    };
   }
 
   const currentRun = db
@@ -2187,10 +2634,14 @@ async function executeCronTask(agenticOsDir, taskId) {
     `\n=== [${startIso}] START: ${job.name} ===`
   );
 
-  markTaskRunning(agenticOsDir, taskId);
-
   let attempt = 0;
-  let lastRun = { exitCode: 1, timedOut: false, stdout: "", stderr: "" };
+  let lastRun = {
+    exitCode: 1,
+    timedOut: false,
+    stdout: "",
+    stderr: "",
+    streamState: createCronClaudeStreamState(taskId),
+  };
   const configuredAttempts = Math.max(1, Number(job.retry || 0) + 1);
   const maxAttempts =
     trigger === "scheduled"
@@ -2209,13 +2660,20 @@ async function executeCronTask(agenticOsDir, taskId) {
     }
 
     try {
-      lastRun = await spawnClaudeRun(executionJob, workspace, logFilePath);
+      lastRun = await spawnClaudeRun(
+        agenticOsDir,
+        taskId,
+        executionJob,
+        workspace,
+        logFilePath
+      );
     } catch (error) {
       lastRun = {
         exitCode: 1,
         timedOut: false,
         stdout: "",
         stderr: error instanceof Error ? error.message : String(error),
+        streamState: createCronClaudeStreamState(taskId),
       };
       appendCronLog(agenticOsDir, job.clientId, job.slug, `[cron-daemon] ${lastRun.stderr}`);
     }
@@ -2241,14 +2699,23 @@ async function executeCronTask(agenticOsDir, taskId) {
       : [];
   const containmentError =
     leakedRootOutputs.length > 0 ? formatOutputLeakMessage(leakedRootOutputs) : null;
+  const streamState = lastRun.streamState || createCronClaudeStreamState(taskId);
+  const needsInput =
+    !containmentError &&
+    !lastRun.timedOut &&
+    lastRun.exitCode === 0 &&
+    streamState.lastTextWasQuestion === true;
   const result = containmentError
     ? "failure"
+    : needsInput
+      ? "failure"
     : lastRun.timedOut
       ? "timeout"
       : lastRun.exitCode === 0
         ? "success"
         : "failure";
-  const exitCode = containmentError && lastRun.exitCode === 0 ? 1 : lastRun.exitCode;
+  const exitCode =
+    (containmentError || needsInput) && lastRun.exitCode === 0 ? 1 : lastRun.exitCode;
   persistTaskOutputs(agenticOsDir, taskId, outputs);
 
   const completion = await finalizeCronExecutionOutcome(agenticOsDir, job, taskId, {
@@ -2258,17 +2725,28 @@ async function executeCronTask(agenticOsDir, taskId) {
     completedAt,
     trigger,
     scheduledFor: currentRun?.scheduledFor,
+    costUsd: streamState.resultCostUsd,
+    needsInput,
+    status: needsInput ? "review" : undefined,
+    completionReason: needsInput ? "needs_input" : undefined,
     errorMessage:
       result === "success"
         ? null
+        : needsInput
+          ? null
+          : containmentError || lastRun.stderr || `Exit code ${exitCode}`,
+    detail:
+      needsInput
+        ? streamState.latestQuestionLabel || "Waiting for your reply"
         : containmentError || lastRun.stderr || `Exit code ${exitCode}`,
-    detail: containmentError || lastRun.stderr || `Exit code ${exitCode}`,
     activityLabel:
-      result === "success"
+      needsInput
+        ? streamState.latestQuestionLabel || "Waiting for your reply"
+        : result === "success"
         ? "Scheduled job completed"
         : result === "timeout"
           ? `Timed out after ${job.timeout}`
-          : `Failed with exit code ${lastRun.exitCode}`,
+          : streamState.latestActivityLabel || `Failed with exit code ${lastRun.exitCode}`,
     logLines: containmentError ? [`[cron-daemon] ${containmentError}`] : [],
   });
 

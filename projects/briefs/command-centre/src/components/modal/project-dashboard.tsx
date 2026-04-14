@@ -18,6 +18,7 @@ import { useTaskStore } from "@/store/task-store";
 import { LevelBadge } from "@/components/board/level-badge";
 import { ModalChat } from "./modal-chat";
 import { ReplyInput } from "./reply-input";
+import { getPendingTaskQuestionPreview } from "@/lib/task-logs";
 
 type StatusKey = "backlog" | "queued" | "running" | "review" | "done";
 
@@ -36,17 +37,7 @@ function getPendingQuestionPreview(
   child: Task,
   childLogs: LogEntry[],
 ): string | null {
-  if (!child.needsInput) return null;
-  for (let i = childLogs.length - 1; i >= 0; i--) {
-    const e = childLogs[i];
-    if (e.type === "question" && !e.questionAnswers) {
-      return e.content.slice(0, 120);
-    }
-    if (e.type === "structured_question" && !e.questionAnswers) {
-      return e.content.slice(0, 120) || "Claude is asking for structured input.";
-    }
-  }
-  return "Waiting for your reply";
+  return getPendingTaskQuestionPreview(childLogs, child.needsInput === true, 120);
 }
 
 async function runTask(id: string): Promise<boolean> {

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { spawn } from "child_process";
 import {
   parseQuestionSpecs,
   serializeAnswersToProse,
   type QuestionAnswers,
   type QuestionSpec,
 } from "@/types/question-spec";
+import { runClaudeTextPrompt } from "@/lib/run-claude-text-prompt";
 
 interface PlanSubtasksBody {
   goal: string;
@@ -243,56 +243,9 @@ Shape B — follow-up questions:
 }
 
 function runClaude(prompt: string): Promise<string | null> {
-  return new Promise((resolve) => {
-    const timeout = setTimeout(() => {
-      console.error("[plan-subtasks] Sonnet call timed out after 90s");
-      try {
-        proc.kill("SIGTERM");
-      } catch {
-        /* gone */
-      }
-      resolve(null);
-    }, 90000);
-
-    const cleanEnv = { ...process.env };
-    delete cleanEnv.CLAUDECODE;
-
-    const proc = spawn(
-      "claude",
-      ["-p", prompt, "--output-format", "text", "--model", "sonnet"],
-      {
-        stdio: ["pipe", "pipe", "pipe"],
-        env: cleanEnv,
-      }
-    );
-
-    if (proc.stdin) proc.stdin.end();
-
-    let stdout = "";
-    let stderr = "";
-    proc.stdout?.on("data", (chunk: Buffer) => {
-      stdout += chunk.toString();
-    });
-    proc.stderr?.on("data", (chunk: Buffer) => {
-      stderr += chunk.toString();
-    });
-
-    proc.on("close", (code) => {
-      clearTimeout(timeout);
-      if (code === 0 && stdout.trim()) {
-        resolve(stdout.trim());
-      } else {
-        console.error(
-          `[plan-subtasks] claude exited code=${code} stdout_len=${stdout.length} stderr=${stderr.slice(0, 400)}`
-        );
-        resolve(null);
-      }
-    });
-
-    proc.on("error", (err) => {
-      clearTimeout(timeout);
-      console.error("[plan-subtasks] claude spawn error:", err);
-      resolve(null);
-    });
+  return runClaudeTextPrompt({
+    prompt,
+    model: "sonnet",
+    timeoutMs: 90_000,
   });
 }

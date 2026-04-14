@@ -52,7 +52,8 @@ function loadQueueWatcherModule(stubs = {}) {
 test("initQueueWatcher skips queued cron tasks when the daemon is already the leader", async () => {
   const workspaceDir = makeTempWorkspace();
   const db = cronRuntime.getDb(workspaceDir);
-  const executeCalls = [];
+  const cronExecuteCalls = [];
+  const processExecuteCalls = [];
   const listeners = [];
   const originalSetInterval = global.setInterval;
 
@@ -70,10 +71,19 @@ test("initQueueWatcher skips queued cron tasks when the daemon is already the le
       "./process-manager": {
         processManager: {
           executeTask: async (taskId) => {
-            executeCalls.push(taskId);
+            processExecuteCalls.push(taskId);
           },
           hasActiveSession: () => false,
         },
+      },
+      "./config": {
+        getConfig: () => ({ agenticOsDir: workspaceDir }),
+      },
+      "./cron-runtime.js": {
+        executeCronTask: async (agenticOsDir, taskId) => {
+          cronExecuteCalls.push({ agenticOsDir, taskId });
+        },
+        buildRecoveredCronRunUpdate: cronRuntime.buildRecoveredCronRunUpdate,
       },
       "./cron-system-status": {
         getCronSystemStatus: () => ({ runtime: "daemon" }),
@@ -98,7 +108,8 @@ test("initQueueWatcher skips queued cron tasks when the daemon is already the le
 
     await Promise.resolve();
 
-    assert.deepEqual(executeCalls, []);
+    assert.deepEqual(cronExecuteCalls, []);
+    assert.deepEqual(processExecuteCalls, []);
   } finally {
     global.setInterval = originalSetInterval;
     db.close();
@@ -106,12 +117,16 @@ test("initQueueWatcher skips queued cron tasks when the daemon is already the le
   }
 });
 
-test("initQueueWatcher only dispatches one start when task:created and task:status both arrive", async () => {
+test("initQueueWatcher routes queued cron tasks through cronRuntime exactly once when task:created and task:status both arrive", async () => {
   const workspaceDir = makeTempWorkspace();
   const db = cronRuntime.getDb(workspaceDir);
   const listeners = [];
-  const executeCalls = [];
-  const activeTaskIds = new Set();
+  const cronExecuteCalls = [];
+  const processExecuteCalls = [];
+  let resolveCronExecution;
+  const cronExecution = new Promise((resolve) => {
+    resolveCronExecution = resolve;
+  });
   const originalSetInterval = global.setInterval;
 
   try {
@@ -128,11 +143,20 @@ test("initQueueWatcher only dispatches one start when task:created and task:stat
       "./process-manager": {
         processManager: {
           executeTask: async (taskId) => {
-            executeCalls.push(taskId);
-            activeTaskIds.add(taskId);
+            processExecuteCalls.push(taskId);
           },
-          hasActiveSession: (taskId) => activeTaskIds.has(taskId),
+          hasActiveSession: () => false,
         },
+      },
+      "./config": {
+        getConfig: () => ({ agenticOsDir: workspaceDir }),
+      },
+      "./cron-runtime.js": {
+        executeCronTask: async (agenticOsDir, taskId) => {
+          cronExecuteCalls.push({ agenticOsDir, taskId });
+          return cronExecution;
+        },
+        buildRecoveredCronRunUpdate: cronRuntime.buildRecoveredCronRunUpdate,
       },
       "./cron-system-status": {
         getCronSystemStatus: () => ({ runtime: "in-process" }),
@@ -159,7 +183,101 @@ test("initQueueWatcher only dispatches one start when task:created and task:stat
 
     await Promise.resolve();
 
-    assert.deepEqual(executeCalls, ["task-double-event"]);
+    assert.deepEqual(cronExecuteCalls, [
+      { agenticOsDir: workspaceDir, taskId: "task-double-event" },
+    ]);
+    assert.deepEqual(processExecuteCalls, []);
+    resolveCronExecution();
+  } finally {
+    global.setInterval = originalSetInterval;
+    db.close();
+    cleanupTempWorkspace(workspaceDir);
+  }
+});
+
+test("initQueueWatcher periodic queued-cron scan reuses the same in-process cron guard", async () => {
+  const workspaceDir = makeTempWorkspace();
+  const db = cronRuntime.getDb(workspaceDir);
+  const listeners = [];
+  const cronExecuteCalls = [];
+  const processExecuteCalls = [];
+  let intervalCallback = null;
+  let resolveCronExecution;
+  const cronExecution = new Promise((resolve) => {
+    resolveCronExecution = resolve;
+  });
+  const originalSetInterval = global.setInterval;
+
+  try {
+    global.setInterval = (callback) => {
+      intervalCallback = callback;
+      return { unref() {} };
+    };
+
+    const { initQueueWatcher } = loadQueueWatcherModule({
+      "./db": { getDb: () => db },
+      "./event-bus": {
+        emitTaskEvent: () => {},
+        onTaskEvent: (listener) => {
+          listeners.push(listener);
+        },
+      },
+      "./process-manager": {
+        processManager: {
+          executeTask: async (taskId) => {
+            processExecuteCalls.push(taskId);
+          },
+          hasActiveSession: () => false,
+        },
+      },
+      "./config": {
+        getConfig: () => ({ agenticOsDir: workspaceDir }),
+      },
+      "./cron-runtime.js": {
+        executeCronTask: async (agenticOsDir, taskId) => {
+          cronExecuteCalls.push({ agenticOsDir, taskId });
+          return cronExecution;
+        },
+        buildRecoveredCronRunUpdate: cronRuntime.buildRecoveredCronRunUpdate,
+      },
+      "./cron-system-status": {
+        getCronSystemStatus: () => ({ runtime: "in-process" }),
+      },
+      "./cron-scheduler": {
+        getInProcessCronRuntimeIdentifier: () => "in-process-test",
+      },
+    });
+
+    initQueueWatcher();
+    assert.equal(listeners.length, 1);
+    assert.equal(typeof intervalCallback, "function");
+
+    const now = new Date().toISOString();
+    db.prepare(
+      `INSERT INTO tasks (
+        id, title, description, status, level, parentId, columnOrder, createdAt, updatedAt,
+        costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt,
+        clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode
+      ) VALUES (?, ?, ?, 'queued', 'task', NULL, 0, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, ?, 'default')`
+    ).run(
+      "task-periodic-cron",
+      "Periodic queued cron",
+      "Should only dispatch once while already starting.",
+      now,
+      now,
+      "periodic-job"
+    );
+
+    intervalCallback();
+    intervalCallback();
+
+    await Promise.resolve();
+
+    assert.deepEqual(cronExecuteCalls, [
+      { agenticOsDir: workspaceDir, taskId: "task-periodic-cron" },
+    ]);
+    assert.deepEqual(processExecuteCalls, []);
+    resolveCronExecution();
   } finally {
     global.setInterval = originalSetInterval;
     db.close();
@@ -217,6 +335,9 @@ test("initQueueWatcher records inferred recovery for terminal cron rows instead 
           executeTask: async () => {},
           hasActiveSession: () => false,
         },
+      },
+      "./config": {
+        getConfig: () => ({ agenticOsDir: workspaceDir }),
       },
       "./cron-system-status": {
         getCronSystemStatus: () => ({ runtime: "in-process" }),

@@ -13,7 +13,8 @@ param(
     [string]$Channel = "",
     [string]$Event = "",
     [string]$ContextJson = "",
-    [string]$ContextBase64 = ""
+    [string]$ContextBase64 = "",
+    [switch]$Preview
 )
 
 Set-StrictMode -Version Latest
@@ -54,6 +55,10 @@ function Invoke-InWindowsPowerShell {
         }
     }
 
+    if ($Preview) {
+        $forwardArgs += "-Preview"
+    }
+
     if (-not [string]::IsNullOrEmpty($ContextBase64)) {
         $forwardArgs += @("-ContextBase64", $ContextBase64)
     } elseif (-not [string]::IsNullOrEmpty($ContextJson)) {
@@ -78,6 +83,8 @@ $configPath = Join-Path $PSScriptRoot "windows-notify.config.json"
 $configDir = Split-Path -Parent $configPath
 $projectDir = Split-Path -Parent $PSScriptRoot
 $powershellExe = Join-Path $env:WINDIR "System32\WindowsPowerShell\v1.0\powershell.exe"
+$protocolName = "agentic-os-notify"
+$activationScriptPath = Join-Path $PSScriptRoot "windows-notify-activate.ps1"
 $validChannels = @("interactive", "cron")
 $validLayouts = @("compact", "hero")
 $validVariants = @("success", "info", "warning", "error")
@@ -242,6 +249,54 @@ function Get-ContextData {
     return $data
 }
 
+function Trim-ToastText {
+    param(
+        [AllowEmptyString()][string]$Text,
+        [int]$MaxLength = 80
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Text)) {
+        return ""
+    }
+
+    $trimmed = $Text.Trim()
+    if ($trimmed.Length -le $MaxLength) {
+        return $trimmed
+    }
+
+    return ($trimmed.Substring(0, $MaxLength - 3).TrimEnd() + "...")
+}
+
+function ConvertTo-Base64Url {
+    param([string]$Text)
+
+    $encoded = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($Text))
+    return $encoded.TrimEnd([char]'=').Replace("+", "-").Replace("/", "_")
+}
+
+function Get-ActivationUri {
+    param([hashtable]$Payload)
+
+    if (
+        [string]::IsNullOrWhiteSpace($Payload.Context["sessionId"]) -and
+        [string]::IsNullOrWhiteSpace($Payload.Context["taskId"]) -and
+        [string]::IsNullOrWhiteSpace($Payload.Context["cwd"])
+    ) {
+        return ""
+    }
+
+    $activationPayload = [ordered]@{
+        sessionId = $Payload.Context["sessionId"]
+        taskId = $Payload.Context["taskId"]
+        port = $Payload.Context["port"]
+        cwd = $Payload.Context["cwd"]
+    }
+
+    $json = $activationPayload | ConvertTo-Json -Compress
+    $encoded = ConvertTo-Base64Url -Text $json
+    return "${protocolName}:?data=$encoded"
+}
+
 function Get-HashString {
     param([string]$Value)
 
@@ -352,6 +407,10 @@ function Get-NotificationPayload {
         Status = Get-FirstNonEmpty @($Status, $Title, (Get-DefaultStatus $Variant))
         Subject = Get-FirstNonEmpty @($Subject, $Subtitle)
         Detail = Get-FirstNonEmpty @($Detail, $Message)
+        Folder = ""
+        Job = ""
+        UseStructuredBody = $false
+        ActivationUri = ""
         Attribution = if ([string]::IsNullOrWhiteSpace($Attribution)) { $Config.app.attribution } else { $Attribution }
         Duration = if ([string]::IsNullOrWhiteSpace($Duration)) { $Config.app.defaultDuration } else { $Duration }
         Layout = if ([string]::IsNullOrWhiteSpace($Layout)) { $Config.app.defaultLayout } else { $Layout }
@@ -371,8 +430,19 @@ function Get-NotificationPayload {
         $payload.Status = Resolve-TemplateText -Template $eventConfig.status -Context $payload.Context
         $payload.Subject = Resolve-TemplateText -Template $eventConfig.subject -Context $payload.Context
         $payload.Detail = Resolve-TemplateText -Template $eventConfig.detail -Context $payload.Context
+        $folderTemplate = if ($eventConfig.ContainsKey("folder")) { $eventConfig["folder"] } else { "" }
+        $jobTemplate = if ($eventConfig.ContainsKey("job")) { $eventConfig["job"] } else { "" }
+        $payload.Folder = Resolve-TemplateText -Template $folderTemplate -Context $payload.Context
+        $payload.Job = Resolve-TemplateText -Template $jobTemplate -Context $payload.Context
         $payload.Duration = $eventConfig.duration
         $payload.Layout = if ([string]::IsNullOrWhiteSpace($Layout)) { $eventConfig.layout } else { $Layout }
+        $payload.UseStructuredBody = (
+            $Channel -eq "interactive" -and (
+                -not [string]::IsNullOrWhiteSpace($payload.Folder) -or
+                -not [string]::IsNullOrWhiteSpace($payload.Job)
+            )
+        )
+        $payload.ActivationUri = Get-ActivationUri -Payload $payload
     }
 
     if ([string]::IsNullOrWhiteSpace($payload.Status)) {
@@ -414,6 +484,156 @@ function ConvertTo-XmlText {
         return ""
     }
     return [System.Security.SecurityElement]::Escape($Text)
+}
+
+function ConvertTo-XmlAttributeString {
+    param([hashtable]$Attributes)
+
+    if ($null -eq $Attributes -or $Attributes.Count -eq 0) {
+        return ""
+    }
+
+    $parts = @()
+    foreach ($key in $Attributes.Keys) {
+        $value = [string]$Attributes[$key]
+        if (-not [string]::IsNullOrWhiteSpace($value)) {
+            $parts += "$key=`"$(ConvertTo-XmlText $value)`""
+        }
+    }
+
+    if ($parts.Count -eq 0) {
+        return ""
+    }
+
+    return " " + ($parts -join " ")
+}
+
+function Get-ToastRenderData {
+    param(
+        [hashtable]$Config,
+        [hashtable]$Payload
+    )
+
+    $variantConfig = $Config.assets.variants[$Payload.Variant]
+    $statusLine = $Payload.Status
+    if ($Payload.Layout -eq "compact" -and -not [string]::IsNullOrWhiteSpace($variantConfig.emoji)) {
+        $statusLine = "$statusLine $($variantConfig.emoji)".Trim()
+    }
+
+    $textEntries = @()
+    $bodyLines = @()
+
+    if ($Payload.Layout -eq "compact") {
+        if (-not [string]::IsNullOrWhiteSpace($statusLine)) {
+            $textEntries += @{ Text = $statusLine; Attributes = @{} }
+            $bodyLines += $statusLine
+        }
+
+        if ($Payload.UseStructuredBody) {
+            $folderLine = Trim-ToastText -Text $Payload.Folder -MaxLength 56
+            $jobLine = Trim-ToastText -Text $Payload.Job -MaxLength 72
+            $groupLines = @()
+
+            if (-not [string]::IsNullOrWhiteSpace($folderLine)) {
+                $groupLines += "          <text hint-style=`"base`" hint-maxLines=`"1`">$(ConvertTo-XmlText $folderLine)</text>"
+                $bodyLines += $folderLine
+            }
+
+            if (-not [string]::IsNullOrWhiteSpace($jobLine)) {
+                $groupLines += "          <text hint-style=`"baseSubtle`" hint-maxLines=`"1`">$(ConvertTo-XmlText $jobLine)</text>"
+                $bodyLines += $jobLine
+            }
+
+            if ($groupLines.Count -gt 0) {
+                $textEntries += @{
+                    RawXml = @"
+      <group>
+        <subgroup>
+$($groupLines -join "`n")
+        </subgroup>
+      </group>
+"@
+                }
+            }
+        } else {
+            $subjectLine = Trim-ToastText -Text $Payload.Subject -MaxLength 64
+            $detailLine = Trim-ToastText -Text $Payload.Detail -MaxLength 96
+
+            if (-not [string]::IsNullOrWhiteSpace($subjectLine)) {
+                $textEntries += @{ Text = $subjectLine; Attributes = @{} }
+                $bodyLines += $subjectLine
+            }
+            if (-not [string]::IsNullOrWhiteSpace($detailLine)) {
+                $textEntries += @{ Text = $detailLine; Attributes = @{} }
+                $bodyLines += $detailLine
+            }
+        }
+    } else {
+        $heroBodyLine = Get-FirstNonEmpty @($Payload.Detail, $Payload.Subject)
+        $heroBodyLine = Trim-ToastText -Text $heroBodyLine -MaxLength 96
+        if (-not [string]::IsNullOrWhiteSpace($heroBodyLine)) {
+            $textEntries += @{ Text = $heroBodyLine; Attributes = @{} }
+            $bodyLines += $heroBodyLine
+        }
+    }
+
+    return @{
+        StatusLine = $statusLine
+        TextEntries = $textEntries
+        BodyLines = $bodyLines
+    }
+}
+
+function Convert-ToastTextEntryToXml {
+    param([hashtable]$Entry)
+
+    if ($Entry.ContainsKey("RawXml")) {
+        return $Entry.RawXml
+    }
+
+    $attrString = ConvertTo-XmlAttributeString -Attributes $Entry.Attributes
+    return "      <text$attrString>$(ConvertTo-XmlText $Entry.Text)</text>"
+}
+
+function Build-ToastXml {
+    param(
+        [hashtable]$Config,
+        [hashtable]$Payload,
+        [hashtable]$Assets,
+        [hashtable]$RenderData
+    )
+
+    $variantConfig = $Config.assets.variants[$Payload.Variant]
+    $sound = ConvertTo-XmlText $variantConfig.sound
+    $bindingLines = @()
+
+    if ($Payload.Layout -eq "hero" -and -not [string]::IsNullOrWhiteSpace($Assets.HeroPath)) {
+        $bindingLines += "      <image placement=`"hero`" src=`"$(ConvertTo-XmlText $Assets.HeroPath)`" />"
+    }
+    $bindingLines += "      <image placement=`"appLogoOverride`" hint-crop=`"circle`" src=`"$(ConvertTo-XmlText $Assets.LogoPath)`" />"
+    foreach ($entry in $RenderData.TextEntries) {
+        $bindingLines += Convert-ToastTextEntryToXml -Entry $entry
+    }
+    if (-not [string]::IsNullOrWhiteSpace($Payload.Attribution)) {
+        $bindingLines += "      <text placement=`"attribution`">$(ConvertTo-XmlText $Payload.Attribution)</text>"
+    }
+
+    $toastAttributes = @("duration=`"$($Payload.Duration)`"")
+    if (-not [string]::IsNullOrWhiteSpace($Payload.ActivationUri)) {
+        $toastAttributes += "activationType=`"protocol`""
+        $toastAttributes += "launch=`"$(ConvertTo-XmlText $Payload.ActivationUri)`""
+    }
+
+    return @"
+<toast $($toastAttributes -join " ")>
+  <visual>
+    <binding template="ToastGeneric">
+$($bindingLines -join "`n")
+    </binding>
+  </visual>
+  <audio src="$sound" />
+</toast>
+"@
 }
 
 function New-RoundedRectPath {
@@ -658,6 +878,27 @@ try { propertyStore.SetValue(ref key, ref appIdVariant); propertyStore.Commit();
 "@
 }
 
+function Ensure-ProtocolHandler {
+    param(
+        [string]$ProtocolName,
+        [string]$ScriptPath
+    )
+
+    if (-not (Test-Path -LiteralPath $ScriptPath)) {
+        throw "Protocol activation script was not found at $ScriptPath"
+    }
+
+    $baseKey = "HKCU:\Software\Classes\$ProtocolName"
+    $commandKey = Join-Path $baseKey "shell\open\command"
+    $commandValue = "`"$powershellExe`" -NoProfile -ExecutionPolicy Bypass -File `"$ScriptPath`" `"%1`""
+
+    New-Item -Path $baseKey -Force | Out-Null
+    Set-Item -Path $baseKey -Value "URL:$ProtocolName Protocol"
+    New-ItemProperty -Path $baseKey -Name "URL Protocol" -Value "" -PropertyType String -Force | Out-Null
+    New-Item -Path $commandKey -Force | Out-Null
+    Set-Item -Path $commandKey -Value $commandValue
+}
+
 function Ensure-StartMenuShortcut {
     param(
         [string]$ShortcutPath,
@@ -667,6 +908,10 @@ function Ensure-StartMenuShortcut {
 
     Ensure-ShortcutInterop
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $ShortcutPath) | Out-Null
+    $legacyShortcutPath = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Agentic OS Notifications.lnk"
+    if ($legacyShortcutPath -ne $ShortcutPath -and (Test-Path -LiteralPath $legacyShortcutPath)) {
+        Remove-Item -LiteralPath $legacyShortcutPath -Force -ErrorAction SilentlyContinue
+    }
     [DesktopToastShortcut]::EnsureShortcut(
         $ShortcutPath,
         $powershellExe,
@@ -702,51 +947,11 @@ function Show-Toast {
     param(
         [hashtable]$Config,
         [hashtable]$Payload,
-        [hashtable]$Assets
+        [hashtable]$Assets,
+        [hashtable]$RenderData
     )
 
-    $variantConfig = $Config.assets.variants[$Payload.Variant]
-    $sound = ConvertTo-XmlText $variantConfig.sound
-    $statusLine = $Payload.Status
-    if ($Payload.Layout -eq "compact" -and -not [string]::IsNullOrWhiteSpace($variantConfig.emoji)) {
-        $statusLine = "$($variantConfig.emoji) $statusLine".Trim()
-    }
-
-    $bindingLines = @()
-    if ($Payload.Layout -eq "hero" -and -not [string]::IsNullOrWhiteSpace($Assets.HeroPath)) {
-        $bindingLines += "      <image placement=`"hero`" src=`"$(ConvertTo-XmlText $Assets.HeroPath)`" />"
-    }
-    $bindingLines += "      <image placement=`"appLogoOverride`" hint-crop=`"circle`" src=`"$(ConvertTo-XmlText $Assets.LogoPath)`" />"
-    if ($Payload.Layout -eq "compact") {
-        if (-not [string]::IsNullOrWhiteSpace($statusLine)) {
-            $bindingLines += "      <text>$(ConvertTo-XmlText $statusLine)</text>"
-        }
-        if (-not [string]::IsNullOrWhiteSpace($Payload.Subject)) {
-            $bindingLines += "      <text>$(ConvertTo-XmlText $Payload.Subject)</text>"
-        }
-        if (-not [string]::IsNullOrWhiteSpace($Payload.Detail)) {
-            $bindingLines += "      <text>$(ConvertTo-XmlText $Payload.Detail)</text>"
-        }
-    } else {
-        $heroBodyLine = Get-FirstNonEmpty @($Payload.Detail, $Payload.Subject)
-        if (-not [string]::IsNullOrWhiteSpace($heroBodyLine)) {
-            $bindingLines += "      <text>$(ConvertTo-XmlText $heroBodyLine)</text>"
-        }
-    }
-    if (-not [string]::IsNullOrWhiteSpace($Payload.Attribution)) {
-        $bindingLines += "      <text placement=`"attribution`">$(ConvertTo-XmlText $Payload.Attribution)</text>"
-    }
-
-    $xmlContent = @"
-<toast duration="$($Payload.Duration)">
-  <visual>
-    <binding template="ToastGeneric">
-$($bindingLines -join "`n")
-    </binding>
-  </visual>
-  <audio src="$sound" />
-</toast>
-"@
+    $xmlContent = Build-ToastXml -Config $Config -Payload $Payload -Assets $Assets -RenderData $RenderData
 
     [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
     [Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom, ContentType = WindowsRuntime] | Out-Null
@@ -760,22 +965,30 @@ $($bindingLines -join "`n")
 
 $config = Load-NotificationConfig
 $payload = Get-NotificationPayload -Config $config
+$renderData = Get-ToastRenderData -Config $config -Payload $payload
 $shortcutPath = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\$($config.app.shortcutName).lnk"
 $result = [ordered]@{
     ok                    = $false
     delivery              = "none"
+    preview               = [bool]$Preview
     mode                  = $payload.Mode
     channel               = $payload.Channel
     event                 = $payload.Event
     variant               = $payload.Variant
     layout                = $payload.Layout
     status                = $payload.Status
+    status_line           = $renderData.StatusLine
     subject               = $payload.Subject
     detail                = $payload.Detail
-    title                 = $payload.Status
-    subtitle              = $payload.Subject
-    message               = $payload.Detail
+    folder                = $payload.Folder
+    job                   = $payload.Job
+    body_lines            = $renderData.BodyLines
+    title                 = $config.app.displayName
+    subtitle              = $payload.Status
+    message               = Get-FirstNonEmpty @($payload.Detail, $payload.Job, $payload.Subject)
     duration              = $payload.Duration
+    attribution           = $payload.Attribution
+    activation_uri        = $payload.ActivationUri
     app_id                = $config.app.id
     display_name          = $config.app.displayName
     config_path           = $configPath
@@ -784,11 +997,6 @@ $result = [ordered]@{
 
 try {
     $assets = Ensure-NotificationAssets -Config $config -Payload $payload
-    Ensure-StartMenuShortcut -ShortcutPath $shortcutPath -Config $config -IconPath $assets.ShortcutIconPath
-    Show-Toast -Config $config -Payload $payload -Assets $assets
-
-    $result.ok = $true
-    $result.delivery = "toast"
     $result.asset_root = $assets.AssetRoot
     $result.logo_path = $assets.LogoPath
     $result.logo_source = $assets.LogoSource
@@ -797,6 +1005,19 @@ try {
     if (-not [string]::IsNullOrWhiteSpace($assets.HeroPath)) {
         $result.hero_path = $assets.HeroPath
         $result.hero_source = $assets.HeroSource
+    }
+    $result.xml = Build-ToastXml -Config $config -Payload $payload -Assets $assets -RenderData $renderData
+
+    if ($Preview) {
+        $result.ok = $true
+        $result.delivery = "preview"
+    } else {
+        Ensure-ProtocolHandler -ProtocolName $protocolName -ScriptPath $activationScriptPath
+        Ensure-StartMenuShortcut -ShortcutPath $shortcutPath -Config $config -IconPath $assets.ShortcutIconPath
+        Show-Toast -Config $config -Payload $payload -Assets $assets -RenderData $renderData
+
+        $result.ok = $true
+        $result.delivery = "toast"
     }
 }
 catch {

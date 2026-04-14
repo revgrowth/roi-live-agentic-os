@@ -1,4 +1,4 @@
-import { spawn, type ChildProcess } from "child_process";
+import type { ChildProcess } from "child_process";
 import { createInterface } from "readline";
 import { getDb } from "./db";
 import { getConfig, getClientAgenticOsDir } from "./config";
@@ -7,6 +7,7 @@ import { emitTaskEvent } from "./event-bus";
 import { ClaudeOutputParser } from "./claude-parser";
 import { fileWatcher } from "./file-watcher";
 import { buildSiblingContextBlock } from "./gather-context";
+import { killChildProcessTree, spawnManagedTaskProcess } from "./subprocess";
 import type { Task, LogEntry } from "@/types/task";
 import type { QuestionSpec } from "@/types/question-spec";
 
@@ -48,22 +49,6 @@ class ProcessManager {
     process.on("exit", cleanup);
     process.on("SIGTERM", cleanup);
     process.on("SIGINT", cleanup);
-  }
-
-  /**
-   * Kill a process and its entire process tree.
-   * Processes are spawned with detached: true, so they get their own process group.
-   * Sending a signal to -pid kills the entire group (parent + all descendants).
-   */
-  private killProcessTree(proc: ChildProcess, signal: NodeJS.Signals = "SIGTERM"): void {
-    if (!proc.pid) return;
-    try {
-      // Kill the entire process group (negative pid)
-      process.kill(-proc.pid, signal);
-    } catch {
-      // Process group already gone — try killing just the process
-      try { proc.kill(signal); } catch { /* already gone */ }
-    }
   }
 
   /** Check if this task has an active in-memory session (managed by processManager) */
@@ -434,7 +419,7 @@ class ProcessManager {
     // kill it — we'll spawn a new --continue process
     if (session) {
       console.log(`[process-manager] Killing running process tree for ${taskId} before reply`);
-      this.killProcessTree(session.proc);
+      killChildProcessTree(session.proc);
       this.sessions.delete(taskId);
     }
 
@@ -480,9 +465,9 @@ class ProcessManager {
   async killSession(taskId: string): Promise<void> {
     const session = this.sessions.get(taskId);
     if (session) {
-      this.killProcessTree(session.proc);
+      killChildProcessTree(session.proc);
       const killTimer = setTimeout(() => {
-        this.killProcessTree(session.proc, "SIGKILL");
+        killChildProcessTree(session.proc, "SIGKILL");
       }, 5000);
       session.proc.on("close", () => clearTimeout(killTimer));
       this.sessions.delete(taskId);
@@ -1075,7 +1060,7 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
   cleanup(): void {
     for (const [taskId, session] of this.sessions) {
       console.log(`[process-manager] Cleaning up session for task ${taskId}`);
-      this.killProcessTree(session.proc);
+      killChildProcessTree(session.proc);
     }
     this.sessions.clear();
     this.waitingForReply.clear();
@@ -1186,7 +1171,7 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
 
     let proc: ChildProcess;
     try {
-      proc = spawn("claude", args, {
+      proc = spawnManagedTaskProcess("claude", args, {
         cwd,
         stdio: ["pipe", "pipe", "pipe"],
         env: cleanEnv,
@@ -1373,11 +1358,10 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     }
 
     // Check if a question was asked during this turn.
-    // Cron jobs are non-interactive — ignore question detection since nobody can reply.
     const db2 = getDb();
     const cronCheck = db2.prepare("SELECT cronJobSlug FROM tasks WHERE id = ?").get(taskId) as { cronJobSlug: string | null } | undefined;
     const isCronTask = !!cronCheck?.cronJobSlug;
-    let questionAsked = isCronTask ? false : (session?.pendingQuestion ?? false);
+    const questionAsked = session?.pendingQuestion ?? false;
 
     // Respect explicit user actions: if the user already marked this task "done"
     // via the UI while Claude was finishing, don't override it.
@@ -1417,7 +1401,7 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
 
       // Kill any orphaned grandchild processes (e.g. Next.js workers spawned by Claude tools)
       if (session) {
-        this.killProcessTree(session.proc);
+        killChildProcessTree(session.proc);
       }
 
       this.waitingForReply.add(taskId);
@@ -1442,14 +1426,33 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
       // Subtask or cron asked a question — keep interactive
       console.log(`[process-manager] Turn complete with pending question for ${taskId} — adding to waitingForReply`);
 
-      db.prepare(
-        "UPDATE tasks SET updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, needsInput = 1 WHERE id = ?"
-      ).run(now, totalCost, totalTokens, totalDuration, taskId);
+      if (isCronTask) {
+        db.prepare(
+          "UPDATE tasks SET status = 'review', completedAt = NULL, updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, needsInput = 1 WHERE id = ?"
+        ).run(now, totalCost, totalTokens, totalDuration, taskId);
+      } else {
+        db.prepare(
+          "UPDATE tasks SET updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, needsInput = 1 WHERE id = ?"
+        ).run(now, totalCost, totalTokens, totalDuration, taskId);
+      }
+
+      if (session) {
+        killChildProcessTree(session.proc);
+      }
 
       this.waitingForReply.add(taskId);
       this.sessions.delete(taskId);
 
       const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
+
+      if (updated.cronJobSlug) {
+        this.recordCronRun(updated, totalCost, totalDuration, {
+          result: "failure",
+          exitCode: 1,
+          completionReason: "needs_input",
+        });
+      }
+
       emitTaskEvent({ type: "task:status", task: this.normalizeTask(updated), timestamp: now });
     } else {
       // Subtask or cron completed without question — finalize.
@@ -1461,7 +1464,7 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
 
       // Kill any orphaned grandchild processes (e.g. Next.js workers spawned by Claude tools)
       if (session) {
-        this.killProcessTree(session.proc);
+        killChildProcessTree(session.proc);
       }
 
       const completionLabel = this.buildCompletionSummary(taskId, db);
@@ -1557,13 +1560,6 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
 
     const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
     emitTaskEvent({ type: "task:question", task: this.normalizeTask(updated), timestamp: now, questionText });
-
-    this.addLogEntry(taskId, {
-      id: crypto.randomUUID(),
-      type: "question",
-      timestamp: now,
-      content: questionText,
-    });
   }
 
   handleTaskError(taskId: string, errorMessage: string): void {
@@ -1572,22 +1568,24 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     // Kill any orphaned grandchild processes before cleanup
     const session = this.sessions.get(taskId);
     if (session) {
-      this.killProcessTree(session.proc);
+      killChildProcessTree(session.proc);
     }
 
     const db = getDb();
     const now = new Date().toISOString();
 
-    // Check if this is a cron task — cron tasks should complete on error, not wait for input
+    // Check if this is a cron task so resumed scheduled work can land in review,
+    // not misleadingly mark itself done.
     const task = db.prepare("SELECT cronJobSlug FROM tasks WHERE id = ?").get(taskId) as { cronJobSlug: string | null } | undefined;
     const isCronTask = !!task?.cronJobSlug;
 
     if (isCronTask) {
-      // Cron tasks: move to "done" with error flag — nobody can reply
+      // Cron task continuations still need a human to step in when they fail.
       db.prepare(
-        "UPDATE tasks SET status = ?, completedAt = ?, updatedAt = ?, errorMessage = ?, activityLabel = ?, needsInput = 0 WHERE id = ?"
-      ).run("done", now, now, errorMessage, "Failed — see error", taskId);
+        "UPDATE tasks SET status = 'review', completedAt = NULL, updatedAt = ?, errorMessage = ?, activityLabel = ?, needsInput = 1 WHERE id = ?"
+      ).run(now, errorMessage, "Error — needs attention", taskId);
 
+      this.waitingForReply.add(taskId);
       this.sessions.delete(taskId);
       this.lastProgressEmit.delete(taskId);
     } else {
@@ -1717,16 +1715,35 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     return "Completed";
   }
 
-  /** Finalize a cron run through the shared runtime helper. */
-  private recordCronRun(task: Task, costUsd: number, durationMs: number): void {
+  /** Finalize the currently running cron row, if one exists for this task. */
+  private recordCronRun(
+    task: Task,
+    costUsd: number,
+    durationMs: number,
+    overrides: {
+      result?: "success" | "failure" | "timeout";
+      exitCode?: number;
+      completionReason?: string;
+    } = {},
+  ): void {
     if (!task.cronJobSlug) return;
+
+    const db = getDb();
+    const runningRow = db
+      .prepare("SELECT id FROM cron_runs WHERE taskId = ? AND result = 'running' LIMIT 1")
+      .get(task.id) as { id: number } | undefined;
+
+    if (!runningRow) {
+      return;
+    }
 
     completeCronRunForTask(task, {
       costUsd,
       durationMs,
-      result: task.errorMessage ? "failure" : "success",
-      exitCode: task.errorMessage ? 1 : 0,
+      result: overrides.result ?? (task.errorMessage ? "failure" : "success"),
+      exitCode: overrides.exitCode ?? (task.errorMessage ? 1 : 0),
       completedAt: new Date().toISOString(),
+      ...(overrides.completionReason ? { completionReason: overrides.completionReason } : {}),
     });
   }
 
