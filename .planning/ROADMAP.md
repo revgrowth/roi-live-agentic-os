@@ -36,7 +36,7 @@ This roadmap restores the cron regressions in the current Agentic OS workspace w
   1. Starting background cron execution on Windows does not open visible PowerShell windows.
   2. Scheduled Windows cron runs stay hidden during execution instead of popping up terminal windows.
   3. Hidden execution still preserves useful logs, status inspection, and clean stop behavior.
-**Plans**: TBD
+**Plans**: 02-01, 02-02
 
 ### Phase 3: Client Workspace Containment
 **Goal**: Ensure client cron runs are scoped to the selected client workspace rather than the repo root.
@@ -69,6 +69,6 @@ This roadmap restores the cron regressions in the current Agentic OS workspace w
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Run Truth & Regression Forensics | 2/2 | Complete | 2026-04-14 |
-| 2. Quiet Windows Background Execution | 0/TBD | Not started | - |
+| 2. Quiet Windows Background Execution | 0/2 | Planned | - |
 | 3. Client Workspace Containment | 0/TBD | Not started | - |
 | 4. Baseline Preservation & Regression Validation | 0/TBD | Not started | - |
