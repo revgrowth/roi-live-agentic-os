@@ -1278,6 +1278,254 @@ function completeCronRunForTask(agenticOsDir, task, payload = {}) {
   });
 }
 
+function normalizeCronNotificationResult(result) {
+  if (result === "success") {
+    return "success";
+  }
+  if (result === "timeout") {
+    return "timeout";
+  }
+  return "failure";
+}
+
+function formatCronNotificationDuration(durationMs) {
+  const durationSeconds = Math.max(0, Math.round(Number(durationMs || 0) / 1000));
+  return `${durationSeconds}s`;
+}
+
+function shouldSendCronNotification(notifySetting, result) {
+  const policy = String(notifySetting || "on_finish").trim().toLowerCase();
+  const normalizedResult = normalizeCronNotificationResult(result);
+
+  if (policy === "silent") {
+    return false;
+  }
+
+  if (policy === "on_failure") {
+    return normalizedResult === "failure" || normalizedResult === "timeout";
+  }
+
+  return (
+    normalizedResult === "success" ||
+    normalizedResult === "failure" ||
+    normalizedResult === "timeout"
+  );
+}
+
+function defaultWindowsCronNotificationSender(agenticOsDir, notification) {
+  return new Promise((resolve, reject) => {
+    const notifyScriptPath = path.join(agenticOsDir, "scripts", "windows-notify.ps1");
+    if (!fs.existsSync(notifyScriptPath)) {
+      resolve({ sent: false, skipped: true, reason: "missing-script" });
+      return;
+    }
+
+    const child = spawn(
+      "powershell.exe",
+      [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        notifyScriptPath,
+        "-Channel",
+        "cron",
+        "-Event",
+        notification.event,
+        "-ContextJson",
+        JSON.stringify(notification.context),
+      ],
+      {
+        cwd: agenticOsDir,
+        env: process.env,
+        stdio: ["ignore", "pipe", "pipe"],
+        windowsHide: true,
+        shell: false,
+      }
+    );
+
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if ((code || 0) !== 0) {
+        const message =
+          stderr.trim() || stdout.trim() || `Notification helper exited with code ${code}`;
+        reject(new Error(message));
+        return;
+      }
+
+      resolve({
+        sent: true,
+        event: notification.event,
+        output: stdout.trim(),
+      });
+    });
+  });
+}
+
+async function maybeSendWindowsCronNotification(agenticOsDir, job, payload = {}) {
+  const result = normalizeCronNotificationResult(payload.result);
+  const notifySetting = payload.notifySetting || job?.notify || "on_failure";
+
+  if (!shouldSendCronNotification(notifySetting, result)) {
+    return {
+      sent: false,
+      skipped: true,
+      reason: "policy",
+      event: result,
+    };
+  }
+
+  if (getRuntimePlatform() !== "win32") {
+    return {
+      sent: false,
+      skipped: true,
+      reason: "platform",
+      event: result,
+    };
+  }
+
+  const notificationSender =
+    runtimeHooks.notificationSender || defaultWindowsCronNotificationSender;
+  const jobName = payload.jobName || job?.name || job?.slug || "Scheduled task";
+  const clientLabel =
+    payload.clientLabel || job?.workspaceLabel || toClientLabel(job?.clientId);
+  const exitCode =
+    payload.exitCode !== undefined
+      ? payload.exitCode
+      : result === "success"
+        ? 0
+        : result === "timeout"
+          ? 124
+          : 1;
+
+  return notificationSender(agenticOsDir, {
+    event: result,
+    job,
+    payload,
+    context: {
+      status:
+        payload.status ||
+        (result === "success"
+          ? "Task complete"
+          : result === "timeout"
+            ? "Timed out"
+            : "Needs attention"),
+      subject: payload.subject || jobName,
+      detail: payload.detail || payload.errorMessage || "",
+      duration: payload.duration || formatCronNotificationDuration(payload.durationMs),
+      clientLabel,
+      jobName,
+      exitCode,
+      timeout: payload.timeout || job?.timeout || DEFAULT_TIMEOUT,
+      catchUpSuffix: payload.catchUpSuffix || "",
+    },
+  });
+}
+
+async function finalizeCronExecutionOutcome(agenticOsDir, job, taskId, payload = {}) {
+  const completedAt = payload.completedAt || new Date().toISOString();
+  const durationMs = payload.durationMs ?? 0;
+  const result = normalizeCronNotificationResult(payload.result);
+  const exitCode =
+    payload.exitCode !== undefined
+      ? payload.exitCode
+      : result === "success"
+        ? 0
+        : result === "timeout"
+          ? 124
+          : 1;
+
+  for (const line of Array.isArray(payload.logLines) ? payload.logLines : []) {
+    if (line && job?.slug) {
+      appendCronLog(agenticOsDir, job.clientId, job.slug, line);
+    }
+  }
+
+  if (job?.slug) {
+    appendCronLog(
+      agenticOsDir,
+      job.clientId,
+      job.slug,
+      `=== [${completedAt}] ${result.toUpperCase()}: ${job.name} (${Math.round(durationMs / 1000)}s) ===`
+    );
+  }
+
+  const updatedTask = finalizeTask(agenticOsDir, taskId, {
+    result,
+    errorMessage: payload.errorMessage || null,
+    durationMs,
+    completedAt,
+    activityLabel:
+      payload.activityLabel ||
+      (result === "success"
+        ? "Scheduled job completed"
+        : result === "timeout"
+          ? `Timed out after ${job?.timeout || DEFAULT_TIMEOUT}`
+          : `Failed with exit code ${exitCode}`),
+  });
+
+  completeCronRunForTask(agenticOsDir, updatedTask, {
+    result,
+    exitCode,
+    durationMs,
+    completedAt,
+    trigger: payload.trigger,
+    scheduledFor: payload.scheduledFor,
+    resultSource: payload.resultSource,
+    completionReason: payload.completionReason,
+  });
+
+  let notification = {
+    sent: false,
+    skipped: true,
+    reason: "not-attempted",
+    event: result,
+  };
+
+  try {
+    notification = await maybeSendWindowsCronNotification(agenticOsDir, job, {
+      ...payload,
+      result,
+      exitCode,
+      durationMs,
+      completedAt,
+    });
+  } catch (error) {
+    notification = {
+      sent: false,
+      skipped: false,
+      event: result,
+      error: error instanceof Error ? error.message : String(error),
+    };
+
+    if (job?.slug) {
+      appendCronLog(
+        agenticOsDir,
+        job.clientId,
+        job.slug,
+        `[cron-daemon] Notification failed: ${notification.error}`
+      );
+    }
+  }
+
+  return {
+    task: updatedTask,
+    result,
+    exitCode,
+    durationMs,
+    notification,
+  };
+}
+
 function parseTimeoutToMs(timeoutValue) {
   const raw = String(timeoutValue || DEFAULT_TIMEOUT).trim();
   if (/^\d+$/.test(raw)) {
@@ -1790,24 +2038,44 @@ async function executeCronTask(agenticOsDir, taskId) {
     throw new Error(`Queued cron task not found: ${taskId}`);
   }
 
+  const currentRun = db
+    .prepare(
+      `SELECT trigger, scheduledFor
+       FROM cron_runs
+       WHERE taskId = ?
+         AND result = 'running'
+       ORDER BY id DESC
+       LIMIT 1`
+    )
+    .get(taskId);
+  const trigger = currentRun?.trigger === "manual" ? "manual" : "scheduled";
+
   const job = getCronJob(agenticOsDir, originalTask.cronJobSlug, originalTask.clientId);
   if (!job) {
-    const missingTask = finalizeTask(agenticOsDir, taskId, {
+    const missingJob = {
+      slug: originalTask.cronJobSlug,
+      name: originalTask.cronJobSlug,
+      clientId: originalTask.clientId,
+      workspaceLabel: toClientLabel(originalTask.clientId),
+      notify: "on_failure",
+      timeout: DEFAULT_TIMEOUT,
+    };
+
+    const missingResult = await finalizeCronExecutionOutcome(agenticOsDir, missingJob, taskId, {
       result: "failure",
       errorMessage: `Cron job definition not found: ${originalTask.cronJobSlug}`,
       durationMs: 0,
       activityLabel: "Cron job missing",
+      trigger,
+      scheduledFor: currentRun?.scheduledFor,
+      detail: `Cron job definition not found: ${originalTask.cronJobSlug}`,
     });
-    completeCronRunForTask(agenticOsDir, missingTask, {
-      result: "failure",
-      exitCode: 1,
-      durationMs: 0,
-    });
+
     return {
-      task: missingTask,
-      result: "failure",
-      exitCode: 1,
-      durationMs: 0,
+      task: missingResult.task,
+      result: missingResult.result,
+      exitCode: missingResult.exitCode,
+      durationMs: missingResult.durationMs,
     };
   }
 
@@ -1823,17 +2091,6 @@ async function executeCronTask(agenticOsDir, taskId) {
     ...job,
     prompt: buildCronExecutionPrompt(job, workspace),
   };
-  const currentRun = db
-    .prepare(
-      `SELECT trigger
-       FROM cron_runs
-       WHERE taskId = ?
-         AND result = 'running'
-       ORDER BY id DESC
-       LIMIT 1`
-    )
-    .get(taskId);
-  const trigger = currentRun?.trigger === "manual" ? "manual" : "scheduled";
 
   appendCronLog(
     agenticOsDir,
@@ -1898,46 +2155,32 @@ async function executeCronTask(agenticOsDir, taskId) {
   const exitCode = containmentError && lastRun.exitCode === 0 ? 1 : lastRun.exitCode;
   persistTaskOutputs(agenticOsDir, taskId, outputs);
 
-  if (containmentError) {
-    appendCronLog(agenticOsDir, job.clientId, job.slug, `[cron-daemon] ${containmentError}`);
-  }
-
-  appendCronLog(
-    agenticOsDir,
-    job.clientId,
-    job.slug,
-    `=== [${completedAt}] ${result.toUpperCase()}: ${job.name} (${Math.round(durationMs / 1000)}s) ===`
-  );
-
-  const updatedTask = finalizeTask(agenticOsDir, taskId, {
+  const completion = await finalizeCronExecutionOutcome(agenticOsDir, job, taskId, {
     result,
+    exitCode,
+    durationMs,
+    completedAt,
+    trigger,
+    scheduledFor: currentRun?.scheduledFor,
     errorMessage:
       result === "success"
         ? null
         : containmentError || lastRun.stderr || `Exit code ${exitCode}`,
-    durationMs,
-    completedAt,
+    detail: containmentError || lastRun.stderr || `Exit code ${exitCode}`,
     activityLabel:
       result === "success"
         ? "Scheduled job completed"
         : result === "timeout"
           ? `Timed out after ${job.timeout}`
           : `Failed with exit code ${lastRun.exitCode}`,
-  });
-
-  completeCronRunForTask(agenticOsDir, updatedTask, {
-    result,
-    exitCode,
-    durationMs,
-    completedAt,
-    trigger,
+    logLines: containmentError ? [`[cron-daemon] ${containmentError}`] : [],
   });
 
   return {
-    task: updatedTask,
-    result,
-    exitCode,
-    durationMs,
+    task: completion.task,
+    result: completion.result,
+    exitCode: completion.exitCode,
+    durationMs: completion.durationMs,
     outputs,
   };
 }
@@ -2018,4 +2261,7 @@ module.exports = {
   resolveWindowsClaudeLaunchPlan,
   setCronRuntimeTestHooks,
   resetCronRuntimeTestHooks,
+  shouldSendCronNotification,
+  maybeSendWindowsCronNotification,
+  finalizeCronExecutionOutcome,
 };
