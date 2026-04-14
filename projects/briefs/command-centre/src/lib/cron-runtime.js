@@ -28,6 +28,14 @@ const OUTPUT_SCAN_IGNORES = new Set([
 let cachedDbPath = null;
 let cachedDb = null;
 
+const WINDOWS_HIDDEN_RUNNER_PATH = path.resolve(
+  __dirname,
+  "..",
+  "..",
+  "scripts",
+  "run-hidden-command.ps1"
+);
+
 function normalizeClientId(clientId) {
   if (!clientId || clientId === "root") {
     return null;
@@ -1421,6 +1429,118 @@ function finalizeTask(agenticOsDir, taskId, payload) {
   return db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId);
 }
 
+function spawnClaudeRunViaHiddenWindowsWrapper(job, cwd, logFilePath, claudeCommand, claudeArgs, env) {
+  return new Promise((resolve, reject) => {
+    const tempBase = `${logFilePath}.${process.pid}.${Date.now()}.${randomUUID()}`;
+    const stdoutPath = `${tempBase}.stdout`;
+    const stderrPath = `${tempBase}.stderr`;
+    const helperArgs = [
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      WINDOWS_HIDDEN_RUNNER_PATH,
+      "-FilePath",
+      claudeCommand,
+      "-WorkingDirectory",
+      cwd,
+      "-StdoutPath",
+      stdoutPath,
+      "-StderrPath",
+      stderrPath,
+      "-ArgumentsBase64",
+      Buffer.from(JSON.stringify(claudeArgs), "utf8").toString("base64"),
+      "-TimeoutSeconds",
+      String(Math.max(1, Math.ceil(parseTimeoutToMs(job.timeout) / 1000))),
+    ];
+
+    const child = spawn("powershell.exe", helperArgs, {
+      cwd,
+      env,
+      stdio: ["ignore", "pipe", "pipe"],
+      windowsHide: true,
+    });
+
+    let stdout = "";
+    let stderr = "";
+    let wrapperStderr = "";
+    let settled = false;
+    let stdoutLength = 0;
+    let stderrLength = 0;
+
+    const appendIncrementalFileContent = (filePath, streamName) => {
+      if (!fs.existsSync(filePath)) {
+        return;
+      }
+
+      const text = fs.readFileSync(filePath, "utf8");
+      const previousLength = streamName === "stdout" ? stdoutLength : stderrLength;
+      if (text.length <= previousLength) {
+        return;
+      }
+
+      const delta = text.slice(previousLength);
+      if (streamName === "stdout") {
+        stdout += delta;
+        stdoutLength = text.length;
+      } else {
+        stderr += delta;
+        stderrLength = text.length;
+      }
+
+      fs.appendFileSync(logFilePath, delta, "utf-8");
+    };
+
+    const flushBufferedOutput = () => {
+      appendIncrementalFileContent(stdoutPath, "stdout");
+      appendIncrementalFileContent(stderrPath, "stderr");
+    };
+
+    const cleanupTempFiles = () => {
+      for (const filePath of [stdoutPath, stderrPath]) {
+        try {
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        } catch {
+          // Best-effort cleanup only.
+        }
+      }
+    };
+
+    const pollHandle = setInterval(flushBufferedOutput, 250);
+
+    child.stderr.on("data", (chunk) => {
+      wrapperStderr += chunk.toString();
+    });
+
+    child.on("error", (error) => {
+      if (settled) return;
+      settled = true;
+      clearInterval(pollHandle);
+      flushBufferedOutput();
+      cleanupTempFiles();
+      reject(error);
+    });
+
+    child.on("close", (code) => {
+      if (settled) return;
+      settled = true;
+      clearInterval(pollHandle);
+      flushBufferedOutput();
+      cleanupTempFiles();
+
+      const combinedStderr = [stderr, wrapperStderr.trim()].filter(Boolean).join("\n");
+      resolve({
+        exitCode: code || 0,
+        timedOut: code === 124,
+        stdout,
+        stderr: combinedStderr,
+      });
+    });
+  });
+}
+
 function spawnClaudeRun(job, cwd, logFilePath) {
   return new Promise((resolve, reject) => {
     const env = { ...process.env };
@@ -1428,6 +1548,20 @@ function spawnClaudeRun(job, cwd, logFilePath) {
     env.AGENTIC_OS_DIR = cwd;
     const claudeCommand = env.AGENTIC_OS_CLAUDE_BIN || "claude";
     const claudeArgs = ["-p", job.prompt, "--model", job.model, "--dangerously-skip-permissions"];
+    const timeoutMs = parseTimeoutToMs(job.timeout);
+
+    if (process.platform === "win32" && fs.existsSync(WINDOWS_HIDDEN_RUNNER_PATH)) {
+      spawnClaudeRunViaHiddenWindowsWrapper(
+        job,
+        cwd,
+        logFilePath,
+        claudeCommand,
+        claudeArgs,
+        env
+      ).then(resolve).catch(reject);
+      return;
+    }
+
     const useWindowsCmdShell =
       process.platform === "win32" && /\.(cmd|bat)$/i.test(String(claudeCommand));
 
@@ -1443,7 +1577,6 @@ function spawnClaudeRun(job, cwd, logFilePath) {
     let stderr = "";
     let timedOut = false;
     let settled = false;
-    const timeoutMs = parseTimeoutToMs(job.timeout);
 
     const onStreamData = (streamName, chunk) => {
       const text = chunk.toString();
@@ -1534,6 +1667,17 @@ async function executeCronTask(agenticOsDir, taskId) {
     ...job,
     prompt: buildCronExecutionPrompt(job, workspace),
   };
+  const currentRun = db
+    .prepare(
+      `SELECT trigger
+       FROM cron_runs
+       WHERE taskId = ?
+         AND result = 'running'
+       ORDER BY id DESC
+       LIMIT 1`
+    )
+    .get(taskId);
+  const trigger = currentRun?.trigger === "manual" ? "manual" : "scheduled";
 
   appendCronLog(
     agenticOsDir,
@@ -1546,7 +1690,11 @@ async function executeCronTask(agenticOsDir, taskId) {
 
   let attempt = 0;
   let lastRun = { exitCode: 1, timedOut: false, stdout: "", stderr: "" };
-  const maxAttempts = Math.max(1, Number(job.retry || 0) + 1);
+  const configuredAttempts = Math.max(1, Number(job.retry || 0) + 1);
+  const maxAttempts =
+    trigger === "scheduled"
+      ? Math.min(Math.max(1, Number(job.retry || 0) + 1), 2)
+      : configuredAttempts;
 
   while (attempt < maxAttempts) {
     attempt += 1;
@@ -1626,6 +1774,7 @@ async function executeCronTask(agenticOsDir, taskId) {
     exitCode,
     durationMs,
     completedAt,
+    trigger,
   });
 
   return {

@@ -2,6 +2,7 @@ import { spawn, type ChildProcess } from "child_process";
 import { createInterface } from "readline";
 import { getDb } from "./db";
 import { getConfig, getClientAgenticOsDir } from "./config";
+import { completeCronRunForTask } from "./cron-service";
 import { emitTaskEvent } from "./event-bus";
 import { ClaudeOutputParser } from "./claude-parser";
 import { fileWatcher } from "./file-watcher";
@@ -1716,72 +1717,17 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     return "Completed";
   }
 
-  /**
-   * Record a cron run in the cron_runs table and update cron/status/{slug}.json
-   * so the cron jobs UI shows accurate last-run and history data.
-   */
+  /** Finalize a cron run through the shared runtime helper. */
   private recordCronRun(task: Task, costUsd: number, durationMs: number): void {
-    const slug = task.cronJobSlug;
-    if (!slug) return;
+    if (!task.cronJobSlug) return;
 
-    const db = getDb();
-    const now = new Date().toISOString();
-    const durationSec = Math.round(durationMs / 1000);
-    const result = task.errorMessage ? "failure" : "success";
-    const exitCode = task.errorMessage ? 1 : 0;
-
-    // Check if a running row already exists for this task (inserted by manual run endpoint)
-    try {
-      const existing = db.prepare(
-        `SELECT id FROM cron_runs WHERE taskId = ? AND result = 'running' LIMIT 1`
-      ).get(task.id) as { id: number } | undefined;
-
-      if (existing) {
-        // Update the existing running row with completion data (preserves trigger value)
-        db.prepare(
-          `UPDATE cron_runs SET completedAt = ?, result = ?, durationSec = ?, costUsd = ?, exitCode = ?
-           WHERE id = ?`
-        ).run(now, result, durationSec, costUsd, exitCode, existing.id);
-      } else {
-        // No existing row — insert fresh (handles scheduled runs from external dispatcher)
-        db.prepare(
-          `INSERT INTO cron_runs (jobSlug, taskId, startedAt, completedAt, result, durationSec, costUsd, exitCode, trigger)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'scheduled')`
-        ).run(slug, task.id, task.startedAt || now, now, result, durationSec, costUsd, exitCode);
-      }
-    } catch (err) {
-      console.error(`[process-manager] Failed to record cron_runs for ${slug}:`, err);
-    }
-
-    // Update cron/status/{slug}.json
-    try {
-      const fs = require("fs") as typeof import("fs");
-      const pathMod = require("path") as typeof import("path");
-      const config = getConfig();
-      const statusDir = pathMod.join(config.agenticOsDir, "cron", "status");
-      fs.mkdirSync(statusDir, { recursive: true });
-
-      // Read existing status to preserve run_count/fail_count
-      const statusPath = pathMod.join(statusDir, `${slug}.json`);
-      let existing = { run_count: 0, fail_count: 0 };
-      try {
-        existing = JSON.parse(fs.readFileSync(statusPath, "utf-8"));
-      } catch { /* first run */ }
-
-      const status = {
-        last_run: now,
-        result,
-        duration: durationSec,
-        exit_code: exitCode,
-        run_count: (existing.run_count || 0) + 1,
-        fail_count: (existing.fail_count || 0) + (result === "failure" ? 1 : 0),
-      };
-
-      fs.writeFileSync(statusPath, JSON.stringify(status, null, 2), "utf-8");
-      console.log(`[process-manager] Updated cron status for ${slug}: ${result}`);
-    } catch (err) {
-      console.error(`[process-manager] Failed to update cron status for ${slug}:`, err);
-    }
+    completeCronRunForTask(task, {
+      costUsd,
+      durationMs,
+      result: task.errorMessage ? "failure" : "success",
+      exitCode: task.errorMessage ? 1 : 0,
+      completedAt: new Date().toISOString(),
+    });
   }
 
   private handleSpawnError(taskId: string, err: unknown): void {
