@@ -321,3 +321,89 @@ test("resolveGitBashPath preserves CLAUDE_CODE_GIT_BASH_PATH or discovers bash.e
     fs.rmSync(discoveredBashPath, { force: true });
   }
 });
+
+test("shouldSendCronNotification respects on_finish, on_failure, and silent", () => {
+  const matrix = [
+    ["on_finish", "success", true],
+    ["on_finish", "failure", true],
+    ["on_finish", "timeout", true],
+    ["on_failure", "success", false],
+    ["on_failure", "failure", true],
+    ["on_failure", "timeout", true],
+    ["silent", "success", false],
+    ["silent", "failure", false],
+    ["silent", "timeout", false],
+  ];
+
+  for (const [notifySetting, result, expected] of matrix) {
+    assert.equal(
+      cronRuntime.shouldSendCronNotification(notifySetting, result),
+      expected,
+      `${notifySetting} should ${expected ? "" : "not "}send for ${result}`
+    );
+  }
+});
+
+test("executeCronTask finalizes missing cron definitions through the shared failure path", async () => {
+  const workspaceDir = makeTempWorkspace();
+  const db = cronRuntime.getDb(workspaceDir);
+  const taskId = "task-missing-cron-job";
+  const startedAt = new Date().toISOString();
+  const notifications = [];
+
+  try {
+    fs.writeFileSync(path.join(workspaceDir, "AGENTS.md"), "# test workspace\n", "utf-8");
+
+    db.prepare(
+      `INSERT INTO tasks (
+        id, title, description, status, level, parentId, columnOrder, createdAt, updatedAt,
+        costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt,
+        clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode
+      ) VALUES (?, ?, ?, 'queued', 'task', NULL, 0, ?, ?, NULL, NULL, NULL, 'Queued', NULL, ?, NULL, NULL, 0, NULL, NULL, ?, 'default')`
+    ).run(
+      taskId,
+      "Missing cron job",
+      "Should fail through the shared finalizer",
+      startedAt,
+      startedAt,
+      startedAt,
+      "missing-job"
+    );
+
+    db.prepare(
+      `INSERT INTO cron_runs (jobSlug, taskId, startedAt, result, trigger, clientId, scheduledFor)
+       VALUES (?, ?, ?, 'running', 'scheduled', NULL, ?)`
+    ).run("missing-job", taskId, startedAt, startedAt);
+
+    cronRuntime.setCronRuntimeTestHooks({
+      platform: () => "win32",
+      notificationSender(_agenticOsDir, notification) {
+        notifications.push(notification);
+        return Promise.resolve({ sent: true, event: notification.event });
+      },
+    });
+
+    const result = await cronRuntime.executeCronTask(workspaceDir, taskId);
+    const updatedTask = db.prepare("SELECT status, errorMessage FROM tasks WHERE id = ?").get(taskId);
+    const cronRun = db
+      .prepare(
+        `SELECT result, exitCode, trigger
+         FROM cron_runs
+         WHERE taskId = ?`
+      )
+      .get(taskId);
+
+    assert.equal(result.result, "failure");
+    assert.equal(updatedTask.status, "review");
+    assert.match(updatedTask.errorMessage, /Cron job definition not found/);
+    assert.equal(cronRun.result, "failure");
+    assert.equal(cronRun.exitCode, 1);
+    assert.equal(cronRun.trigger, "scheduled");
+    assert.equal(notifications.length, 1);
+    assert.equal(notifications[0].event, "failure");
+    assert.equal(notifications[0].context.jobName, "missing-job");
+  } finally {
+    cronRuntime.resetCronRuntimeTestHooks();
+    cleanupTempWorkspace(workspaceDir);
+  }
+});
