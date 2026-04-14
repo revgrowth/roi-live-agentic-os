@@ -1,58 +1,60 @@
-# Cron Jobs Hardening
+# Cron Jobs Hardening Recovery
 
 ## What This Is
 
-This project hardens the Cron Jobs experience inside Agentic OS across both the CLI daemon flow and the Command Centre UI. It focuses on making scheduling easier to understand, safer in mixed runtime scenarios, invisible to users when running in the background on Windows, and fully isolated inside each client workspace.
+This project restores cron behaviors that regressed in the current Agentic OS workspace while keeping the newer features that already exist in this folder. The work focuses on scheduled-task execution truth, hidden Windows background execution, and strict client-workspace containment, using `C:\Users\gmsal\Code Projects\AgenticOS - backup 2026-04-13 pre-merge` and `C:\Users\gmsal\Code Projects\AgenticOS - pr-cron-hardening` as trusted reference points.
 
 ## Core Value
 
-Cron jobs must feel reliable, understandable, and safely contained whether they run from the root workspace or from a client workspace.
+Cron jobs must run once, invisibly in the background on Windows, and only within the correct workspace boundary without breaking the features that already work in this folder.
 
 ## Requirements
 
 ### Validated
 
 - ✓ Managed cron scheduling already exists across the root workspace and client workspaces — existing
-- ✓ CLI scripts already exist for starting, stopping, checking status, and viewing daemon logs — existing
 - ✓ The Command Centre UI already manages cron jobs and can trigger cron runs — existing
-- ✓ Runtime leadership already uses a shared lock model so the UI runtime and CLI daemon do not intentionally schedule in parallel — existing
+- ✓ CLI scripts already exist for starting, stopping, checking status, and viewing daemon logs — existing
+- ✓ Client workspaces, client switching, and client-specific cron job concepts already exist in the current codebase — existing
+- ✓ The current folder contains newer cron-related features that must be preserved during recovery — existing
 
 ### Active
 
-- [ ] Cron-related CLI scripts present friendly, visual, high-signal output that is easy for non-technical users to understand
-- [ ] Runtime ownership between the UI runtime and CLI daemon is visible so users can tell which process currently owns scheduling
-- [ ] Windows cron execution started from the CLI daemon runs without opening visible terminal windows
-- [ ] Client cron jobs are fully isolated across execution, outputs, logs, history, and UI presentation
+- [ ] A scheduled cron run executes its underlying prompt exactly once, so one run cannot create duplicate or triple replies in chat history
+- [ ] Windows cron execution started in the background does not show visible PowerShell windows again
+- [ ] A client cron job can only see and act inside its own client folder rather than the whole repository
+- [ ] Regression fixes are applied in this folder without removing or breaking the newer features already present here
+- [ ] The recovery work explains whether the regressions came from an incomplete or incorrect merge path, enough to avoid repeating the same breakage
 
 ### Out of Scope
 
-- Replacing the current cron architecture with an operating-system scheduler — the current shared runtime model should be preserved
-- Building a remote or cloud cron service — this work is limited to the local Agentic OS runtime
-- Broad redesign of the entire task system — only cron-related behavior should change unless a small supporting fix is required
-- Merging pull requests automatically — the user wants to test first and approve PR creation later
+- Rebuilding the cron system from scratch — this is recovery and hardening on top of the current architecture
+- Treating `C:\Users\gmsal\Code Projects\AgenticOS - merge-lab 2026-04-13` as the source of truth — it is only a secondary check if needed
+- Rolling the current folder fully back to an older branch snapshot — the goal is to keep current features, not replace them
+- Broad unrelated refactors outside cron/runtime/client-containment behavior — only supporting changes that are necessary for the fixes should be included
 
 ## Context
 
-Agentic OS already includes a managed cron runtime inside the Command Centre project plus shell and PowerShell scripts for daemon lifecycle management. A previous codebase map confirms that cron state is persisted in SQLite, runtime leadership is tracked under `.command-centre`, and both root and client workspaces are discovered by the same runtime. A planning brief already exists in `projects/briefs/cron-jobs-hardening/` and frames the work as four connected problems: CLI UX, runtime ownership clarity, Windows daemon pop-up terminals, and incomplete client isolation. The current repo also has unrelated local changes, so this project must avoid touching unrelated work while planning and implementing fixes.
+This repository is a brownfield Agentic OS workspace with an existing codebase map under `.planning/codebase/`. The Command Centre app in `projects/briefs/command-centre/` already handles cron scheduling, task execution, client switching, and runtime coordination. The current branch has regressions that were reportedly already fixed in two other local folders: `C:\Users\gmsal\Code Projects\AgenticOS - backup 2026-04-13 pre-merge` and `C:\Users\gmsal\Code Projects\AgenticOS - pr-cron-hardening`. Those two folders are the trusted references if recovery work needs comparison or selective restoration. `C:\Users\gmsal\Code Projects\AgenticOS - merge-lab 2026-04-13` may help explain what happened, but it is not important as a target state. Success means the current workspace regains the three missing behaviors while preserving the current feature baseline.
 
 ## Constraints
 
-- **Architecture**: Preserve the shared single-runtime leadership model — the fix should clarify ownership, not introduce two schedulers
-- **Compatibility**: Do not break the existing root-workspace cron flow while fixing client isolation
-- **User Experience**: CLI output must stay simple and readable for non-technical users
-- **Platform**: Windows daemon behavior must match the hidden background experience already achieved by the UI-triggered path
-- **Workflow**: Planning artifacts should be written in English, while direct collaboration with the user stays in Portuguese
-- **Delivery**: The work should be executed in parallel where practical, and PRs should only be prepared after the user tests the result
+- **Baseline Preservation**: Keep the current folder as the final source of truth — do not replace it with an older snapshot
+- **Reference Sources**: Prefer `pre-merge` and `pr-cron-hardening` when looking for known-good fixes — they are expected to complement each other
+- **Workspace Safety**: Client jobs must stay contained to their own client directories — this is a hard boundary, not a UI preference
+- **Platform**: Windows background cron behavior must remain hidden during daemon-driven execution
+- **Scope Control**: Focus on the three regressions and the minimum supporting changes needed to preserve current features
+- **Diagnosis**: Check whether `merge-lab` shows unfinished or deviated work only if that helps explain the regression path
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Treat this as one focused hardening project with multiple parallel workstreams | The four issues are distinct on the surface but converge on the same cron runtime and workspace boundaries | — Pending |
-| Use the existing cron-jobs-hardening brief as source material for initialization | The brief already captures the current findings and avoids re-discovering the same scope | — Pending |
-| Keep planning artifacts in English | The user explicitly requested English planning documents | ✓ Good |
-| Optimize for parallel execution using strong sub-agents where useful | The user explicitly wants parallel execution and high-capability delegated work | — Pending |
-| Delay GitHub PR creation until after user testing | The user wants to validate behavior before authorizing PRs to `origin/dev` | ✓ Good |
+| Keep this folder as the recovery target | The user wants the final working version here, not in a reference folder | ✓ Good |
+| Use `pre-merge` and `pr-cron-hardening` as trusted references | The user confirmed they contain good information for these fixes | ✓ Good |
+| Treat `merge-lab` only as a diagnostic checkpoint | The user does not want it treated as the target implementation | ✓ Good |
+| Preserve all currently working features as the baseline | Recovery must not remove newer work already present in this folder | — Pending |
+| Investigate the regression path enough to avoid repeating it | Understanding whether the break came from an incomplete or wrong merge helps protect future merges | — Pending |
 
 ## Evolution
 
