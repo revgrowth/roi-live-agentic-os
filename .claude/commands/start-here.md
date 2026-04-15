@@ -26,9 +26,10 @@ Create today's memory file per CLAUDE.md's **Daily Memory** section:
 **Run this every session (first-run AND returning), before anything else.**
 
 Check whether the user's data is backed up to their own GitHub repo:
-1. Run `git remote -v` and inspect the `origin` URL.
-2. If `origin` contains `simonc602/agentic-os` (the upstream template), the user hasn't set up their own repo yet.
-3. If there is no `origin` at all, same situation.
+1. First, check `.env` for `IS_TEMPLATE_MAINTAINER=true`. If set, **skip this entire step** — the user owns the template repo and `origin` is already correct.
+2. Run `git remote -v` and inspect the `origin` URL.
+3. If `origin` contains `simonc602/agentic-os` (the upstream template), the user hasn't set up their own repo yet.
+4. If there is no `origin` at all, same situation.
 
 **If not configured:**
 > "Before we get started — your brand data, client files, and project outputs all live locally right now. If anything happens to this machine, they're gone. Let's back them up to a private GitHub repo that only you can access."

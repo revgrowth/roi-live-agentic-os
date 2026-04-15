@@ -34,7 +34,7 @@ Do these four steps silently. Do NOT output anything — no greeting, no recap, 
 - Do NOT auto-run `/start-here`
 - Do NOT output anything
 
-**GitHub backup check (once per day):** Only on the first session of the day (today's memory file had no prior session blocks). If `origin` still points to the upstream template repo, warn once. Otherwise silent.
+**GitHub backup check (once per day):** Only on the first session of the day (today's memory file had no prior session blocks). First check `.env` for `IS_TEMPLATE_MAINTAINER=true` — if set, skip entirely. Otherwise, if `origin` still points to the upstream template repo, warn once. Otherwise silent.
 
 ### Greeting Behaviour
 

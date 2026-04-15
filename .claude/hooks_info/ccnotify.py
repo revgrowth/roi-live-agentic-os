@@ -166,6 +166,7 @@ class ClaudePromptTracker:
             record=record,
             cwd=record.get("cwd"),
             duration_text=duration,
+            assistant_message=data.get("last_assistant_message", ""),
         )
 
         complete_message = (
@@ -382,6 +383,7 @@ class ClaudePromptTracker:
         cwd="",
         raw_message="",
         duration_text="Unknown",
+        assistant_message="",
     ):
         """Capture stable Windows click and copy data at send time."""
         session_bridge = self.get_session_bridge(session_id)
@@ -392,7 +394,11 @@ class ClaudePromptTracker:
         effective_cwd = cwd or (record.get("cwd") if record else "") or ""
         folder_label = self.folder_label(effective_cwd, task_row=task_row)
         task_id = (task_row or {}).get("id") or session_bridge.get("taskId") or ""
-        job_label = self.resolve_job_label(record, task_row, task_id=task_id)
+        sync_mode = session_bridge.get("syncMode", "")
+        job_label = self.resolve_job_label(
+            record, task_row, task_id=task_id,
+            assistant_message=assistant_message, sync_mode=sync_mode,
+        )
         port = (
             session_bridge.get("port")
             or self.command_centre_port()
@@ -593,13 +599,13 @@ class ClaudePromptTracker:
                 row = None
                 if task_id:
                     row = conn.execute(
-                        "SELECT id, title, clientId, claudeSessionId FROM tasks WHERE id = ?",
+                        "SELECT id, title, clientId, claudeSessionId, activityLabel FROM tasks WHERE id = ?",
                         (task_id,),
                     ).fetchone()
                 if row is None and session_id:
                     row = conn.execute(
                         """
-                        SELECT id, title, clientId, claudeSessionId
+                        SELECT id, title, clientId, claudeSessionId, activityLabel
                         FROM tasks
                         WHERE claudeSessionId = ?
                         ORDER BY updatedAt DESC
@@ -650,16 +656,37 @@ class ClaudePromptTracker:
             logging.warning("Failed to read command-centre port: %s", error)
             return "3000"
 
-    def resolve_job_label(self, record, task_row, task_id=""):
+    def resolve_job_label(self, record, task_row, task_id="", assistant_message="", sync_mode=""):
         """Resolve the visible task label without leaking prompt text into the toast."""
         prompt = (record or {}).get("prompt", "")
+
+        # 1. Task title from the command centre
         task_title = self.extract_clean_task_title(
             (task_row or {}).get("title", ""),
             prompt,
         )
-        if task_title:
-            return task_title
 
+        # 2. Fresh label from Claude's latest response
+        fresh_label = self.extract_assistant_label(assistant_message)
+
+        # UI-created tasks (managed) have intentional titles — use them.
+        # Terminal-created tasks (hook-owned) have auto-set titles from the first
+        # prompt which go stale — prefer the fresh response label instead.
+        is_managed = sync_mode == "managed"
+
+        if task_title and (is_managed or not fresh_label):
+            return task_title
+        if fresh_label:
+            return fresh_label
+
+        # 3. Fall back to activityLabel from the DB (may be one turn stale)
+        activity_label = self.normalize_message(
+            (task_row or {}).get("activityLabel", "") or ""
+        )
+        if activity_label and activity_label not in ("Session started", "Session ended", "Waiting for input"):
+            return activity_label
+
+        # 4. Fall back to output filename
         output_file_name = self.get_latest_task_output_filename(
             task_id or (task_row or {}).get("id")
         )
@@ -670,6 +697,31 @@ class ClaudePromptTracker:
         if seq:
             return f"Job #{seq}"
         return "Current task"
+
+    @staticmethod
+    def extract_assistant_label(text):
+        """Extract a concise label from Claude's response for the notification.
+
+        Mirrors the logic in session-sync-stop.js extractLabel():
+        prefer the last question, otherwise the last sentence.
+        """
+        if not text:
+            return ""
+        lines = [line.strip() for line in text.split("\n") if line.strip()]
+        if not lines:
+            return ""
+        # Find last line ending with ?
+        for line in reversed(lines):
+            if line.endswith("?"):
+                clean = line.lstrip("*#->").strip().rstrip("*")
+                if clean:
+                    return clean[:100] if len(clean) <= 100 else clean[:97] + "..."
+        # Fall back to last non-empty line
+        last = lines[-1]
+        clean = last.lstrip("*#->").strip().rstrip("*")
+        if clean:
+            return clean[:100] if len(clean) <= 100 else clean[:97] + "..."
+        return ""
 
     def extract_clean_task_title(self, title, prompt):
         """Prefer a real task title, but reject or trim prompt-shaped titles."""
