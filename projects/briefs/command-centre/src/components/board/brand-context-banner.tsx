@@ -25,7 +25,10 @@ export function BrandContextBanner() {
       await createTask(
         "Start Here",
         "Run /start-here",
-        "task"
+        "task",
+        null,  // projectSlug
+        null,  // parentId
+        "bypassPermissions"
       );
       // Find the newly created task and queue it
       const tasks = useTaskStore.getState().tasks;

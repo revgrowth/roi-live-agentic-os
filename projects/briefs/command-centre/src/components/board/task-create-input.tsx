@@ -371,7 +371,8 @@ export function TaskCreateInput({
     try {
       const taskTitle = type === "start-here" ? "Start Here" : "Wrap Up";
       const taskDesc = type === "start-here" ? "Run /start-here" : "Run /wrap-up";
-      await createTask(taskTitle, taskDesc, "task");
+      const permMode = type === "start-here" ? "bypassPermissions" : undefined;
+      await createTask(taskTitle, taskDesc, "task", null, null, permMode);
       const tasks = useTaskStore.getState().tasks;
       const newTask = tasks.find(
         (t) => t.title === taskTitle && t.status === "backlog"

@@ -239,7 +239,7 @@ export function ChatPane({
             fontWeight: 500,
             color: "#6B8E6B",
           }}>
-            Marked as complete by user
+            Complete
           </span>
         </div>
       )}
