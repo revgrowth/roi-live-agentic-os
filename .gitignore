@@ -11,9 +11,14 @@
 # Installer state
 .claude/skills/_catalog/installed.json
 
+# Dev-only skills (not shipped to main)
+.claude/skills/ops-new-feature/
+.claude/skills/ops-release/
+
 # System
 .DS_Store
 .backup/
+.tmp/
 
 # Next.js / Node (inside project folders)
 **/node_modules/

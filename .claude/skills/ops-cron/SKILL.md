@@ -99,6 +99,8 @@ Give the user the right runtime model:
 - **CLI user:** start the daemon manually with `start-crons`; stop it with `stop-crons`
 - **Both together:** only one host becomes leader; the other stays passive
 
+Scheduled jobs run with `--dangerously-skip-permissions` so they can execute unattended without approval prompts. This is intentional — cron jobs must complete autonomously.
+
 Never suggest Task Scheduler, launchd, or crontab.
 
 ---

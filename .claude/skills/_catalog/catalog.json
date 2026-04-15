@@ -72,6 +72,34 @@
       "dependencies": [],
       "mcp_servers": ["heygen"]
     },
+    "str-ai-seo": {
+      "category": "strategy",
+      "description": "Optimize content for AI search engines and LLM citations",
+      "requires_services": [],
+      "dependencies": [],
+      "mcp_servers": []
+    },
+    "viz-interface-design": {
+      "category": "visual",
+      "description": "Design dashboards, admin panels, and SaaS UIs",
+      "requires_services": [],
+      "dependencies": [],
+      "mcp_servers": []
+    },
+    "tool-stitch": {
+      "category": "utility",
+      "description": "Fetch UI designs from Google Stitch projects",
+      "requires_services": [],
+      "dependencies": [],
+      "mcp_servers": ["stitch"]
+    },
+    "viz-stitch-design": {
+      "category": "visual",
+      "description": "Design and iterate on UI screens with Google Stitch",
+      "requires_services": [],
+      "dependencies": ["tool-stitch"],
+      "mcp_servers": ["stitch"]
+    },
     "ops-cron": {
       "category": "operations",
       "description": "Schedule recurring Claude Code tasks with the managed cron runtime",
