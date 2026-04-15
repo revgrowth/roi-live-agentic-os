@@ -160,13 +160,13 @@ If you backed up custom skills, copy those back into `.claude/skills/` too.
 
 ## Step 5: Run setup
 
-This re-installs your selected skills and verifies everything is connected:
+This refreshes system dependencies and environment files:
 
 ```bash
 bash scripts/setup.sh
 ```
 
-It'll read your `installed.json` (which you just restored) and install the skills you previously chose, plus offer you any new ones.
+If you also want to reinstall the `centre` launcher shortcut, rerun `bash scripts/install.sh` after this step. `setup.sh` only handles dependency setup.
 
 ---
 
@@ -176,7 +176,7 @@ The Command Centre is a web-based dashboard that shows your tasks, projects, sch
 
 **Using the `centre` alias (easiest):**
 
-The setup script in Step 5 installs a `centre` command you can run from anywhere. Open a new terminal window (important — the alias won't be available in the same terminal that ran setup) and type:
+If you already ran `bash scripts/install.sh`, `centre` should be installed. Open a new terminal window (important — the shortcut will not be available in the same terminal that ran the installer) and type:
 
 ```bash
 centre
@@ -184,7 +184,9 @@ centre
 
 That's it. It installs dependencies on first run, starts the server, and opens your browser automatically.
 
-If the `centre` command isn't recognised, it usually means your shell hasn't picked up the new alias yet. Try one of these:
+On Windows, the installer writes `centre` into both Windows PowerShell and PowerShell 7 profiles. Open a new PowerShell window after the installer finishes. `bash scripts/setup.sh` does not install the launcher.
+
+If the `centre` command isn't recognised, it usually means your shell has not picked up the new shortcut yet. Try one of these:
 - Close and reopen your terminal
 - Run `source ~/.zshrc` (Mac), `source ~/.bashrc` (Linux), or `. $PROFILE` (Windows PowerShell) to reload your shell config
 

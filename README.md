@@ -30,7 +30,7 @@ centre
 
 That's it. The `centre` command installs dependencies on first run, starts the Next.js dev server, and opens `http://localhost:3000` in your browser.
 
-On Windows, use `powershell -File scripts\centre.ps1` instead.
+On Windows, `bash scripts/install.sh` installs `centre` into both Windows PowerShell and PowerShell 7 profiles. Open a new PowerShell window after the installer finishes, then run `centre`. `bash scripts/setup.sh` only refreshes dependencies. If you need the manual fallback, use `powershell -File scripts\centre.ps1`.
 
 Compatibility note: Agentic OS remains Claude-first, but the shared project instructions now live in `AGENTS.md`. Claude reads them through `CLAUDE.md`, and Codex can read `AGENTS.md` directly.
 

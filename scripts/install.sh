@@ -463,10 +463,10 @@ if [[ "$CRON_DRY_RUN" == "1" ]]; then
 fi
 
 # =============================================================================
-# 7. Install `centre` shell alias
+# 7. Install `centre` launcher shortcut
 # =============================================================================
 echo ""
-info "Installing 'centre' launcher alias..."
+info "Installing 'centre' launcher shortcut..."
 echo ""
 
 CENTRE_SCRIPT="$SCRIPT_DIR/centre.sh"
@@ -535,14 +535,23 @@ case "$(uname -s)" in
         info "Then launch the command centre from anywhere with: centre"
         ;;
     MINGW*|MSYS*|CYGWIN*)
-        # Git Bash on Windows — install bash alias AND a PowerShell profile function.
+        # Git Bash on Windows — install bash alias AND PowerShell profile functions.
         [[ -f "$HOME/.bashrc" ]] && install_alias_into "$HOME/.bashrc"
+        PS_HOST=""
         if command -v powershell.exe &>/dev/null; then
-            info "Installing PowerShell 'centre' function into \$PROFILE..."
-            powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(cygpath -w "$SCRIPT_DIR/install-centre-alias.ps1" 2>/dev/null || echo "$SCRIPT_DIR/install-centre-alias.ps1")" \
-                || warn "PowerShell alias install failed — you can run scripts\\install-centre-alias.ps1 manually."
+            PS_HOST="powershell.exe"
+        elif command -v pwsh &>/dev/null; then
+            PS_HOST="pwsh"
+        elif command -v pwsh.exe &>/dev/null; then
+            PS_HOST="pwsh.exe"
+        fi
+
+        if [[ -n "$PS_HOST" ]]; then
+            info "Installing PowerShell 'centre' function into Windows PowerShell and PowerShell 7 profiles..."
+            "$PS_HOST" -NoProfile -ExecutionPolicy Bypass -File "$(cygpath -w "$SCRIPT_DIR/install-centre-alias.ps1" 2>/dev/null || echo "$SCRIPT_DIR/install-centre-alias.ps1")" \
+                || warn "PowerShell profile install failed — you can run scripts\\install-centre-alias.ps1 manually."
         else
-            warn "PowerShell not found — skipping \$PROFILE install."
+            warn "PowerShell not found — skipping Windows profile install."
             warn "On Windows, prefer: powershell -File scripts\\centre.ps1"
         fi
         ;;
