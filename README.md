@@ -11,26 +11,37 @@ Agentic OS gives Claude Code personality, memory, and skills so it works like a 
 ```bash
 git clone https://<YOUR-TOKEN>@github.com/simonc602/agentic-os.git
 cd agentic-os
-bash scripts/install.sh
+bash scripts/centre.sh
 ```
 
 Replace `<YOUR-TOKEN>` with the access token from the [Agentic Academy classroom](https://www.skool.com/scrapes/classroom/d1cfafed?md=552b0ba753df4c738843913fb3eb8312).
 
-The installer checks your system, sets up dependencies, and lets you pick which skills to install.
+On first launch, `centre.sh` runs the guided bootstrap automatically. It checks your system, prepares the local files Agentic OS needs, repairs missing dependencies when needed, and asks the one-time setup questions.
 
 When it finishes, open Claude Code. It automatically detects you're new and walks you through building your brand foundation -- voice, positioning, and ideal customer profile.
 
+On Windows, use:
+
+```powershell
+powershell -File scripts\centre.ps1
+```
+
 ### Launching the command centre
 
-Open a new terminal (so the installed shell alias loads) and run:
+After the first guided launch, you can keep using:
 
 ```bash
 centre
 ```
 
-That's it. The `centre` command installs dependencies on first run, starts the Next.js dev server, and opens `http://localhost:3000` in your browser.
+That's it. The `centre` command reuses the saved launcher state, repairs missing bootstrap files silently when needed, starts the Next.js dev server, and opens `http://localhost:3000` in your browser.
 
-On Windows, `bash scripts/install.sh` installs `centre` into both Windows PowerShell and PowerShell 7 profiles. Open a new PowerShell window after the installer finishes, then run `centre`. `bash scripts/setup.sh` only refreshes dependencies. If you need the manual fallback, use `powershell -File scripts\centre.ps1`.
+`install.sh` and `setup.sh` still exist for manual maintenance:
+- `bash scripts/install.sh` runs the guided installer directly.
+- `bash scripts/install.sh --repair` repairs only the local bootstrap files.
+- `bash scripts/setup.sh` refreshes dependency checks without launching the UI.
+
+On Windows, the guided install can optionally add `centre` to both Windows PowerShell and PowerShell 7 profiles. If you prefer not to install the shortcut, keep using `powershell -File scripts\centre.ps1`.
 
 Compatibility note: Agentic OS remains Claude-first, but the shared project instructions now live in `AGENTS.md`. Claude reads them through `CLAUDE.md`, and Codex can read `AGENTS.md` directly.
 

@@ -158,15 +158,21 @@ If you backed up custom skills, copy those back into `.claude/skills/` too.
 
 ---
 
-## Step 5: Run setup
+## Step 5: Launch through centre
 
-This refreshes system dependencies and environment files:
+The launcher is now the main entry point. It will detect whether this workspace still needs first-run setup, repair missing local files silently when needed, and then open the UI:
 
 ```bash
-bash scripts/setup.sh
+bash scripts/centre.sh
 ```
 
-If you also want to reinstall the `centre` launcher shortcut, rerun `bash scripts/install.sh` after this step. `setup.sh` only handles dependency setup.
+On Windows, use:
+
+```powershell
+powershell -File scripts\centre.ps1
+```
+
+If you want to run the maintenance scripts manually, `bash scripts/install.sh` still runs the guided installer, and `bash scripts/setup.sh` still refreshes dependency checks.
 
 ---
 
@@ -176,15 +182,15 @@ The Command Centre is a web-based dashboard that shows your tasks, projects, sch
 
 **Using the `centre` alias (easiest):**
 
-If you already ran `bash scripts/install.sh`, `centre` should be installed. Open a new terminal window (important — the shortcut will not be available in the same terminal that ran the installer) and type:
+If you chose to install the optional shortcut during the guided first launch, open a new terminal window (important — the shortcut will not be available in the same terminal that installed it) and type:
 
 ```bash
 centre
 ```
 
-That's it. It installs dependencies on first run, starts the server, and opens your browser automatically.
+That's it. It reuses the saved launcher state, repairs missing bootstrap files silently when needed, starts the server, and opens your browser automatically.
 
-On Windows, the installer writes `centre` into both Windows PowerShell and PowerShell 7 profiles. Open a new PowerShell window after the installer finishes. `bash scripts/setup.sh` does not install the launcher.
+On Windows, the guided install can write `centre` into both Windows PowerShell and PowerShell 7 profiles. Open a new PowerShell window after the installer finishes. `bash scripts/setup.sh` does not install the launcher.
 
 If the `centre` command isn't recognised, it usually means your shell has not picked up the new shortcut yet. Try one of these:
 - Close and reopen your terminal

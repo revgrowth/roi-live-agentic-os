@@ -1,166 +1,236 @@
 #!/usr/bin/env bash
 set -uo pipefail
-# Note: intentionally NOT using set -e here.
-# We want to continue past individual install failures
-# and report them all at the end, not bail on the first one.
 
-# Agentic OS — System Setup
-# Installs CLI dependencies needed by skills in this repo.
-# Called automatically by install.sh. Can also be run standalone:
+# Agentic OS - Dependency Setup
+# Supports:
 #   bash scripts/setup.sh
-#
-# Supports macOS (brew) and Windows (winget/choco/pip).
+#   bash scripts/setup.sh --check
+#   bash scripts/setup.sh --silent
+#   bash scripts/setup.sh --check --silent
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+source "$SCRIPT_DIR/lib/python.sh"
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-ok()   { printf "${GREEN}  ✓ %s${NC}\n" "$1"; }
-warn() { printf "${YELLOW}  → %s${NC}\n" "$1"; }
-fail() { printf "${RED}  ✗ %s${NC}\n" "$1"; }
+CHECK_ONLY=0
+SILENT=0
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --check)
+            CHECK_ONLY=1
+            ;;
+        --silent)
+            SILENT=1
+            ;;
+        -h|--help)
+            cat <<'EOF'
+Agentic OS dependency setup
+
+Usage:
+  bash scripts/setup.sh
+  bash scripts/setup.sh --check
+  bash scripts/setup.sh --silent
+  bash scripts/setup.sh --check --silent
+
+Modes:
+  --check   Only verify whether required dependencies are missing.
+  --silent  Reduce script output for launcher-driven repairs.
+EOF
+            exit 0
+            ;;
+        *)
+            printf "${RED}Unknown argument: %s${NC}\n" "$1" >&2
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+say() {
+    if [[ $SILENT -eq 0 ]]; then
+        printf "%s\n" "$1"
+    fi
+}
+
+ok() {
+    if [[ $SILENT -eq 0 ]]; then
+        printf "${GREEN}  ✓ %s${NC}\n" "$1"
+    fi
+}
+
+warn() {
+    if [[ $SILENT -eq 0 ]]; then
+        printf "${YELLOW}  ! %s${NC}\n" "$1"
+    fi
+}
+
+fail() {
+    if [[ $SILENT -eq 0 ]]; then
+        printf "${RED}  ✗ %s${NC}\n" "$1"
+    fi
+}
 
 installed() { command -v "$1" &>/dev/null; }
 
-# ---------- Resolve paths ----------
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) REPO_ROOT="$(cygpath -m "$REPO_ROOT")" ;; esac
-source "$SCRIPT_DIR/lib/python.sh"
+run_install() {
+    local label="$1"
+    shift
 
-# ---------- Detect OS ----------
+    if [[ $CHECK_ONLY -eq 1 ]]; then
+        record_missing "$label"
+        return 1
+    fi
+
+    if "$@"; then
+        ok "$label installed"
+        return 0
+    fi
+
+    fail "$label install failed"
+    record_missing "$label"
+    return 1
+}
+
+record_missing() {
+    local label="$1"
+    MISSING_ITEMS+=("$label")
+    return 1
+}
+
 OS="unknown"
 case "$(uname -s)" in
-    Darwin*)          OS="mac" ;;
+    Darwin*) OS="mac" ;;
     MINGW*|MSYS*|CYGWIN*) OS="windows" ;;
-    Linux*)           OS="linux" ;;
+    Linux*) OS="linux" ;;
 esac
 
-echo ""
-echo "========================================="
-echo "  Agentic OS — Dependency Setup"
-echo "========================================="
-echo ""
-printf "  Platform: %s\n" "$OS"
-echo ""
-
+WIN_PKG=""
 ERRORS=0
+MISSING_ITEMS=()
 
-# ---------- Package manager check ----------
+if [[ $SILENT -eq 0 ]]; then
+    echo ""
+    echo "========================================="
+    echo "  Agentic OS - Dependency Setup"
+    echo "========================================="
+    echo ""
+    printf "  Platform: %s\n" "$OS"
+    echo ""
+fi
+
 if [[ "$OS" == "mac" ]]; then
-    printf "Checking brew... "
+    say "Checking brew..."
     if installed brew; then
         ok "brew found"
     else
-        fail "brew not found — install from https://brew.sh"
+        fail "brew not found - install from https://brew.sh"
+        record_missing "brew"
         ERRORS=$((ERRORS + 1))
     fi
 elif [[ "$OS" == "windows" ]]; then
-    printf "Checking package manager... "
+    say "Checking package manager..."
     if installed winget; then
-        ok "winget found"
         WIN_PKG="winget"
+        ok "winget found"
     elif installed choco; then
-        ok "choco found"
         WIN_PKG="choco"
+        ok "choco found"
     else
-        warn "No package manager found (winget or choco). Some auto-installs may fail."
-        WIN_PKG=""
+        warn "No package manager found (winget or choco). Some installs may need manual help."
     fi
 fi
 
-# ---------- Python 3 ----------
-printf "Checking Python 3... "
+say "Checking Python 3..."
 if resolve_python_cmd; then
     ok "$PYTHON_VERSION via $PYTHON_LABEL"
     if is_windows_shell && [[ $PYTHON3_DIAGNOSTIC_BROKEN -eq 1 ]]; then
-        warn "Windows exposes a non-working python3 at ${PYTHON3_DIAGNOSTIC_PATH}."
-        warn "Agentic OS will use '${PYTHON_LABEL}' instead. Manual cleanup is optional: disable the App Execution Alias or adjust PATH."
+        warn "Windows exposes a broken python3 at ${PYTHON3_DIAGNOSTIC_PATH}."
+        warn "Agentic OS will use '${PYTHON_LABEL}' instead."
     fi
 else
     fail "Python 3 not found"
-    fail "Install Python 3: https://www.python.org/downloads/"
+    record_missing "python3"
     ERRORS=$((ERRORS + 1))
 fi
 
-# ---------- uv (Python package manager) ----------
-printf "Checking uv... "
+say "Checking uv..."
 if installed uv; then
     ok "uv $(uv --version 2>&1 | awk '{print $2}')"
 else
-    warn "Installing uv..."
+    warn "uv missing"
     if [[ "$OS" == "mac" ]] && installed brew; then
-        brew install uv && ok "uv installed" || { fail "uv install failed"; ERRORS=$((ERRORS + 1)); }
-    elif [[ "$OS" == "windows" ]] && [[ "${WIN_PKG:-}" == "winget" ]]; then
-        winget install --id astral-sh.uv -e --silent && ok "uv installed" || { fail "uv install failed"; ERRORS=$((ERRORS + 1)); }
+        run_install "uv" brew install uv || ERRORS=$((ERRORS + 1))
+    elif [[ "$OS" == "windows" ]] && [[ "$WIN_PKG" == "winget" ]]; then
+        run_install "uv" winget install --id astral-sh.uv -e --silent || ERRORS=$((ERRORS + 1))
+    elif [[ "$OS" == "windows" ]] && [[ "$WIN_PKG" == "choco" ]]; then
+        run_install "uv" choco install uv -y || ERRORS=$((ERRORS + 1))
+    elif installed curl; then
+        run_install "uv" bash -lc "curl -LsSf https://astral.sh/uv/install.sh | sh" || ERRORS=$((ERRORS + 1))
     else
-        curl -LsSf https://astral.sh/uv/install.sh | sh && ok "uv installed" || { fail "uv install failed"; ERRORS=$((ERRORS + 1)); }
+        record_missing "uv"
+        ERRORS=$((ERRORS + 1))
     fi
 fi
 
-# ---------- yt-dlp (YouTube transcripts) ----------
-printf "Checking yt-dlp... "
+say "Checking yt-dlp..."
 if installed yt-dlp; then
     ok "yt-dlp found"
 else
-    warn "Installing yt-dlp..."
+    warn "yt-dlp missing"
     if [[ "$OS" == "mac" ]] && installed brew; then
-        brew install yt-dlp && ok "yt-dlp installed" || { fail "yt-dlp install failed"; ERRORS=$((ERRORS + 1)); }
-    elif [[ "$OS" == "windows" ]] && [[ "${WIN_PKG:-}" == "winget" ]]; then
-        winget install --id yt-dlp.yt-dlp -e --silent && ok "yt-dlp installed" || { fail "yt-dlp install failed"; ERRORS=$((ERRORS + 1)); }
-    elif installed pip3; then
-        pip3 install yt-dlp && ok "yt-dlp installed" || { fail "yt-dlp install failed"; ERRORS=$((ERRORS + 1)); }
-    elif installed pip; then
-        pip install yt-dlp && ok "yt-dlp installed" || { fail "yt-dlp install failed"; ERRORS=$((ERRORS + 1)); }
+        run_install "yt-dlp" brew install yt-dlp || ERRORS=$((ERRORS + 1))
+    elif [[ "$OS" == "windows" ]] && [[ "$WIN_PKG" == "winget" ]]; then
+        run_install "yt-dlp" winget install --id yt-dlp.yt-dlp -e --silent || ERRORS=$((ERRORS + 1))
+    elif resolve_python_cmd; then
+        run_install "yt-dlp" "${PYTHON_CMD[@]}" -m pip install yt-dlp || ERRORS=$((ERRORS + 1))
     else
-        fail "Cannot install yt-dlp — need pip or a package manager"; ERRORS=$((ERRORS + 1))
+        record_missing "yt-dlp"
+        ERRORS=$((ERRORS + 1))
     fi
 fi
 
-# ---------- ffmpeg (video processing) ----------
-printf "Checking ffmpeg... "
+say "Checking ffmpeg..."
 if installed ffmpeg; then
     ok "ffmpeg found"
 else
-    warn "Installing ffmpeg..."
+    warn "ffmpeg missing"
     if [[ "$OS" == "mac" ]] && installed brew; then
-        brew install ffmpeg && ok "ffmpeg installed" || { fail "ffmpeg install failed"; ERRORS=$((ERRORS + 1)); }
-    elif [[ "$OS" == "windows" ]] && [[ "${WIN_PKG:-}" == "winget" ]]; then
-        winget install --id Gyan.FFmpeg -e --silent && ok "ffmpeg installed" || { fail "ffmpeg install failed"; ERRORS=$((ERRORS + 1)); }
-    elif [[ "$OS" == "windows" ]] && [[ "${WIN_PKG:-}" == "choco" ]]; then
-        choco install ffmpeg -y && ok "ffmpeg installed" || { fail "ffmpeg install failed"; ERRORS=$((ERRORS + 1)); }
+        run_install "ffmpeg" brew install ffmpeg || ERRORS=$((ERRORS + 1))
+    elif [[ "$OS" == "windows" ]] && [[ "$WIN_PKG" == "winget" ]]; then
+        run_install "ffmpeg" winget install --id Gyan.FFmpeg -e --silent || ERRORS=$((ERRORS + 1))
+    elif [[ "$OS" == "windows" ]] && [[ "$WIN_PKG" == "choco" ]]; then
+        run_install "ffmpeg" choco install ffmpeg -y || ERRORS=$((ERRORS + 1))
     else
-        fail "Install ffmpeg manually — https://ffmpeg.org/download.html"; ERRORS=$((ERRORS + 1))
+        record_missing "ffmpeg"
+        ERRORS=$((ERRORS + 1))
     fi
 fi
 
-# ---------- .env file ----------
-echo ""
-printf "Checking .env... "
-if [[ -f "$REPO_ROOT/.env" ]]; then
-    ok ".env exists"
-else
-    if [[ -f "$REPO_ROOT/.env.example" ]]; then
-        cp "$REPO_ROOT/.env.example" "$REPO_ROOT/.env"
-        warn "Created .env from .env.example — add your API keys to .env"
-    else
-        warn "No .env.example found — skipping"
+if [[ $CHECK_ONLY -eq 1 ]]; then
+    if [[ $ERRORS -eq 0 ]]; then
+        exit 0
     fi
+    exit 1
 fi
 
-# ---------- Summary ----------
-echo ""
-echo "========================================="
-if [[ $ERRORS -eq 0 ]]; then
-    printf "${GREEN}  All dependencies installed!${NC}\n"
-else
-    printf "${YELLOW}  %d optional dependency issue(s) — see above.${NC}\n" "$ERRORS"
-    printf "${YELLOW}  Skills that need these tools will tell you when they're missing.${NC}\n"
-    printf "${YELLOW}  Everything else works fine without them.${NC}\n"
+if [[ $SILENT -eq 0 ]]; then
+    echo ""
+    echo "========================================="
+    if [[ $ERRORS -eq 0 ]]; then
+        printf "${GREEN}  All dependency checks passed.${NC}\n"
+    else
+        printf "${YELLOW}  %d dependency issue(s) still need attention.${NC}\n" "$ERRORS"
+        printf "${YELLOW}  Missing items: %s${NC}\n" "${MISSING_ITEMS[*]:-unknown}"
+    fi
+    echo "========================================="
+    echo ""
 fi
-echo "========================================="
-echo ""
 
-# Always exit 0 — dependency failures are non-blocking.
-# Skills gracefully degrade when their tools are missing.
+# Keep manual setup non-blocking for compatibility.
 exit 0
