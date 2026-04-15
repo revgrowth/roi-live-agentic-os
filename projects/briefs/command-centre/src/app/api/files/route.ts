@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { listDirectory, normalizeRelativePath } from "@/lib/file-service";
 import { getClientAgenticOsDir } from "@/lib/config";
 
-const ALLOWED_ROOTS = ["context", "brand_context", "docs", "projects", ".planning", ".claude/skills"];
+const ALLOWED_ROOTS = ["context", "brand_context", "docs", "projects", ".planning", ".claude/skills", "clients"];
 
 export async function GET(request: NextRequest) {
   try {

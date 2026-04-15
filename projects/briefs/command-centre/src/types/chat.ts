@@ -29,6 +29,8 @@ export interface MessageMetadata {
   /** For bubbled sub-agent questions */
   questionTaskId?: string;
   questionText?: string;
+  /** Structured question specs (select/multiselect options) */
+  questionSpecs?: import("@/types/question-spec").QuestionSpec[];
   /** For reply messages: which question this answers */
   replyToMessageId?: string;
   /** For task completion messages */

@@ -54,6 +54,8 @@ export interface LogEntry {
   questionAnswers?: string;
   /** Task ID this entry came from (set when merging parent + subtask logs). */
   sourceTaskId?: string;
+  /** Permission mode active when this user_reply was sent */
+  permissionMode?: string;
 }
 
 export interface Task {
@@ -90,7 +92,15 @@ export interface Task {
   teamId?: string | null;
   coordinationLevel?: "inject" | "shared_context" | "team" | null;
   goalGroup: string | null;
+  tag: string | null;
+  pinnedAt: string | null;
   dependsOnTaskIds?: string[] | null;
+  /** Worktree isolation mode for parallel execution */
+  isolation?: "none" | "worktree" | null;
+  /** Absolute path to the git worktree when running in isolation */
+  worktreePath?: string | null;
+  /** Git branch name for the worktree */
+  worktreeBranch?: string | null;
 }
 
 export interface OutputFile {
@@ -147,5 +157,10 @@ export type TaskUpdateInput = Partial<
     | "teamId"
     | "coordinationLevel"
     | "goalGroup"
+    | "tag"
+    | "pinnedAt"
+    | "isolation"
+    | "worktreePath"
+    | "worktreeBranch"
   >
 >;

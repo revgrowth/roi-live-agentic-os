@@ -147,6 +147,9 @@ export function getDb(): Database.Database {
     db.exec("ALTER TABLE tasks ADD COLUMN permissionMode TEXT DEFAULT 'default'");
   }
 
+  // Fix cron tasks that were incorrectly stored with 'default' permission mode
+  db.exec("UPDATE tasks SET permissionMode = 'bypassPermissions' WHERE cronJobSlug IS NOT NULL AND permissionMode = 'default'");
+
   // Migration: add model column for selecting Claude model per task
   const modelCol = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
   if (!modelCol.some((c) => c.name === "model")) {
@@ -192,6 +195,17 @@ export function getDb(): Database.Database {
   if (!goalCol.some((c) => c.name === "goalGroup")) {
     db.exec("ALTER TABLE tasks ADD COLUMN goalGroup TEXT");
     db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_goalGroup ON tasks(goalGroup)");
+  }
+
+  // Migration: add tag column for user-defined project tagging
+  if (!goalCol.some((c) => c.name === "tag")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN tag TEXT");
+    db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_tag ON tasks(tag)");
+  }
+
+  // Migration: add pinnedAt column for pinning tasks to the top of goals
+  if (!goalCol.some((c) => c.name === "pinnedAt")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN pinnedAt TEXT");
   }
 
   // Migration: add questionSpec + questionAnswers columns to task_logs for
@@ -251,6 +265,14 @@ export function getDb(): Database.Database {
     }
   } catch (err) {
     console.error("[db] Failed to migrate task_logs CHECK constraint:", err);
+  }
+
+  // Migration: add permissionMode column to task_logs — records which mode was active per user reply
+  try {
+    db.exec("ALTER TABLE task_logs ADD COLUMN permissionMode TEXT");
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (!/duplicate column/i.test(msg)) throw err;
   }
 
   // Migration: add dependsOnTaskIds column — JSON array of task IDs this task depends on

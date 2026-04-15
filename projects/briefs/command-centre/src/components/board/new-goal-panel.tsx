@@ -11,6 +11,7 @@ import type { SlashCommand } from "@/lib/slash-commands";
 import { HighlightMirror } from "@/components/modal/reply-input";
 import { ModelPicker } from "@/components/shared/model-picker";
 import { PermissionPicker } from "@/components/shared/permission-picker";
+import { TagPicker } from "@/components/shared/tag-picker";
 import { recordTagUsage } from "./goal-chips";
 import { LEVEL_LABELS, LEVEL_HINTS } from "@/lib/levels";
 
@@ -85,6 +86,7 @@ export function NewGoalPanel({
   onCreated,
   onStartDrawerDrag,
 }: NewGoalPanelProps) {
+  const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [level, setLevel] = useState<TaskLevel>("task");
   const [showLevelMenu, setShowLevelMenu] = useState(false);
@@ -103,13 +105,16 @@ export function NewGoalPanel({
   const [isUploading, setIsUploading] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [showClientMenu, setShowClientMenu] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
+  const titleRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLTextAreaElement>(null);
   const levelMenuRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const clientMenuRef = useRef<HTMLDivElement>(null);
 
   const createTask = useTaskStore((s) => s.createTask);
+  const updateTask = useTaskStore((s) => s.updateTask);
   const clients = useClientStore((s) => s.clients);
   const rootName = useClientStore((s) => s.rootName);
 
@@ -127,8 +132,8 @@ export function NewGoalPanel({
       .catch(() => {});
   }, []);
 
-  // Auto-focus textarea
-  useEffect(() => { descRef.current?.focus(); }, []);
+  // Auto-focus title input
+  useEffect(() => { titleRef.current?.focus(); }, []);
 
   // Close level menu on outside click
   useEffect(() => {
@@ -167,7 +172,9 @@ export function NewGoalPanel({
   const createWithLevel = useCallback(
     async (goalTitle: string, fullDescription: string, taskLevel: TaskLevel) => {
       let taskProjectSlug: string | null = null;
-      if (taskLevel === "project" || taskLevel === "gsd") {
+      // Create a brief for project/gsd tasks, or for any task in plan mode
+      const needsBrief = taskLevel === "project" || taskLevel === "gsd" || permissionMode === "plan";
+      if (needsBrief) {
         taskProjectSlug = goalTitle
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
@@ -180,7 +187,7 @@ export function NewGoalPanel({
             body: JSON.stringify({
               slug: taskProjectSlug,
               name: goalTitle,
-              level: taskLevel === "gsd" ? 3 : 2,
+              level: taskLevel === "gsd" ? 3 : taskLevel === "project" ? 2 : 1,
               goal: fullDescription.slice(0, 200),
             }),
           });
@@ -198,7 +205,8 @@ export function NewGoalPanel({
 
   const handleSubmit = useCallback(async () => {
     const trimmed = message.trim();
-    if (!trimmed || isSubmitting) return;
+    const trimmedTitle = title.trim();
+    if ((!trimmed && !trimmedTitle) || isSubmitting) return;
 
     // Detect and strip --project / --gsd flags
     const flagMatch = trimmed.match(/\s*--(project|gsd)\s*/i);
@@ -208,15 +216,34 @@ export function NewGoalPanel({
     }
     const cleanMessage = trimmed.replace(/\s*--(project|gsd)\s*/gi, " ").trim();
 
-    // Derive title from first line
-    const lines = cleanMessage.split("\n");
-    const firstLine = lines[0];
-    const goalTitle = firstLine.length <= 60
-      ? firstLine
-      : firstLine.slice(0, 57).replace(/\s+\S*$/, "") + "...";
+    // Use the explicit title, or derive from first line of description
+    let goalTitle: string;
+    if (trimmedTitle) {
+      goalTitle = trimmedTitle.length <= 60
+        ? trimmedTitle
+        : trimmedTitle.slice(0, 57).replace(/\s+\S*$/, "") + "...";
+    } else {
+      const lines = cleanMessage.split("\n");
+      const firstLine = lines[0];
+      goalTitle = firstLine.length <= 60
+        ? firstLine
+        : firstLine.slice(0, 57).replace(/\s+\S*$/, "") + "...";
+    }
+
+    // Expand collapsed pasted text blocks back to full content
+    let expandedMessage = cleanMessage;
+    if (descRef.current?.dataset.pastedBlocks) {
+      try {
+        const blocks = JSON.parse(descRef.current.dataset.pastedBlocks) as Array<{ label: string; text: string }>;
+        for (const block of blocks) {
+          expandedMessage = expandedMessage.replace(block.label, block.text);
+        }
+      } catch { /* ignore */ }
+      descRef.current.dataset.pastedBlocks = "";
+    }
 
     // Build description with attachment paths
-    let fullDescription = cleanMessage;
+    let fullDescription = expandedMessage || trimmedTitle;
     if (attachments.length > 0) {
       const attachmentLines = attachments.map((a) => `- ${a.relativePath}`).join("\n");
       fullDescription = fullDescription
@@ -226,9 +253,12 @@ export function NewGoalPanel({
 
     setIsSubmitting(true);
     const taskId = await createWithLevel(goalTitle, fullDescription || goalTitle, detectedLevel);
+    if (taskId && selectedTag) {
+      await updateTask(taskId, { tag: selectedTag });
+    }
     setIsSubmitting(false);
     if (taskId) onCreated(taskId);
-  }, [message, attachments, isSubmitting, level, createWithLevel, onCreated]);
+  }, [message, title, attachments, isSubmitting, level, createWithLevel, onCreated, selectedTag, updateTask]);
 
   const handleMessageChange = useCallback((value: string) => {
     setMessage(value);
@@ -356,6 +386,39 @@ export function NewGoalPanel({
     setAttachments((prev) => prev.filter((a) => a.relativePath !== relativePath));
   }, []);
 
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) handleFileUpload(file);
+        return;
+      }
+    }
+    // Large text paste — collapse into a single-line placeholder in the textarea
+    // but store the full text so it renders in the sent message
+    const text = e.clipboardData?.getData("text/plain") ?? "";
+    const lineCount = text.split("\n").length;
+    if (lineCount > 10) {
+      e.preventDefault();
+      const label = `[Pasted text +${lineCount} lines]`;
+      const ta = descRef.current;
+      if (ta) {
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        const before = message.slice(0, start);
+        const after = message.slice(end);
+        // Store full text in a data attribute on the textarea for retrieval at submit
+        const pastedBlocks = (ta.dataset.pastedBlocks ? JSON.parse(ta.dataset.pastedBlocks) : []) as Array<{ label: string; text: string }>;
+        pastedBlocks.push({ label, text });
+        ta.dataset.pastedBlocks = JSON.stringify(pastedBlocks);
+        handleMessageChange(before + label + after);
+      }
+    }
+  }, [handleFileUpload, message, handleMessageChange]);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if ((showSlashMenu || showTagMenu) && ["ArrowDown", "ArrowUp", "Enter", "Tab", "Escape"].includes(e.key)) return;
@@ -393,7 +456,7 @@ export function NewGoalPanel({
   );
 
   const hasHighlight = message.includes("@") || message.includes("/") || message.includes("--");
-  const canSubmit = message.trim().length > 0 && !isSubmitting;
+  const canSubmit = (message.trim().length > 0 || title.trim().length > 0) && !isSubmitting;
 
   const suggestions = STATIC_SUGGESTIONS;
   const suggestionsLabel = "Try something like";
@@ -490,251 +553,232 @@ export function NewGoalPanel({
         </button>
       </div>
 
-      {/* Message textarea + suggestions */}
-      <div style={{ flex: 1, overflow: "auto", padding: "16px 20px 0" }}>
-        <div style={{ position: "relative" }}>
-          {showSlashMenu && (
-            <SlashCommandMenu
-              query={slashQuery}
-              onSelect={handleSlashSelect}
-              onClose={() => { setShowSlashMenu(false); setSlashQuery(""); }}
-              anchor="below"
-            />
-          )}
-          {showTagMenu && promptTags.length > 0 && (
-            <SlashCommandMenu
-              query={tagQuery}
-              onSelect={() => {}}
-              onClose={() => { setShowTagMenu(false); setTagQuery(""); }}
-              anchor="below"
-              mode="tag"
-              tagItems={promptTags.filter((t) => !tagQuery || t.name.toLowerCase().includes(tagQuery.toLowerCase()))}
-              onTagSelect={(tag) => {
-                const el = descRef.current;
-                if (el) {
-                  const cursor = el.selectionStart ?? message.length;
-                  const before = message.slice(0, cursor);
-                  const after = message.slice(cursor);
-                  const replaced = before.replace(/(^|[\s])@[\w\/-]*$/, `$1@${tag.name} `);
-                  setMessage(replaced + after);
-                } else {
-                  setMessage((prev) => prev + `@${tag.name} `);
-                }
-                recordTagUsage(tag.name);
-                setShowTagMenu(false);
-                setTagQuery("");
-                descRef.current?.focus();
-              }}
-            />
-          )}
-          {showFlagMenu && filteredFlags.length > 0 && (
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                zIndex: 300,
-                marginTop: 28,
-                backgroundColor: "#FFFFFF",
-                borderRadius: 8,
-                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
-                border: "1px solid #e5e1dc",
-                padding: 4,
-                width: 260,
-              }}
-            >
-              <div style={{
-                fontSize: 10,
-                fontFamily: MONO,
-                color: "#9C9CA0",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-                padding: "4px 10px 2px",
-              }}>
-                Level flag
-              </div>
-              {filteredFlags.map((opt, i) => (
-                <button
-                  key={opt.flag}
-                  onClick={() => handleFlagSelect(opt)}
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    padding: "7px 10px",
-                    fontSize: 12,
-                    fontFamily: MONO,
-                    border: "none",
-                    borderRadius: 5,
-                    backgroundColor: i === flagMenuIndex ? "#f3f0ee" : "transparent",
-                    color: "#1B1C1B",
-                    cursor: "pointer",
-                    textAlign: "left" as const,
-                    fontWeight: 400,
-                  }}
-                  onMouseEnter={() => setFlagMenuIndex(i)}
-                >
-                  <div style={{ fontWeight: 600 }}>{opt.label}</div>
-                  <div style={{ fontSize: 10, color: "#9C9CA0", marginTop: 1 }}>
-                    {opt.hint}
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-          <div style={{ position: "relative" }}>
-            {hasHighlight && (
-              <HighlightMirror
-                text={message}
-                style={{
-                  fontSize: 15,
-                  fontFamily: "var(--font-inter), Inter, sans-serif",
-                  lineHeight: 1.6,
-                  padding: 0,
+      {/* Content area */}
+      <div style={{ flex: 1, overflow: "auto", padding: "16px 20px 20px" }}>
+        {/* Title input */}
+        <input
+          ref={titleRef}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              descRef.current?.focus();
+            }
+          }}
+          placeholder="Goal title..."
+          style={{
+            width: "100%",
+            fontSize: 20,
+            fontWeight: 600,
+            fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+            color: "#1B1C1B",
+            border: "none",
+            outline: "none",
+            background: "transparent",
+            padding: 0,
+            marginBottom: 12,
+          }}
+        />
+
+        {/* Grey input container — matches reply-input style */}
+        <div
+          style={{
+            background: "#f3f0ee",
+            border: "1px solid #e5e1dc",
+            borderRadius: 10,
+            overflow: "visible",
+            position: "relative",
+          }}
+        >
+          {/* Description */}
+          <div style={{ position: "relative", padding: "12px 14px 8px" }}>
+            {showSlashMenu && (
+              <SlashCommandMenu
+                query={slashQuery}
+                onSelect={handleSlashSelect}
+                onClose={() => { setShowSlashMenu(false); setSlashQuery(""); }}
+                anchor="below"
+              />
+            )}
+            {showTagMenu && promptTags.length > 0 && (
+              <SlashCommandMenu
+                query={tagQuery}
+                onSelect={() => {}}
+                onClose={() => { setShowTagMenu(false); setTagQuery(""); }}
+                anchor="below"
+                mode="tag"
+                tagItems={promptTags.filter((t) => !tagQuery || t.name.toLowerCase().includes(tagQuery.toLowerCase()))}
+                onTagSelect={(tag) => {
+                  const el = descRef.current;
+                  if (el) {
+                    const cursor = el.selectionStart ?? message.length;
+                    const before = message.slice(0, cursor);
+                    const after = message.slice(cursor);
+                    const replaced = before.replace(/(^|[\s])@[\w\/-]*$/, `$1@${tag.name} `);
+                    setMessage(replaced + after);
+                  } else {
+                    setMessage((prev) => prev + `@${tag.name} `);
+                  }
+                  recordTagUsage(tag.name);
+                  setShowTagMenu(false);
+                  setTagQuery("");
+                  descRef.current?.focus();
                 }}
               />
             )}
-            <textarea
-              ref={descRef}
-              value={message}
-              onChange={(e) => handleMessageChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="What do you want to do? (/ commands, @ tags, -- flags)"
-              style={{
-                width: "100%",
-                fontSize: 15,
-                fontFamily: "var(--font-inter), Inter, sans-serif",
-                color: hasHighlight ? "transparent" : "#1B1C1B",
-                caretColor: "#1B1C1B",
-                lineHeight: 1.6,
-                border: "none",
-                outline: "none",
-                background: "transparent",
-                resize: "none",
-                padding: 0,
-                minHeight: 120,
-                position: "relative",
-                zIndex: 1,
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Suggestion chips — visible when textarea is empty */}
-        {!message && (
-          <div style={{ marginTop: 16 }}>
-            <div style={{
-              fontSize: 11,
-              fontFamily: MONO,
-              color: "#9C9CA0",
-              textTransform: "uppercase" as const,
-              letterSpacing: "0.06em",
-              marginBottom: 10,
-            }}>
-              {suggestionsLabel}
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {suggestions.map((s) => (
-                <button
-                  key={s.title}
-                  onClick={() => {
-                    setMessage(s.prompt ?? (s.title + (s.desc ? "\n" + s.desc : "")));
-                    descRef.current?.focus();
-                  }}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 2,
-                    padding: "8px 10px",
-                    border: "1px solid rgba(218, 193, 185, 0.2)",
-                    borderRadius: 8,
-                    backgroundColor: "transparent",
-                    cursor: "pointer",
-                    textAlign: "left" as const,
-                    transition: "all 120ms ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#faf9f7";
-                    e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.5)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "transparent";
-                    e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.2)";
-                  }}
-                >
-                  <span style={{ fontSize: 13, fontWeight: 600, fontFamily: "var(--font-epilogue), Epilogue, sans-serif", color: "#1B1C1B" }}>
-                    {s.title}
-                  </span>
-                  <span style={{ fontSize: 12, fontFamily: MONO, color: "#9C9CA0" }}>
-                    {s.desc}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Attachment chips */}
-        {attachments.length > 0 && (
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "8px 0" }}>
-            {attachments.map((att) => {
-              const Icon = getAttachmentIcon(att.extension);
-              return (
-                <div
-                  key={att.relativePath}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 5,
-                    padding: "3px 8px",
-                    borderRadius: 6,
-                    backgroundColor: "rgba(218, 193, 185, 0.15)",
-                    fontSize: 11,
-                    fontFamily: MONO,
-                    color: "#5E5E65",
-                  }}
-                >
-                  <Icon size={12} />
-                  <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {att.fileName}
-                  </span>
-                  <button
-                    onClick={() => removeAttachment(att.relativePath)}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
-                  >
-                    <X size={10} />
-                  </button>
+            {showFlagMenu && filteredFlags.length > 0 && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  zIndex: 300,
+                  marginTop: 28,
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: 8,
+                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+                  border: "1px solid #e5e1dc",
+                  padding: 4,
+                  width: 260,
+                }}
+              >
+                <div style={{
+                  fontSize: 10,
+                  fontFamily: MONO,
+                  color: "#9C9CA0",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                  padding: "4px 10px 2px",
+                }}>
+                  Level flag
                 </div>
-              );
-            })}
+                {filteredFlags.map((opt, i) => (
+                  <button
+                    key={opt.flag}
+                    onClick={() => handleFlagSelect(opt)}
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      padding: "7px 10px",
+                      fontSize: 12,
+                      fontFamily: MONO,
+                      border: "none",
+                      borderRadius: 5,
+                      backgroundColor: i === flagMenuIndex ? "#f3f0ee" : "transparent",
+                      color: "#1B1C1B",
+                      cursor: "pointer",
+                      textAlign: "left" as const,
+                      fontWeight: 400,
+                    }}
+                    onMouseEnter={() => setFlagMenuIndex(i)}
+                  >
+                    <div style={{ fontWeight: 600 }}>{opt.label}</div>
+                    <div style={{ fontSize: 10, color: "#9C9CA0", marginTop: 1 }}>
+                      {opt.hint}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            <div style={{ position: "relative" }}>
+              {hasHighlight && (
+                <HighlightMirror
+                  text={message}
+                  style={{
+                    fontSize: 14,
+                    fontFamily: "var(--font-inter), Inter, sans-serif",
+                    lineHeight: 1.5,
+                    padding: "4px 0",
+                  }}
+                />
+              )}
+              <textarea
+                ref={descRef}
+                value={message}
+                onChange={(e) => handleMessageChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
+                placeholder="What do you want to do? (/ commands, @ tags, -- flags)"
+                style={{
+                  width: "100%",
+                  fontSize: 14,
+                  fontFamily: "var(--font-inter), Inter, sans-serif",
+                  color: hasHighlight ? "transparent" : "#1B1C1B",
+                  caretColor: "#1B1C1B",
+                  lineHeight: 1.5,
+                  border: "none",
+                  outline: "none",
+                  background: "transparent",
+                  resize: "none",
+                  padding: "4px 0",
+                  minHeight: 80,
+                  position: "relative",
+                  zIndex: 1,
+                }}
+              />
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) handleFileUpload(file);
-          e.target.value = "";
-        }}
-        style={{ display: "none" }}
-        accept="image/*,.pdf,.md,.txt,.csv,.json,.html"
-      />
+          {/* Attachment chips */}
+          {attachments.length > 0 && (
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "0 14px 8px" }}>
+              {attachments.map((att) => {
+                const Icon = getAttachmentIcon(att.extension);
+                return (
+                  <div
+                    key={att.relativePath}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      padding: "3px 8px",
+                      borderRadius: 6,
+                      backgroundColor: "rgba(218, 193, 185, 0.15)",
+                      fontSize: 11,
+                      fontFamily: MONO,
+                      color: "#5E5E65",
+                    }}
+                  >
+                    <Icon size={12} />
+                    <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {att.fileName}
+                    </span>
+                    <button
+                      onClick={() => removeAttachment(att.relativePath)}
+                      style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
+                    >
+                      <X size={10} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
-      {/* Bottom toolbar */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          padding: "10px 20px",
-          borderTop: "1px solid #e8e4df",
-          background: "#faf9f7",
-          flexShrink: 0,
-        }}
-      >
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileUpload(file);
+              e.target.value = "";
+            }}
+            style={{ display: "none" }}
+            accept="image/*,.pdf,.md,.txt,.csv,.json,.html"
+          />
+
+          {/* Toolbar */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              padding: "6px 8px",
+              borderTop: "1px solid #e5e1dc",
+            }}
+          >
         {/* Attach file */}
         <button
           onClick={() => fileInputRef.current?.click()}
@@ -759,6 +803,7 @@ export function NewGoalPanel({
 
         <ModelPicker value={model} onChange={setModel} />
         <PermissionPicker value={permissionMode} onChange={setPermissionMode} />
+        <TagPicker value={selectedTag} onChange={setSelectedTag} />
 
         {/* Level pill — in toolbar */}
         <div ref={levelMenuRef} style={{ position: "relative" }}>
@@ -967,6 +1012,66 @@ export function NewGoalPanel({
           <ArrowUp size={12} />
           {isSubmitting ? "Sending..." : "Send"}
         </button>
+          </div>
+        </div>
+
+        {/* Suggestion chips */}
+        {(
+          <div style={{ marginTop: 16 }}>
+            <div style={{
+              fontSize: 11,
+              fontFamily: MONO,
+              color: "#9C9CA0",
+              textTransform: "uppercase" as const,
+              letterSpacing: "0.06em",
+              marginBottom: 10,
+            }}>
+              {suggestionsLabel}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {suggestions.map((s) => (
+                <button
+                  key={s.title}
+                  onClick={() => {
+                    const addition = s.prompt ?? (s.title + (s.desc ? "\n" + s.desc : ""));
+                    setMessage((prev) => {
+                      if (!prev.trim()) return addition;
+                      return prev.trimEnd() + "\n" + addition;
+                    });
+                    descRef.current?.focus();
+                  }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                    padding: "8px 10px",
+                    border: "1px solid rgba(218, 193, 185, 0.2)",
+                    borderRadius: 8,
+                    backgroundColor: "transparent",
+                    cursor: "pointer",
+                    textAlign: "left" as const,
+                    transition: "all 120ms ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#faf9f7";
+                    e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.5)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.2)";
+                  }}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 600, fontFamily: "var(--font-epilogue), Epilogue, sans-serif", color: "#1B1C1B" }}>
+                    {s.title}
+                  </span>
+                  <span style={{ fontSize: 12, fontFamily: MONO, color: "#9C9CA0" }}>
+                    {s.desc}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

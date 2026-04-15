@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutDashboard, Clock, Cpu, FileText, Settings, ChevronLeft, ChevronRight, History, Bot } from "lucide-react";
+import { Home, LayoutDashboard, Clock, Cpu, FileText, Settings, ChevronLeft, ChevronRight, History } from "lucide-react";
 import { ClientSwitcher } from "./client-switcher";
 
 const mainNavItems = [
   { label: "Overview", icon: Home, href: "/" },
   { label: "Board", icon: LayoutDashboard, href: "/board" },
-  { label: "Autonomous", icon: Bot, href: "/autonomous" },
   { label: "Scheduled Tasks", icon: Clock, href: "/cron" },
   { label: "History", icon: History, href: "/history" },
   { label: "Skills", icon: Cpu, href: "/skills" },

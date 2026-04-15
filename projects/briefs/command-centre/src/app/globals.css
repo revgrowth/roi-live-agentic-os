@@ -51,6 +51,15 @@ body {
   animation: running-glow 2.5s ease-in-out infinite;
 }
 
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pulse-text {
+  animation: pulse-opacity 2s ease-in-out infinite;
+}
+
 .custom-shadow {
   box-shadow: 0px 12px 32px rgba(147, 69, 42, 0.06);
 }

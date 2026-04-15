@@ -1,9 +1,12 @@
 import type { ChildProcess } from "child_process";
 import { createInterface } from "readline";
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
 import { getDb } from "./db";
 import { getConfig, getClientAgenticOsDir } from "./config";
 import { completeCronRunForTask } from "./cron-service";
-import { emitTaskEvent } from "./event-bus";
+import { emitTaskEvent, emitChatEvent } from "./event-bus";
 import { ClaudeOutputParser } from "./claude-parser";
 import { fileWatcher } from "./file-watcher";
 import { buildSiblingContextBlock } from "./gather-context";
@@ -159,6 +162,7 @@ class ProcessManager {
         type: "user_reply",
         timestamp: now,
         content: userGoalText,
+        permissionMode: task.permissionMode || undefined,
       });
 
       const updatedTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
@@ -249,30 +253,6 @@ class ProcessManager {
       const gsdPhaseNumber = taskRow?.phaseNumber;
       const isTopLevelParent = !task.parentId;
 
-      // Single-session-per-project: if this task's parent already owns a live
-      // Claude session, we resume INTO that session instead of spawning fresh.
-      // All project/GSD subtasks share one conversation memory so the integrator
-      // step at the end of the project can compose everything without any
-      // cross-process context plumbing.
-      let resumeParentSession = false;
-      let parentSessionId: string | null = null;
-      if (task.parentId) {
-        const parentRow = db
-          .prepare(
-            "SELECT id, level, claudeSessionId FROM tasks WHERE id = ?"
-          )
-          .get(task.parentId) as
-          | { id: string; level: string; claudeSessionId: string | null }
-          | undefined;
-        if (
-          parentRow &&
-          (parentRow.level === "project" || parentRow.level === "gsd") &&
-          parentRow.claudeSessionId
-        ) {
-          resumeParentSession = true;
-          parentSessionId = parentRow.claudeSessionId;
-        }
-      }
 
       if (isSlashCommand) {
         // Slash command task — pass the description as-is (e.g. "Run /start-here", "Run /gsd:plan-phase 6")
@@ -295,24 +275,6 @@ class ProcessManager {
       } else if (task.level === "gsd" && isTopLevelParent) {
         // GSD project — run /gsd:new-project which handles interviews, research, and roadmap creation
         prompt = `Run /gsd:new-project "${task.title}"${task.description ? `\n\nContext from user: ${task.description}` : ""}`;
-      } else if (resumeParentSession && parentSessionId) {
-        // Resume path: parent already has a live session holding the brief,
-        // brand context, and every previous subtask's full transcript in
-        // Claude's own memory. Skip the brief/sibling prepends entirely — we
-        // just queue the next turn as "do this subtask."
-        prompt = task.description
-          ? `Next subtask: ${task.title}\n\n${task.description}`
-          : `Next subtask: ${task.title}`;
-        contextSources.push({
-          type: "system",
-          label: "Resumed from project session",
-        });
-        // Mirror the parent's session ID onto this child row so the existing
-        // spawnClaudeTurn --resume lookup (which reads from the task row) finds
-        // it. Any later user reply to this subtask will also resolve to the
-        // same session via the standard reply path.
-        db.prepare("UPDATE tasks SET claudeSessionId = ? WHERE id = ?")
-          .run(parentSessionId, taskId);
       } else {
         if (task.projectSlug) {
           const briefPath = pathMod.join(cwd, "projects", "briefs", task.projectSlug, "brief.md");
@@ -324,26 +286,32 @@ class ProcessManager {
             }
           } catch { /* proceed without context */ }
         }
-        // Sibling context — only relevant when we're NOT resuming a shared
-        // parent session. If the parent owns a session, Claude's own memory
-        // already contains everything the sibling manifest would describe.
-        try {
-          const siblingBlock = buildSiblingContextBlock(task);
-          if (siblingBlock) {
-            prompt += `${siblingBlock}\n\n---\n\n`;
-            contextSources.push({ type: "system", label: "Sibling task context" });
+        // Sibling context — only for GSD/phase subtasks so they know what
+        // siblings have done. Ad-hoc pane chats (no gsdStep, no phaseNumber)
+        // are independent conversations and should not see sibling context.
+        if (gsdStep || gsdPhaseNumber != null) {
+          try {
+            const siblingBlock = buildSiblingContextBlock(task);
+            if (siblingBlock) {
+              prompt += `${siblingBlock}\n\n---\n\n`;
+              contextSources.push({ type: "system", label: "Sibling task context" });
+            }
+          } catch (err) {
+            console.error("[process-manager] buildSiblingContextBlock failed:", err);
           }
-        } catch (err) {
-          console.error("[process-manager] buildSiblingContextBlock failed:", err);
         }
         prompt += task.description ? `Task: ${task.title}\n\n${task.description}` : task.title;
+
+        // Plan mode instruction — tell Claude to write the plan into brief.md
+        if (task.permissionMode === "plan" && task.projectSlug) {
+          prompt += `\n\n---\n\n[Plan Mode] You are running in plan mode. After researching and planning:\n1. Update the brief at projects/briefs/${task.projectSlug}/brief.md with the full plan — fill in the Deliverables and Acceptance Criteria sections with concrete items (use checkbox format: - [ ] Item)\n2. Show what you researched, what tools/skills you used, and what context you loaded\n3. Present the plan clearly in the conversation with your reasoning\n4. Wait for the user to approve before executing`;
+        }
       }
 
       // Inject session activity summary for wrap-up and session-aware tasks.
       // Skip when resuming a parent session — that session already has today's
       // context in its own memory and doesn't need a cross-task summary.
-      const needsSessionContext =
-        !resumeParentSession && this.isSessionContextTask(task);
+      const needsSessionContext = this.isSessionContextTask(task);
       console.log(`[process-manager] Session context check for "${task.title}" (desc: "${task.description?.slice(0, 50)}"): ${needsSessionContext}`);
       if (needsSessionContext) {
         const sessionSummary = this.buildSessionSummary(cwd, taskId);
@@ -352,10 +320,19 @@ class ProcessManager {
         contextSources.push({ type: "system", label: "Session Activity Summary" });
       }
 
-      // Persist context sources to DB
+      // Persist context sources to DB and log what was loaded
       if (contextSources.length > 0) {
         db.prepare("UPDATE tasks SET contextSources = ? WHERE id = ?")
           .run(JSON.stringify(contextSources), taskId);
+
+        // Add a visible log entry showing what context was injected
+        const contextLabels = contextSources.map((s) => s.label).join(", ");
+        this.addLogEntry(taskId, {
+          id: crypto.randomUUID(),
+          type: "system",
+          timestamp: new Date().toISOString(),
+          content: `Context loaded: ${contextLabels}`,
+        });
       }
 
       // Expand @tag references in the prompt against context/prompt-tags.md
@@ -371,10 +348,8 @@ class ProcessManager {
       prompt = prompt + STRUCTURED_QUESTION_ADDENDUM;
 
       // Spawn the turn. When resuming a parent-owned session, flag
-      // isContinuation=true so spawnClaudeTurn routes through the --resume
-      // branch and picks up the parent's session ID (mirrored onto this row
-      // above).
-      this.spawnClaudeTurn(taskId, prompt, cwd, resumeParentSession);
+      // Every task starts fresh — no parent session continuation.
+      this.spawnClaudeTurn(taskId, prompt, cwd, false);
     } finally {
       this.startingTasks.delete(taskId);
     }
@@ -1030,6 +1005,8 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
         permissionMode: "default",
         lastReplyAt: null,
         goalGroup: null,
+        tag: null,
+        pinnedAt: null,
       };
 
       db.prepare(
@@ -1072,12 +1049,13 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
   getLogEntries(taskId: string): LogEntry[] {
     const db = getDb();
     const rows = db.prepare(
-      "SELECT id, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers FROM task_logs WHERE taskId = ? ORDER BY rowid ASC"
+      "SELECT id, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers, permissionMode FROM task_logs WHERE taskId = ? ORDER BY rowid ASC"
     ).all(taskId) as Array<{
       id: string; type: string; timestamp: string; content: string;
       toolName: string | null; toolArgs: string | null; toolResult: string | null;
       isCollapsed: number;
       questionSpec: string | null; questionAnswers: string | null;
+      permissionMode: string | null;
     }>;
 
     return rows.map((row) => ({
@@ -1091,6 +1069,7 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
       ...(row.isCollapsed ? { isCollapsed: true } : {}),
       ...(row.questionSpec ? { questionSpec: row.questionSpec } : {}),
       ...(row.questionAnswers ? { questionAnswers: row.questionAnswers } : {}),
+      ...(row.permissionMode ? { permissionMode: row.permissionMode } : {}),
     }));
   }
 
@@ -1124,8 +1103,16 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
 
     // Read the task's permission mode + model from the DB
     const db = getDb();
-    const taskRow = db.prepare("SELECT permissionMode, model FROM tasks WHERE id = ?").get(taskId) as { permissionMode: string | null; model: string | null } | undefined;
-    const permissionMode = taskRow?.permissionMode || "bypassPermissions";
+    const taskRow = db.prepare("SELECT permissionMode, model, cronJobSlug, projectSlug FROM tasks WHERE id = ?").get(taskId) as { permissionMode: string | null; model: string | null; cronJobSlug: string | null; projectSlug: string | null } | undefined;
+
+    // Tell GSD which project this task belongs to (priority 2 in resolvePlanningDir)
+    if (taskRow?.projectSlug) {
+      cleanEnv.AGENTIC_OS_ACTIVE_PROJECT = taskRow.projectSlug;
+    }
+    // Cron tasks always run with bypassPermissions — they execute unattended
+    const permissionMode = taskRow?.cronJobSlug
+      ? "bypassPermissions"
+      : (taskRow?.permissionMode || "bypassPermissions");
     const model = taskRow?.model || null;
 
     // Build args
@@ -1428,11 +1415,11 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
 
       if (isCronTask) {
         db.prepare(
-          "UPDATE tasks SET status = 'review', completedAt = NULL, updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, needsInput = 1 WHERE id = ?"
+          "UPDATE tasks SET status = 'review', completedAt = NULL, updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, needsInput = 1, activityLabel = NULL WHERE id = ?"
         ).run(now, totalCost, totalTokens, totalDuration, taskId);
       } else {
         db.prepare(
-          "UPDATE tasks SET updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, needsInput = 1 WHERE id = ?"
+          "UPDATE tasks SET updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, needsInput = 1, activityLabel = NULL WHERE id = ?"
         ).run(now, totalCost, totalTokens, totalDuration, taskId);
       }
 
@@ -1545,6 +1532,10 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
       content: specs.map((s, i) => `${i + 1}. ${s.prompt}`).join("\n"),
       questionSpec: JSON.stringify(specs),
     });
+
+    // Bubble into the chat conversation if this task is part of one
+    const summaryText = specs.map((s, i) => `${i + 1}. ${s.prompt}`).join("\n");
+    this.bubbleQuestionToChat(db, taskId, summaryText, now, specs);
   }
 
   handleQuestion(taskId: string, questionText: string): void {
@@ -1560,6 +1551,62 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
 
     const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
     emitTaskEvent({ type: "task:question", task: this.normalizeTask(updated), timestamp: now, questionText });
+
+    // Bubble into the chat conversation if this task is part of one
+    this.bubbleQuestionToChat(db, taskId, questionText, now);
+  }
+
+  /**
+   * Insert a sub_agent message into the chat conversation so the question
+   * appears in the autonomous chat view as a bubbled question card.
+   */
+  private bubbleQuestionToChat(
+    db: ReturnType<typeof getDb>,
+    taskId: string,
+    questionText: string,
+    timestamp: string,
+    questionSpecs?: QuestionSpec[],
+  ): void {
+    const task = db.prepare("SELECT conversationId, title FROM tasks WHERE id = ?").get(taskId) as
+      { conversationId: string | null; title: string } | undefined;
+    if (!task?.conversationId) return;
+
+    const msgId = crypto.randomUUID();
+    const metadata: Record<string, unknown> = {
+      questionTaskId: taskId,
+      questionText,
+    };
+    if (questionSpecs && questionSpecs.length > 0) {
+      metadata.questionSpecs = questionSpecs;
+    }
+
+    db.prepare(
+      `INSERT INTO messages (id, conversationId, taskId, role, content, metadata, parentMessageId, createdAt)
+       VALUES (?, ?, ?, 'sub_agent', ?, ?, NULL, ?)`
+    ).run(
+      msgId,
+      task.conversationId,
+      taskId,
+      questionText,
+      JSON.stringify(metadata),
+      timestamp,
+    );
+
+    emitChatEvent({
+      type: "chat:message",
+      conversationId: task.conversationId,
+      message: {
+        id: msgId,
+        conversationId: task.conversationId,
+        taskId,
+        role: "sub_agent",
+        content: questionText,
+        metadata: metadata as import("@/types/chat").MessageMetadata,
+        parentMessageId: null,
+        createdAt: timestamp,
+      },
+      timestamp,
+    });
   }
 
   handleTaskError(taskId: string, errorMessage: string): void {
@@ -1611,13 +1658,23 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
   addLogEntry(taskId: string, entry: LogEntry): void {
     const db = getDb();
     db.prepare(
-      "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers, permissionMode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     ).run(
       entry.id, taskId, entry.type, entry.timestamp, entry.content,
       entry.toolName ?? null, entry.toolArgs ?? null, entry.toolResult ?? null,
       entry.isCollapsed ? 1 : 0,
       entry.questionSpec ?? null, entry.questionAnswers ?? null,
+      entry.permissionMode ?? null,
     );
+
+    // When Claude writes or edits a file, register it as a task output immediately.
+    // This supplements the file-watcher (which may miss files due to timing or scope).
+    if (entry.type === "tool_use" && entry.toolArgs) {
+      const toolName = (entry.toolName || "").toLowerCase();
+      if (toolName === "write" || toolName === "edit" || toolName === "multiedit") {
+        this.registerFileOutput(taskId, entry.toolArgs);
+      }
+    }
 
     const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task | undefined;
     if (task) {
@@ -1627,6 +1684,63 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
         timestamp: entry.timestamp,
         logEntry: entry,
       });
+    }
+  }
+
+  /**
+   * Extract a file path from a Write/Edit tool_use and insert into task_outputs.
+   * Skips source code extensions and deduplicates against existing records.
+   */
+  private registerFileOutput(taskId: string, toolArgs: string): void {
+    try {
+      const args = JSON.parse(toolArgs);
+      const filePath: string | undefined = args.file_path ?? args.path;
+      if (!filePath || typeof filePath !== "string") return;
+
+      const fileName = path.basename(filePath);
+      const extension = path.extname(filePath).replace(".", "").toLowerCase();
+
+      // Skip source code and config files
+      const skipExtensions = new Set([
+        "ts", "tsx", "js", "jsx", "css", "scss", "less",
+        "py", "rb", "go", "rs", "java", "c", "cpp", "h",
+        "sh", "bash", "zsh", "sql",
+        "lock", "map", "tsbuildinfo", "env", "gitignore", "eslintrc", "prettierrc",
+      ]);
+      if (!extension || skipExtensions.has(extension)) return;
+
+      const db = getDb();
+
+      // Deduplicate: skip if already tracked for this task
+      const existing = db.prepare(
+        "SELECT id FROM task_outputs WHERE taskId = ? AND filePath = ? LIMIT 1"
+      ).get(taskId, filePath) as { id: string } | undefined;
+      if (existing) return;
+
+      // Get file size if the file exists on disk
+      let sizeBytes: number | null = null;
+      try {
+        sizeBytes = fs.statSync(filePath).size;
+      } catch {
+        // File may not exist yet (Edit on a new path, or write hasn't flushed)
+      }
+
+      const config = getConfig();
+      const relativePath = path.relative(config.agenticOsDir, filePath);
+      const id = crypto.randomUUID();
+      const now = new Date().toISOString();
+
+      db.prepare(
+        "INSERT INTO task_outputs (id, taskId, fileName, filePath, relativePath, extension, sizeBytes, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+      ).run(id, taskId, fileName, filePath, relativePath, extension, sizeBytes, now);
+
+      // Emit event so the UI updates the FILES tab in real time
+      const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task | undefined;
+      if (task) {
+        emitTaskEvent({ type: "task:output", task: this.normalizeTask(task), timestamp: now });
+      }
+    } catch {
+      // Non-critical — don't break log entry processing
     }
   }
 

@@ -64,11 +64,15 @@ function autoQueueUnblockedSiblings(db: Database.Database, completedChild: Task,
       // All done — check if this is a GSD verify completion that should trigger next phase
       autoQueueNextPhase(db, completedChild, now);
 
-      db.prepare(
-        "UPDATE tasks SET status = 'review', updatedAt = ?, activityLabel = NULL, needsInput = 0 WHERE id = ?"
-      ).run(now, completedChild.parentId);
-      const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(completedChild.parentId) as Task;
-      emitTaskEvent({ type: "task:status", task: { ...updatedParent, needsInput: Boolean(updatedParent.needsInput) }, timestamp: now });
+      // Don't override a user-initiated "done" state — only move to review if not already done
+      const parent = db.prepare("SELECT status FROM tasks WHERE id = ?").get(completedChild.parentId) as { status: string } | undefined;
+      if (parent && parent.status !== "done") {
+        db.prepare(
+          "UPDATE tasks SET status = 'review', updatedAt = ?, activityLabel = NULL, needsInput = 0 WHERE id = ?"
+        ).run(now, completedChild.parentId);
+        const updatedParent = db.prepare("SELECT * FROM tasks WHERE id = ?").get(completedChild.parentId) as Task;
+        emitTaskEvent({ type: "task:status", task: { ...updatedParent, needsInput: Boolean(updatedParent.needsInput) }, timestamp: now });
+      }
     }
     return;
   }
@@ -275,6 +279,8 @@ export async function PATCH(
       "phaseNumber",
       "gsdStep",
       "permissionMode",
+      "tag",
+      "pinnedAt",
     ];
 
     for (const field of allowedFields) {
@@ -331,6 +337,30 @@ export async function PATCH(
     // Auto-queue unblocked siblings when a child task is marked done
     if (body.status === "done" && updated.parentId) {
       autoQueueUnblockedSiblings(db, updated, now);
+
+      // Auto-check the matching deliverable in brief.md
+      if (updated.projectSlug) {
+        try {
+          const fs = require("fs") as typeof import("fs");
+          const path = require("path") as typeof import("path");
+          const { getClientAgenticOsDir } = require("@/lib/config") as typeof import("@/lib/config");
+          const { toggleDeliverableCheckbox } = require("@/lib/brief-sync") as typeof import("@/lib/brief-sync");
+
+          const baseDir = getClientAgenticOsDir(updated.clientId ?? null);
+          const briefRelPath = `projects/briefs/${updated.projectSlug}/brief.md`;
+          const briefFullPath = path.join(baseDir, briefRelPath);
+
+          if (fs.existsSync(briefFullPath)) {
+            const content = fs.readFileSync(briefFullPath, "utf-8");
+            const updatedContent = toggleDeliverableCheckbox(content, updated.title, true);
+            if (updatedContent !== content) {
+              fs.writeFileSync(briefFullPath, updatedContent, "utf-8");
+            }
+          }
+        } catch {
+          // Non-critical — skip silently on failure
+        }
+      }
     }
 
     // When a parent task is moved to "queued", auto-queue independent children in parallel
@@ -388,6 +418,14 @@ export async function DELETE(
       .get(id) as Task | undefined;
     if (!existing) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+
+    // Kill any running session first
+    await processManager.killSession(id).catch(() => {});
+    // Also kill child task sessions
+    const children = db.prepare("SELECT id FROM tasks WHERE parentId = ?").all(id) as { id: string }[];
+    for (const child of children) {
+      await processManager.killSession(child.id).catch(() => {});
     }
 
     // Delete child tasks first

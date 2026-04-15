@@ -7,17 +7,18 @@ import type { Task } from "@/types/task";
 const MONO = "'DM Mono', 'JetBrains Mono', 'SF Mono', ui-monospace, monospace";
 const PAGE_SIZE = 5;
 
-type ColKey = "inProgress" | "inReview" | "done";
+type ColKey = "goals" | "done";
 
 export interface SwimLane {
   /** null = root / general */
   clientSlug: string | null;
   clientName: string;
   clientColor: string;
-  inProgress: Task[];
-  inReview: Task[];
+  goals: Task[];
   done: Task[];
 }
+
+export type DoneFilter = "1d" | "7d" | "30d" | "90d";
 
 export interface KanbanBoardProps {
   lanes: SwimLane[];
@@ -31,11 +32,17 @@ export interface KanbanBoardProps {
   isEmpty: boolean;
   /** When true, hide the Done column entirely (e.g. when drawer is wide) */
   hideDone?: boolean;
+  /** Active time filter for the Done column */
+  doneFilter?: DoneFilter;
+  /** Callback when user changes the done filter */
+  onDoneFilterChange?: (filter: DoneFilter) => void;
+  /** Group cards by tag in all columns */
+  groupByTag?: boolean;
+  onToggleGroupByTag?: () => void;
 }
 
 const COL_META: { key: ColKey; label: string; emptyText: string }[] = [
-  { key: "inProgress", label: "Claude's Turn", emptyText: "No active tasks" },
-  { key: "inReview", label: "Your Turn", emptyText: "Nothing to review" },
+  { key: "goals", label: "Goals", emptyText: "No active tasks" },
   { key: "done", label: "Done", emptyText: "No completed tasks" },
 ];
 
@@ -54,6 +61,13 @@ function useIsNarrow() {
   return narrow;
 }
 
+const DONE_FILTER_OPTIONS: { key: DoneFilter; label: string }[] = [
+  { key: "1d", label: "24h" },
+  { key: "7d", label: "7d" },
+  { key: "30d", label: "30d" },
+  { key: "90d", label: "90d" },
+];
+
 export function KanbanBoard({
   lanes,
   singleLane,
@@ -65,6 +79,10 @@ export function KanbanBoard({
   dropOverColumn,
   isEmpty,
   hideDone,
+  doneFilter,
+  onDoneFilterChange,
+  groupByTag,
+  onToggleGroupByTag,
 }: KanbanBoardProps) {
   const isDragging = !!draggingId;
   const isNarrow = useIsNarrow();
@@ -123,6 +141,56 @@ export function KanbanBoard({
                       {count}
                     </span>
                   )}
+                  <div style={{ display: "flex", gap: 2, marginLeft: "auto" }}>
+                    {col.key === "done" && doneFilter && onDoneFilterChange && (
+                      <>
+                        {DONE_FILTER_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.key}
+                            onClick={() => onDoneFilterChange(opt.key)}
+                            style={{
+                              fontSize: 9,
+                              fontFamily: MONO,
+                              fontWeight: doneFilter === opt.key ? 600 : 400,
+                              color: doneFilter === opt.key ? "#93452A" : "#bbb",
+                              backgroundColor: doneFilter === opt.key ? "rgba(147, 69, 42, 0.08)" : "transparent",
+                              border: "none",
+                              borderRadius: 4,
+                              padding: "2px 6px",
+                              cursor: "pointer",
+                              transition: "all 120ms ease",
+                              textTransform: "none",
+                              letterSpacing: 0,
+                            }}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                        <div style={{ width: 1, background: "rgba(218, 193, 185, 0.4)", margin: "0 2px" }} />
+                      </>
+                    )}
+                    {onToggleGroupByTag && (
+                      <button
+                        onClick={onToggleGroupByTag}
+                        style={{
+                          fontSize: 9,
+                          fontFamily: MONO,
+                          fontWeight: groupByTag ? 600 : 400,
+                          color: groupByTag ? "#93452A" : "#bbb",
+                          backgroundColor: groupByTag ? "rgba(147, 69, 42, 0.08)" : "transparent",
+                          border: "none",
+                          borderRadius: 4,
+                          padding: "2px 6px",
+                          cursor: "pointer",
+                          transition: "all 120ms ease",
+                          textTransform: "none",
+                          letterSpacing: 0,
+                        }}
+                      >
+                        By tag
+                      </button>
+                    )}
+                  </div>
                 </div>
               </Fragment>
             );
@@ -163,6 +231,7 @@ export function KanbanBoard({
           isNarrow={isNarrow}
           visibleCols={visibleCols}
           gridTemplate={gridTemplate}
+          groupByTag={groupByTag}
         />
       ))}
     </div>
@@ -173,6 +242,7 @@ function LaneRow({
   lane,
   singleLane,
   renderCard,
+  groupByTag,
   isDragging,
   dropOverColumn,
   onDropColumn,
@@ -193,9 +263,10 @@ function LaneRow({
   isNarrow: boolean;
   visibleCols: typeof COL_META;
   gridTemplate: string | undefined;
+  groupByTag?: boolean;
 }) {
   const [laneCollapsed, setLaneCollapsed] = useState(false);
-  const totalTasks = lane.inProgress.length + lane.inReview.length + lane.done.length;
+  const totalTasks = lane.goals.length + lane.done.length;
 
   return (
     <div style={{ marginBottom: singleLane ? 0 : 4 }}>
@@ -272,6 +343,7 @@ function LaneRow({
                 isDragging={isDragging}
                 dropOverColumn={dropOverColumn}
                 onDropColumn={onDropColumn}
+                groupByTag={!!groupByTag}
                 onDragOverColumn={onDragOverColumn}
                 onDragLeaveColumn={onDragLeaveColumn}
                 renderCard={renderCard}
@@ -295,6 +367,7 @@ function ColumnCell({
   onDragOverColumn,
   onDragLeaveColumn,
   renderCard,
+  groupByTag,
 }: {
   col: { key: ColKey; label: string; emptyText: string };
   tasks: Task[];
@@ -305,12 +378,14 @@ function ColumnCell({
   onDragOverColumn: (column: ColKey, e: React.DragEvent) => void;
   onDragLeaveColumn: (column: ColKey) => void;
   renderCard: (task: Task, column: ColKey) => ReactNode;
+  groupByTag?: boolean;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const hasOverflow = allTasks.length > PAGE_SIZE;
-  const visibleTasks = expanded ? allTasks : allTasks.slice(0, PAGE_SIZE);
-  const hiddenCount = allTasks.length - PAGE_SIZE;
+  const hasOverflow = allTasks.length > visibleCount;
+  const canCollapse = visibleCount > PAGE_SIZE;
+  const visibleTasks = allTasks.slice(0, visibleCount);
+  const hiddenCount = allTasks.length - visibleCount;
 
   const isDoneCol = col.key === "done";
   const isOver = dropOverColumn === col.key;
@@ -386,61 +461,151 @@ function ColumnCell({
           <EmptyColumn text={col.emptyText} compact={isNarrow} />
         ) : (
           <>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 0,
-                borderRadius: 10,
-                overflow: "hidden",
-                borderBottom: "1px solid rgba(218, 193, 185, 0.35)",
-              }}
-            >
-              {visibleTasks.map((task) => renderCard(task, col.key))}
-            </div>
+            {(() => {
+              if (groupByTag) {
+                // Group tasks by tag
+                const tagGroups = new Map<string, Task[]>();
+                for (const t of visibleTasks) {
+                  const key = t.tag || "_none";
+                  if (!tagGroups.has(key)) tagGroups.set(key, []);
+                  tagGroups.get(key)!.push(t);
+                }
+                // Sort: named tags alphabetically, "No tag" last
+                const sorted = [...tagGroups.entries()].sort((a, b) => {
+                  if (a[0] === "_none") return 1;
+                  if (b[0] === "_none") return -1;
+                  return a[0].localeCompare(b[0]);
+                });
+                return (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {sorted.map(([tag, tasks]) => (
+                      <div key={tag}>
+                        <div style={{
+                          fontSize: 9, fontFamily: MONO, fontWeight: 600, color: "#bbb",
+                          textTransform: "uppercase", letterSpacing: "0.06em",
+                          padding: "4px 6px 2px", display: "flex", alignItems: "center", gap: 6,
+                        }}>
+                          {tag === "_none" ? "No tag" : tag}
+                          <span style={{ fontSize: 9, color: "#ccc", fontWeight: 400 }}>{tasks.length}</span>
+                        </div>
+                        <div style={{
+                          display: "flex", flexDirection: "column", gap: 0,
+                          borderRadius: 10, overflow: "hidden",
+                          borderBottom: "1px solid rgba(218, 193, 185, 0.35)",
+                        }}>
+                          {tasks.map((task) => renderCard(task, col.key))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+              // Default: split pinned from unpinned for visual grouping
+              const pinnedTasks = visibleTasks.filter((t) => !!t.pinnedAt);
+              const unpinnedTasks = visibleTasks.filter((t) => !t.pinnedAt);
+              const hasBothGroups = pinnedTasks.length > 0 && unpinnedTasks.length > 0;
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: hasBothGroups ? 8 : 0 }}>
+                  {pinnedTasks.length > 0 && (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0,
+                        borderRadius: 10,
+                        overflow: "hidden",
+                        borderBottom: "1px solid rgba(218, 193, 185, 0.35)",
+                      }}
+                    >
+                      {pinnedTasks.map((task) => renderCard(task, col.key))}
+                    </div>
+                  )}
+                  {unpinnedTasks.length > 0 && (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0,
+                        borderRadius: 10,
+                        overflow: "hidden",
+                        borderBottom: "1px solid rgba(218, 193, 185, 0.35)",
+                      }}
+                    >
+                      {unpinnedTasks.map((task) => renderCard(task, col.key))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
-            {/* Expand / Collapse toggle */}
-            {hasOverflow && (
-              <button
-                onClick={() => setExpanded((v) => !v)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 4,
-                  padding: "6px 12px",
-                  marginTop: 6,
-                  borderRadius: 6,
-                  border: "1px dashed rgba(218, 193, 185, 0.35)",
-                  background: "transparent",
-                  cursor: "pointer",
-                  fontSize: 11,
-                  fontFamily: MONO,
-                  color: "#999",
-                  transition: "all 120ms ease",
-                  width: "100%",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(218, 193, 185, 0.08)";
-                  e.currentTarget.style.color = "#666";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                  e.currentTarget.style.color = "#999";
-                }}
-              >
-                {expanded ? (
-                  <>
+            {/* Expand / Collapse toggles */}
+            {(hasOverflow || canCollapse) && (
+              <div style={{ display: "flex", gap: 4, marginTop: 6 }}>
+                {hasOverflow && (
+                  <button
+                    onClick={() => setVisibleCount((v) => Math.min(v + PAGE_SIZE, allTasks.length))}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 4,
+                      padding: "6px 12px",
+                      borderRadius: 6,
+                      border: "1px dashed rgba(218, 193, 185, 0.35)",
+                      background: "transparent",
+                      cursor: "pointer",
+                      fontSize: 11,
+                      fontFamily: MONO,
+                      color: "#999",
+                      transition: "all 120ms ease",
+                      flex: 1,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "rgba(218, 193, 185, 0.08)";
+                      e.currentTarget.style.color = "#666";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "#999";
+                    }}
+                  >
+                    <ChevronDown size={11} />
+                    +{Math.min(hiddenCount, PAGE_SIZE)} more
+                  </button>
+                )}
+                {canCollapse && (
+                  <button
+                    onClick={() => setVisibleCount(PAGE_SIZE)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 4,
+                      padding: "6px 12px",
+                      borderRadius: 6,
+                      border: "1px dashed rgba(218, 193, 185, 0.35)",
+                      background: "transparent",
+                      cursor: "pointer",
+                      fontSize: 11,
+                      fontFamily: MONO,
+                      color: "#999",
+                      transition: "all 120ms ease",
+                      flexShrink: 0,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "rgba(218, 193, 185, 0.08)";
+                      e.currentTarget.style.color = "#666";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "#999";
+                    }}
+                  >
                     <ChevronDown size={11} style={{ transform: "rotate(180deg)" }} />
                     Show less
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown size={11} />
-                    +{hiddenCount} more
-                  </>
+                  </button>
                 )}
-              </button>
+              </div>
             )}
           </>
         )}

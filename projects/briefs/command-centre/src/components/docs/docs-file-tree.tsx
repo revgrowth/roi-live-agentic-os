@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { FileText, Folder, FolderOpen } from "lucide-react";
+import { FileText, Folder, FolderOpen, Users } from "lucide-react";
 import type { FileNode } from "@/types/file";
+import type { Client } from "@/types/client";
 import { useClientId, appendClientId } from "@/hooks/use-client-id";
 import { getFileIcon, getFileIconColor } from "@/lib/file-icons";
 
@@ -65,6 +66,10 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set());
   const [childrenMap, setChildrenMap] = useState<Record<string, FileNode[]>>({});
   const [loading, setLoading] = useState(true);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
+  const [clientsExpanded, setClientsExpanded] = useState(true);
+  const [clientChildren, setClientChildren] = useState<Record<string, FileNode[]>>({});
 
   // Drag state for file-to-folder moves
   const [dragOverDir, setDragOverDir] = useState<string | null>(null);
@@ -152,6 +157,22 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
 
       setSections(loadedSections);
       setExpandedSections(defaultExpanded);
+
+      // Fetch clients for the clients section (only when viewing root workspace)
+      if (!clientId) {
+        try {
+          const clientsRes = await fetch("/api/clients");
+          if (clientsRes.ok) {
+            const data = await clientsRes.json();
+            if (mounted && data.clients?.length > 0) {
+              setClients(data.clients);
+            }
+          }
+        } catch { /* ignore */ }
+      } else {
+        setClients([]);
+      }
+
       setLoading(false);
     }
 
@@ -240,6 +261,46 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
     },
     [childrenMap, clientId]
   );
+
+  // ── Client section helpers ──
+
+  const toggleClient = useCallback((slug: string) => {
+    setExpandedClients((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) {
+        next.delete(slug);
+      } else {
+        next.add(slug);
+        if (!clientChildren[slug]) {
+          const dirs = ["brand_context", "context", "projects", "cron/jobs"];
+          Promise.all(
+            dirs.map((d) =>
+              fetch(`/api/files?dir=${encodeURIComponent(`clients/${slug}/${d}`)}`)
+                .then((r) => (r.ok ? r.json() : []))
+                .catch(() => [])
+            )
+          ).then((results) => {
+            const nodes: FileNode[] = [];
+            dirs.forEach((dir, i) => {
+              const children = results[i] as FileNode[];
+              if (children.length > 0) {
+                nodes.push({
+                  name: dir,
+                  path: `clients/${slug}/${dir}`,
+                  type: "directory",
+                  children,
+                  lastModified: new Date().toISOString(),
+                  size: 0,
+                });
+              }
+            });
+            setClientChildren((prev) => ({ ...prev, [slug]: nodes }));
+          });
+        }
+      }
+      return next;
+    });
+  }, [clientChildren]);
 
   // ── File-to-folder drag handlers ──
 
@@ -653,6 +714,134 @@ export function DocsFileTree({ onSelectFile, selectedPath }: DocsFileTreeProps) 
           )}
         </div>
       ))}
+
+      {/* Clients Section */}
+      {clients.length > 0 && (
+        <div style={{ marginTop: 8 }}>
+          <button
+            onClick={() => setClientsExpanded((v) => !v)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              width: "100%",
+              padding: "8px 12px",
+              border: "none",
+              background: "transparent",
+              color: "#1B1C1B",
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              fontSize: 13,
+              cursor: "pointer",
+              borderRadius: "0.25rem",
+              textAlign: "left",
+              transition: "background 150ms ease",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "#F6F3F1"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+          >
+            <Users size={16} style={{ color: "#93452A", flexShrink: 0 }} />
+            <span style={{ fontWeight: 500 }}>clients</span>
+            <span
+              style={{
+                marginLeft: "auto",
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                fontSize: 10,
+                color: "#9C9CA0",
+              }}
+            >
+              {clients.length}
+            </span>
+          </button>
+          {clientsExpanded && (
+            <div>
+              {clients.map((client) => {
+                const isExpanded = expandedClients.has(client.slug);
+                const children = clientChildren[client.slug] || [];
+                return (
+                  <div key={client.slug}>
+                    <button
+                      onClick={() => toggleClient(client.slug)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        width: "100%",
+                        padding: "8px 12px",
+                        paddingLeft: 28,
+                        border: "none",
+                        background: "transparent",
+                        color: "#1B1C1B",
+                        fontFamily: "var(--font-inter), Inter, sans-serif",
+                        fontSize: 13,
+                        cursor: "pointer",
+                        borderRadius: "0.25rem",
+                        textAlign: "left",
+                        transition: "background 150ms ease",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "#F6F3F1"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                    >
+                      {isExpanded ? (
+                        <FolderOpen size={16} style={{ color: "#93452A", flexShrink: 0 }} />
+                      ) : (
+                        <Folder size={16} style={{ color: "#5E5E65", flexShrink: 0 }} />
+                      )}
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+                        {client.name}
+                      </span>
+                    </button>
+                    {isExpanded && children.map((dirNode) => (
+                      <div key={dirNode.path}>
+                        <button
+                          onClick={() => toggleDir(dirNode.path)}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            width: "100%",
+                            padding: "8px 12px",
+                            paddingLeft: 44,
+                            border: "none",
+                            background: "transparent",
+                            color: "#1B1C1B",
+                            fontFamily: "var(--font-inter), Inter, sans-serif",
+                            fontSize: 13,
+                            cursor: "pointer",
+                            borderRadius: "0.25rem",
+                            textAlign: "left",
+                            transition: "background 150ms ease",
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = "#F6F3F1"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                        >
+                          {expandedDirs.has(dirNode.path) ? (
+                            <FolderOpen size={16} style={{ color: "#93452A", flexShrink: 0 }} />
+                          ) : (
+                            <Folder size={16} style={{ color: "#5E5E65", flexShrink: 0 }} />
+                          )}
+                          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+                            {dirNode.name}
+                          </span>
+                          <span style={{
+                            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                            fontSize: 10,
+                            color: "#9C9CA0",
+                          }}>
+                            {(dirNode.children || []).length}
+                          </span>
+                        </button>
+                        {expandedDirs.has(dirNode.path) && (dirNode.children || []).map((child) =>
+                          renderNode(child, 3)
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

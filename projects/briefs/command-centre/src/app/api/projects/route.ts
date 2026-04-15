@@ -87,6 +87,7 @@ export async function POST(request: NextRequest) {
       level?: number;
       goal?: string;
       clientId?: string;
+      deliverables?: Array<{ title: string; description?: string; acceptanceCriteria?: string[] }>;
     };
 
     if (!body.slug || !body.name) {
@@ -127,6 +128,29 @@ export async function POST(request: NextRequest) {
 
     const today = new Date().toISOString().split("T")[0];
     const level = body.level || 2;
+
+    // Build deliverables section from provided data or use placeholder
+    let deliverablesSection: string;
+    let acceptanceSection: string;
+    if (body.deliverables && body.deliverables.length > 0) {
+      deliverablesSection = body.deliverables
+        .map((d) => {
+          let item = `- **${d.title}**`;
+          if (d.description) item += `\n  ${d.description}`;
+          return item;
+        })
+        .join("\n");
+      const allCriteria = body.deliverables
+        .flatMap((d) => d.acceptanceCriteria ?? [])
+        .filter(Boolean);
+      acceptanceSection = allCriteria.length > 0
+        ? allCriteria.map((c) => `- ${c}`).join("\n")
+        : "_To be defined alongside deliverables._";
+    } else {
+      deliverablesSection = "_Claude will define deliverables and create subtasks on the first turn._";
+      acceptanceSection = "_To be defined alongside deliverables._";
+    }
+
     const briefContent = `---
 project: ${body.slug}
 status: active
@@ -142,11 +166,11 @@ ${body.goal || "To be defined."}
 
 ## Deliverables
 
-_Claude will define deliverables and create subtasks on the first turn._
+${deliverablesSection}
 
 ## Acceptance Criteria
 
-_To be defined alongside deliverables._
+${acceptanceSection}
 `;
 
     fs.writeFileSync(briefPath, briefContent, "utf-8");

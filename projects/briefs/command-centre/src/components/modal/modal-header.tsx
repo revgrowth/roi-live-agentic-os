@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { X, ChevronDown, Trash2, Check, Terminal, Copy } from "lucide-react";
+import { X, ChevronDown, Trash2, Terminal, Copy } from "lucide-react";
 import type { Task, TaskStatus, PermissionMode } from "@/types/task";
 import { PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
@@ -342,42 +342,7 @@ export function ModalHeader({
               Reopen
             </button>
           )}
-          {task.claudeSessionId && (
-            <ResumeButton sessionId={task.claudeSessionId} />
-          )}
-          {task.phaseNumber != null && task.gsdStep && task.status !== "done" && (
-            <button
-              onClick={() => {
-                updateTask(task.id, { status: "done" });
-              }}
-              title={`Mark Phase ${task.phaseNumber} ${task.gsdStep} as complete`}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-                marginRight: 4,
-                padding: "5px 10px",
-                border: "none",
-                borderRadius: 6,
-                backgroundColor: "rgba(107, 142, 107, 0.1)",
-                color: "#6B8E6B",
-                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                fontSize: 11,
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "background-color 150ms ease",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(107, 142, 107, 0.2)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(107, 142, 107, 0.1)";
-              }}
-            >
-              <Check size={12} />
-              Mark complete
-            </button>
-          )}
+          {/* Resume button removed — individual pane resume buttons are sufficient */}
           <button
             onClick={() => {
               deleteTask(task.id);

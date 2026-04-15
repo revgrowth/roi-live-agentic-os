@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { readFile, writeFile, deleteFile, moveFile, normalizeRelativePath } from "@/lib/file-service";
 import { getClientAgenticOsDir } from "@/lib/config";
 
-const ALLOWED_ROOTS = ["context", "brand_context", "docs", "projects", ".planning", ".claude/skills"];
+const ALLOWED_ROOTS = ["context", "brand_context", "docs", "projects", ".planning", ".claude/skills", "clients"];
 const ALLOWED_ROOT_FILES = ["AGENTS.md", "CLAUDE.md", "README.md"];
 
 function validateFilePath(segments: string[]): string | null {

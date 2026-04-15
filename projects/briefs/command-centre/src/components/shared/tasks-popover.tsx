@@ -8,6 +8,9 @@ export interface SubtaskSummary {
   id: string;
   title: string;
   status: string;
+  phaseNumber?: number | null;
+  gsdStep?: string | null;
+  needsInput?: boolean;
 }
 
 interface TasksPopoverProps {
@@ -16,8 +19,22 @@ interface TasksPopoverProps {
   /** Real child subtasks of the parent task, if any. Takes precedence
    *  over `todos` when non-empty. */
   subtasks?: SubtaskSummary[];
-  /** Optional click handler for a subtask row (e.g. open subtask). */
+  /** Optional click handler for a subtask row (e.g. scroll to / focus). */
   onSelectSubtask?: (id: string) => void;
+  /** Execute a subtask — POST /api/tasks/:id/execute */
+  onRunSubtask?: (id: string) => void;
+  /** Execute a subtask in a new chat pane */
+  onRunSubtaskInNewChat?: (id: string, title: string) => void;
+  /** Execute all backlog subtasks */
+  onRunAll?: () => void;
+  /** Mark a subtask as done */
+  onMarkDone?: (id: string) => void;
+  /** Available chat panes for "Add to existing chat" picker */
+  availablePanes?: Array<{ id: string; label: string; isMain?: boolean }>;
+  /** Run a subtask in a specific existing pane */
+  onRunSubtaskInPane?: (subtaskId: string, paneId: string) => void;
+  /** Compact mode — icon only, no label text (for multi-pane layouts) */
+  compact?: boolean;
 }
 
 const SUBTASK_DONE = new Set(["done", "completed", "review"]);
@@ -29,7 +46,7 @@ function subtaskBucket(status: string): "done" | "running" | "pending" {
   return "pending";
 }
 
-export function TasksPopover({ todos, subtasks, onSelectSubtask }: TasksPopoverProps) {
+export function TasksPopover({ todos, subtasks, onSelectSubtask, onRunSubtask, onRunSubtaskInNewChat, onRunAll, onMarkDone, availablePanes, onRunSubtaskInPane, compact }: TasksPopoverProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -48,13 +65,24 @@ export function TasksPopover({ todos, subtasks, onSelectSubtask }: TasksPopoverP
     ? subtasks!.filter((s) => subtaskBucket(s.status) === "done").length
     : todos.filter((t) => t.status === "completed").length;
   const progress = total > 0 ? completed / total : 0;
-
   const headerLabel = hasSubtasks ? "Subtasks" : "Todos";
   const buttonLabel = hasSubtasks ? "Subtasks" : "Todos";
+
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [popoverPos, setPopoverPos] = useState<{ left: number; bottom: number } | null>(null);
+
+  // Recalculate position when opening
+  useEffect(() => {
+    if (open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setPopoverPos({ left: rect.left, bottom: window.innerHeight - rect.top + 6 });
+    }
+  }, [open]);
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         title={buttonLabel}
@@ -81,23 +109,21 @@ export function TasksPopover({ todos, subtasks, onSelectSubtask }: TasksPopoverP
         }}
       >
         <ListChecks size={13} />
-        {buttonLabel}
-        {total > 0 ? ` · ${completed}/${total}` : ""}
+        {!compact && <>{buttonLabel}{total > 0 ? ` · ${completed}/${total}` : ""}</>}
       </button>
       {open && (
         <div
           style={{
-            position: "absolute",
-            left: 0,
-            bottom: "100%",
-            marginBottom: 6,
-            width: 320,
-            maxHeight: 360,
+            position: "fixed",
+            left: popoverPos?.left ?? 0,
+            bottom: popoverPos?.bottom ?? 0,
+            width: 340,
+            maxHeight: 400,
             backgroundColor: "#FFFFFF",
             border: "1px solid rgba(218, 193, 185, 0.3)",
             borderRadius: 10,
             boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-            zIndex: 200,
+            zIndex: 9999,
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
@@ -123,9 +149,11 @@ export function TasksPopover({ todos, subtasks, onSelectSubtask }: TasksPopoverP
               }}
             >
               <span>{headerLabel}</span>
-              <span style={{ color: "#5E5E65", fontWeight: 500 }}>
-                {completed}/{total} completed
-              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ color: "#5E5E65", fontWeight: 500 }}>
+                  {completed}/{total} completed
+                </span>
+              </div>
             </div>
             <div
               style={{
@@ -162,16 +190,12 @@ export function TasksPopover({ todos, subtasks, onSelectSubtask }: TasksPopoverP
                 const bucket = subtaskBucket(st.status);
                 const done = bucket === "done";
                 const running = bucket === "running";
+                const pending = bucket === "pending";
+                const executed = !pending; // has been run at some point
+
                 return (
-                  <button
+                  <div
                     key={st.id}
-                    type="button"
-                    onClick={() => {
-                      if (onSelectSubtask) {
-                        onSelectSubtask(st.id);
-                        setOpen(false);
-                      }
-                    }}
                     style={{
                       display: "flex",
                       alignItems: "flex-start",
@@ -179,22 +203,35 @@ export function TasksPopover({ todos, subtasks, onSelectSubtask }: TasksPopoverP
                       padding: "8px 12px",
                       width: "100%",
                       textAlign: "left",
-                      border: "none",
-                      background: "transparent",
-                      cursor: onSelectSubtask ? "pointer" : "default",
-                      fontSize: 12,
-                      fontFamily: "var(--font-inter), Inter, sans-serif",
-                      color: done ? "#9C9CA0" : "#1B1C1B",
+                      borderLeft: st.needsInput
+                        ? "3px solid #93452A"
+                        : "3px solid transparent",
+                      backgroundColor: st.needsInput
+                        ? "rgba(255, 245, 240, 0.5)"
+                        : "transparent",
+                      transition: "background 80ms ease",
                     }}
                     onMouseEnter={(e) => {
-                      if (onSelectSubtask)
-                        e.currentTarget.style.background = "rgba(0,0,0,0.04)";
+                      if (executed && !st.needsInput) {
+                        e.currentTarget.style.background = "rgba(0,0,0,0.02)";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.background = st.needsInput
+                        ? "rgba(255, 245, 240, 0.5)"
+                        : "transparent";
                     }}
                   >
-                    <div
+                    {/* Status checkbox — clickable to toggle done */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (running) return; // Can't mark running tasks as done
+                        if (onMarkDone) {
+                          onMarkDone(st.id);
+                        }
+                      }}
                       style={{
                         flexShrink: 0,
                         width: 14,
@@ -208,23 +245,71 @@ export function TasksPopover({ todos, subtasks, onSelectSubtask }: TasksPopoverP
                         alignItems: "center",
                         justifyContent: "center",
                         marginTop: 1,
+                        padding: 0,
+                        cursor: running ? "default" : "pointer",
                       }}
                     >
                       {done && <Check size={10} color="#fff" strokeWidth={3} />}
                       {running && (
                         <Loader2 size={9} color="#93452A" className="animate-spin" />
                       )}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <span
-                        style={{
-                          textDecoration: done ? "line-through" : "none",
-                          lineHeight: 1.4,
-                          fontWeight: running ? 600 : 400,
-                        }}
-                      >
-                        {st.title}
-                      </span>
+                    </button>
+
+                    {/* Title + info */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (executed && onSelectSubtask) {
+                          onSelectSubtask(st.id);
+                          setOpen(false);
+                        }
+                      }}
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        border: "none",
+                        background: "transparent",
+                        padding: 0,
+                        textAlign: "left",
+                        cursor: executed && onSelectSubtask ? "pointer" : "default",
+                        fontSize: 12,
+                        fontFamily: "var(--font-inter), Inter, sans-serif",
+                        color: done ? "#9C9CA0" : pending ? "#9C9CA0" : "#1B1C1B",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span
+                          style={{
+                            textDecoration: done ? "line-through" : "none",
+                            lineHeight: 1.4,
+                            fontWeight: running ? 600 : 400,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            flex: 1,
+                            minWidth: 0,
+                          }}
+                        >
+                          {st.title}
+                        </span>
+                        {st.phaseNumber != null && (
+                          <span
+                            style={{
+                              fontSize: 9,
+                              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                              fontWeight: 600,
+                              padding: "1px 5px",
+                              borderRadius: 3,
+                              backgroundColor: "#F5F3FF",
+                              color: "#6D28D9",
+                              flexShrink: 0,
+                            }}
+                          >
+                            P{st.phaseNumber}
+                            {st.gsdStep ? ` · ${st.gsdStep}` : ""}
+                          </span>
+                        )}
+                      </div>
                       {running && (
                         <div
                           style={{
@@ -237,15 +322,35 @@ export function TasksPopover({ todos, subtasks, onSelectSubtask }: TasksPopoverP
                           {st.status === "running" ? "working..." : "queued"}
                         </div>
                       )}
-                    </div>
+                      {st.needsInput && (
+                        <div
+                          style={{
+                            fontSize: 10,
+                            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                            color: "#93452A",
+                            fontStyle: "italic",
+                            marginTop: 2,
+                          }}
+                        >
+                          Waiting for your input
+                        </div>
+                      )}
+                    </button>
+
+                    {/* Open as conversation */}
                     {onSelectSubtask && (
                       <ChevronRight
                         size={12}
                         color="#b5b3b0"
-                        style={{ flexShrink: 0 }}
+                        style={{ flexShrink: 0, cursor: "pointer" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectSubtask(st.id);
+                          setOpen(false);
+                        }}
                       />
                     )}
-                  </button>
+                  </div>
                 );
               })}
             {!hasSubtasks &&

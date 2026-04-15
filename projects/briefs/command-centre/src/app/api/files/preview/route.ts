@@ -5,9 +5,8 @@ import { getConfig } from "@/lib/config";
 
 const MAX_PREVIEW_SIZE = 1024 * 1024; // 1MB
 
-const TEXT_EXTENSIONS = new Set(["md", "txt", "csv", "json", "log"]);
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg", "ico"]);
-const BINARY_PREVIEW_EXTENSIONS = new Set(["pdf"]);
+const BINARY_EXTENSIONS = new Set(["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "zip", "tar", "gz", "mp4", "mp3", "wav", "ogg", "webm"]);
 const RAW_TEXT_EXTENSIONS = new Set(["html", "htm"]);
 
 const MIME_TYPES: Record<string, string> = {
@@ -51,8 +50,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const ext = path.extname(resolvedPath).replace(".", "").toLowerCase();
   const stat = fs.statSync(resolvedPath);
 
-  // Binary preview: serve the raw file with proper content-type
-  if (IMAGE_EXTENSIONS.has(ext) || BINARY_PREVIEW_EXTENSIONS.has(ext)) {
+  // Binary preview: serve the raw file with proper content-type (images, PDFs)
+  if (IMAGE_EXTENSIONS.has(ext)) {
     const mimeType = MIME_TYPES[ext] || "application/octet-stream";
     const fileBuffer = fs.readFileSync(resolvedPath);
     return new NextResponse(fileBuffer, {
@@ -62,6 +61,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         "Cache-Control": "private, max-age=300",
       },
     });
+  }
+
+  // Non-previewable binary formats
+  if (BINARY_EXTENSIONS.has(ext)) {
+    return NextResponse.json(
+      { error: `Binary file (.${ext}) — use download instead` },
+      { status: 400 }
+    );
   }
 
   // Raw HTML: serve as text/html so iframes can render it directly.
@@ -78,15 +85,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     });
   }
 
-  // Text preview
-  if (!TEXT_EXTENSIONS.has(ext)) {
-    return NextResponse.json(
-      { error: `Extension .${ext} is not previewable` },
-      { status: 400 }
-    );
-  }
-
-  // Check file size
+  // Text preview: any extension not handled above is treated as text.
+  // This covers md, txt, csv, json, log, xml, yaml, excalidraw, etc.
   if (stat.size > MAX_PREVIEW_SIZE) {
     return NextResponse.json({
       content: null,

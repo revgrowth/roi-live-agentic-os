@@ -133,6 +133,8 @@ export async function POST(request: NextRequest) {
       permissionMode: "default",
       lastReplyAt: null,
       goalGroup: null,
+      tag: null,
+      pinnedAt: null,
     };
 
     db.prepare(

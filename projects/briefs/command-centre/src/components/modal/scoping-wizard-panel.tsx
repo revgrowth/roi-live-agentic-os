@@ -513,6 +513,12 @@ function ScopingWizardCore({
 
     try {
       // 1. Create the project (level 2 = Planned Project)
+      // Pass deliverables so brief.md has them from the start
+      const deliverables = rows.map((r) => ({
+        title: r.title.trim() || "Untitled",
+        description: r.description.trim() || undefined,
+        acceptanceCriteria: r.acceptanceCriteria?.filter(Boolean) ?? [],
+      }));
       const projectRes = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -522,6 +528,7 @@ function ScopingWizardCore({
           level: 2,
           goal: enrichedGoal,
           clientId,
+          deliverables,
         }),
       });
 

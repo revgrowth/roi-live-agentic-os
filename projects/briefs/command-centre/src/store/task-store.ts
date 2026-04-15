@@ -42,6 +42,7 @@ interface TaskStore {
   appendLogEntry: (taskId: string, entry: LogEntry) => void;
   syncPhases: (parentTaskId: string) => Promise<void>;
   syncProjects: () => Promise<void>;
+  setTaskFields: (id: string, fields: Partial<Task>) => void;
   openPanel: (taskId: string) => void;
   closePanel: () => void;
 
@@ -160,6 +161,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       permissionMode: (permissionMode as Task["permissionMode"]) || "default",
       lastReplyAt: null,
       goalGroup: null,
+      tag: null,
+      pinnedAt: null,
     };
 
     // Track pending create for SSE reconciliation
@@ -459,9 +462,16 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
             const preserveTitle =
               event.type !== "task:updated" ||
               (event.task.title.length > t.title.length * 3 && event.task.title.length > 80);
-            return preserveTitle
+            // Progress events must never downgrade needsInput from true to false —
+            // they fire before question detection and carry stale needsInput state.
+            const preserveNeedsInput =
+              event.type === "task:progress" && t.needsInput && !event.task.needsInput;
+            const merged = preserveTitle
               ? { ...event.task, title: t.title }
               : event.task;
+            return preserveNeedsInput
+              ? { ...merged, needsInput: true }
+              : merged;
           }),
         }));
         break;
@@ -480,10 +490,20 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         }));
         break;
       case "task:log":
-        // Append log entry if present
+        // Append log entry and update task state (needsInput, activityLabel, etc.)
         if (event.logEntry) {
           get().appendLogEntry(event.task.id, event.logEntry);
         }
+        set((state) => ({
+          tasks: state.tasks.map((t) => {
+            if (t.id !== event.task.id) return t;
+            if ((t.status === "done" || isUserDone(t.id)) && event.task.status !== "done") return t;
+            // Never let a log event downgrade needsInput from true to false —
+            // log events fire before question detection and carry stale state.
+            const newNeedsInput = (t.needsInput && !event.task.needsInput) ? true : event.task.needsInput;
+            return { ...t, needsInput: newNeedsInput, activityLabel: event.task.activityLabel };
+          }),
+        }));
         break;
       case "task:deleted":
         set((state) => ({
@@ -579,6 +599,14 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     } catch {
       // Non-critical — silently fail
     }
+  },
+
+  setTaskFields: (id: string, fields: Partial<Task>) => {
+    set((state) => ({
+      tasks: state.tasks.map((t) =>
+        t.id === id ? { ...t, ...fields } : t
+      ),
+    }));
   },
 
   openPanel: (taskId: string) => {

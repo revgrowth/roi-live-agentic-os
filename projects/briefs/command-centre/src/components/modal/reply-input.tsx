@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Paperclip, X, Image, FileType, FileText } from "lucide-react";
 import type { LogEntry, PermissionMode, ClaudeModel, Todo } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 import { SlashCommandMenu } from "@/components/shared/slash-command-menu";
@@ -12,6 +12,23 @@ import { TasksPopover, type SubtaskSummary } from "@/components/shared/tasks-pop
 import { parseTodosFromInput } from "@/lib/claude-parser";
 import type { SlashCommand } from "@/lib/slash-commands";
 import { recordTagUsage } from "@/components/board/goal-chips";
+
+// ── Attachment helpers ──────────────────────────────────────────
+
+interface Attachment {
+  fileName: string;
+  relativePath: string;
+  extension: string;
+  sizeBytes: number;
+}
+
+const IMAGE_EXTS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg"]);
+
+function getAttachmentIcon(ext: string) {
+  if (IMAGE_EXTS.has(ext)) return Image;
+  if (ext === "pdf") return FileType;
+  return FileText;
+}
 
 /** Renders a highlight mirror behind a transparent textarea so @tags and
  *  /commands appear colored while the user types normally. */
@@ -87,6 +104,27 @@ interface ReplyInputProps {
   subtasks?: SubtaskSummary[];
   /** Click handler for a subtask row. */
   onSelectSubtask?: (id: string) => void;
+  /** Execute a subtask — POST /api/tasks/:id/execute */
+  onRunSubtask?: (id: string) => void;
+  /** Execute a subtask in a new chat pane */
+  onRunSubtaskInNewChat?: (id: string, title: string) => void;
+  /** Execute all backlog subtasks */
+  onRunAll?: () => void;
+  /** Mark a subtask as done */
+  onMarkDone?: (id: string) => void;
+  /** Available chat panes for "Add to existing chat" picker */
+  availablePanes?: Array<{ id: string; label: string; isMain?: boolean }>;
+  /** Run a subtask in a specific existing pane */
+  onRunSubtaskInPane?: (subtaskId: string, paneId: string) => void;
+  /** When set, the first message creates a new pane task instead of replying.
+   *  Returns the new task ID on success, null on failure. */
+  onCreatePaneTask?: (message: string, permissionMode: string) => Promise<string | null>;
+  /** Compact mode — shrink toolbar elements (for multi-pane layouts) */
+  compact?: boolean;
+  /** Project slug — used to pin the relevant brief at the top of the @ menu */
+  projectSlug?: string | null;
+  /** Hide the tasks/todos popover (e.g. for single tasks without a plan) */
+  hideTasksPopover?: boolean;
 }
 
 export function ReplyInput({
@@ -99,6 +137,16 @@ export function ReplyInput({
   initialModel = null,
   subtasks,
   onSelectSubtask,
+  onRunSubtask,
+  onRunSubtaskInNewChat,
+  onRunAll,
+  onMarkDone,
+  availablePanes,
+  onRunSubtaskInPane,
+  onCreatePaneTask,
+  compact,
+  projectSlug,
+  hideTasksPopover,
 }: ReplyInputProps) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -110,7 +158,10 @@ export function ReplyInput({
   const [promptTags, setPromptTags] = useState<TagItem[]>([]);
   const [permissionMode, setPermissionMode] = useState<PermissionMode>(initialPermissionMode);
   const [model, setModel] = useState<ClaudeModel | null>(initialModel);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const createTask = useTaskStore((s) => s.createTask);
   const updateTask = useTaskStore((s) => s.updateTask);
   const logEntries = useTaskStore((s) => s.logEntries[taskId]) ?? [];
@@ -144,11 +195,98 @@ export function ReplyInput({
     return [];
   }, [logEntries]);
 
+  const handleFileUpload = useCallback(async (file: File) => {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("dir", ".tmp/attachments");
+      const res = await fetch("/api/files/upload", { method: "POST", body: formData });
+      if (!res.ok) throw new Error("Upload failed");
+      const result: Attachment = await res.json();
+      setAttachments((prev) => [...prev, result]);
+    } catch { /* silently fail */ } finally {
+      setIsUploading(false);
+    }
+  }, []);
+
+  const removeAttachment = useCallback((relativePath: string) => {
+    setAttachments((prev) => prev.filter((a) => a.relativePath !== relativePath));
+  }, []);
+
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) handleFileUpload(file);
+        return;
+      }
+    }
+    // Large text paste — collapse into a placeholder, expand on submit
+    const text = e.clipboardData?.getData("text/plain") ?? "";
+    const lineCount = text.split("\n").length;
+    if (lineCount > 10) {
+      e.preventDefault();
+      const label = `[Pasted text +${lineCount} lines]`;
+      const ta = textareaRef.current;
+      if (ta) {
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        const before = message.slice(0, start);
+        const after = message.slice(end);
+        const pastedBlocks = (ta.dataset.pastedBlocks ? JSON.parse(ta.dataset.pastedBlocks) : []) as Array<{ label: string; text: string }>;
+        pastedBlocks.push({ label, text });
+        ta.dataset.pastedBlocks = JSON.stringify(pastedBlocks);
+        setMessage(before + label + after);
+      }
+    }
+  }, [handleFileUpload, message]);
+
   const handleSubmit = useCallback(async () => {
     const trimmed = message.trim();
-    if (!trimmed || isSending) return;
+    if (!trimmed && attachments.length === 0) return;
+    if (isSending) return;
+
+    // Expand collapsed pasted text blocks back to full content
+    let expanded = trimmed;
+    if (textareaRef.current?.dataset.pastedBlocks) {
+      try {
+        const blocks = JSON.parse(textareaRef.current.dataset.pastedBlocks) as Array<{ label: string; text: string }>;
+        for (const block of blocks) {
+          expanded = expanded.replace(block.label, block.text);
+        }
+      } catch { /* ignore */ }
+      textareaRef.current.dataset.pastedBlocks = "";
+    }
+
+    // Build final message with attachment paths
+    let finalMessage = expanded;
+    if (attachments.length > 0) {
+      const attachmentLines = attachments.map((a) => `- ${a.relativePath}`).join("\n");
+      finalMessage = finalMessage
+        ? `${finalMessage}\n\nAttached files:\n${attachmentLines}`
+        : `Attached files:\n${attachmentLines}`;
+    }
 
     setIsSending(true);
+
+    // If this is an empty pane, create a new task instead of replying
+    if (onCreatePaneTask) {
+      setMessage("");
+      setAttachments([]);
+      try {
+        await onCreatePaneTask(finalMessage, permissionMode);
+      } catch {
+        setError("Failed to start conversation");
+        setTimeout(() => setError(null), 3000);
+      } finally {
+        setIsSending(false);
+      }
+      return;
+    }
 
     // Optimistic: add user_reply entry locally
     if (onOptimisticReply) {
@@ -156,18 +294,28 @@ export function ReplyInput({
         id: "local-" + crypto.randomUUID(),
         type: "user_reply",
         timestamp: new Date().toISOString(),
-        content: trimmed,
+        content: finalMessage,
+        permissionMode,
       };
       onOptimisticReply(entry);
     }
 
+    // Optimistic: mark task as running (clears needsInput so card lights up purple)
+    useTaskStore.getState().setTaskFields(taskId, {
+      status: "running",
+      needsInput: false,
+      activityLabel: null,
+      lastReplyAt: new Date().toISOString(),
+    });
+
     setMessage("");
+    setAttachments([]);
 
     try {
       const res = await fetch(`/api/tasks/${taskId}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed, permissionMode, model }),
+        body: JSON.stringify({ message: finalMessage, permissionMode, model }),
       });
       if (!res.ok) {
         console.error(`[reply-input] Reply failed: ${res.status}`);
@@ -180,7 +328,7 @@ export function ReplyInput({
     } finally {
       setIsSending(false);
     }
-  }, [message, isSending, taskId, onOptimisticReply, permissionMode, model]);
+  }, [message, attachments, isSending, taskId, onOptimisticReply, onCreatePaneTask, permissionMode, model]);
 
   const handleSlashSelect = useCallback(async (cmd: SlashCommand) => {
     setShowSlashMenu(false);
@@ -249,7 +397,7 @@ export function ReplyInput({
   return (
     <div
       style={{
-        padding: "12px 24px 16px 24px",
+        padding: compact ? "6px 12px 8px 12px" : "12px 24px 16px 24px",
         borderTop: "1px solid #EAE8E6",
       }}
     >
@@ -267,7 +415,7 @@ export function ReplyInput({
           position: "relative",
         }}
       >
-        <div style={{ position: "relative", padding: "10px 12px 6px" }}>
+        <div style={{ position: "relative", padding: compact ? "6px 10px 4px" : "12px 14px 8px" }}>
           {showSlashMenu && (
             <SlashCommandMenu
               query={slashQuery}
@@ -283,7 +431,18 @@ export function ReplyInput({
               onClose={() => { setShowTagMenu(false); setTagQuery(""); }}
               anchor="above"
               mode="tag"
-              tagItems={promptTags.filter((t) => !tagQuery || t.name.toLowerCase().includes(tagQuery.toLowerCase()))}
+              tagItems={promptTags
+                .filter((t) => !tagQuery || t.name.toLowerCase().includes(tagQuery.toLowerCase()))
+                .sort((a, b) => {
+                  // Pin the current project's brief to the top
+                  if (projectSlug) {
+                    const aIsBrief = a.name === `brief/${projectSlug}`;
+                    const bIsBrief = b.name === `brief/${projectSlug}`;
+                    if (aIsBrief && !bIsBrief) return -1;
+                    if (!aIsBrief && bIsBrief) return 1;
+                  }
+                  return 0;
+                })}
               onTagSelect={(tag) => {
                 const el = textareaRef.current;
                 if (el) {
@@ -321,13 +480,15 @@ export function ReplyInput({
               value={message}
               onChange={(e) => handleChange(e.target.value)}
               onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
               placeholder={placeholder}
-              rows={1}
+              rows={compact ? 1 : 3}
               style={{
                 width: "100%",
-                fontSize: 14,
+                fontSize: compact ? 13 : 14,
                 fontFamily: "var(--font-inter), Inter, sans-serif",
-                padding: "4px 0",
+                padding: compact ? "2px 0" : "4px 0",
+                minHeight: compact ? 28 : 60,
                 backgroundColor: "transparent",
                 outline: "none",
                 border: "none",
@@ -341,38 +502,118 @@ export function ReplyInput({
             />
           </div>
         </div>
+        {/* Attachment chips */}
+        {attachments.length > 0 && (
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: compact ? "4px 8px" : "4px 14px 6px" }}>
+            {attachments.map((att) => {
+              const Icon = getAttachmentIcon(att.extension);
+              return (
+                <div
+                  key={att.relativePath}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    padding: "3px 8px",
+                    borderRadius: 6,
+                    backgroundColor: "rgba(218, 193, 185, 0.15)",
+                    fontSize: 11,
+                    fontFamily: "'DM Mono', monospace",
+                    color: "#5E5E65",
+                  }}
+                >
+                  <Icon size={12} />
+                  <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {att.fileName}
+                  </span>
+                  <button
+                    onClick={() => removeAttachment(att.relativePath)}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
+                  >
+                    <X size={10} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFileUpload(file);
+            e.target.value = "";
+          }}
+          style={{ display: "none" }}
+          accept="image/*,.pdf,.md,.txt,.csv,.json,.html"
+        />
+
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: 2,
-            padding: "6px 8px",
+            padding: compact ? "4px 6px" : "6px 8px",
             borderTop: "1px solid #e5e1dc",
           }}
         >
+          {/* Attach file */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "4px 6px",
+              border: "none",
+              borderRadius: 5,
+              backgroundColor: "transparent",
+              color: isUploading ? "#bbb" : "#5E5E65",
+              cursor: isUploading ? "not-allowed" : "pointer",
+            }}
+            onMouseEnter={(e) => { if (!isUploading) e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.04)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
+            title="Attach file"
+          >
+            <Paperclip size={14} />
+          </button>
           <ModelPicker value={model} onChange={setModel} />
           <PermissionPicker value={permissionMode} onChange={setPermissionMode} />
+          {!hideTasksPopover && (
           <TasksPopover
             todos={latestTodos}
             subtasks={subtasks}
             onSelectSubtask={onSelectSubtask}
+            onRunSubtask={onRunSubtask}
+            onRunSubtaskInNewChat={onRunSubtaskInNewChat}
+            onRunAll={onRunAll}
+            onMarkDone={onMarkDone}
+            availablePanes={availablePanes}
+            onRunSubtaskInPane={onRunSubtaskInPane}
+            compact={compact}
           />
+          )}
           <div style={{ flex: 1 }} />
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={!message.trim() || isSending}
+            disabled={(!message.trim() && attachments.length === 0) || isSending}
             style={{
               width: 28,
               height: 26,
               borderRadius: 6,
               border: "none",
               background:
-                message.trim() && !isSending
+                (message.trim() || attachments.length > 0) && !isSending
                   ? "linear-gradient(135deg, #93452A, #B25D3F)"
                   : "#e8e4df",
-              color: message.trim() && !isSending ? "#FFFFFF" : "#5E5E65",
-              cursor: message.trim() && !isSending ? "pointer" : "default",
+              color: (message.trim() || attachments.length > 0) && !isSending ? "#FFFFFF" : "#5E5E65",
+              cursor: (message.trim() || attachments.length > 0) && !isSending ? "pointer" : "default",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

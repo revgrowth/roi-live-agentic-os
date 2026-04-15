@@ -144,6 +144,8 @@ export async function POST(request: NextRequest) {
       permissionMode: bodyPermissionMode || "default",
       lastReplyAt: null,
       goalGroup: null,
+      tag: null,
+      pinnedAt: null,
       dependsOnTaskIds:
         Array.isArray(bodyDependsOnTaskIds) && bodyDependsOnTaskIds.length > 0
           ? bodyDependsOnTaskIds

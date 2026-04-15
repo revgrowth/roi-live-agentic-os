@@ -529,6 +529,9 @@ function getDb(agenticOsDir) {
   ensureColumn(db, "cron_runs", "resultSource", "ALTER TABLE cron_runs ADD COLUMN resultSource TEXT");
   ensureColumn(db, "cron_runs", "completionReason", "ALTER TABLE cron_runs ADD COLUMN completionReason TEXT");
 
+  // Fix cron tasks that were incorrectly stored with 'default' permission mode
+  db.exec("UPDATE tasks SET permissionMode = 'bypassPermissions' WHERE cronJobSlug IS NOT NULL AND permissionMode = 'default'");
+
   db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_clientId ON tasks(clientId)");
   db.exec("CREATE INDEX IF NOT EXISTS idx_tasks_cronJobSlug ON tasks(cronJobSlug)");
   db.exec("CREATE INDEX IF NOT EXISTS idx_cron_runs_clientId ON cron_runs(clientId)");
@@ -1139,7 +1142,7 @@ function enqueueCronJob(agenticOsDir, job, options = {}) {
     phaseNumber: null,
     gsdStep: null,
     cronJobSlug: job.slug,
-    permissionMode: "default",
+    permissionMode: "bypassPermissions",
   };
 
   db.prepare(

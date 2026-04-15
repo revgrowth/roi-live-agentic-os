@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
-import { ArrowUp } from "lucide-react";
-import type { Task, LogEntry, PermissionMode } from "@/types/task";
-import { ChatEntry, TextGroup, ToolSummaryBlock, FileOutputCard, isFileOutputEntry, parseFileOutput } from "./chat-entry";
+import { ArrowUp, FileText, Search, Terminal, Globe, Wrench, ListChecks, ChevronDown, ChevronRight, Check, Circle, MessageSquare } from "lucide-react";
+import type { Task, LogEntry, PermissionMode, Todo } from "@/types/task";
+import { ChatEntry, TextGroup, FileOutputCard, SkillInvocationCard, isFileOutputEntry, isSkillEntry, parseFileOutput } from "./chat-entry";
+import { parseTodosFromInput } from "@/lib/claude-parser";
 import { shouldShowTaskErrorBanner } from "@/lib/task-logs";
 import {
   extractQuestionSpecsFromText,
@@ -57,8 +58,9 @@ function randomVerb(): string {
   return SPINNER_VERBS[Math.floor(Math.random() * SPINNER_VERBS.length)];
 }
 
-/** Claude-style spinner: cycles through random verbs with a spinning asterisk. */
-function SpinnerVerb({ startedAt, activityLabel }: { startedAt?: string | null; activityLabel?: string | null }) {
+/** Claude-style spinner: cycles through random verbs with a spinning asterisk.
+ *  `turnStartedAt` is the most recent turn start (last user reply or task start). */
+function SpinnerVerb({ startedAt, lastReplyAt, activityLabel }: { startedAt?: string | null; lastReplyAt?: string | null; activityLabel?: string | null }) {
   const [verb, setVerb] = useState(randomVerb);
   const [elapsed, setElapsed] = useState(0);
 
@@ -68,14 +70,16 @@ function SpinnerVerb({ startedAt, activityLabel }: { startedAt?: string | null; 
   }, []);
 
   useEffect(() => {
-    if (!startedAt) return;
-    const start = new Date(startedAt).getTime();
+    const origin = lastReplyAt || startedAt;
+    if (!origin) return;
+    const start = new Date(origin).getTime();
     if (isNaN(start)) return;
+    setElapsed(0);
     const tick = () => setElapsed(Math.floor((Date.now() - start) / 1000));
     tick();
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [startedAt]);
+  }, [lastReplyAt, startedAt]);
 
   return (
     <>
@@ -273,30 +277,356 @@ function ErrorBanner({ message }: { message: string }) {
   );
 }
 
+/* ─────────────────── Vibe Kanban-style tool rows ─────────────────── */
+
+/** Icon + color mapping for tool compact rows */
+function toolRowVisual(toolName: string): { Icon: React.ComponentType<{ size?: number; color?: string; style?: React.CSSProperties }>; label: string } {
+  const n = (toolName || "").toLowerCase();
+  if (n === "read") return { Icon: FileText, label: "Read" };
+  if (n === "glob") return { Icon: Search, label: "Search" };
+  if (n === "grep") return { Icon: Search, label: "Search" };
+  if (n === "bash") return { Icon: Terminal, label: "Bash" };
+  if (n === "webfetch") return { Icon: Globe, label: "Fetch" };
+  if (n === "websearch") return { Icon: Globe, label: "Web Search" };
+  return { Icon: Wrench, label: toolName || "Tool" };
+}
+
+/** Extract a short detail string from tool args */
+function toolRowDetail(entry: LogEntry): string | null {
+  if (!entry.toolArgs) return null;
+  try {
+    const args = JSON.parse(entry.toolArgs) as Record<string, unknown>;
+    const name = (entry.toolName || "").toLowerCase();
+    if (typeof args.file_path === "string") {
+      return args.file_path.split("/").pop() || args.file_path;
+    }
+    if (typeof args.path === "string") {
+      return args.path.split("/").pop() || args.path;
+    }
+    if (typeof args.pattern === "string") {
+      return args.pattern.length > 40 ? args.pattern.slice(0, 40) + "…" : args.pattern;
+    }
+    if (typeof args.query === "string") {
+      return args.query.length > 40 ? args.query.slice(0, 40) + "…" : args.query;
+    }
+    if (typeof args.url === "string") {
+      try { return new URL(args.url).hostname.replace(/^www\./, ""); } catch { return args.url.slice(0, 40); }
+    }
+    if (typeof args.command === "string") {
+      const cmd = args.command.trim();
+      return cmd.length > 50 ? cmd.slice(0, 50) + "…" : cmd;
+    }
+    if (typeof args.description === "string") {
+      return args.description.length > 50 ? args.description.slice(0, 50) + "…" : args.description;
+    }
+    return null;
+  } catch { return null; }
+}
+
+/** Compact single-line row for a tool call — or aggregated "Read · 4 files" */
+function ToolCompactRow({ toolName, entries }: { toolName: string; entries: LogEntry[] }) {
+  const { Icon, label } = toolRowVisual(toolName);
+  const count = entries.length;
+
+  // Single entry: show detail (e.g. "Read README.md")
+  if (count === 1) {
+    const detail = toolRowDetail(entries[0]);
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "3px 2px",
+          fontSize: 13,
+          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+          color: "#8a8886",
+          lineHeight: 1.4,
+        }}
+      >
+        <Icon size={13} color="#9C9CA0" style={{ flexShrink: 0 }} />
+        <span>{label}</span>
+        {detail && (
+          <span style={{ color: "#9C9CA0", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {detail}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  // Multiple entries: "Read · 4 files"
+  const noun = label === "Search" ? "searches" : label === "Bash" ? "commands" : "files";
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "3px 2px",
+        fontSize: 13,
+        fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+        color: "#8a8886",
+        lineHeight: 1.4,
+      }}
+    >
+      <Icon size={13} color="#9C9CA0" style={{ flexShrink: 0 }} />
+      <span>{label}</span>
+      <span style={{ color: "#9C9CA0" }}>· {count} {noun}</span>
+    </div>
+  );
+}
+
+/** Collapsible thinking-group: collapses tool activity + narration into
+ *  an indented, expandable block. Shows a summary line when collapsed. */
+function ThinkingGroup({
+  items,
+  onPreviewFile,
+  activePreviewPath,
+  permissionMode,
+  taskId,
+  readOnly,
+}: {
+  items: RenderItem[];
+  onPreviewFile?: (file: { relativePath: string; extension: string; fileName: string }) => void;
+  activePreviewPath?: string | null;
+  permissionMode?: PermissionMode;
+  taskId?: string;
+  readOnly?: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  // Count tools and narration lines for the summary
+  const toolCount = items.filter((it) =>
+    it.kind === "tool-row" || it.kind === "file-output" || it.kind === "todo-update" || it.kind === "skill-invocation"
+  ).length;
+  const textCount = items.filter((it) => it.kind === "text-group").length;
+
+  // Build summary label
+  const parts: string[] = [];
+  if (toolCount > 0) parts.push(`${toolCount} tool${toolCount === 1 ? "" : "s"}`);
+  if (textCount > 0) parts.push(`${textCount} step${textCount === 1 ? "" : "s"}`);
+  const summary = parts.length > 0 ? parts.join(", ") : "Activity";
+
+  return (
+    <div style={{ marginTop: 4, marginBottom: 4 }}>
+      <button
+        type="button"
+        onClick={() => setExpanded((e) => !e)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "4px 2px",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          fontSize: 12,
+          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+          color: "#b5b3b0",
+          fontWeight: 500,
+          lineHeight: 1.4,
+        }}
+      >
+        {expanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+        <MessageSquare size={12} style={{ flexShrink: 0 }} />
+        <span>Thinking</span>
+        {!expanded && (
+          <span style={{ color: "#c4c0bb" }}>{summary}</span>
+        )}
+      </button>
+      {expanded && (
+        <div
+          style={{
+            borderLeft: "2px solid rgba(218, 193, 185, 0.4)",
+            marginLeft: 6,
+            paddingLeft: 14,
+            marginTop: 4,
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
+          {items.map((sub, idx) => {
+            if (sub.kind === "text-group") {
+              return (
+                <div key={sub.entries[0].id} style={{ marginTop: 2, marginBottom: 2 }}>
+                  <TextGroup entries={sub.entries} onPreviewFile={onPreviewFile} variant="narration" />
+                </div>
+              );
+            }
+            if (sub.kind === "tool-row") {
+              return (
+                <div key={sub.entries[0].id}>
+                  <ToolCompactRow toolName={sub.toolName} entries={sub.entries} />
+                </div>
+              );
+            }
+            if (sub.kind === "file-output") {
+              const info = parseFileOutput(sub.entry);
+              const active = !!info && activePreviewPath === info.relativePath;
+              return (
+                <div key={sub.entry.id} style={{ marginTop: 4, marginBottom: 4 }}>
+                  <FileOutputCard
+                    entry={sub.entry}
+                    isActive={active}
+                    onPreview={
+                      onPreviewFile && info
+                        ? (p) => onPreviewFile({ ...p, fileName: info.fileName })
+                        : undefined
+                    }
+                  />
+                </div>
+              );
+            }
+            if (sub.kind === "skill-invocation") {
+              return (
+                <div key={sub.entry.id} style={{ marginTop: 4, marginBottom: 4 }}>
+                  <SkillInvocationCard entry={sub.entry} />
+                </div>
+              );
+            }
+            if (sub.kind === "todo-update") {
+              return (
+                <div key={sub.entry.id}>
+                  <TodoUpdateCard entry={sub.entry} />
+                </div>
+              );
+            }
+            return null;
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Collapsible "Updated Todos" card — shows todo items when expanded */
+function TodoUpdateCard({ entry }: { entry: LogEntry }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const todos: Todo[] = useMemo(() => {
+    if (!entry.toolArgs) return [];
+    try {
+      const args = JSON.parse(entry.toolArgs);
+      return parseTodosFromInput(args) || [];
+    } catch { return []; }
+  }, [entry.toolArgs]);
+
+  return (
+    <div style={{ width: "100%" }}>
+      <button
+        type="button"
+        onClick={() => setExpanded((e) => !e)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "3px 2px",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          fontSize: 12,
+          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+          color: "#9C9CA0",
+          fontWeight: 500,
+          lineHeight: 1.4,
+        }}
+      >
+        <ListChecks size={13} color="#b5b3b0" style={{ flexShrink: 0 }} />
+        <span>Updated Todos</span>
+        {expanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+      </button>
+      {expanded && todos.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            paddingLeft: 22,
+            marginTop: 2,
+            marginBottom: 4,
+          }}
+        >
+          {todos.map((todo, i) => {
+            const isDone = todo.status === "completed";
+            const isActive = todo.status === "in_progress";
+            return (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: 12,
+                  fontFamily: "var(--font-inter), Inter, sans-serif",
+                  color: isDone ? "#6B8E6B" : isActive ? "#C4784E" : "#5E5E65",
+                  lineHeight: 1.4,
+                }}
+              >
+                {isDone ? (
+                  <Check size={12} color="#6B8E6B" style={{ flexShrink: 0 }} />
+                ) : (
+                  <Circle size={12} color={isActive ? "#C4784E" : "#b5b3b0"} style={{ flexShrink: 0 }} />
+                )}
+                <span>{todo.content}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /**
- * Group consecutive entries for business-focused rendering:
+ * Group consecutive entries for Vibe Kanban-style rendering:
  * - Consecutive text entries → TextGroup (merged prose)
- * - Consecutive tool_use / tool_result entries → ToolSummaryBlock (collapsed summary)
- * - Everything else (question, user_reply, system) → individual ChatEntry
+ * - Consecutive same-type tool calls → ToolCompactRow (aggregated)
+ * - TodoWrite → TodoUpdateCard (collapsible)
+ * - File writes → FileOutputCard
+ * - Skill invocations → SkillInvocationCard
+ * - Everything else → individual ChatEntry
  */
 type RenderItem =
   | { kind: "text-group"; entries: LogEntry[] }
   | { kind: "tool-group"; entries: LogEntry[] }
+  | { kind: "tool-row"; toolName: string; entries: LogEntry[] }
+  | { kind: "todo-update"; entry: LogEntry }
   | { kind: "file-output"; entry: LogEntry }
+  | { kind: "skill-invocation"; entry: LogEntry }
+  | { kind: "thinking-group"; items: RenderItem[] }
   | { kind: "single"; entry: LogEntry }
   | { kind: "child-question"; childTask: Task; entry: LogEntry }
-  | { kind: "child-review"; childTask: Task };
+  | { kind: "child-review"; childTask: Task }
+  | { kind: "phase-divider"; childTask: Task };
 
 /** A merged timeline entry with a sort key */
 type TimelineEntry =
   | { kind: "parent"; entry: LogEntry }
   | { kind: "child-question"; childTask: Task; entry: LogEntry }
-  | { kind: "child-review"; childTask: Task; timestamp: string };
+  | { kind: "child-review"; childTask: Task; timestamp: string }
+  | { kind: "phase-divider"; childTask: Task; timestamp: string };
+
+/** Normalize a tool name to a grouping key for aggregation.
+ *  e.g. "Read" and "Read" → same key, "Grep" and "Glob" → both "Search" */
+function toolGroupKey(toolName: string): string {
+  const n = (toolName || "").toLowerCase();
+  if (n === "grep" || n === "glob") return "search";
+  return n;
+}
+
+/** True when a tool_use is a TodoWrite call */
+function isTodoEntry(entry: LogEntry): boolean {
+  return entry.type === "tool_use" && (entry.toolName || "").toLowerCase() === "todowrite";
+}
 
 function groupEntries(entries: LogEntry[]): RenderItem[] {
   const items: RenderItem[] = [];
   let currentTextGroup: LogEntry[] = [];
-  let currentToolGroup: LogEntry[] = [];
+  // Buffer for consecutive same-type tool calls to aggregate
+  let currentToolBuffer: LogEntry[] = [];
+  let currentToolKey: string | null = null;
 
   const flushTextGroup = () => {
     if (currentTextGroup.length > 0) {
@@ -305,10 +635,15 @@ function groupEntries(entries: LogEntry[]): RenderItem[] {
     }
   };
 
-  const flushToolGroup = () => {
-    if (currentToolGroup.length > 0) {
-      items.push({ kind: "tool-group", entries: [...currentToolGroup] });
-      currentToolGroup = [];
+  const flushToolBuffer = () => {
+    if (currentToolBuffer.length > 0 && currentToolKey) {
+      items.push({
+        kind: "tool-row",
+        toolName: currentToolBuffer[0].toolName || "",
+        entries: [...currentToolBuffer],
+      });
+      currentToolBuffer = [];
+      currentToolKey = null;
     }
   };
 
@@ -327,35 +662,50 @@ function groupEntries(entries: LogEntry[]): RenderItem[] {
       }
     }
 
-    if (entry.type === "text") {
-      flushToolGroup();
+    if (entry.type === "text" || entry.type === "question") {
+      flushToolBuffer();
       currentTextGroup.push(entry);
-    } else if (entry.type === "tool_use" || entry.type === "tool_result") {
+    } else if (entry.type === "tool_result") {
+      // tool_result entries are hidden — their content is noise
+      continue;
+    } else if (entry.type === "tool_use") {
       flushTextGroup();
-      // File writes/edits get their own inline card in-line with surrounding tools
-      if (entry.type === "tool_use" && isFileOutputEntry(entry)) {
-        flushToolGroup();
+      // File writes/edits get their own inline card
+      if (isFileOutputEntry(entry)) {
+        flushToolBuffer();
         items.push({ kind: "file-output", entry });
+      } else if (isSkillEntry(entry)) {
+        flushToolBuffer();
+        items.push({ kind: "skill-invocation", entry });
+      } else if (isTodoEntry(entry)) {
+        flushToolBuffer();
+        items.push({ kind: "todo-update", entry });
       } else {
-        currentToolGroup.push(entry);
+        // Aggregate consecutive same-type tool calls
+        const key = toolGroupKey(entry.toolName || "");
+        if (currentToolKey && currentToolKey === key) {
+          currentToolBuffer.push(entry);
+        } else {
+          flushToolBuffer();
+          currentToolKey = key;
+          currentToolBuffer = [entry];
+        }
       }
     } else if (
       entry.type === "system" &&
-      currentToolGroup.length > 0 &&
+      currentToolBuffer.length > 0 &&
       /permission|approved|denied|waiting for|plan approval/i.test(entry.content)
     ) {
-      // Absorb permission/tool-related system messages into the current
-      // tool group so they don't break the collapsed summary into many
-      // small blocks separated by permission lines.
-      currentToolGroup.push(entry);
+      // Absorb permission system messages silently
+      continue;
     } else {
       flushTextGroup();
-      flushToolGroup();
+      flushToolBuffer();
       items.push({ kind: "single", entry });
     }
   }
   flushTextGroup();
-  flushToolGroup();
+  flushToolBuffer();
 
   return items;
 }
@@ -378,9 +728,21 @@ function buildMergedTimeline(
     timeline.push({ kind: "parent", entry });
   }
 
-  // Add child question entries and review banners
+  // Add child question entries, review banners, and phase dividers
+  const seenPhases = new Set<string>();
   for (const child of childTasks) {
     const childLogs = childLogEntries[child.id] || [];
+
+    // Insert a phase divider before the first log entry from each child
+    if (childLogs.length > 0 && !seenPhases.has(child.id)) {
+      seenPhases.add(child.id);
+      timeline.push({
+        kind: "phase-divider",
+        childTask: child,
+        timestamp: childLogs[0].timestamp,
+      });
+    }
+
     for (const entry of childLogs) {
       if (entry.type === "question") {
         timeline.push({ kind: "child-question", childTask: child, entry });
@@ -428,6 +790,9 @@ function buildMergedTimeline(
     } else if (item.kind === "child-review") {
       flushParentBuffer();
       result.push({ kind: "child-review", childTask: item.childTask });
+    } else if (item.kind === "phase-divider") {
+      flushParentBuffer();
+      result.push({ kind: "phase-divider", childTask: item.childTask });
     }
   }
   flushParentBuffer();
@@ -543,6 +908,8 @@ interface ModalChatProps {
   activityLabel?: string | null;
   /** ISO timestamp when the task started running — used for elapsed timer */
   startedAt?: string | null;
+  /** ISO timestamp of the most recent user reply — resets the thinking timer */
+  lastReplyAt?: string | null;
   /** Cost in USD from Claude API */
   costUsd?: number | null;
   /** Total tokens used */
@@ -569,6 +936,7 @@ export function ModalChat({
   permissionMode,
   activityLabel,
   startedAt,
+  lastReplyAt,
   costUsd,
   tokensUsed,
   errorMessage,
@@ -700,34 +1068,124 @@ export function ModalChat({
   const hasEntries = logEntries.length > 0;
   const neverStarted = status === "backlog" || status === "queued";
   const showEmpty = !hasEntries && !hasChildren && neverStarted;
-  const showLoading = !hasEntries && !hasChildren && !neverStarted && !isRunning;
+  const isTerminal = status === "done" || status === "review" || status === "error";
+  const showLoading = !hasEntries && !hasChildren && !neverStarted && !isRunning && !isTerminal;
   const showTyping = isRunning && !hasEntries && !needsInput;
 
+  // Determine if Claude is actively working right now. Use the last log entry
+  // timestamp as a staleness check — if the last entry was > 60s ago and there's
+  // no activityLabel, Claude has likely stopped and we shouldn't show the spinner.
+  const isActivelyWorking = useMemo(() => {
+    if (!isRunning || needsInput) return false;
+    if (!hasEntries) return true; // just started, no entries yet
+    if (activityLabel) return true; // has a fresh activity label from SSE
+    const lastEntry = logEntries[logEntries.length - 1];
+    if (!lastEntry) return true;
+    const lastTs = new Date(lastEntry.timestamp).getTime();
+    if (isNaN(lastTs)) return true;
+    const age = Date.now() - lastTs;
+    return age < 60_000; // active if last entry was within 60 seconds
+  }, [isRunning, needsInput, hasEntries, activityLabel, logEntries]);
+
   // Build merged timeline when there are child tasks, otherwise use simple grouping
-  const renderItems = hasChildren
-    ? buildMergedTimeline(logEntries, childTasks, childLogEntries)
-    : groupEntries(logEntries);
+  const renderItems = useMemo(() => {
+    const grouped = hasChildren
+      ? buildMergedTimeline(logEntries, childTasks, childLogEntries)
+      : groupEntries(logEntries);
+
+    // Collapse thinking into collapsible groups, working at the TURN level.
+    // A "turn" = everything between user messages (single items like user_reply).
+    // Within each turn, if there's any tool activity, everything except the
+    // last text-group (the actual answer) gets collapsed into a thinking-group.
+    // When the task is still running, even the last text-group in the final
+    // turn is absorbed since the real answer hasn't arrived yet.
+    const TOOL_KINDS = new Set(["tool-row", "file-output", "todo-update", "skill-invocation"]);
+    const TURN_BREAK_KINDS = new Set(["single", "child-question", "child-review", "phase-divider"]);
+
+    // Split into turns (separated by user messages / structural items)
+    const turns: RenderItem[][] = [];
+    let currentTurn: RenderItem[] = [];
+    const breakItems: { index: number; item: RenderItem }[] = [];
+
+    for (const item of grouped) {
+      if (TURN_BREAK_KINDS.has(item.kind)) {
+        if (currentTurn.length > 0) {
+          turns.push(currentTurn);
+          currentTurn = [];
+        }
+        breakItems.push({ index: turns.length, item });
+        turns.push([]); // placeholder — will be replaced by the break item
+      } else {
+        currentTurn.push(item);
+      }
+    }
+    if (currentTurn.length > 0) {
+      turns.push(currentTurn);
+    }
+
+    // Process each turn: collapse thinking, promote the answer
+    const result: RenderItem[] = [];
+    for (let t = 0; t < turns.length; t++) {
+      const turn = turns[t];
+
+      // Check if this is a break-item placeholder
+      const breakItem = breakItems.find((b) => b.index === t);
+      if (breakItem) {
+        result.push(breakItem.item);
+        continue;
+      }
+
+      // Does this turn have any tool activity?
+      const hasTools = turn.some((it) => TOOL_KINDS.has(it.kind));
+      if (!hasTools) {
+        // Pure text turn (no tools) — show as-is, no collapsing needed
+        result.push(...turn);
+        continue;
+      }
+
+      // Find the last text-group that comes AFTER the last tool — that's the answer.
+      // If the last text-group is before all tools, it's narration (no answer yet).
+      const isLastTurn = t === turns.length - 1;
+      let answerIdx = -1;
+      if (!isRunning || !isLastTurn) {
+        // Find the index of the last tool-kind item
+        let lastToolIdx = -1;
+        for (let k = turn.length - 1; k >= 0; k--) {
+          if (TOOL_KINDS.has(turn[k].kind)) { lastToolIdx = k; break; }
+        }
+        // Only promote a text-group as the answer if it comes after tool activity
+        for (let k = turn.length - 1; k >= 0; k--) {
+          if (turn[k].kind === "text-group" && k > lastToolIdx) {
+            answerIdx = k;
+            break;
+          }
+        }
+      }
+      // If running + last turn: answerIdx stays -1 (everything is thinking)
+      // If no text after tools: answerIdx stays -1 (no answer to promote)
+
+      // Split: everything except the answer → thinking-group
+      const thinkingItems: RenderItem[] = [];
+      for (let k = 0; k < turn.length; k++) {
+        if (k === answerIdx) continue;
+        thinkingItems.push(turn[k]);
+      }
+
+      if (thinkingItems.length > 0) {
+        result.push({ kind: "thinking-group", items: thinkingItems });
+      }
+      if (answerIdx >= 0) {
+        result.push(turn[answerIdx]);
+      }
+    }
+
+    return result;
+  }, [hasChildren, logEntries, childTasks, childLogEntries, isRunning]);
 
   // Set of child task IDs that currently need input (have unanswered questions)
   const childrenNeedingInput = new Set(
     childTasks.filter((c) => c.needsInput).map((c) => c.id)
   );
-
-  // Surface the most recent question so the drill-in view makes it obvious
-  // WHY a task is waiting and WHAT it asked. Without this, a subtask blocked
-  // on (e.g.) a permission prompt looks identical to one just still running.
-  const latestQuestionEntry =
-    needsInput && !readOnly
-      ? [...logEntries]
-          .reverse()
-          .find((e) => e.type === "question" || e.type === "structured_question")
-      : null;
-  const latestQuestionSnippet = latestQuestionEntry
-    ? (latestQuestionEntry.content || "")
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 160)
-    : null;
 
   const hasPendingStructuredQuestion = useMemo(() => {
     for (let i = logEntries.length - 1; i >= 0; i--) {
@@ -750,56 +1208,7 @@ export function ModalChat({
         overflow: "hidden",
       }}
     >
-      {needsInput && !readOnly && (
-        <button
-          type="button"
-          onClick={jumpToLatest}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            textAlign: "left",
-            cursor: "pointer",
-            margin: "12px 24px 0",
-            padding: "10px 14px",
-            border: "1px solid rgba(232, 149, 109, 0.55)",
-            borderRadius: 10,
-            background: "#fffaf6",
-            color: "#93452A",
-            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-            fontSize: 12,
-            lineHeight: 1.4,
-          }}
-        >
-          <span
-            aria-hidden
-            style={{
-              display: "inline-block",
-              width: 8,
-              height: 8,
-              borderRadius: 999,
-              background: "#e8956d",
-              flexShrink: 0,
-            }}
-          />
-          <span style={{ flex: 1, minWidth: 0 }}>
-            <strong style={{ fontWeight: 600 }}>Waiting for your reply</strong>
-            {latestQuestionSnippet ? (
-              <>
-                {" · "}
-                <span style={{ color: "#6b4a3d", fontStyle: "italic" }}>
-                  {latestQuestionSnippet}
-                  {latestQuestionEntry && (latestQuestionEntry.content || "").length > 160 ? "…" : ""}
-                </span>
-              </>
-            ) : (
-              <span style={{ color: "#6b4a3d" }}>
-                {" "}· tap to jump to the question
-              </span>
-            )}
-          </span>
-        </button>
-      )}
+      {/* "Waiting for your reply" banner removed — the reply input box is sufficient */}
 
       <div
         ref={scrollRef}
@@ -810,7 +1219,7 @@ export function ModalChat({
           padding: "24px 24px 16px 24px",
           display: "flex",
           flexDirection: "column",
-          gap: 8,
+          gap: 6,
         }}
       >
         {/* Empty state */}
@@ -857,20 +1266,57 @@ export function ModalChat({
           </div>
         )}
 
+        {/* Empty state for terminal tasks with no log entries */}
+        {!hasEntries && !hasChildren && isTerminal && (
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <span
+              style={{
+                fontSize: 13,
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                color: "#9C9CA0",
+              }}
+            >
+              No conversation history
+            </span>
+          </div>
+        )}
+
         {/* Typing indicator — before any entries arrive */}
-        {showTyping && <SpinnerVerb startedAt={startedAt} activityLabel={activityLabel} />}
+        {showTyping && <SpinnerVerb startedAt={startedAt} lastReplyAt={lastReplyAt} activityLabel={activityLabel} />}
 
         {/* Log entries — business-focused grouping with child task events */}
-        {renderItems.map((item) => {
+        {renderItems.map((item, index) => {
           // Derive source task ID from the first entry in each group
           const sourceId =
             "entries" in item ? item.entries[0]?.sourceTaskId
             : "entry" in item ? item.entry?.sourceTaskId
             : undefined;
 
+          if (item.kind === "thinking-group") {
+            return (
+              <div key={`thinking-${index}`}>
+                <ThinkingGroup
+                  items={item.items}
+                  onPreviewFile={onPreviewFile}
+                  activePreviewPath={activePreviewPath}
+                  permissionMode={permissionMode}
+                  taskId={taskId}
+                  readOnly={readOnly}
+                />
+              </div>
+            );
+          }
+
           if (item.kind === "text-group") {
             return (
-              <div key={item.entries[0].id} data-source-task={sourceId}>
+              <div key={item.entries[0].id} data-source-task={sourceId} style={{ marginTop: 14, marginBottom: 6 }}>
                 <TextGroup
                   entries={item.entries}
                   onPreviewFile={onPreviewFile}
@@ -879,11 +1325,20 @@ export function ModalChat({
             );
           }
           if (item.kind === "tool-group") {
+            // Legacy fallback — should not be produced by new grouping
+            return null;
+          }
+          if (item.kind === "tool-row") {
             return (
-              <div key={item.entries[0].id} data-source-task={sourceId}>
-                <ToolSummaryBlock
-                  entries={item.entries}
-                />
+              <div key={item.entries[0].id} data-source-task={sourceId} style={{ borderLeft: "2px solid rgba(218, 193, 185, 0.4)", paddingLeft: 10, marginLeft: 2 }}>
+                <ToolCompactRow toolName={item.toolName} entries={item.entries} />
+              </div>
+            );
+          }
+          if (item.kind === "todo-update") {
+            return (
+              <div key={item.entry.id} data-source-task={sourceId} style={{ marginTop: 4, marginBottom: 4 }}>
+                <TodoUpdateCard entry={item.entry} />
               </div>
             );
           }
@@ -891,7 +1346,7 @@ export function ModalChat({
             const info = parseFileOutput(item.entry);
             const active = !!info && activePreviewPath === info.relativePath;
             return (
-              <div key={item.entry.id} data-source-task={sourceId}>
+              <div key={item.entry.id} data-source-task={sourceId} style={{ marginTop: 10, marginBottom: 10 }}>
                 <FileOutputCard
                   entry={item.entry}
                   isActive={active}
@@ -901,6 +1356,13 @@ export function ModalChat({
                       : undefined
                   }
                 />
+              </div>
+            );
+          }
+          if (item.kind === "skill-invocation") {
+            return (
+              <div key={item.entry.id} data-source-task={sourceId} style={{ marginTop: 10, marginBottom: 10 }}>
+                <SkillInvocationCard entry={item.entry} />
               </div>
             );
           }
@@ -976,6 +1438,66 @@ export function ModalChat({
               </div>
             );
           }
+          if (item.kind === "phase-divider") {
+            const child = item.childTask;
+            const statusLabel =
+              child.status === "done" ? "Done"
+              : child.status === "running" ? "In Progress"
+              : child.status === "review" ? "Needs Review"
+              : child.status === "queued" ? "Queued"
+              : "Not Started";
+            const statusColor =
+              child.status === "done" ? "#6B8E6B"
+              : child.status === "running" ? "#C4784E"
+              : child.status === "review" ? "#B25D3F"
+              : "#9C9CA0";
+            const isPhase = child.phaseNumber != null;
+            const label = isPhase
+              ? `Phase ${child.phaseNumber}: ${child.title}`
+              : child.title;
+
+            return (
+              <div
+                key={`phase-div-${child.id}`}
+                data-phase-number={child.phaseNumber ?? undefined}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "12px 0 6px",
+                  margin: "8px 0 4px",
+                }}
+              >
+                <div style={{ flex: 1, height: 1, backgroundColor: "#EAE8E6" }} />
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    fontWeight: 600,
+                    color: "#5E5E65",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {label}
+                </span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    fontWeight: 500,
+                    color: statusColor,
+                    padding: "1px 6px",
+                    borderRadius: 4,
+                    backgroundColor: `${statusColor}11`,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {statusLabel}
+                </span>
+                <div style={{ flex: 1, height: 1, backgroundColor: "#EAE8E6" }} />
+              </div>
+            );
+          }
           if (item.kind === "child-review") {
             return (
               <div
@@ -1006,7 +1528,7 @@ export function ModalChat({
           }
           if (item.kind === "single") {
             return (
-              <div key={item.entry.id} data-source-task={sourceId}>
+              <div key={item.entry.id} data-source-task={sourceId} style={{ marginTop: 20, marginBottom: 10 }}>
                 <ChatEntry entry={item.entry} permissionMode={permissionMode} taskId={taskId} readOnly={readOnly} />
               </div>
             );
@@ -1015,7 +1537,7 @@ export function ModalChat({
         })}
 
         {/* Spinner verb — shown while Claude is actively working */}
-        {isRunning && !needsInput && <SpinnerVerb startedAt={startedAt} activityLabel={activityLabel} />}
+        {isActivelyWorking && <SpinnerVerb startedAt={startedAt} lastReplyAt={lastReplyAt} activityLabel={activityLabel} />}
 
         {/* Error banner — shown when task failed */}
         {showErrorBanner && errorMessage && <ErrorBanner message={errorMessage} />}
@@ -1033,20 +1555,7 @@ export function ModalChat({
 
         {/* Question indicator — hide when the structured question is already
             rendered inline in the timeline entry itself. */}
-        {needsInput === true && logEntries.length > 0 && !hasPendingStructuredQuestion && (
-          <div
-            style={{
-              fontSize: 12,
-              fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              color: "#93452A",
-              fontStyle: "italic",
-              textAlign: "center",
-              padding: "8px 0",
-            }}
-          >
-            Waiting for your reply...
-          </div>
-        )}
+        {/* Removed: "Waiting for your reply..." text — the reply input itself is sufficient */}
       </div>
 
       {/* Jump to latest button */}

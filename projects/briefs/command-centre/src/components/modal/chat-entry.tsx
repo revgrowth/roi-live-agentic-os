@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   FileText,
   FilePlus2,
@@ -10,6 +10,7 @@ import {
   Terminal,
   Globe,
   Sparkles,
+  Zap,
   ListChecks,
   MessageSquare,
   User as UserIcon,
@@ -59,7 +60,7 @@ function Timestamp({ iso }: { iso: string }) {
 
 const markdownComponents = {
   p: ({ children }: { children?: React.ReactNode }) => (
-    <p style={{ margin: "6px 0" }}>{children}</p>
+    <p style={{ margin: "12px 0" }}>{children}</p>
   ),
   a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
     <a
@@ -106,10 +107,10 @@ const markdownComponents = {
     <pre
       style={{
         backgroundColor: "rgba(0,0,0,0.04)",
-        padding: 12,
+        padding: 16,
         borderRadius: 6,
         overflow: "auto",
-        margin: "8px 0",
+        margin: "16px 0",
         fontSize: 13,
       }}
     >
@@ -117,26 +118,26 @@ const markdownComponents = {
     </pre>
   ),
   ul: ({ children }: { children?: React.ReactNode }) => (
-    <ul style={{ paddingLeft: 20, margin: "4px 0" }}>{children}</ul>
+    <ul style={{ paddingLeft: 20, margin: "10px 0" }}>{children}</ul>
   ),
   ol: ({ children }: { children?: React.ReactNode }) => (
-    <ol style={{ paddingLeft: 20, margin: "4px 0" }}>{children}</ol>
+    <ol style={{ paddingLeft: 20, margin: "10px 0" }}>{children}</ol>
   ),
   li: ({ children }: { children?: React.ReactNode }) => (
-    <li style={{ margin: "2px 0" }}>{children}</li>
+    <li style={{ margin: "4px 0" }}>{children}</li>
   ),
   h1: ({ children }: { children?: React.ReactNode }) => (
-    <h1 style={{ fontSize: 18, fontWeight: 700, margin: "12px 0 6px" }}>
+    <h1 style={{ fontSize: 20, fontWeight: 700, margin: "24px 0 10px" }}>
       {children}
     </h1>
   ),
   h2: ({ children }: { children?: React.ReactNode }) => (
-    <h2 style={{ fontSize: 16, fontWeight: 700, margin: "10px 0 4px" }}>
+    <h2 style={{ fontSize: 17, fontWeight: 700, margin: "20px 0 8px" }}>
       {children}
     </h2>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
-    <h3 style={{ fontSize: 14, fontWeight: 600, margin: "8px 0 4px" }}>
+    <h3 style={{ fontSize: 15, fontWeight: 600, margin: "16px 0 6px" }}>
       {children}
     </h3>
   ),
@@ -144,8 +145,8 @@ const markdownComponents = {
     <blockquote
       style={{
         borderLeft: "3px solid #93452A",
-        paddingLeft: 12,
-        margin: "6px 0",
+        padding: 14,
+        margin: "14px 0",
         color: "#5E5E65",
         fontStyle: "italic",
       }}
@@ -252,26 +253,29 @@ function CompactRow({
  * thing that gets a box.
  */
 /** Detect whether an inline code string looks like a file path. */
-const FILE_PATH_RE = /^[.\w/-]+\.\w{1,10}$/;
-const PREVIEWABLE_CODE_EXTS = new Set([
-  "md", "txt", "csv", "json", "html", "log", "yml", "yaml", "toml",
-  "ts", "tsx", "js", "jsx", "py", "rs", "go", "sql", "sh", "css",
+const FILE_PATH_RE = /^[.\w/ -]+\.\w{1,15}$/;
+const SKIP_CODE_EXTS = new Set([
+  "com", "org", "net", "io", "dev", "app",  // domains, not files
 ]);
 
 function looksLikeFilePath(text: string): boolean {
   if (!FILE_PATH_RE.test(text)) return false;
+  // Must contain at least one slash (directory separator)
+  if (!text.includes("/")) return false;
   const dot = text.lastIndexOf(".");
   if (dot < 0) return false;
   const ext = text.slice(dot + 1).toLowerCase();
-  return PREVIEWABLE_CODE_EXTS.has(ext);
+  return !SKIP_CODE_EXTS.has(ext);
 }
 
 export function TextGroup({
   entries,
   onPreviewFile,
+  variant = "answer",
 }: {
   entries: LogEntry[];
   onPreviewFile?: (file: { relativePath: string; extension: string; fileName: string }) => void;
+  variant?: "answer" | "narration";
 }) {
   const [previewingPath, setPreviewingPath] = useState<{ relativePath: string; extension: string } | null>(null);
 
@@ -333,25 +337,45 @@ export function TextGroup({
   };
 
   return (
-    <>
-      {entries.map((entry) => (
-        <div
-          key={entry.id}
-          className="chat-markdown"
-          style={{
-            width: "100%",
-            padding: "2px 2px",
-            fontSize: 13,
-            fontFamily: "var(--font-inter), Inter, sans-serif",
-            color: "#1B1C1B",
-            lineHeight: 1.6,
-          }}
-        >
-          <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-            {entry.content}
-          </ReactMarkdown>
-        </div>
-      ))}
+    <div
+      style={variant === "narration" ? {
+        padding: "2px 0",
+      } : {
+        backgroundColor: "#FBFAF9",
+        borderLeft: "3px solid rgba(218, 193, 185, 0.5)",
+        borderRadius: "0 6px 6px 0",
+        padding: "14px 18px",
+        maxWidth: 720,
+      }}
+    >
+      {entries.map((entry) => {
+        const isActiveQuestion = entry.type === "question";
+        return (
+          <div
+            key={entry.id}
+            className="chat-markdown"
+            style={variant === "narration" ? {
+              width: "100%",
+              fontSize: 12,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              color: "#7a7570",
+              lineHeight: 1.5,
+              ...(isActiveQuestion ? { fontWeight: 600 } : {}),
+            } : {
+              width: "100%",
+              fontSize: 14,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              color: "#1B1C1B",
+              lineHeight: 1.7,
+              ...(isActiveQuestion ? { fontWeight: 600 } : {}),
+            }}
+          >
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+              {entry.content}
+            </ReactMarkdown>
+          </div>
+        );
+      })}
       {previewingPath && (
         <div style={{ width: "100%", marginTop: 4, marginBottom: 4 }}>
           <div
@@ -386,7 +410,7 @@ export function TextGroup({
           />
         </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -403,6 +427,22 @@ export function isFileOutputEntry(entry: LogEntry): boolean {
     name === "multiedit" ||
     name === "notebookedit"
   );
+}
+
+/** True when the tool_use represents a skill invocation. */
+export function isSkillEntry(entry: LogEntry): boolean {
+  if (entry.type !== "tool_use") return false;
+  return (entry.toolName || "").toLowerCase() === "skill";
+}
+
+/** Extract the skill name from a Skill tool_use entry. */
+export function parseSkillName(entry: LogEntry): string | null {
+  if (!entry.toolArgs) return null;
+  try {
+    const args = JSON.parse(entry.toolArgs) as Record<string, unknown>;
+    if (typeof args.skill === "string") return args.skill;
+  } catch { /* ignore */ }
+  return null;
 }
 
 type FileOutputInfo = {
@@ -493,7 +533,7 @@ export function parseFileOutput(entry: LogEntry): FileOutputInfo | null {
   };
 }
 
-const PREVIEWABLE_EXTS = new Set(["md", "txt", "csv", "json", "html", "htm", "log"]);
+const PREVIEWABLE_EXTS = new Set(["md", "txt", "csv", "json", "html", "htm", "log", "xml", "yaml", "yml", "toml", "excalidraw"]);
 const HTML_EXTS = new Set(["html", "htm"]);
 
 /** Shared inline preview panel used by FileOutputCard and TextGroup. */
@@ -778,6 +818,54 @@ function ToolRow({ entry }: { entry: LogEntry }) {
   );
 }
 
+/** Renders a skill invocation as a distinct accent card. */
+export function SkillInvocationCard({ entry }: { entry: LogEntry }) {
+  const skillName = parseSkillName(entry) ?? "Unknown skill";
+  // Format skill name: "meta-wrap-up" → "Meta Wrap Up"
+  const displayName = skillName
+    .split(/[-_]/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+
+  return (
+    <div style={{ width: "100%" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "8px 12px",
+          borderLeft: "3px solid #7C3AED",
+          backgroundColor: "rgba(124, 58, 237, 0.04)",
+          borderRadius: "0 6px 6px 0",
+        }}
+      >
+        <Zap size={13} color="#7C3AED" style={{ flexShrink: 0 }} />
+        <span
+          style={{
+            fontSize: 12,
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+            fontWeight: 600,
+            color: "#7C3AED",
+          }}
+        >
+          Skill invoked
+        </span>
+        <span
+          style={{
+            fontSize: 12,
+            fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+            fontWeight: 500,
+            color: "#5B21B6",
+          }}
+        >
+          {displayName}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 /** Renders a group of consecutive tool_use / tool_result entries as a
  *  collapsible summary. Collapsed by default — shows "Used N tools" with
  *  a short preview of tool names. Expand to see the full list. */
@@ -888,34 +976,25 @@ function StructuredQuestionEntry({
   taskId?: string;
   readOnly?: boolean;
 }) {
-  const [expanded, setExpanded] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  let specs: QuestionSpec[] = [];
-  try {
-    if (entry.questionSpec) {
-      specs = parseQuestionSpecs(JSON.parse(entry.questionSpec));
+  const specs = useMemo(() => {
+    try {
+      if (entry.questionSpec) {
+        return parseQuestionSpecs(JSON.parse(entry.questionSpec));
+      }
+    } catch {
+      /* ignore */
     }
-  } catch {
-    /* ignore */
-  }
+    return [] as QuestionSpec[];
+  }, [entry.questionSpec]);
 
-  let answers: QuestionAnswers | null = null;
-  try {
-    if (entry.questionAnswers) {
-      answers = JSON.parse(entry.questionAnswers) as QuestionAnswers;
-    }
-  } catch {
-    /* ignore */
-  }
+  const answered = entry.questionAnswers != null || submitted;
 
-  const answered = answers !== null || submitted;
+  // Once answered (either from DB or just submitted), hide the entire block
+  if (specs.length === 0 || answered) return null;
+
   const count = specs.length;
-  // Structured questions are always interactive when unanswered — readOnly
-  // only gates the free-text reply input, not inline question forms.
-  const canShowForm = !answered && taskId && count > 0;
-
-  if (count === 0) return null;
 
   const handleSubmit = async (formAnswers: QuestionAnswers) => {
     if (!taskId) return;
@@ -924,7 +1003,7 @@ function StructuredQuestionEntry({
       await fetch(`/api/tasks/${taskId}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: prose }),
+        body: JSON.stringify({ message: prose, structuredAnswers: formAnswers }),
       });
       setSubmitted(true);
     } catch {
@@ -932,93 +1011,47 @@ function StructuredQuestionEntry({
     }
   };
 
-  const summary = answered
-    ? `${count} question${count === 1 ? "" : "s"} answered`
-    : `${count} question${count === 1 ? "" : "s"} — waiting for your reply`;
+  const summary = `${count} question${count === 1 ? "" : "s"} — waiting for your reply`;
 
   return (
     <div style={{ width: "100%" }}>
       <div
         style={{
-          borderLeft: `3px solid ${answered ? "#1B7F3A" : "#93452A"}`,
-          backgroundColor: answered ? "#F1F8F3" : "#FFF5F3",
+          borderLeft: "3px solid #93452A",
+          backgroundColor: "#FFF5F3",
           padding: "10px 14px",
           borderRadius: "0 0.5rem 0.5rem 0",
           fontFamily: "var(--font-inter), Inter, sans-serif",
           color: "#1B1C1B",
         }}
       >
-        {/* Header — always visible */}
-        <button
-          onClick={() => setExpanded((e) => !e)}
+        {/* Header */}
+        <div
           style={{
-            background: "none",
-            border: "none",
-            padding: 0,
             display: "flex",
             alignItems: "center",
             gap: 6,
-            cursor: "pointer",
             fontSize: 13,
             fontWeight: 600,
-            color: answered ? "#1B7F3A" : "#93452A",
+            color: "#93452A",
             fontFamily:
               "var(--font-space-grotesk), Space Grotesk, sans-serif",
+            marginBottom: 12,
           }}
         >
-          {(expanded || canShowForm) ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          <ChevronDown size={14} />
           {summary}
-        </button>
+        </div>
 
-        {/* Interactive form — shown inline when unanswered */}
-        {canShowForm && (
-          <div style={{ marginTop: 12 }}>
-            <QuestionModal
-              questions={specs}
-              variant="inline"
-              hideFooter={false}
-              submitLabel="Reply"
-              onSubmit={handleSubmit}
-            />
-          </div>
-        )}
-
-        {/* Read-only answers — shown when answered and expanded */}
-        {answered && expanded && (
-          <div
-            style={{
-              marginTop: 10,
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-            }}
-          >
-            {specs.map((spec) => {
-              const answer = answers?.[spec.id];
-              const displayAnswer = Array.isArray(answer)
-                ? answer.join(", ")
-                : typeof answer === "string"
-                ? answer
-                : "";
-              return (
-                <div key={spec.id} style={{ fontSize: 13, lineHeight: 1.5 }}>
-                  <div style={{ color: "#5E5E65", fontWeight: 500 }}>
-                    {spec.prompt}
-                  </div>
-                  <div
-                    style={{
-                      color: displayAnswer ? "#1B1C1B" : "#9C9CA0",
-                      marginTop: 2,
-                      whiteSpace: "pre-wrap",
-                      fontStyle: displayAnswer ? "normal" : "italic",
-                    }}
-                  >
-                    {displayAnswer || "(no answer)"}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        {/* Interactive form */}
+        {taskId && (
+          <QuestionModal
+            questions={specs}
+            variant="inline"
+            hideFooter={false}
+            submitLabel="Reply"
+            onSubmit={handleSubmit}
+          />
         )}
       </div>
       <Timestamp iso={entry.timestamp} />
@@ -1038,7 +1071,7 @@ function stripInjectedContext(text: string): string {
   // Remove session activity summary prefix injected for wrap-up tasks
   cleaned = cleaned.replace(/^IMPORTANT: The following session activity summary[\s\S]*?Now proceed with the task:\n*/m, "");
   // Remove structured question addendum
-  cleaned = cleaned.replace(/\n*---\nIMPORTANT:.*structured question protocol[\s\S]*$/m, "");
+  cleaned = cleaned.replace(/\n*---\nWhen you need clarification from the user[\s\S]*$/m, "");
   // Remove project scoping system prompt prefix
   cleaned = cleaned.replace(/^You are scoping a Level \d+ (?:planned |GSD )?project[\s\S]*?(?:CRITICAL:.*\n)*/m, "");
   // Remove GSD project prompt prefix
@@ -1051,6 +1084,9 @@ function stripInjectedContext(text: string): string {
 function UserReplyEntry({ entry, permissionMode }: { entry: LogEntry; permissionMode?: PermissionMode }) {
   const [collapsed, setCollapsed] = useState(false);
   const displayContent = stripInjectedContext(entry.content);
+  // Prefer the permission mode stored on the log entry (snapshot at send time)
+  // over the task-level mode (which reflects the latest value)
+  const effectiveMode = (entry.permissionMode as PermissionMode) || permissionMode;
 
   return (
     <div
@@ -1084,25 +1120,25 @@ function UserReplyEntry({ entry, permissionMode }: { entry: LogEntry; permission
           >
             You
           </span>
-          {permissionMode && (
+          {effectiveMode && (
             <span
               style={{
                 fontSize: 10,
                 fontFamily: "'DM Mono', monospace",
                 fontWeight: 500,
                 color:
-                  permissionMode === "plan" ? "#16A34A"
-                  : permissionMode === "bypassPermissions" || permissionMode === "acceptEdits" || permissionMode === "auto" ? "#DC2626"
+                  effectiveMode === "plan" ? "#16A34A"
+                  : effectiveMode === "bypassPermissions" || effectiveMode === "acceptEdits" || effectiveMode === "auto" ? "#DC2626"
                   : "#7C3AED",
                 background:
-                  permissionMode === "plan" ? "rgba(22, 163, 74, 0.08)"
-                  : permissionMode === "bypassPermissions" || permissionMode === "acceptEdits" || permissionMode === "auto" ? "rgba(220, 38, 38, 0.08)"
+                  effectiveMode === "plan" ? "rgba(22, 163, 74, 0.08)"
+                  : effectiveMode === "bypassPermissions" || effectiveMode === "acceptEdits" || effectiveMode === "auto" ? "rgba(220, 38, 38, 0.08)"
                   : "rgba(124, 58, 237, 0.08)",
                 padding: "2px 6px",
                 borderRadius: 3,
               }}
             >
-              {PERMISSION_MODE_LABELS[permissionMode]?.toLowerCase() ?? permissionMode} mode
+              {PERMISSION_MODE_LABELS[effectiveMode]?.toLowerCase() ?? effectiveMode} mode
             </span>
           )}
           <Timestamp iso={entry.timestamp} />
@@ -1188,7 +1224,10 @@ export function ChatEntry({
       // Handled by ToolSummaryBlock in grouped rendering
       return null;
     case "question":
-      return <QuestionEntry entry={entry} />;
+      // Prose-detected questions render as normal text — they're usually
+      // rhetorical (Claude kept going). Only structured_question gets
+      // interactive treatment.
+      return <TextGroup entries={[entry]} />;
     case "structured_question":
       return <StructuredQuestionEntry entry={entry} taskId={taskId} readOnly={readOnly} />;
     case "user_reply":

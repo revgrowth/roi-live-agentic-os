@@ -54,7 +54,7 @@ export function ModalSidebar({ task, onFileClick }: { task: Task; onFileClick?: 
       <div style={{ height: 8 }} />
 
       {/* Outputs */}
-      <PanelOutputs taskId={task.id} onFileClick={onFileClick} />
+      <PanelOutputs taskId={task.id} clientId={task.clientId} onFileClick={onFileClick} />
 
       {/* Error section */}
       {task.errorMessage && (

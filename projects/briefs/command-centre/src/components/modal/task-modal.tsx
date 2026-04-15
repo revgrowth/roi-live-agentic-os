@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useTaskStore } from "@/store/task-store";
 import type { LogEntry, OutputFile } from "@/types/task";
 import { ModalHeader } from "./modal-header";
@@ -9,8 +9,11 @@ import { ReplyInput } from "./reply-input";
 import { ModalFilePreview } from "./modal-file-preview";
 import { ModalNewTaskForm } from "./modal-new-task-form";
 import { ProjectDashboard } from "./project-dashboard";
+import { ChatList } from "./chat-list";
+import { PaneContainer } from "./pane-container";
 import { PanelOutputs } from "../panel/panel-outputs";
 import { QuestionModal } from "@/components/shared/question-modal";
+import { usePaneState } from "@/hooks/use-pane-state";
 import {
   parseQuestionSpecs,
   type QuestionSpec,
@@ -20,11 +23,12 @@ import {
 // Stable reference to avoid infinite re-render loop in Zustand selector
 const EMPTY_LOG_ENTRIES: LogEntry[] = [];
 
-type ModalTab = "conversation" | "files";
+type ModalTab = "conversation" | "plan" | "files";
 
-const TAB_CONFIG: { key: ModalTab; label: string }[] = [
-  { key: "conversation", label: "Conversation" },
-  { key: "files", label: "Files" },
+const TAB_CONFIG: { key: ModalTab; getLabel?: (count: number) => string; label?: string }[] = [
+  { key: "conversation", label: "Chat" },
+  { key: "files", getLabel: (count: number) => `Files (${count})` },
+  { key: "plan", label: "Plan" },
 ];
 
 export function TaskModal() {
@@ -32,6 +36,7 @@ export function TaskModal() {
   const closePanel = useTaskStore((s) => s.closePanel);
   const tasks = useTaskStore((s) => s.tasks);
   const fetchLogEntries = useTaskStore((s) => s.fetchLogEntries);
+  const updateTask = useTaskStore((s) => s.updateTask);
 
   const [isVisible, setIsVisible] = useState(false);
   const [activeFile, setActiveFile] = useState<OutputFile | null>(null);
@@ -85,12 +90,11 @@ export function TaskModal() {
     ? tasks.find((t) => t.id === viewingTaskId)
     : null;
 
-  // Get child tasks for parent tasks (level !== "task").
+  // Get child tasks for parent-level tasks OR any task that has children.
   // Match GoalCard's join: any task whose parentId === viewingTaskId, OR any
   // task that shares the same projectSlug (catches legacy wizard children
   // that were created with parentId: null before the backfill landed).
-  const isParentTask = task && task.level !== "task";
-  const childTasks = isParentTask
+  const childTasks = task
     ? tasks
         .filter(
           (t) =>
@@ -99,6 +103,7 @@ export function TaskModal() {
         )
         .sort((a, b) => a.columnOrder - b.columnOrder)
     : [];
+  const isParentTask = task && (task.level !== "task" || childTasks.length > 0);
 
   // Navigate into a subtask without closing the modal
   const navigateToChild = useCallback((childId: string) => {
@@ -118,6 +123,49 @@ export function TaskModal() {
   }, []);
 
   const hasNavHistory = navStack.length > 0;
+
+  // ── VS Code-style pane state (extracted hook) ────────────────────
+  const {
+    paneState,
+    visiblePanes,
+    hasPanesOpen,
+    isMainChatSolo,
+    handleOpenChat,
+    handleOpenTerminal,
+    handleOpenSubtaskPane,
+    handleAddToViewport,
+    handleClosePane,
+    handleRemovePane,
+    handleFocusPane,
+    handleFocusMainChat,
+    handleSplitWithNew,
+    handleSetLayout,
+    handleToggleSidebar,
+    handleCloseAllPanes,
+    handleRenamePane,
+    handleAssignTaskToPane,
+    resetPaneState,
+  } = usePaneState(viewingTaskId ?? undefined);
+
+  // Track whether we've auto-expanded for this modal open
+  const hasAutoExpanded = useRef(false);
+
+  // Auto-expand modal when multiple panes become visible
+  useEffect(() => {
+    if (visiblePanes.length >= 2 && !hasAutoExpanded.current) {
+      hasAutoExpanded.current = true;
+      const target = Math.min(panelWidth * 1.5, window.innerWidth - 40);
+      if (target > panelWidth) {
+        setPanelWidth(Math.round(target));
+      }
+    }
+  }, [visiblePanes.length, panelWidth]);
+
+  // Reset pane state when modal closes or task changes
+  useEffect(() => {
+    resetPaneState();
+    hasAutoExpanded.current = false;
+  }, [selectedTaskId, resetPaneState]);
 
   // Fetch log entries into the store when task changes
   useEffect(() => {
@@ -144,15 +192,17 @@ export function TaskModal() {
     fetchLogEntries(selectedTaskId);
   }, [selectedTaskId, fetchLogEntries]);
 
+  // needsInput is cleared when the user sends a reply, not on view
+
   // Fetch log entries for all child tasks
   useEffect(() => {
-    if (!isParentTask || childTasks.length === 0) return;
+    if (childTasks.length === 0) return;
     for (const child of childTasks) {
       fetchLogEntries(child.id);
     }
     // Only re-fetch when the set of child IDs changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isParentTask, childTasks.map((c) => c.id).join(","), fetchLogEntries]);
+  }, [childTasks.map((c) => c.id).join(","), fetchLogEntries]);
 
   // Auto-preview: when the currently-viewed task produces an HTML output,
   // automatically open it in the file preview (Vibe Kanban-style). We only
@@ -189,19 +239,22 @@ export function TaskModal() {
   const allLogEntries = useTaskStore((s) => s.logEntries);
   const logEntries = (viewingTaskId ? allLogEntries[viewingTaskId] : undefined) ?? EMPTY_LOG_ENTRIES;
 
-  // Build child log entries record
+  // Build child log entries record — always build for any task with children
   const childLogEntries: Record<string, LogEntry[]> = {};
-  if (isParentTask) {
-    for (const child of childTasks) {
-      childLogEntries[child.id] = allLogEntries[child.id] ?? EMPTY_LOG_ENTRIES;
-    }
+  for (const child of childTasks) {
+    childLogEntries[child.id] = allLogEntries[child.id] ?? EMPTY_LOG_ENTRIES;
   }
 
-  // Escape to close (or go back through nav stack)
+  // Escape to close (or go back through nav stack) + pane shortcuts
   useEffect(() => {
     if (!selectedTaskId) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        // Close panes first
+        if (hasPanesOpen) {
+          handleCloseAllPanes();
+          return;
+        }
         if (activeFile) {
           if (viewingTaskId) {
             userDismissedAutoPreviewRef.current.add(viewingTaskId);
@@ -215,10 +268,22 @@ export function TaskModal() {
           closePanel();
         }
       }
+      // Cmd+\ — split with new chat
+      if (e.key === "\\" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        handleSplitWithNew();
+      }
+      // Cmd+1/2/3/4 — switch pane focus by position
+      if (["1", "2", "3", "4"].includes(e.key) && (e.metaKey || e.ctrlKey) && visiblePanes.length > 1) {
+        e.preventDefault();
+        const idx = parseInt(e.key) - 1;
+        const target = visiblePanes[idx];
+        if (target) handleFocusPane(target.id);
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [selectedTaskId, closePanel, activeFile, newTaskAttachment, hasNavHistory, navigateBack, viewingTaskId]);
+  }, [selectedTaskId, closePanel, activeFile, newTaskAttachment, hasNavHistory, navigateBack, viewingTaskId, hasPanesOpen, handleCloseAllPanes, visiblePanes, handleFocusPane, handleSplitWithNew]);
 
   // Optimistic reply handler
   const appendLogEntry = useTaskStore((s) => s.appendLogEntry);
@@ -434,7 +499,7 @@ export function TaskModal() {
           </div>
         )}
 
-        {/* Tab bar */}
+        {/* Tab bar — Chat / Files / Plan */}
         {!activeFile && !newTaskAttachment && (
           <div
             style={{
@@ -445,30 +510,15 @@ export function TaskModal() {
               flexShrink: 0,
             }}
           >
-            {TAB_CONFIG.map((tab) => {
-              const isActive = activeTab === tab.key;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  style={{
-                    padding: "10px 16px",
-                    fontSize: 12,
-                    fontWeight: isActive ? 600 : 500,
-                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                    border: "none",
-                    borderBottom: isActive ? "2px solid #93452A" : "2px solid transparent",
-                    backgroundColor: "transparent",
-                    color: isActive ? "#93452A" : "#9C9CA0",
-                    cursor: "pointer",
-                    transition: "all 120ms ease",
-                    marginBottom: -1,
-                  }}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
+            {TAB_CONFIG.map((tab) => (
+              <TabButton
+                key={tab.key}
+                label={tab.getLabel ? tab.getLabel(currentOutputs?.length ?? 0) : tab.label!}
+                tabKey={tab.key}
+                activeTab={activeTab}
+                onClick={() => setActiveTab(tab.key)}
+              />
+            ))}
           </div>
         )}
 
@@ -511,93 +561,240 @@ export function TaskModal() {
               }}
             />
           ) : activeTab === "conversation" ? (
-            isParentTask ? (
-              <ProjectDashboard
-                task={task}
-                childTasks={childTasks}
-                childLogEntries={childLogEntries}
-                logEntries={logEntries}
-                isRunning={isRunning}
-                needsInput={task.needsInput === true}
-                status={task.status}
-                showReplyInput={showReplyInput}
-                onViewSubtask={navigateToChild}
-                onOptimisticReply={handleOptimisticReply}
-                onPreviewFile={(f) => {
-                  setActiveFile({
-                    id: `chat-preview-${f.relativePath}`,
-                    taskId: task.id,
-                    fileName: f.fileName,
-                    filePath: f.relativePath,
-                    relativePath: f.relativePath,
-                    extension: f.extension,
-                    sizeBytes: null,
-                    createdAt: new Date().toISOString(),
-                  });
-                }}
-                briefDescription={displayDescription}
-                onOpenBrief={
-                  task.projectSlug
-                    ? () => {
-                        const briefPath = `projects/briefs/${task.projectSlug}/brief.md`;
-                        setActiveFile({
-                          id: `brief-${task.projectSlug}`,
-                          taskId: task.id,
-                          fileName: "brief.md",
-                          filePath: briefPath,
-                          relativePath: briefPath,
-                          extension: "md",
-                          sizeBytes: null,
-                          createdAt: new Date().toISOString(),
-                        });
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
+                {/* Main content: panes when active, otherwise project dashboard / chat */}
+                <div style={{ flex: 1, display: "flex", overflow: "hidden", minWidth: 0, minHeight: 0 }}>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+                  <PaneContainer
+                    visiblePanes={visiblePanes}
+                    allTasks={tasks}
+                    logEntriesByTask={childLogEntries}
+                    activePaneId={paneState.activePaneId}
+                    layout={paneState.layout}
+                    parentTask={task}
+                    mainPaneLabel={task.title}
+                    onFocusPane={handleFocusPane}
+                    onClosePane={handleClosePane}
+                    onSetLayout={handleSetLayout}
+                    onDropPane={handleAddToViewport}
+                    onPreviewFile={(f) => {
+                      setActiveFile({
+                        id: `pane-preview-${f.relativePath}`,
+                        taskId: task.id,
+                        fileName: f.fileName,
+                        filePath: f.relativePath,
+                        relativePath: f.relativePath,
+                        extension: f.extension,
+                        sizeBytes: null,
+                        createdAt: new Date().toISOString(),
+                      });
+                    }}
+                    onRenamePane={handleRenamePane}
+                    onAssignTaskToPane={handleAssignTaskToPane}
+                    subtasks={childTasks.map((s) => ({ id: s.id, title: s.title, status: s.status, phaseNumber: s.phaseNumber, gsdStep: s.gsdStep, needsInput: s.needsInput === true }))}
+                    onMarkTaskDone={(taskId) => updateTask(taskId, { status: "done", needsInput: false })}
+                    onMarkSubtaskDone={(id) => updateTask(id, { status: "done", needsInput: false })}
+                    onRunSubtaskInNewChat={(id, title) => {
+                      handleOpenSubtaskPane(id, title);
+                      useTaskStore.getState().fetchLogEntries(id);
+                      updateTask(id, { status: "running", permissionMode: task.permissionMode ?? "bypassPermissions" });
+                      fetch(`/api/tasks/${id}/execute`, { method: "POST" });
+                    }}
+                    availablePanes={[
+                      { id: "main-chat", label: "Main chat", isMain: true },
+                      ...paneState.openPanes.filter((p) => p.type === "chat").map((p) => ({ id: p.id, label: p.label })),
+                    ]}
+                    onRunSubtaskInPane={(subtaskId, paneId) => {
+                      if (paneId !== "main-chat") {
+                        handleAssignTaskToPane(paneId, subtaskId);
+                        handleFocusPane(paneId);
                       }
-                    : undefined
-                }
-              />
-            ) : (
-              <>
-                <ModalChat
-                  taskId={task.id}
-                  logEntries={logEntries}
-                  isRunning={isRunning}
-                  needsInput={task.needsInput === true}
-                  status={task.status}
+                      updateTask(subtaskId, { status: "running", permissionMode: task.permissionMode ?? "bypassPermissions" });
+                      useTaskStore.getState().fetchLogEntries(subtaskId);
+                      fetch(`/api/tasks/${subtaskId}/execute`, { method: "POST" });
+                    }}
+                    renderMainPane={() => (
+                      isParentTask ? (
+                      <ProjectDashboard
+                        task={task}
+                        childTasks={childTasks}
+                        childLogEntries={childLogEntries}
+                        logEntries={logEntries}
+                        isRunning={isRunning}
+                        needsInput={task.needsInput === true}
+                        status={task.status}
+                        showReplyInput={showReplyInput}
+                        onViewSubtask={navigateToChild}
+                        onOptimisticReply={handleOptimisticReply}
+                        onPreviewFile={(f) => {
+                          setActiveFile({
+                            id: `chat-preview-${f.relativePath}`,
+                            taskId: task.id,
+                            fileName: f.fileName,
+                            filePath: f.relativePath,
+                            relativePath: f.relativePath,
+                            extension: f.extension,
+                            sizeBytes: null,
+                            createdAt: new Date().toISOString(),
+                          });
+                        }}
+                        briefDescription={displayDescription}
+                        openPanes={paneState.openPanes}
+                        onOpenSubtaskPane={handleOpenSubtaskPane}
+                        onFocusPane={handleFocusPane}
+                        onAssignSubtaskToPane={handleAssignTaskToPane}
+                        onOpenBrief={
+                          task.projectSlug && task.level === "gsd"
+                            ? () => {
+                                const briefPath = `projects/briefs/${task.projectSlug}/brief.md`;
+                                setActiveFile({
+                                  id: `brief-${task.projectSlug}`,
+                                  taskId: task.id,
+                                  fileName: "brief.md",
+                                  filePath: briefPath,
+                                  relativePath: briefPath,
+                                  extension: "md",
+                                  sizeBytes: null,
+                                  createdAt: new Date().toISOString(),
+                                });
+                              }
+                            : undefined
+                        }
+                        onOpenPlan={
+                          task.projectSlug
+                            ? () => {
+                                const isGsd = task.level === "gsd";
+                                const planPath = isGsd
+                                  ? `projects/briefs/${task.projectSlug}/.planning/ROADMAP.md`
+                                  : `projects/briefs/${task.projectSlug}/brief.md`;
+                                const fileName = isGsd ? "ROADMAP.md" : "brief.md";
+                                setActiveFile({
+                                  id: `plan-${task.projectSlug}`,
+                                  taskId: task.id,
+                                  fileName,
+                                  filePath: planPath,
+                                  relativePath: planPath,
+                                  extension: "md",
+                                  sizeBytes: null,
+                                  createdAt: new Date().toISOString(),
+                                });
+                              }
+                            : undefined
+                        }
+                      />
+                      ) : (
+                        <>
+                          <ModalChat
+                            taskId={task.id}
+                            logEntries={logEntries}
+                            isRunning={isRunning}
+                            needsInput={task.needsInput === true}
+                            status={task.status}
+                            childTasks={childTasks}
+                            childLogEntries={childLogEntries}
+                            activePreviewPath={null}
+                            onPreviewFile={(f) => {
+                              setActiveFile({
+                                id: `chat-preview-${f.relativePath}`,
+                                taskId: task.id,
+                                fileName: f.fileName,
+                                filePath: f.relativePath,
+                                relativePath: f.relativePath,
+                                extension: f.extension,
+                                sizeBytes: null,
+                                createdAt: new Date().toISOString(),
+                              });
+                            }}
+                            activityLabel={task.activityLabel}
+                            startedAt={task.startedAt}
+                            lastReplyAt={task.lastReplyAt}
+                            costUsd={task.costUsd}
+                            tokensUsed={task.tokensUsed}
+                            errorMessage={task.errorMessage}
+                            durationMs={task.durationMs}
+                          />
+                          <ReplyInput
+                            taskId={task.id}
+                            isVisible={showReplyInput}
+                            needsInput={task.needsInput === true}
+                            taskStatus={task.status}
+                            initialPermissionMode={task.permissionMode ?? "bypassPermissions"}
+                            initialModel={task.model ?? null}
+                            onOptimisticReply={handleOptimisticReply}
+                            projectSlug={task.projectSlug}
+                            hideTasksPopover={task.level === "task"}
+                          />
+                        </>
+                      )
+                    )}
+                  />
+                </div>
+
+                {/* Pane sidebar — shows open panes, + to add chat/terminal */}
+                <ChatList
+                  openPanes={paneState.openPanes}
+                  activePaneId={paneState.activePaneId}
+                  visiblePaneIds={paneState.visiblePaneIds}
+                  parentTaskTitle={task.title}
+                  collapsed={paneState.sidebarCollapsed}
+                  onToggleCollapse={handleToggleSidebar}
+                  onFocusPane={handleFocusPane}
+                  onFocusMainChat={handleFocusMainChat}
+                  onRemovePane={handleRemovePane}
+                  onAddToViewport={handleAddToViewport}
+                  onRenamePane={handleRenamePane}
+                  onOpenChat={handleOpenChat}
+                  onOpenTerminal={handleOpenTerminal}
+                  mainTaskId={task.id}
                   childTasks={childTasks}
-                  childLogEntries={childLogEntries}
-                  activePreviewPath={null}
-                  onPreviewFile={(f) => {
+                  onOpenSubtaskPane={handleOpenSubtaskPane}
+                />
+                </div>
+              </div>
+          ) : activeTab === "plan" ? (
+            task.projectSlug ? (
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                <ModalFilePreview
+                  fileName={task.level === "gsd" ? "ROADMAP.md" : "brief.md"}
+                  relativePath={
+                    task.level === "gsd"
+                      ? `projects/briefs/${task.projectSlug}/.planning/ROADMAP.md`
+                      : `projects/briefs/${task.projectSlug}/brief.md`
+                  }
+                  onBack={() => setActiveTab("conversation")}
+                  onNewTask={handleNewTaskFromOutput}
+                  onSelectFile={(path) => {
+                    const name = path.split("/").pop() ?? path;
                     setActiveFile({
-                      id: `chat-preview-${f.relativePath}`,
+                      id: `plan-nav-${path}`,
                       taskId: task.id,
-                      fileName: f.fileName,
-                      filePath: f.relativePath,
-                      relativePath: f.relativePath,
-                      extension: f.extension,
+                      fileName: name,
+                      relativePath: path,
+                      filePath: path,
+                      extension: name.includes(".") ? name.split(".").pop() ?? "" : "",
                       sizeBytes: null,
                       createdAt: new Date().toISOString(),
                     });
                   }}
-                  activityLabel={task.activityLabel}
-                  startedAt={task.startedAt}
-                  costUsd={task.costUsd}
-                  tokensUsed={task.tokensUsed}
-                  errorMessage={task.errorMessage}
-                  durationMs={task.durationMs}
                 />
-                <ReplyInput
-                  taskId={task.id}
-                  isVisible={showReplyInput}
-                  needsInput={task.needsInput === true}
-                  taskStatus={task.status}
-                  initialPermissionMode={task.permissionMode ?? "bypassPermissions"}
-                  initialModel={task.model ?? null}
-                  onOptimisticReply={handleOptimisticReply}
+                <SyncDeliverablesBar
+                  projectSlug={task.projectSlug}
+                  parentId={task.id}
+                  clientId={task.clientId}
+                  onSynced={() => fetchLogEntries(task.id)}
                 />
-              </>
+              </div>
+            ) : (
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, color: "#9C9CA0", fontSize: 13, fontFamily: "var(--font-inter), Inter, sans-serif", padding: 24 }}>
+                <span>No plan linked to this task yet</span>
+                <span style={{ fontSize: 11, lineHeight: 1.5, textAlign: "center", maxWidth: 280 }}>
+                  Set a <strong style={{ color: "#5E5E65" }}>projectSlug</strong> on this task to link it to a brief in <code style={{ fontSize: 10, background: "#F6F3F1", padding: "1px 4px", borderRadius: 3 }}>projects/briefs/</code>
+                </span>
+              </div>
             )
           ) : activeTab === "files" ? (
             <div style={{ flex: 1, overflowY: "auto" }}>
-              <PanelOutputs taskId={task.id} onFileClick={handleFileClick} />
+              <PanelOutputs taskId={task.id} clientId={task.clientId} projectSlug={task.projectSlug} taskLevel={task.level} onFileClick={handleFileClick} />
             </div>
           ) : null}
         </div>
@@ -619,5 +816,126 @@ export function TaskModal() {
         />
       )}
     </>
+  );
+}
+
+/* ─── Sync deliverables bar ────────────────────────────────────── */
+
+function SyncDeliverablesBar({ projectSlug, parentId, clientId, onSynced }: {
+  projectSlug: string;
+  parentId: string;
+  clientId?: string | null;
+  onSynced: () => void;
+}) {
+  const [syncing, setSyncing] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+  const fetchTasks = useTaskStore((s) => s.fetchTasks);
+
+  const handleSync = async () => {
+    setSyncing(true);
+    setResult(null);
+    try {
+      const res = await fetch("/api/briefs/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "sync-deliverables-to-tasks",
+          projectSlug,
+          parentId,
+          clientId,
+        }),
+      });
+      const data = await res.json();
+      if (data.created?.length > 0) {
+        setResult(`Created ${data.created.length} subtask${data.created.length > 1 ? "s" : ""}`);
+        fetchTasks();
+        onSynced();
+      } else {
+        setResult(data.message || "Already in sync");
+      }
+      setTimeout(() => setResult(null), 3000);
+    } catch {
+      setResult("Sync failed");
+      setTimeout(() => setResult(null), 3000);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  return (
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      gap: 8,
+      padding: "6px 16px",
+      borderTop: "1px solid #EAE8E6",
+      flexShrink: 0,
+      backgroundColor: "#FCFBFA",
+    }}>
+      {result && (
+        <span style={{
+          fontSize: 11,
+          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+          color: result.startsWith("Created") ? "#6B8E6B" : "#9C9CA0",
+        }}>
+          {result}
+        </span>
+      )}
+      <button
+        onClick={handleSync}
+        disabled={syncing}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 4,
+          padding: "4px 10px",
+          border: "none",
+          borderRadius: 4,
+          backgroundColor: "rgba(109, 40, 217, 0.08)",
+          color: "#6D28D9",
+          fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+          fontSize: 11,
+          fontWeight: 600,
+          cursor: syncing ? "wait" : "pointer",
+          opacity: syncing ? 0.6 : 1,
+        }}
+        onMouseEnter={(e) => { if (!syncing) e.currentTarget.style.backgroundColor = "rgba(109, 40, 217, 0.14)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(109, 40, 217, 0.08)"; }}
+      >
+        {syncing ? "Syncing..." : "Sync deliverables → subtasks"}
+      </button>
+    </div>
+  );
+}
+
+/* ─── Tab button helper ────────────────────────────────────────── */
+
+function TabButton({ label, tabKey, activeTab, onClick }: {
+  label: string;
+  tabKey: string;
+  activeTab: string;
+  onClick: () => void;
+}) {
+  const isActive = activeTab === tabKey;
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: "10px 16px",
+        fontSize: 12,
+        fontWeight: isActive ? 600 : 500,
+        fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+        border: "none",
+        borderBottom: isActive ? "2px solid #93452A" : "2px solid transparent",
+        backgroundColor: "transparent",
+        color: isActive ? "#93452A" : "#9C9CA0",
+        cursor: "pointer",
+        transition: "all 120ms ease",
+        marginBottom: -1,
+      }}
+    >
+      {label}
+    </button>
   );
 }

@@ -132,6 +132,8 @@ export async function POST(request: Request) {
         permissionMode: "default",
         lastReplyAt: null,
         goalGroup: null,
+        tag: null,
+        pinnedAt: null,
       };
 
       db.prepare(
@@ -156,12 +158,14 @@ export async function POST(request: Request) {
         phaseNumber: currentPhase?.number ?? parentTask.phaseNumber,
       };
 
-      // Only update status if it's not currently being worked on in a session
-      if (parentTask.status !== "running" && !allComplete) {
+      // Respect user-initiated done/review states — never resurrect a task
+      // the user has manually completed. Only update status for active tasks.
+      const userSettled = parentTask.status === "done" || parentTask.status === "review";
+      if (!userSettled && parentTask.status !== "running" && !allComplete) {
         updates.status = "running";
         if (!parentTask.startedAt) updates.startedAt = now;
       }
-      if (allComplete && parentTask.status !== "done") {
+      if (allComplete && !userSettled) {
         updates.status = "done";
         updates.completedAt = now;
       }
@@ -260,6 +264,8 @@ export async function POST(request: Request) {
           permissionMode: "default",
           lastReplyAt: null,
           goalGroup: null,
+          tag: null,
+          pinnedAt: null,
         };
 
         db.prepare(

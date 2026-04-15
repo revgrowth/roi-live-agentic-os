@@ -282,17 +282,27 @@ function CommandCentreBody() {
       }}>
         {/* Left: branding + tabs */}
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <h1 style={{
-            fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
-            fontWeight: 700,
-            fontSize: 18,
-            color: "#93452A",
-            letterSpacing: "-0.02em",
-            margin: 0,
-            whiteSpace: "nowrap",
-          }}>
-            Agentic OS
-          </h1>
+          <a
+            href="https://skool.com/scrapes"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none" }}
+          >
+            <img src="/logo.png" alt="" style={{ width: 26, height: 26, display: "block" }} />
+            <h1 style={{
+              fontFamily: "var(--font-epilogue), Epilogue, sans-serif",
+              fontWeight: 700,
+              fontSize: 18,
+              color: "#1B1C1B",
+              letterSpacing: "-0.02em",
+              margin: 0,
+              marginTop: 4,
+              whiteSpace: "nowrap",
+              lineHeight: 1,
+            }}>
+              Agentic OS
+            </h1>
+          </a>
 
           <div style={{
             width: 1,

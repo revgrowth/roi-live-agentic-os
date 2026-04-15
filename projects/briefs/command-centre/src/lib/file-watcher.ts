@@ -111,26 +111,24 @@ class FileWatcher {
       const fileName = path.basename(filePath);
       const extension = path.extname(filePath).replace(".", "").toLowerCase();
 
-      // Only track deliverable file types — skip source code and config files
-      const deliverableExtensions = new Set([
-        "md", "txt", "pdf", "csv", "json",
-        "png", "jpg", "jpeg", "gif", "svg", "webp",
-        "mp4", "mp3", "wav",
-        "html", "xml",
-        "doc", "docx", "xls", "xlsx", "ppt", "pptx",
-      ]);
-      const sourceExtensions = new Set([
+      // Skip source code, config, and extensionless files — track everything else as deliverables.
+      // Blocklist approach: any extension NOT in this set is considered a deliverable output.
+      const skipExtensions = new Set([
+        // Source code
         "ts", "tsx", "js", "jsx", "css", "scss", "less",
         "py", "rb", "go", "rs", "java", "c", "cpp", "h",
         "sh", "bash", "zsh", "sql",
+        // Config / build artifacts
+        "lock", "map", "d.ts", "tsbuildinfo", "env", "log",
+        "gitignore", "eslintrc", "prettierrc",
       ]);
 
-      if (sourceExtensions.has(extension)) {
-        console.log(`[file-watcher] Skipping source file: ${fileName}`);
+      if (extension === "") {
+        console.log(`[file-watcher] Skipping extensionless file: ${fileName}`);
         return;
       }
-      if (!deliverableExtensions.has(extension) && extension !== "") {
-        console.log(`[file-watcher] Skipping non-deliverable: ${fileName}`);
+      if (skipExtensions.has(extension)) {
+        console.log(`[file-watcher] Skipping source/config file: ${fileName}`);
         return;
       }
 

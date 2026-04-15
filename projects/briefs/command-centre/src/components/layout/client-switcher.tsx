@@ -183,19 +183,7 @@ export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSw
         title={collapsed ? `Workspace: ${displayName}` : undefined}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-          {selectedClient ? (
-            <span
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                backgroundColor: selectedClient.color,
-                flexShrink: 0,
-              }}
-            />
-          ) : (
-            <Globe size={16} style={{ color: "#5E5E65", flexShrink: 0 }} />
-          )}
+          <Globe size={16} style={{ color: "#5E5E65", flexShrink: 0 }} />
           {!collapsed && (
             <span
               style={{
@@ -333,15 +321,6 @@ export function ClientSwitcher({ collapsed = false, direction = "up" }: ClientSw
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-                <span
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    backgroundColor: client.color,
-                    flexShrink: 0,
-                  }}
-                />
                 <span
                   style={{
                     display: "block",

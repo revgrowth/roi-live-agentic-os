@@ -102,11 +102,12 @@ export async function POST(
     ).run(JSON.stringify(structuredAnswers), answeredLogId);
   }
 
-  // Persist user reply as log entry
+  // Persist user reply as log entry — include the permissionMode active at reply time
   const entryId = crypto.randomUUID();
+  const replyPermMode = (permissionMode && VALID_PERMISSION_MODES.includes(permissionMode)) ? permissionMode : (task.permissionMode || null);
   db.prepare(
-    "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-  ).run(entryId, id, "user_reply", now, trimmed, null, null, null, 0, null, null);
+    "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers, permissionMode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  ).run(entryId, id, "user_reply", now, trimmed, null, null, null, 0, null, null, replyPermMode);
 
   // Title is set once at creation (via AI generation or fallback).
   // User replies are follow-ups, not new goals — don't overwrite the title.
@@ -142,6 +143,7 @@ export async function POST(
       type: "user_reply",
       timestamp: now,
       content: trimmed,
+      permissionMode: replyPermMode ?? undefined,
     },
   });
 

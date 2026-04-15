@@ -155,6 +155,8 @@ export async function POST(
           permissionMode: "default",
           lastReplyAt: null,
           goalGroup: null,
+          tag: null,
+          pinnedAt: null,
         };
 
         db.prepare(

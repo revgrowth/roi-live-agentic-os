@@ -173,12 +173,14 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { type, content, toolName, toolArgs, toolResult } = body as {
+    const { type, content, toolName, toolArgs, toolResult, questionSpec, questionAnswers } = body as {
       type: string;
       content: string;
       toolName?: string;
       toolArgs?: string;
       toolResult?: string;
+      questionSpec?: string;
+      questionAnswers?: string;
     };
 
     if (!type || !content) {
@@ -193,11 +195,13 @@ export async function POST(
       ...(toolName ? { toolName } : {}),
       ...(toolArgs ? { toolArgs } : {}),
       ...(toolResult ? { toolResult } : {}),
+      ...(questionSpec ? { questionSpec } : {}),
+      ...(questionAnswers ? { questionAnswers } : {}),
     };
 
     db.prepare(
       "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-    ).run(entry.id, id, entry.type, entry.timestamp, entry.content, toolName ?? null, toolArgs ?? null, toolResult ?? null, 0, null, null);
+    ).run(entry.id, id, entry.type, entry.timestamp, entry.content, toolName ?? null, toolArgs ?? null, toolResult ?? null, 0, questionSpec ?? null, questionAnswers ?? null);
 
     emitTaskEvent({
       type: "task:log",

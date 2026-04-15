@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, X, CheckCircle2, Paperclip, Download, Eye, FileText, Play, ArrowLeft, Maximize2, Minimize2, Plus, Pencil, Terminal, Copy } from "lucide-react";
+import { Check, X, CheckCircle2, Paperclip, Download, Eye, ExternalLink, FileText, Play, ArrowLeft, Maximize2, Minimize2, Plus, Pencil, Terminal, Copy, PanelRight, PanelRightClose, Pin } from "lucide-react";
 import { useTaskStore } from "@/store/task-store";
 import type { Task, LogEntry, TaskLevel, PermissionMode, ClaudeModel, Todo } from "@/types/task";
 import { PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS } from "@/types/task";
@@ -14,10 +14,8 @@ import { parseTodosFromInput } from "@/lib/claude-parser";
 import { NewGoalPanel } from "./new-goal-panel";
 import { LevelBadge } from "./level-badge";
 import { RoutingDecisionCard } from "./routing-decision-card";
-import { ReviewBanner } from "./review-banner";
-import { SubtaskStatusStrip } from "./subtask-status-strip";
 import { ClientFilterBar } from "./client-filter-bar";
-import { KanbanBoard, type SwimLane } from "./kanban-board";
+import { KanbanBoard, type SwimLane, type DoneFilter } from "./kanban-board";
 import { ScopingWizardInline } from "../modal/scoping-wizard-panel";
 import { GsdGuardrailModal } from "../modal/gsd-guardrail-modal";
 import type { ScopeResult } from "@/app/api/tasks/scope-goal/route";
@@ -27,8 +25,13 @@ import { useCronStore } from "@/store/cron-store";
 import type { CronJob } from "@/types/cron";
 import { ModalChat } from "@/components/modal/modal-chat";
 import { ReplyInput, HighlightMirror } from "@/components/modal/reply-input";
+import { PhaseProgressStrip } from "@/components/modal/phase-progress-strip";
+import { ChatList } from "@/components/modal/chat-list";
+import { PaneContainer } from "@/components/modal/pane-container";
+import { usePaneState, MAIN_PANE_ID, type PaneItem } from "@/hooks/use-pane-state";
 import { SlashCommandMenu, type TagItem } from "@/components/shared/slash-command-menu";
 import type { SlashCommand } from "@/lib/slash-commands";
+import { TagPicker, TagPill, TagFilterBar } from "@/components/shared/tag-picker";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -96,7 +99,10 @@ function formatElapsed(startedAt: string): string {
 }
 
 function taskNeedsInput(t: Task): boolean {
-  return t.needsInput || !!t.errorMessage || t.status === "review";
+  return t.needsInput
+    || !!t.errorMessage
+    || t.status === "review"
+    || (t.status === "running" && !!t.activityLabel?.trimEnd().endsWith("?"));
 }
 
 // For project/gsd parents, a child awaiting input should make the parent
@@ -235,20 +241,44 @@ function GoalCard({
   unseen?: boolean;
 }) {
   const [hover, setHover] = useState(false);
+  const updateTask = useTaskStore((s) => s.updateTask);
+  const isPinned = !!task.pinnedAt;
   const isProjectParent = task.level === "project" || task.level === "gsd";
   const client = task.clientId ? clients.find((c) => c.slug === task.clientId) : null;
 
-  const children = allTasks.filter(
-    (t) => t.parentId === task.id || (task.projectSlug && t.projectSlug === task.projectSlug && t.id !== task.id)
-  );
+  const children = allTasks.filter((t) => t.parentId === task.id);
   const hasChildren = children.length > 0;
-  const childDone = children.filter((t) => t.status === "done").length;
+  // Chat conversations = children that were user-initiated chats, NOT GSD
+  // execution steps (which have phaseNumber/gsdStep set). Only count tasks
+  // that actually ran (startedAt set) and are real chat windows.
+  const conversations = children.filter((t) => t.startedAt && !t.gsdStep && t.phaseNumber == null);
+  const childDone = conversations.filter((t) => t.status === "done").length;
   const childNeeds = isProjectParent && children.some(taskNeedsInput);
   const childRunning = isProjectParent && children.some((c) => c.status === "running");
 
-  const isRunning = task.status === "running" || childRunning;
-  const needs = !isRunning && (taskNeedsInput(task) || childNeeds);
+  // A parent is only "running" if at least one child is actively working (not waiting for input)
+  const runningChildren = children.filter((c) => c.status === "running");
+  const activeRunningChildren = runningChildren.filter((c) => !taskNeedsInput(c));
+  const allRunningChildrenNeedInput = runningChildren.length > 0
+    && runningChildren.every(taskNeedsInput);
+  const parentSelfRunning = task.status === "running" && !taskNeedsInput(task);
+  const needs = taskNeedsInput(task) || childNeeds || allRunningChildrenNeedInput;
+  // For parents: show running when ANY child is actively working, even if others need input.
+  // For single tasks: only show running when the task itself is active (not needing input).
+  const isRunning = isProjectParent
+    ? activeRunningChildren.length > 0
+    : parentSelfRunning;
   const isDone = isAchieved(task);
+
+  // Conversation status counts — the main chat (parent task) is always
+  // conversation #1. Additional child chat windows (non-GSD) are also counted.
+  const mainNeedsReview = taskNeedsInput(task) && task.status !== "done";
+  const mainIsActive = task.status === "running" && !taskNeedsInput(task);
+  const mainIsDone = task.status === "done";
+  const childReviewCount = conversations.filter((c) => c.status !== "done" && taskNeedsInput(c)).length + (mainNeedsReview ? 1 : 0);
+  const childActiveCount = conversations.filter((c) => c.status === "running" && !taskNeedsInput(c)).length + (mainIsActive ? 1 : 0);
+  const childDoneWithMain = childDone + (mainIsDone ? 1 : 0);
+  const totalConversations = conversations.length + 1; // +1 for main chat
 
   const [elapsed, setElapsed] = useState("");
   useEffect(() => {
@@ -269,10 +299,8 @@ function GoalCard({
     ? briefSnippet.slice(0, 117) + "..."
     : briefSnippet;
 
-  // Left-edge accent — 3px coloured strip for running/done only
-  const accentColor = isDone
-    ? T.green
-    : isRunning
+  // Left-edge accent — 3px coloured strip for running only
+  const accentColor = isRunning
     ? T.accentRun
     : "transparent";
 
@@ -360,104 +388,231 @@ function GoalCard({
         />
       )}
 
-      {/* Title row */}
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-      }}>
-        {client && (
-          <span style={{
-            fontSize: 10,
-            fontFamily: MONO,
-            color: "#9C9CA0",
-            whiteSpace: "nowrap",
-            flexShrink: 0,
-          }}>
-            {client.name}
-          </span>
-        )}
-        <InlineTitle
-          title={task.title}
-          taskId={task.id}
-          color={isDone ? T.textDim : T.text}
-        />
-      </div>
-
-      {/* Description — one line, muted */}
-      {truncatedBrief && (
-        <div style={{
-          marginTop: 4,
-          fontSize: 12,
-          fontFamily: "var(--font-inter), Inter, sans-serif",
-          color: T.textDim,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          lineHeight: 1.4,
-        }}>
-          {truncatedBrief}
-        </div>
-      )}
-
-      {/* Metadata — vertically stacked, Notion-style */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 6 }}>
-        {task.level !== "task" && (
-          <div><LevelBadge level={task.level} projectSlug={task.projectSlug} /></div>
-        )}
-        {needs && (
-          <span style={{
-            fontSize: 10,
-            fontFamily: MONO,
-            fontWeight: 500,
-            color: T.accent,
-            display: "inline-flex",
+      <div style={{ display: "flex", gap: 10 }}>
+        {/* Left: card content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Title row */}
+          <div style={{
+            display: "flex",
             alignItems: "center",
-            gap: 5,
+            gap: 8,
           }}>
-            needs input
-            {unseen && (
-              <span
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  backgroundColor: "#93452A",
-                  flexShrink: 0,
-                }}
-                title="Not yet viewed"
-              />
+            {client && (
+              <span style={{
+                fontSize: 10,
+                fontFamily: MONO,
+                color: "#9C9CA0",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}>
+                {client.name}
+              </span>
             )}
-          </span>
-        )}
-        {isRunning && !needs && (
-          <span style={{
+            <InlineTitle
+              title={task.title}
+              taskId={task.id}
+              color={isDone ? T.textDim : T.text}
+            />
+            {/* Pin toggle — visible on hover or when pinned */}
+            {(hover || isPinned) && !isDone && (
+              <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                {isPinned && (
+                  <span style={{
+                    fontSize: 10,
+                    fontFamily: MONO,
+                    color: T.textMuted,
+                    whiteSpace: "nowrap",
+                  }}>
+                    {new Date(task.updatedAt).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false })}
+                  </span>
+                )}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    updateTask(task.id, { pinnedAt: isPinned ? null : new Date().toISOString() });
+                  }}
+                  title={isPinned ? "Unpin" : "Pin to top"}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    flexShrink: 0,
+                    opacity: isPinned ? 0.5 : 0.3,
+                    transition: "opacity 120ms ease",
+                  }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.8"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = isPinned ? "0.5" : "0.3"; }}
+                >
+                  <Pin size={13} color={T.textMuted} />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Description — one line, muted */}
+          {truncatedBrief && (
+            <div style={{
+              marginTop: 4,
+              fontSize: 12,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              color: T.textDim,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              lineHeight: 1.4,
+            }}>
+              {truncatedBrief}
+            </div>
+          )}
+
+          {/* Metadata row — all inline */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+              {task.level !== "task" && (
+                <LevelBadge level={task.level} projectSlug={task.projectSlug} />
+              )}
+              {hover ? (
+                <TagPicker
+                  value={task.tag}
+                  onChange={(tag) => updateTask(task.id, { tag })}
+                />
+              ) : task.tag ? (
+                <TagPill tag={task.tag} />
+              ) : null}
+              {/* Non-parent: simple labels */}
+              {!hasChildren && needs && !isDone && (
+                <span style={{
+                  fontSize: 10,
+                  fontFamily: MONO,
+                  fontWeight: 500,
+                  color: T.accent,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 5,
+                }}>
+                  needs input
+                  {unseen && (
+                    <span
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        backgroundColor: "#93452A",
+                        flexShrink: 0,
+                      }}
+                      title="Not yet viewed"
+                    />
+                  )}
+                </span>
+              )}
+            </div>
+            {!hasChildren && isRunning && !needs && (
+              <span style={{
+                fontSize: 10,
+                fontFamily: MONO,
+                color: T.accentRun,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+              }}>
+                running
+                {elapsed && <span style={{ color: T.textMuted }}>{elapsed}</span>}
+              </span>
+            )}
+            {isRunning && task.activityLabel && !isProjectParent && (
+              <span style={{
+                fontSize: 11,
+                fontFamily: MONO,
+                color: "#8a8a8d",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                maxWidth: "100%",
+              }}>
+                {task.activityLabel.length > 60 ? task.activityLabel.slice(0, 59) + "…" : task.activityLabel}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Right: stacked conversation status counts (main chat + child chats) */}
+        {!isDone && (childReviewCount > 0 || childActiveCount > 0 || childDoneWithMain > 0) && (
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            gap: 3,
+            flexShrink: 0,
             fontSize: 10,
             fontFamily: MONO,
-            color: T.accentRun,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 4,
+            paddingTop: 2,
           }}>
-            {hasChildren && childRunning ? "running a task" : "running"}
-            {elapsed && <span style={{ color: T.textMuted }}>{elapsed}</span>}
-          </span>
-        )}
-        {isRunning && task.activityLabel && (
-          <span style={{
-            fontSize: 11,
-            fontFamily: MONO,
-            color: "#8a8a8d",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            maxWidth: "100%",
-          }}>
-            {task.activityLabel.length > 60 ? task.activityLabel.slice(0, 59) + "…" : task.activityLabel}
-          </span>
-        )}
-        {isDone && !needs && !isRunning && (
-          <span style={{ fontSize: 10, fontFamily: MONO, color: T.green }}>done</span>
+            {childReviewCount > 0 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Mark all review conversations as done (children + main)
+                  const reviewTasks = conversations.filter((c) => c.status !== "done" && taskNeedsInput(c));
+                  for (const t of reviewTasks) {
+                    updateTask(t.id, { status: "done", needsInput: false, errorMessage: null, completedAt: new Date().toISOString() });
+                  }
+                  if (mainNeedsReview) {
+                    updateTask(task.id, { status: "done", needsInput: false, errorMessage: null, completedAt: new Date().toISOString() });
+                  }
+                }}
+                title="Click to mark all review items done"
+                style={{
+                  color: T.accent,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 10,
+                  fontFamily: MONO,
+                  padding: 0,
+                  textAlign: "right",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none"; }}
+              >
+                Review · {childReviewCount}
+              </button>
+            )}
+            {childActiveCount > 0 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const activeTasks = conversations.filter((c) => c.status === "running" && !taskNeedsInput(c));
+                  for (const t of activeTasks) {
+                    updateTask(t.id, { status: "done", needsInput: false, errorMessage: null, completedAt: new Date().toISOString() });
+                  }
+                }}
+                title="Click to mark all in-progress items done"
+                style={{
+                  color: T.accentRun,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 10,
+                  fontFamily: MONO,
+                  padding: 0,
+                  textAlign: "right",
+                }}
+                className="pulse-text"
+                onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none"; }}
+              >
+                In progress · {childActiveCount}
+              </button>
+            )}
+            {childDoneWithMain > 0 && (
+              <span style={{ color: T.textMuted }}>
+                Done · {childDoneWithMain}
+              </span>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -768,23 +923,41 @@ interface PlanningFile {
 function PlanningDocViewer({ relativePath, onClose }: { relativePath: string; onClose: () => void }) {
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setLoading(true);
+    setEditing(false);
     fetch(`/api/gsd/files?file=${encodeURIComponent(relativePath)}`)
       .then((r) => r.json())
-      .then((data) => setContent(data.content ?? null))
+      .then((data) => { setContent(data.content ?? null); setDraft(data.content ?? ""); })
       .catch(() => setContent(null))
       .finally(() => setLoading(false));
   }, [relativePath]);
 
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await fetch(`/api/files/${encodeURIComponent(relativePath)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: draft }),
+      });
+      setContent(draft);
+      setEditing(false);
+    } catch { /* non-critical */ }
+    setSaving(false);
+  };
+
   return (
     <div style={{
       background: "#fafaf9",
-      border: "1px solid #e8e4df",
+      border: editing ? "1px solid rgba(147, 69, 42, 0.3)" : "1px solid #e8e4df",
       borderRadius: 8,
       overflow: "hidden",
-      maxHeight: 400,
+      maxHeight: 500,
       display: "flex",
       flexDirection: "column",
       marginTop: 8,
@@ -800,24 +973,74 @@ function PlanningDocViewer({ relativePath, onClose }: { relativePath: string; on
         <span style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: "#999" }}>
           {relativePath.split("/").pop()}
         </span>
-        <button
-          onClick={onClose}
-          style={{ background: "none", border: "none", cursor: "pointer", color: "#999", display: "flex", padding: 2 }}
-        >
-          <X size={12} />
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          {!loading && content !== null && !editing && (
+            <button
+              onClick={() => { setDraft(content); setEditing(true); }}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#999", display: "flex", padding: 2, fontSize: 10, fontFamily: "'DM Mono', monospace" }}
+              title="Edit"
+            >
+              Edit
+            </button>
+          )}
+          {editing && (
+            <>
+              <button
+                onClick={() => setEditing(false)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#999", display: "flex", padding: 2, fontSize: 10, fontFamily: "'DM Mono', monospace" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving || draft === content}
+                style={{
+                  background: draft !== content ? "#93452A" : "#ccc", border: "none", cursor: draft !== content ? "pointer" : "default",
+                  color: "#fff", display: "flex", padding: "2px 8px", fontSize: 10, fontFamily: "'DM Mono', monospace", borderRadius: 3,
+                }}
+              >
+                {saving ? "Saving..." : "Save"}
+              </button>
+            </>
+          )}
+          <button
+            onClick={onClose}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#999", display: "flex", padding: 2 }}
+          >
+            <X size={12} />
+          </button>
+        </div>
       </div>
       <div style={{
         flex: 1,
         overflowY: "auto",
-        padding: 12,
+        padding: editing ? 0 : 12,
         fontSize: 12,
         lineHeight: 1.6,
         color: "#333",
         wordBreak: "break-word",
       }}>
         {loading ? (
-          <span style={{ color: "#bbb" }}>Loading...</span>
+          <span style={{ padding: 12, color: "#bbb" }}>Loading...</span>
+        ) : editing ? (
+          <textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            style={{
+              width: "100%",
+              height: "100%",
+              minHeight: 300,
+              border: "none",
+              outline: "none",
+              resize: "none",
+              padding: 12,
+              fontSize: 12,
+              lineHeight: 1.6,
+              fontFamily: "'DM Mono', monospace",
+              color: "#333",
+              background: "transparent",
+            }}
+          />
         ) : content ? (
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents as never}>
             {content}
@@ -1256,18 +1479,97 @@ function GsdPhasesOverview({
   );
 }
 
+// ── Checkbox helpers for interactive markdown ────────────────────
+
+/** Recursively extract plain text from React children */
+function extractTextFromChildren(children: React.ReactNode): string {
+  if (typeof children === "string") return children;
+  if (typeof children === "number") return String(children);
+  if (!children) return "";
+  if (Array.isArray(children)) return children.map(extractTextFromChildren).join("");
+  if (typeof children === "object" && "props" in (children as React.ReactElement)) {
+    const el = children as React.ReactElement;
+    // Skip checkbox inputs
+    if (el.type === "input") return "";
+    return extractTextFromChildren((el.props as { children?: React.ReactNode }).children);
+  }
+  return "";
+}
+
+/** Filter out checkbox <input> elements from children, keeping everything else */
+function filterCheckboxFromChildren(children: React.ReactNode): React.ReactNode {
+  if (!children) return children;
+  if (!Array.isArray(children)) {
+    if (typeof children === "object" && "props" in (children as React.ReactElement)) {
+      const el = children as React.ReactElement;
+      if (el.type === "input") return null;
+    }
+    return children;
+  }
+  return children.filter((c) => {
+    if (typeof c === "object" && c && "props" in (c as React.ReactElement)) {
+      return (c as React.ReactElement).type !== "input";
+    }
+    return true;
+  });
+}
+
+/** Strip markdown inline formatting (bold, italic, code, links) for plain-text comparison */
+function stripMarkdownInline(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, "$1")  // bold
+    .replace(/__(.+?)__/g, "$1")       // bold alt
+    .replace(/\*(.+?)\*/g, "$1")       // italic
+    .replace(/_(.+?)_/g, "$1")         // italic alt
+    .replace(/`(.+?)`/g, "$1")         // inline code
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"); // links
+}
+
+/** Toggle a checkbox in raw markdown content by matching the label text.
+ *  Client-side equivalent of brief-sync's toggleDeliverableCheckbox. */
+function toggleCheckboxInMarkdown(md: string, label: string, checked: boolean): string {
+  const lines = md.split("\n");
+  const normalizedLabel = label.toLowerCase().trim();
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    // Match task-list items: - [ ] or - [x]
+    if (/^\s*[-*]\s+\[[ xX]\]/.test(line)) {
+      // Extract text after the checkbox, strip markdown formatting for comparison
+      const rawText = line.replace(/^\s*[-*]\s+\[[ xX]\]\s*/, "").trim();
+      const text = stripMarkdownInline(rawText).toLowerCase();
+      if (text.includes(normalizedLabel) || normalizedLabel.includes(text)) {
+        if (checked) {
+          lines[i] = line.replace(/\[ \]/, "[x]");
+        } else {
+          lines[i] = line.replace(/\[x\]/i, "[ ]");
+        }
+        return lines.join("\n");
+      }
+    }
+  }
+  return md;
+}
+
 // ── FilePreviewInline ────────────────────────────────────────────
 
-const PREVIEWABLE = new Set(["md", "txt", "csv", "json", "html"]);
+const PREVIEWABLE = new Set(["md", "txt", "csv", "json", "html", "xml", "yaml", "yml", "toml", "excalidraw"]);
 
-function FilePreviewInline({ relativePath, extension, onClose }: {
+function FilePreviewInline({ relativePath, extension, onClose, fillHeight, onCheckboxToggle, editable }: {
   relativePath: string;
   extension: string;
   onClose: () => void;
+  fillHeight?: boolean;
+  /** Called when a checkbox in the markdown is toggled. Receives the text label and new checked state. */
+  onCheckboxToggle?: (label: string, checked: boolean) => void;
+  /** Allow inline editing of the file content */
+  editable?: boolean;
 }) {
   const router = useRouter();
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [editContent, setEditContent] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -1289,10 +1591,10 @@ function FilePreviewInline({ relativePath, extension, onClose }: {
   return (
     <div style={{
       background: "#fafaf9",
-      border: "1px solid #e8e4df",
-      borderRadius: 8,
+      border: fillHeight ? "none" : "1px solid #e8e4df",
+      borderRadius: fillHeight ? 0 : 8,
       overflow: "hidden",
-      maxHeight: 400,
+      ...(fillHeight ? { flex: 1, minHeight: 0 } : { maxHeight: 400 }),
       display: "flex",
       flexDirection: "column",
     }}>
@@ -1374,18 +1676,91 @@ function FilePreviewInline({ relativePath, extension, onClose }: {
             {fileName}
           </button>
         </div>
-        <button
-          onClick={onClose}
-          title="Close preview"
-          style={{ background: "none", border: "none", cursor: "pointer", color: "#999", display: "flex", padding: 2, flexShrink: 0 }}
-        >
-          <X size={12} />
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+          {editable && !editing && (
+            <button
+              onClick={() => { setEditContent(content ?? ""); setEditing(true); }}
+              title="Edit"
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#999", display: "flex", padding: 2 }}
+            >
+              <Pencil size={12} />
+            </button>
+          )}
+          {editing && (
+            <>
+              <button
+                onClick={() => setEditing(false)}
+                title="Cancel"
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#999", fontSize: 10, fontFamily: "'DM Mono', monospace", padding: "2px 6px" }}
+              >
+                Cancel
+              </button>
+              <button
+                disabled={saving}
+                onClick={async () => {
+                  setSaving(true);
+                  try {
+                    await fetch(`/api/files/${relativePath}`, {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ content: editContent }),
+                    });
+                    setContent(editContent);
+                    setEditing(false);
+                  } catch { /* ignore */ }
+                  setSaving(false);
+                }}
+                title="Save"
+                style={{
+                  background: "#93452A",
+                  border: "none",
+                  cursor: saving ? "wait" : "pointer",
+                  color: "#fff",
+                  fontSize: 10,
+                  fontFamily: "'DM Mono', monospace",
+                  padding: "2px 8px",
+                  borderRadius: 3,
+                  opacity: saving ? 0.6 : 1,
+                }}
+              >
+                {saving ? "Saving..." : "Save"}
+              </button>
+            </>
+          )}
+          <button
+            onClick={onClose}
+            title="Close preview"
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#999", display: "flex", padding: 2 }}
+          >
+            <X size={12} />
+          </button>
+        </div>
       </div>
+      {editing ? (
+        <textarea
+          value={editContent}
+          onChange={(e) => setEditContent(e.target.value)}
+          style={{
+            flex: 1,
+            minHeight: 0,
+            padding: fillHeight ? "24px 32px" : 12,
+            fontSize: 12,
+            fontFamily: "'JetBrains Mono', 'DM Mono', monospace",
+            lineHeight: 1.6,
+            color: "#333",
+            border: "none",
+            outline: "none",
+            resize: "none",
+            background: "#fafaf9",
+            width: "100%",
+            boxSizing: "border-box",
+          }}
+        />
+      ) : (
       <div style={{
         flex: 1,
         overflowY: "auto",
-        padding: 12,
+        padding: fillHeight ? "24px 32px" : 12,
         fontSize: 12,
         fontFamily: extension === "md" ? "inherit" : "'JetBrains Mono', 'DM Mono', monospace",
         lineHeight: 1.6,
@@ -1397,7 +1772,45 @@ function FilePreviewInline({ relativePath, extension, onClose }: {
           <span style={{ color: "#bbb" }}>Loading...</span>
         ) : content ? (
           extension === "md" ? (
-            <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents as never}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
+              ...(mdComponents as Record<string, unknown>),
+              ...(onCheckboxToggle ? {
+                li: ({ children, node }: { children?: React.ReactNode; node?: { children?: Array<{ tagName?: string; properties?: { checked?: boolean; type?: string } }> } }) => {
+                  // Detect task-list items (contain an input[type=checkbox] child)
+                  const inputChild = node?.children?.find(
+                    (c: { tagName?: string; properties?: { type?: string } }) => c.tagName === "input" && c.properties?.type === "checkbox"
+                  );
+                  if (!inputChild) {
+                    return <li style={{ margin: "2px 0" }}>{children}</li>;
+                  }
+                  const isChecked = !!(inputChild as { properties?: { checked?: boolean } }).properties?.checked;
+                  // Extract the text label from the children (skip the input element)
+                  const textLabel = extractTextFromChildren(children);
+                  return (
+                    <li style={{ margin: "2px 0", listStyle: "none", marginLeft: -20 }}>
+                      <label style={{ display: "flex", alignItems: "flex-start", gap: 6, cursor: "pointer" }}>
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => {
+                            // Optimistically update local content so the checkbox re-renders immediately
+                            if (content) {
+                              setContent(toggleCheckboxInMarkdown(content, textLabel, !isChecked));
+                            }
+                            onCheckboxToggle(textLabel, !isChecked);
+                          }}
+                          style={{ marginTop: 3, cursor: "pointer", accentColor: "#93452A" }}
+                        />
+                        <span style={{ textDecoration: isChecked ? "line-through" : undefined, color: isChecked ? "#999" : undefined }}>
+                          {/* Render children but strip the original disabled checkbox */}
+                          {filterCheckboxFromChildren(children)}
+                        </span>
+                      </label>
+                    </li>
+                  );
+                },
+              } : {}),
+            } as never}>
               {content}
             </ReactMarkdown>
           ) : content
@@ -1405,6 +1818,7 @@ function FilePreviewInline({ relativePath, extension, onClose }: {
           <span style={{ color: "#bbb" }}>Preview unavailable</span>
         )}
       </div>
+      )}
     </div>
   );
 }
@@ -1468,7 +1882,35 @@ function DetailPanel({
   const [previewFile, setPreviewFile] = useState<{ relativePath: string; extension: string } | null>(null);
   const [planningFiles, setPlanningFiles] = useState<{ projectFiles: PlanningFile[]; phases: { phaseNumber: number; dirName: string; files: PlanningFile[] }[]; researchFiles: PlanningFile[] } | null>(null);
   const [viewingPlanningDoc, setViewingPlanningDoc] = useState<string | null>(null);
-  const [mainTab, setMainTab] = useState<"chat" | "subtasks" | "files">("chat");
+  const [mainTab, setMainTab] = useState<"chat" | "files" | "plan">("chat");
+  const [planDocked, setPlanDocked] = useState(false);
+
+  // ── Docked plan panel resize ──────────────────────────────────
+  const [dockedPlanPct, setDockedPlanPct] = useState(50); // percentage of container width
+  const dockedContainerRef = useRef<HTMLDivElement>(null);
+  const planDraggingRef = useRef(false);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!planDraggingRef.current || !dockedContainerRef.current) return;
+      const rect = dockedContainerRef.current.getBoundingClientRect();
+      const pct = ((e.clientX - rect.left) / rect.width) * 100;
+      // Clamp between 25% and 75%
+      setDockedPlanPct(Math.max(25, Math.min(75, 100 - pct)));
+    };
+    const onUp = () => {
+      if (!planDraggingRef.current) return;
+      planDraggingRef.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, []);
   const [permissionMode, setPermissionMode] = useState<PermissionMode>(task.permissionMode ?? "bypassPermissions");
   const [model, setModel] = useState<ClaudeModel | null>(task.model ?? null);
   const [changedOnly, setChangedOnly] = useState(false);
@@ -1476,6 +1918,70 @@ function DetailPanel({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
   const activityRef = useRef<HTMLDivElement>(null);
+
+  // ── VS Code-style multi-pane state ──────────────────────────────
+  const {
+    paneState,
+    hasPanesOpen,
+    
+    visiblePanes,
+    handleOpenChat,
+    handleOpenTerminal,
+    handleOpenSubtaskPane,
+    handleAddToViewport,
+    handleClosePane,
+    handleRemovePane,
+    handleFocusPane,
+    handleFocusMainChat,
+    handleSplitWithNew,
+    handleSetLayout,
+    handleToggleSidebar,
+    handleCloseAllPanes,
+    handleRenamePane,
+    handleAssignTaskToPane,
+  } = usePaneState(task.id);
+
+  // All tasks get the multi-pane UI (open subtask chats, terminals, etc.)
+  const isParentTask = true;
+
+  // Main pane — always the first visible pane for parent tasks
+  const mainPane: PaneItem = useMemo(() => ({
+    id: MAIN_PANE_ID,
+    type: "chat" as const,
+    label: task.title.length > 40 ? task.title.slice(0, 37) + "..." : task.title,
+    taskId: task.id,
+  }), [task.id, task.title]);
+
+  // Effective visible panes:
+  // - No panes in viewport → show main pane solo (default view)
+  // - Panes in viewport → resolve MAIN_PANE_ID to the real mainPane with taskId
+  const effectiveVisiblePanes = useMemo(() => {
+    if (visiblePanes.length === 0) return [mainPane];
+    return visiblePanes.map((p) => p.id === MAIN_PANE_ID ? mainPane : p);
+  }, [mainPane, visiblePanes]);
+
+  // Keyboard shortcuts for panes
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && hasPanesOpen) {
+        handleCloseAllPanes();
+        e.stopPropagation();
+        return;
+      }
+      if (e.key === "\\" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        handleSplitWithNew();
+      }
+      if (["1", "2", "3", "4"].includes(e.key) && (e.metaKey || e.ctrlKey) && visiblePanes.length > 1) {
+        e.preventDefault();
+        const idx = parseInt(e.key) - 1;
+        const target = visiblePanes[idx];
+        if (target) handleFocusPane(target.id);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [hasPanesOpen, handleCloseAllPanes, visiblePanes, handleFocusPane, handleSplitWithNew]);
 
   // Drawer width + resize are managed by the parent FeedView so the grid
   // layout can respond. We receive them as props.
@@ -1550,7 +2056,30 @@ function DetailPanel({
   const updateTask = useTaskStore((s) => s.updateTask);
   const needsInput = taskNeedsInput(task);
   const isDone = isAchieved(task);
-  const isParentTask = task.level !== "task";
+
+  // Plan checkbox toggle: check/uncheck deliverable in brief.md + update matching subtask
+  const handlePlanCheckboxToggle = useCallback(async (label: string, checked: boolean) => {
+    if (!task.projectSlug) return;
+
+    // 1. Update the brief.md checkbox
+    try {
+      await fetch("/api/briefs/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "mark-deliverable",
+          projectSlug: task.projectSlug,
+          subtaskTitle: label,
+          checked,
+          parentId: task.id,
+          clientId: task.clientId ?? null,
+        }),
+      });
+    } catch { /* non-critical */ }
+
+    // Note: subtask status is managed by the running processes themselves.
+    // Plan checkboxes only update the brief.md file.
+  }, [task.projectSlug, task.id, task.clientId, subtasks, updateTask]);
 
   // Fetch log entries for all subtasks so we can show question previews.
   // The subtask IDs list is stable across re-renders except when the set changes.
@@ -1562,6 +2091,16 @@ function DetailPanel({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subtaskIdsKey, fetchLogEntries]);
+
+  // Also fetch log entries for any tasks assigned to panes (may not be in subtasks yet)
+  const paneTaskIds = paneState.openPanes.map((p) => p.taskId).filter(Boolean) as string[];
+  const paneTaskIdsKey = paneTaskIds.join(",");
+  useEffect(() => {
+    for (const id of paneTaskIds) {
+      fetchLogEntries(id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paneTaskIdsKey, fetchLogEntries]);
 
   const allLogEntries = useTaskStore((s) => s.logEntries);
   const childLogEntries: Record<string, LogEntry[]> = {};
@@ -1575,19 +2114,6 @@ function DetailPanel({
   // conversation — the merged feed is what the user is actually talking to.
   // Each entry is tagged with sourceTaskId so we can scroll to a subtask's
   // section when clicking it.
-  const projectConversation = useMemo(() => {
-    if (!isParentTask) return logEntries;
-    const merged: LogEntry[] = logEntries.map((e) => ({ ...e, sourceTaskId: task.id }));
-    for (const st of subtasks) {
-      for (const e of (childLogEntries[st.id] ?? [])) {
-        merged.push({ ...e, sourceTaskId: st.id });
-      }
-    }
-    merged.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-    return merged;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isParentTask, logEntries, subtasks, allLogEntries, task.id]);
-
   const anyChildRunning = subtasks.some((s) => s.status === "running");
 
   // Run a single subtask: POST /execute, fall back to direct queue update.
@@ -1701,6 +2227,7 @@ function DetailPanel({
       type: "user_reply",
       content: fullMessage,
       timestamp: new Date().toISOString(),
+      permissionMode,
     });
 
     try {
@@ -1850,28 +2377,6 @@ function DetailPanel({
           )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          {/* Permission mode + model badges */}
-          {task.permissionMode && (
-            <span
-              title={PERMISSION_MODE_HINTS[task.permissionMode] ?? ""}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "3px 7px",
-                fontSize: 10,
-                fontFamily: "'DM Mono', monospace",
-                fontWeight: 500,
-                color: "#999",
-                background: "rgba(218, 193, 185, 0.12)",
-                borderRadius: 4,
-                cursor: "default",
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-              }}
-            >
-              {PERMISSION_MODE_LABELS[task.permissionMode] ?? task.permissionMode}
-            </span>
-          )}
           {task.model && (
             <span
               style={{
@@ -1891,50 +2396,6 @@ function DetailPanel({
             >
               {task.model}
             </span>
-          )}
-          {task.claudeSessionId && (
-            <ResumeClipButton sessionId={task.claudeSessionId} />
-          )}
-          {!isDone && (
-            <button
-              onClick={async () => {
-                if (task.level === "gsd" && task.projectSlug) {
-                  await fetch("/api/gsd/complete", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ projectSlug: task.projectSlug }),
-                  });
-                }
-                onMarkDone(task.id);
-              }}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 5,
-                padding: "5px 10px",
-                fontSize: 11,
-                fontFamily: "'DM Mono', monospace",
-                border: "1px solid #ddd",
-                borderRadius: 6,
-                background: "transparent",
-                color: "#999",
-                cursor: "pointer",
-                transition: "all 150ms ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "#7ab87a";
-                e.currentTarget.style.color = "#5a9a5a";
-                e.currentTarget.style.background = "rgba(122, 184, 122, 0.08)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "#ddd";
-                e.currentTarget.style.color = "#999";
-                e.currentTarget.style.background = "transparent";
-              }}
-            >
-              <Check size={12} />
-              mark done
-            </button>
           )}
           {onToggleFullscreen && (
             <button
@@ -1975,16 +2436,7 @@ function DetailPanel({
         </div>
       </div>
 
-      {/* Subtask status strip — compact dot row for parent tasks */}
-      {isParentTask && subtasks.length > 0 && (
-        <SubtaskStatusStrip
-          subtasks={subtasks.map((s) => ({ id: s.id, title: s.title, status: s.status }))}
-          onJump={(id) => {
-            setMainTab("subtasks");
-            // Scroll to row handled by DOM after tab switch
-          }}
-        />
-      )}
+      {/* Subtask status strip removed — subtasks accessible from bottom of chat */}
 
       {/* Scoping wizard — shown inline when a project goal needs planning */}
       {pendingScope && (
@@ -2020,35 +2472,76 @@ function DetailPanel({
         }}>
           {([
             { key: "chat" as const, label: "Chat" },
-            ...(isParentTask
-              ? [{ key: "subtasks" as const, label: task.level === "gsd" ? `Phases (${subtasks.length})` : `Subtasks (${subtasks.length})` }]
-              : []),
-            { key: "files" as const, label: `Files (${outputFiles.length + (task.level === "gsd" && planningFiles ? planningFiles.projectFiles.length + planningFiles.phases.reduce((n, p) => n + p.files.length, 0) + planningFiles.researchFiles.length : 0)})` },
+            { key: "files" as const, label: `Files (${(task.projectSlug ? 1 : 0) + outputFiles.length + (task.level === "gsd" && planningFiles ? planningFiles.projectFiles.length + planningFiles.phases.reduce((n, p) => n + p.files.length, 0) + planningFiles.researchFiles.length : 0)})` },
+            ...(task.projectSlug ? [{ key: "plan" as const, label: "Plan" }] : []),
           ]).map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setMainTab(t.key)}
-              style={{
-                fontSize: 11,
-                fontFamily: "'DM Mono', monospace",
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                color: mainTab === t.key ? "#1a1a1a" : "#bbb",
-                background: "transparent",
-                border: "none",
-                borderBottom: mainTab === t.key ? "2px solid #93452A" : "2px solid transparent",
-                padding: "8px 12px 8px",
-                cursor: "pointer",
-                marginBottom: -1,
-              }}
-            >
-              {t.label}
-            </button>
+            <div key={t.key} style={{ display: "flex", alignItems: "center" }}>
+              <button
+                onClick={() => {
+                  if (t.key === "plan" && planDocked) {
+                    // Clicking Plan tab text when docked → undock (full-screen plan view)
+                    setPlanDocked(false);
+                  }
+                  setMainTab(t.key);
+                }}
+                style={{
+                  fontSize: 11,
+                  fontFamily: "'DM Mono', monospace",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  color: mainTab === t.key || (t.key === "plan" && planDocked) ? "#1a1a1a" : "#bbb",
+                  background: "transparent",
+                  border: "none",
+                  borderBottom: mainTab === t.key ? "2px solid #93452A" : (t.key === "plan" && planDocked ? "2px solid rgba(147, 69, 42, 0.3)" : "2px solid transparent"),
+                  padding: "8px 12px 8px",
+                  cursor: "pointer",
+                  marginBottom: -1,
+                }}
+              >
+                {t.label}
+              </button>
+              {t.key === "plan" && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (planDocked) {
+                      setPlanDocked(false);
+                    } else {
+                      setPlanDocked(true);
+                      setMainTab("chat");
+                    }
+                  }}
+                  title={planDocked ? "Undock plan" : "Dock plan to chat"}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: planDocked ? "#93452A" : "#bbb",
+                    padding: "4px 4px 4px 0",
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: -1,
+                  }}
+                >
+                  {planDocked ? <PanelRightClose size={13} /> : <PanelRight size={13} />}
+                </button>
+              )}
+            </div>
           ))}
         </div>
 
         {/* Chat tab */}
         {mainTab === "chat" && (
+        <div
+          ref={dockedContainerRef}
+          style={{
+          minWidth: 0,
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: planDocked && task.projectSlug ? "row" : "column",
+          position: "relative",
+        }}>
         <div style={{
           padding: 16,
           minWidth: 0,
@@ -2059,95 +2552,74 @@ function DetailPanel({
         }}>
           {isParentTask ? (
             (() => {
-              const hasConversation = projectConversation.length > 0;
               return (
                 <>
-                <ReviewBanner task={task} onApprove={() => onMarkDone(task.id)} onIterate={(text) => {
-                  // Focus the ReplyInput — it's inside the parent path below
-                  const ta = activityRef.current?.querySelector("textarea");
-                  if (ta) { ta.focus(); ta.value = text; ta.dispatchEvent(new Event("input", { bubbles: true })); }
-                }} />
-                <div
-                  ref={activityRef}
-                  style={{
-                    border: "1px solid #e8e4df",
-                    borderRadius: 8,
-                    overflow: "hidden",
-                    background: "#fff",
-                    display: "flex",
-                    flexDirection: "column",
-                    flex: 1,
-                    minHeight: 0,
-                  }}
-                >
-                  {hasConversation ? (
-                    <div style={{
+                {/* Main content area: always PaneContainer */}
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative", minHeight: 0 }}>
+                  <div style={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0 }}>
+                  <div
+                    ref={activityRef}
+                    style={{
+                      flex: 1,
                       display: "flex",
                       flexDirection: "column",
-                      flex: 1,
+                      overflow: "hidden",
+                      minWidth: 0,
+                      background: "#fff",
                       minHeight: 0,
-                    }}>
-                      <ModalChat
-                        taskId={task.id}
-                        logEntries={projectConversation}
-                        isRunning={anyChildRunning}
-                        needsInput={false}
-                        status={anyChildRunning ? "running" : task.status}
-                        childTasks={[]}
-                        childLogEntries={{}}
-                        activePreviewPath={previewFile?.relativePath ?? null}
-                        onPreviewFile={(f) => setPreviewFile({ relativePath: f.relativePath, extension: f.extension })}
-                        readOnly
-                        scrollToTaskId={scrollToTaskId}
-                        onScrollComplete={() => setScrollToTaskId(null)}
-                        permissionMode={task.permissionMode}
-                        activityLabel={task.activityLabel}
-                        startedAt={task.startedAt}
-                        costUsd={task.costUsd}
-                        tokensUsed={task.tokensUsed}
-                        errorMessage={task.errorMessage}
-                        durationMs={task.durationMs}
-                      />
-                    </div>
-                  ) : (
-                    <div style={{
-                      padding: "24px 12px",
-                      fontSize: 12,
-                      color: "#999",
-                      fontFamily: "'DM Mono', monospace",
-                      textAlign: "center",
-                    }}>
-                      Waiting for first run
-                    </div>
-                  )}
-                  <div style={{
-                    borderTop: "1px solid #e8e4df",
-                    background: "#fff",
-                    padding: "10px 12px",
-                    flexShrink: 0,
-                  }}>
-                    <ReplyInput
-                      taskId={task.id}
-                      isVisible={true}
-                      needsInput={needsInput}
-                      taskStatus={task.status}
-                      initialPermissionMode={task.permissionMode ?? "bypassPermissions"}
-                      initialModel={task.model ?? null}
-                      subtasks={subtasks.map((s) => ({ id: s.id, title: s.title, status: s.status }))}
+                    }}
+                  >
+                    <PaneContainer
+                      visiblePanes={effectiveVisiblePanes}
+                      allTasks={allTasks}
+                      logEntriesByTask={allLogEntries}
+                      activePaneId={paneState.activePaneId}
+                      layout={paneState.layout}
+                      parentTask={task}
+                      onFocusPane={handleFocusPane}
+                      onClosePane={handleClosePane}
+                      onSetLayout={handleSetLayout}
+                      onDropPane={handleAddToViewport}
+                      onPreviewFile={(f) => setPreviewFile({ relativePath: f.relativePath, extension: f.extension })}
+                      onRenamePane={handleRenamePane}
+                      onAssignTaskToPane={handleAssignTaskToPane}
+                      subtasks={subtasks.map((s) => ({ id: s.id, title: s.title, status: s.status, phaseNumber: s.phaseNumber, gsdStep: s.gsdStep, needsInput: s.needsInput }))}
                       onSelectSubtask={(id) => {
                         setMainTab("chat");
-                        setScrollToTaskId(id);
+                        handleOpenSubtaskPane(id, subtasks.find((s) => s.id === id)?.title ?? "Subtask");
                       }}
-                      onOptimisticReply={(entry) => appendLogEntry(task.id, entry)}
+                      onRunSubtask={handleRunSubtask}
+                      onRunAll={handleRunAllSubtasks}
+                      onMarkTaskDone={(taskId) => updateTask(taskId, { status: "done", needsInput: false })}
                     />
+                  </div>
+
+                  {/* Pane sidebar — shows open panes, + to add new chat/terminal */}
+                  {isParentTask && (
+                    <ChatList
+                      openPanes={paneState.openPanes}
+                      activePaneId={paneState.activePaneId}
+                      visiblePaneIds={paneState.visiblePaneIds}
+                      collapsed={paneState.sidebarCollapsed}
+                      parentTaskTitle={task.title}
+                      onToggleCollapse={handleToggleSidebar}
+                      onFocusPane={handleFocusPane}
+                      onFocusMainChat={handleFocusMainChat}
+                      onRemovePane={handleRemovePane}
+                      onAddToViewport={handleAddToViewport}
+                      onRenamePane={handleRenamePane}
+                      onOpenChat={handleOpenChat}
+                      onOpenTerminal={handleOpenTerminal}
+                      mainTaskId={task.id}
+                    />
+                  )}
                   </div>
                 </div>
                 </>
               );
             })()
-          ) : logEntries.length > 0 ? (
+          ) : logEntries.length > 0 || task.status === "running" ? (
             <>
-            <ReviewBanner task={task} onApprove={() => onMarkDone(task.id)} onIterate={(text) => setReplyText(text)} />
             <div style={{
               display: "flex",
               flexDirection: "column",
@@ -2172,6 +2644,7 @@ function DetailPanel({
                 permissionMode={task.permissionMode}
                 activityLabel={task.activityLabel}
                 startedAt={task.startedAt}
+                lastReplyAt={task.lastReplyAt}
                 costUsd={task.costUsd}
                 tokensUsed={task.tokensUsed}
                 errorMessage={task.errorMessage}
@@ -2318,12 +2791,13 @@ function DetailPanel({
                       }
                     }}
                     placeholder="Reply...  Type / for commands, @ for tags"
-                    rows={1}
+                    rows={3}
                     style={{
                       width: "100%",
                       fontSize: 13,
                       fontFamily: "inherit",
                       padding: "4px 0",
+                      minHeight: 60,
                       backgroundColor: "transparent",
                       border: "none",
                       color: (replyText.includes("@") || replyText.includes("/")) ? "transparent" : "#1a1a1a",
@@ -2389,11 +2863,13 @@ function DetailPanel({
 
                 <ModelPicker value={model} onChange={setModel} />
                 <PermissionPicker value={permissionMode} onChange={setPermissionMode} />
+                {task.level !== "task" && (
                 <TasksPopover
                   todos={latestTodos}
-                  subtasks={subtasks.map((s) => ({ id: s.id, title: s.title, status: s.status }))}
+                  subtasks={subtasks.map((s) => ({ id: s.id, title: s.title, status: s.status, phaseNumber: s.phaseNumber, gsdStep: s.gsdStep, needsInput: s.needsInput }))}
                   onSelectSubtask={onSelectSubtask}
                 />
+                )}
 
                 <div style={{ flex: 1 }} />
 
@@ -2426,36 +2902,133 @@ function DetailPanel({
           )}
         </div>
 
+        {/* Docked plan panel — shown alongside chat */}
+        {planDocked && task.projectSlug && (
+          <>
+          {/* Drag handle between chat and plan */}
+          <div
+            onMouseDown={(e) => {
+              e.preventDefault();
+              planDraggingRef.current = true;
+              document.body.style.cursor = "col-resize";
+              document.body.style.userSelect = "none";
+            }}
+            style={{
+              width: 6,
+              cursor: "col-resize",
+              flexShrink: 0,
+              position: "relative",
+              zIndex: 10,
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget.firstChild as HTMLElement | null)?.style?.setProperty("background", "#93452A");
+            }}
+            onMouseLeave={(e) => {
+              if (!planDraggingRef.current) {
+                (e.currentTarget.firstChild as HTMLElement | null)?.style?.setProperty("background", "transparent");
+              }
+            }}
+          >
+            <div style={{
+              position: "absolute",
+              left: 2,
+              top: 0,
+              bottom: 0,
+              width: 2,
+              borderRadius: 1,
+              background: "transparent",
+              transition: "background 150ms",
+            }} />
+          </div>
+          <div style={{
+            width: `${dockedPlanPct}%`,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 0,
+            overflow: "hidden",
+          }}>
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "6px 10px",
+              borderBottom: "1px solid #e8e4df",
+              background: "#f3f0ee",
+              flexShrink: 0,
+            }}>
+              <span style={{
+                fontSize: 10,
+                fontFamily: "'DM Mono', monospace",
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: "#999",
+              }}>Plan</span>
+              <button
+                onClick={() => setPlanDocked(false)}
+                title="Undock plan"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#999",
+                  display: "flex",
+                  padding: 2,
+                }}
+              >
+                <PanelRightClose size={13} />
+              </button>
+            </div>
+            <FilePreviewInline
+              relativePath={`projects/briefs/${task.projectSlug}/brief.md`}
+              extension="md"
+              onClose={() => setPlanDocked(false)}
+              fillHeight
+              onCheckboxToggle={handlePlanCheckboxToggle}
+              editable
+            />
+          </div>
+          </>
+        )}
+        </div>
+
         )}
 
-        {/* Subtasks tab */}
-        {mainTab === "subtasks" && isParentTask && (
-          <div style={{
-            padding: 16,
-            flex: 1,
-            minHeight: 0,
-            overflowY: "auto",
-          }}>
-            {task.level === "gsd" && subtasks.length > 0 ? (
-              <GsdPhasesOverview
-                subtasks={subtasks}
-                parentTask={task}
-                onCommand={(cmd) => setReplyText(cmd)}
-                onSelectSubtask={(id) => {
-                  setMainTab("chat");
-                  setScrollToTaskId(id);
-                }}
-              />
-            ) : (
-              <SubtasksList
-                subtasks={subtasks}
-                onRunSubtask={handleRunSubtask}
-                onRunAll={handleRunAllSubtasks}
-                childLogEntries={childLogEntries}
-              />
+        {/* Plan tab — show brief.md for project tasks (full-screen) */}
+        {mainTab === "plan" && task.projectSlug && (
+          <div style={{ flex: 1, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+            <FilePreviewInline
+              relativePath={`projects/briefs/${task.projectSlug}/brief.md`}
+              extension="md"
+              onClose={() => setMainTab("chat")}
+              fillHeight
+              onCheckboxToggle={handlePlanCheckboxToggle}
+              editable
+            />
+            {!planDocked && (
+              <div style={{ padding: "8px 12px", borderTop: "1px solid #e8e4df", background: "#f3f0ee", flexShrink: 0 }}>
+                <button
+                  onClick={() => { setPlanDocked(true); setMainTab("chat"); }}
+                  style={{
+                    fontSize: 11,
+                    fontFamily: "'DM Mono', monospace",
+                    color: "#93452A",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                >
+                  <PanelRight size={13} />
+                  Dock to chat
+                </button>
+              </div>
             )}
           </div>
         )}
+
+        {/* Subtasks tab removed — subtasks accessible from bottom of chat */}
 
         {/* Files tab */}
         {mainTab === "files" && (
@@ -2466,6 +3039,32 @@ function DetailPanel({
           overflowY: "auto",
         }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {/* Brief / Plan file — pinned at top for project tasks */}
+              {task.projectSlug && (
+                <div style={{ marginBottom: 4 }}>
+                  <div style={{ fontSize: 9, fontFamily: "'DM Mono', monospace", color: "#bbb", letterSpacing: "0.06em", marginBottom: 4, textTransform: "uppercase" }}>
+                    Plan
+                  </div>
+                  <button
+                    onClick={() => {
+                      const briefPath = `projects/briefs/${task.projectSlug}/brief.md`;
+                      setPreviewFile(previewFile?.relativePath === briefPath ? null : { relativePath: briefPath, extension: "md" });
+                    }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 6, width: "100%",
+                      background: previewFile?.relativePath === `projects/briefs/${task.projectSlug}/brief.md` ? "rgba(147, 69, 42, 0.06)" : "transparent",
+                      border: "none", borderRadius: 4, cursor: "pointer",
+                      padding: "4px 6px", fontSize: 11, color: "#555", textAlign: "left",
+                      fontFamily: "'DM Mono', monospace", transition: "background 100ms ease",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.03)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = previewFile?.relativePath === `projects/briefs/${task.projectSlug}/brief.md` ? "rgba(147, 69, 42, 0.06)" : "transparent"; }}
+                  >
+                    <FileText size={10} color="#93452A" />
+                    brief.md
+                  </button>
+                </div>
+              )}
               {/* Planning files for GSD tasks only */}
               {task.level === "gsd" && planningFiles && (
                 <>
@@ -2476,22 +3075,26 @@ function DetailPanel({
                         Project
                       </div>
                       {planningFiles.projectFiles.map((f) => (
-                        <button
-                          key={f.relativePath}
-                          onClick={() => setViewingPlanningDoc(viewingPlanningDoc === f.relativePath ? null : f.relativePath)}
-                          style={{
-                            display: "flex", alignItems: "center", gap: 6, width: "100%",
-                            background: viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent",
-                            border: "none", borderRadius: 4, cursor: "pointer",
-                            padding: "4px 6px", fontSize: 11, color: "#555", textAlign: "left",
-                            fontFamily: "'DM Mono', monospace", transition: "background 100ms ease",
-                          }}
-                          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.03)"; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.background = viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent"; }}
-                        >
-                          <FileText size={10} color="#bbb" />
-                          {f.name}
-                        </button>
+                        <div key={f.relativePath}>
+                          <button
+                            onClick={() => setViewingPlanningDoc(viewingPlanningDoc === f.relativePath ? null : f.relativePath)}
+                            style={{
+                              display: "flex", alignItems: "center", gap: 6, width: "100%",
+                              background: viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent",
+                              border: "none", borderRadius: 4, cursor: "pointer",
+                              padding: "4px 6px", fontSize: 11, color: "#555", textAlign: "left",
+                              fontFamily: "'DM Mono', monospace", transition: "background 100ms ease",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.03)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent"; }}
+                          >
+                            <FileText size={10} color="#bbb" />
+                            {f.name}
+                          </button>
+                          {viewingPlanningDoc === f.relativePath && (
+                            <PlanningDocViewer relativePath={f.relativePath} onClose={() => setViewingPlanningDoc(null)} />
+                          )}
+                        </div>
                       ))}
                     </div>
                   )}
@@ -2503,22 +3106,26 @@ function DetailPanel({
                         Phase {phase.phaseNumber}
                       </div>
                       {phase.files.map((f) => (
-                        <button
-                          key={f.relativePath}
-                          onClick={() => setViewingPlanningDoc(viewingPlanningDoc === f.relativePath ? null : f.relativePath)}
-                          style={{
-                            display: "flex", alignItems: "center", gap: 6, width: "100%",
-                            background: viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent",
-                            border: "none", borderRadius: 4, cursor: "pointer",
-                            padding: "4px 6px", fontSize: 11, color: "#555", textAlign: "left",
-                            fontFamily: "'DM Mono', monospace", transition: "background 100ms ease",
-                          }}
-                          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.03)"; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.background = viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent"; }}
-                        >
-                          <FileText size={10} color="#bbb" />
-                          {f.name}
-                        </button>
+                        <div key={f.relativePath}>
+                          <button
+                            onClick={() => setViewingPlanningDoc(viewingPlanningDoc === f.relativePath ? null : f.relativePath)}
+                            style={{
+                              display: "flex", alignItems: "center", gap: 6, width: "100%",
+                              background: viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent",
+                              border: "none", borderRadius: 4, cursor: "pointer",
+                              padding: "4px 6px", fontSize: 11, color: "#555", textAlign: "left",
+                              fontFamily: "'DM Mono', monospace", transition: "background 100ms ease",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.03)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent"; }}
+                          >
+                            <FileText size={10} color="#bbb" />
+                            {f.name}
+                          </button>
+                          {viewingPlanningDoc === f.relativePath && (
+                            <PlanningDocViewer relativePath={f.relativePath} onClose={() => setViewingPlanningDoc(null)} />
+                          )}
+                        </div>
                       ))}
                     </div>
                   ))}
@@ -2530,28 +3137,28 @@ function DetailPanel({
                         Research
                       </div>
                       {planningFiles.researchFiles.map((f) => (
-                        <button
-                          key={f.relativePath}
-                          onClick={() => setViewingPlanningDoc(viewingPlanningDoc === f.relativePath ? null : f.relativePath)}
-                          style={{
-                            display: "flex", alignItems: "center", gap: 6, width: "100%",
-                            background: viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent",
-                            border: "none", borderRadius: 4, cursor: "pointer",
-                            padding: "4px 6px", fontSize: 11, color: "#555", textAlign: "left",
-                            fontFamily: "'DM Mono', monospace", transition: "background 100ms ease",
-                          }}
-                          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.03)"; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.background = viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent"; }}
-                        >
-                          <FileText size={10} color="#bbb" />
-                          {f.name}
-                        </button>
+                        <div key={f.relativePath}>
+                          <button
+                            onClick={() => setViewingPlanningDoc(viewingPlanningDoc === f.relativePath ? null : f.relativePath)}
+                            style={{
+                              display: "flex", alignItems: "center", gap: 6, width: "100%",
+                              background: viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent",
+                              border: "none", borderRadius: 4, cursor: "pointer",
+                              padding: "4px 6px", fontSize: 11, color: "#555", textAlign: "left",
+                              fontFamily: "'DM Mono', monospace", transition: "background 100ms ease",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.03)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = viewingPlanningDoc === f.relativePath ? "rgba(147, 69, 42, 0.06)" : "transparent"; }}
+                          >
+                            <FileText size={10} color="#bbb" />
+                            {f.name}
+                          </button>
+                          {viewingPlanningDoc === f.relativePath && (
+                            <PlanningDocViewer relativePath={f.relativePath} onClose={() => setViewingPlanningDoc(null)} />
+                          )}
+                        </div>
                       ))}
                     </div>
-                  )}
-
-                  {viewingPlanningDoc && (
-                    <PlanningDocViewer relativePath={viewingPlanningDoc} onClose={() => setViewingPlanningDoc(null)} />
                   )}
 
                   {/* Separator between planning files and output files */}
@@ -2594,88 +3201,125 @@ function DetailPanel({
                   const diffBadge = file.diffStatus === "added" ? { label: "A", color: "#22C55E", bg: "rgba(34, 197, 94, 0.1)" }
                     : file.diffStatus === "modified" ? { label: "M", color: "#F59E0B", bg: "rgba(245, 158, 11, 0.1)" }
                     : null;
+                  // Build breadcrumb from path
+                  const pathParts = file.relativePath.split("/").filter(Boolean);
+                  const breadcrumb = pathParts.length > 1 ? pathParts.slice(0, -1).join(" / ") : "";
+                  const docsHref = `/?tab=docs&file=${encodeURIComponent(file.relativePath)}`;
                   return (
                     <div key={file.id}>
                       <div style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: "6px 8px",
-                        borderRadius: 6,
+                        padding: "10px 12px",
+                        borderRadius: 8,
                         backgroundColor: isActive ? "rgba(147, 69, 42, 0.05)" : "#fafaf9",
                         border: isActive ? "1px solid rgba(147, 69, 42, 0.2)" : "1px solid rgba(218, 193, 185, 0.15)",
                         transition: "background 150ms ease",
                       }}>
-                        <div style={{
-                          width: 24, height: 24, borderRadius: 4, backgroundColor: "#e8e4df",
-                          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                        }}>
-                          <span style={{ fontSize: 8, color: "#999", fontFamily: "'DM Mono', monospace" }}>
-                            .{file.extension}
-                          </span>
-                        </div>
-                        <span style={{
-                          fontSize: 11, color: "#555", overflow: "hidden",
-                          textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1,
-                        }}>
-                          {file.fileName}
-                        </span>
-                        {diffBadge && (
-                          <span style={{
-                            fontSize: 9,
-                            fontWeight: 700,
-                            fontFamily: "'DM Mono', monospace",
-                            color: diffBadge.color,
-                            background: diffBadge.bg,
-                            padding: "1px 5px",
-                            borderRadius: 3,
-                            flexShrink: 0,
+                        {/* Main row: icon + name + extension + size */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{
+                            width: 28, height: 28, borderRadius: 5, backgroundColor: "#e8e4df",
+                            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                           }}>
-                            {diffBadge.label}
-                          </span>
-                        )}
-                        <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
+                            <span style={{ fontSize: 8, color: "#999", fontFamily: "'DM Mono', monospace" }}>
+                              .{file.extension.length > 6 ? file.extension.slice(0, 5) + "\u2026" : file.extension}
+                            </span>
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <span style={{
+                                fontSize: 12, fontWeight: 500, color: "#1a1a1a", overflow: "hidden",
+                                textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0,
+                              }}>
+                                {file.fileName}
+                              </span>
+                              {diffBadge && (
+                                <span style={{
+                                  fontSize: 9, fontWeight: 700, fontFamily: "'DM Mono', monospace",
+                                  color: diffBadge.color, background: diffBadge.bg,
+                                  padding: "1px 5px", borderRadius: 3, flexShrink: 0,
+                                }}>
+                                  {diffBadge.label}
+                                </span>
+                              )}
+                            </div>
+                            {breadcrumb && (
+                              <div style={{
+                                fontSize: 10, color: "#999", fontFamily: "'DM Mono', monospace",
+                                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 1,
+                              }}>
+                                {breadcrumb}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        {/* Action row: preview, docs, download */}
+                        <div style={{
+                          display: "flex", alignItems: "center", gap: 4,
+                          marginTop: 8, paddingTop: 6, borderTop: "1px solid rgba(218, 193, 185, 0.15)",
+                        }}>
                           {canPreview && (
                             <button
                               onClick={() => setPreviewFile(isActive ? null : { relativePath: file.relativePath, extension: file.extension })}
                               title="Preview"
                               style={{
+                                display: "flex", alignItems: "center", gap: 4,
                                 background: "none", border: "none", cursor: "pointer",
-                                color: isActive ? "#93452A" : "#bbb", display: "flex", padding: 3,
-                                transition: "color 0.15s",
+                                color: isActive ? "#93452A" : "#999", fontSize: 10,
+                                fontFamily: "'DM Mono', monospace", padding: "3px 6px", borderRadius: 4,
+                                transition: "color 0.15s, background 0.15s",
                               }}
-                              onMouseEnter={(e) => { e.currentTarget.style.color = "#93452A"; }}
-                              onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = "#bbb"; }}
+                              onMouseEnter={(e) => { e.currentTarget.style.color = "#93452A"; e.currentTarget.style.background = "rgba(147, 69, 42, 0.06)"; }}
+                              onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = "#999"; e.currentTarget.style.background = "transparent"; }}
                             >
-                              <Eye size={12} />
+                              <Eye size={11} /> Preview
                             </button>
                           )}
+                          <a
+                            href={docsHref}
+                            title="Open in Docs"
+                            style={{
+                              display: "flex", alignItems: "center", gap: 4,
+                              color: "#999", fontSize: 10, textDecoration: "none",
+                              fontFamily: "'DM Mono', monospace", padding: "3px 6px", borderRadius: 4,
+                              transition: "color 0.15s, background 0.15s",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.color = "#93452A"; e.currentTarget.style.background = "rgba(147, 69, 42, 0.06)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.color = "#999"; e.currentTarget.style.background = "transparent"; }}
+                          >
+                            <ExternalLink size={11} /> Docs
+                          </a>
                           <button
                             onClick={() => window.open(`/api/files/download?path=${encodeURIComponent(file.relativePath)}`, "_blank")}
                             title="Download"
                             style={{
+                              display: "flex", alignItems: "center", gap: 4,
                               background: "none", border: "none", cursor: "pointer",
-                              color: "#bbb", display: "flex", padding: 3, transition: "color 0.15s",
+                              color: "#999", fontSize: 10,
+                              fontFamily: "'DM Mono', monospace", padding: "3px 6px", borderRadius: 4,
+                              transition: "color 0.15s, background 0.15s",
                             }}
-                            onMouseEnter={(e) => { e.currentTarget.style.color = "#93452A"; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.color = "#bbb"; }}
+                            onMouseEnter={(e) => { e.currentTarget.style.color = "#93452A"; e.currentTarget.style.background = "rgba(147, 69, 42, 0.06)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.color = "#999"; e.currentTarget.style.background = "transparent"; }}
                           >
-                            <Download size={12} />
+                            <Download size={11} /> Download
                           </button>
                         </div>
                       </div>
+                    {/* Inline preview — rendered directly under the clicked file */}
+                    {previewFile && previewFile.relativePath === file.relativePath && (
+                      <FilePreviewInline
+                        relativePath={previewFile.relativePath}
+                        extension={previewFile.extension}
+                        onClose={() => setPreviewFile(null)}
+                        fillHeight
+                        onCheckboxToggle={previewFile.relativePath.endsWith("brief.md") ? handlePlanCheckboxToggle : undefined}
+                        editable={previewFile.relativePath.endsWith("brief.md")}
+                      />
+                    )}
                     </div>
                   );
                 })}
                 </>
-              )}
-              {/* Inline preview */}
-              {previewFile && (
-                <FilePreviewInline
-                  relativePath={previewFile.relativePath}
-                  extension={previewFile.extension}
-                  onClose={() => setPreviewFile(null)}
-                />
               )}
           </div>
         </div>
@@ -3258,15 +3902,21 @@ export function FeedView({
   // Track which needsInput tasks have been opened so we can show a notification dot
   const seenTaskIdsRef = useRef<Set<string>>(new Set());
   useEffect(() => {
-    if (selectedId) seenTaskIdsRef.current.add(selectedId);
-  }, [selectedId]);
+    if (!selectedId) return;
+    seenTaskIdsRef.current.add(selectedId);
+    // Also mark children as seen so the parent's unseen dot clears
+    for (const t of tasks) {
+      if (t.parentId === selectedId) seenTaskIdsRef.current.add(t.id);
+    }
+  }, [selectedId, tasks]);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dropZoneOver, setDropZoneOver] = useState(false);
   // Drop-between-cards indicator: which card is being hovered and which half
   const [dropTarget, setDropTarget] = useState<{ id: string; position: "before" | "after" } | null>(null);
   const [routingDecision, setRoutingDecision] = useState<{ scope: ScopeResult; goal: string } | null>(null);
   const [gsdGuardrail, setGsdGuardrail] = useState<{ scope: ScopeResult; goal: string } | null>(null);
-  const [showNewGoalPanel, setShowNewGoalPanel] = useState(false);
+  const [showNewGoalPanel, setShowNewGoalPanel] = useState(true);
+  const [activeTagFilter, setActiveTagFilter] = useState<string | null>(null);
   const createTaskAction = useTaskStore((s) => s.createTask);
   // Scope data for a task that needs project planning in the detail panel
   const [pendingScope, setPendingScope] = useState<{ taskId: string; scope: ScopeResult; goal: string } | null>(null);
@@ -3390,10 +4040,19 @@ export function FeedView({
         const slug = t.clientId || "_root";
         if (!activeClientSlugs.includes(slug)) return false;
       }
+      // Tag filtering — when a tag is selected, show only tasks with that tag
+      // (plus their children, so subtasks aren't orphaned)
+      if (activeTagFilter) {
+        const matchesTag = t.tag === activeTagFilter;
+        const parentMatchesTag = t.parentId && tasks.some(
+          (p) => p.id === t.parentId && p.tag === activeTagFilter
+        );
+        if (!matchesTag && !parentMatchesTag) return false;
+      }
       if (isTerminalTask(t)) return false;
       return true;
     });
-  }, [tasks, activeClientSlugs]);
+  }, [tasks, activeClientSlugs, activeTagFilter]);
 
   // Slugs of projects (or GSD roots) that have a materialized parent row in
   // the feed. Any sibling task sharing that slug should be hidden from the
@@ -3425,27 +4084,35 @@ export function FeedView({
     });
   }, [filtered, projectParentSlugs]);
 
-  // Effective ordering: manual columnOrder wins; otherwise fall back to
-  // createdAt timestamp so new tasks append at the bottom (stable order).
-  const effectiveOrder = useCallback((t: Task) => {
-    return t.columnOrder && t.columnOrder > 0 ? t.columnOrder : new Date(t.createdAt).getTime();
-  }, []);
+  const [doneFilter, setDoneFilter] = useState<DoneFilter>("1d");
+  const [groupByTag, setGroupByTag] = useState(false);
 
   const activeGoals = useMemo(() => {
     return topLevelTasks
       .filter((t) => t.status !== "done")
-      .sort((a, b) => effectiveOrder(a) - effectiveOrder(b));
-  }, [topLevelTasks, effectiveOrder]);
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [topLevelTasks]);
 
   const achievedGoals = useMemo(() => {
+    const doneFilterMs: Record<string, number> = {
+      "1d": 24 * 60 * 60 * 1000,
+      "7d": 7 * 24 * 60 * 60 * 1000,
+      "30d": 30 * 24 * 60 * 60 * 1000,
+      "90d": 90 * 24 * 60 * 60 * 1000,
+    };
+    const cutoff = Date.now() - (doneFilterMs[doneFilter] ?? doneFilterMs["90d"]);
     return topLevelTasks
-      .filter((t) => t.status === "done")
+      .filter((t) => {
+        if (t.status !== "done") return false;
+        const doneTime = t.completedAt ? new Date(t.completedAt).getTime() : new Date(t.updatedAt).getTime();
+        return doneTime >= cutoff;
+      })
       .sort((a, b) => {
         const aTime = a.completedAt ? new Date(a.completedAt).getTime() : new Date(a.updatedAt).getTime();
         const bTime = b.completedAt ? new Date(b.completedAt).getTime() : new Date(b.updatedAt).getTime();
         return bTime - aTime;
       });
-  }, [topLevelTasks]);
+  }, [topLevelTasks, doneFilter]);
 
   // ── 3-column bucketing: inProgress / inReview / done ──────────
   const isInReview = useCallback((t: Task): boolean => {
@@ -3467,49 +4134,53 @@ export function FeedView({
 
     for (const [slug, tasks] of byClient) {
       const client = slug !== "_root" ? clients.find((c) => c.slug === slug) : null;
-      const inProgress: Task[] = [];
-      const inReview: Task[] = [];
+      const goals: Task[] = [];
       const done: Task[] = [];
 
       for (const t of tasks) {
         // User explicitly marked done → always in done column, even if children still need input
         if (t.status === "done") {
           done.push(t);
-        } else if (isInReview(t)) {
-          inReview.push(t);
         } else {
-          inProgress.push(t);
+          goals.push(t);
         }
       }
 
-      // Sort "Your Turn" so needsInput tasks float to the top (newest first)
-      inReview.sort((a, b) => {
-        const aNeed = taskNeedsInput(a) ? 0 : 1;
-        const bNeed = taskNeedsInput(b) ? 0 : 1;
-        if (aNeed !== bNeed) return aNeed - bNeed;
-        // Within needsInput group, newest first (by updatedAt)
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      // Sort goals: pinned first (reorderable via columnOrder), then newest-created first
+      goals.sort((a, b) => {
+        const aPinned = !!a.pinnedAt;
+        const bPinned = !!b.pinnedAt;
+        // Pinned tasks always stay above non-pinned
+        if (aPinned !== bPinned) return aPinned ? -1 : 1;
+        // Among pinned: use columnOrder (set by drag-reorder) DESC, fall back to pinnedAt ASC
+        if (aPinned && bPinned) {
+          const aOrder = a.columnOrder && a.columnOrder > 0 ? a.columnOrder : 0;
+          const bOrder = b.columnOrder && b.columnOrder > 0 ? b.columnOrder : 0;
+          if (aOrder || bOrder) return bOrder - aOrder;
+          return new Date(a.pinnedAt!).getTime() - new Date(b.pinnedAt!).getTime();
+        }
+        // Among non-pinned: newest created first so new tasks appear at top
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
 
       lanes.push({
         clientSlug: slug === "_root" ? null : slug,
         clientName: client?.name || (slug === "_root" ? rootName : slug),
         clientColor: client?.color || "#999",
-        inProgress,
-        inReview,
+        goals,
         done,
       });
     }
 
-    // Show swim lane headers when multiple clients have active or review tasks
+    // Show swim lane headers when multiple clients have active goals
     // (done-only lanes don't count — they shouldn't trigger headers by themselves)
-    const lanesWithActiveWork = lanes.filter((l) => l.inProgress.length > 0 || l.inReview.length > 0);
+    const lanesWithActiveWork = lanes.filter((l) => l.goals.length > 0);
     const singleLane = lanesWithActiveWork.length <= 1 && lanes.length <= 1;
 
     return { lanes, singleLane };
   }, [activeGoals, achievedGoals, activeClientSlugs, clients, isInReview]);
 
-  const [dropOverColumn, setDropOverColumn] = useState<"inProgress" | "inReview" | "done" | null>(null);
+  const [dropOverColumn, setDropOverColumn] = useState<"goals" | "done" | null>(null);
 
   const selectedTask = (selectedId ? tasks.find((t) => t.id === selectedId) : null) ?? null;
 
@@ -3548,18 +4219,15 @@ export function FeedView({
     setDropOverColumn(null);
   }, []);
 
-  const handleDropColumn = useCallback((column: "inProgress" | "inReview" | "done", e: React.DragEvent) => {
+  const handleDropColumn = useCallback((column: "goals" | "done", e: React.DragEvent) => {
     e.preventDefault();
     const id = e.dataTransfer.getData("text/plain") || draggingId;
     if (!id) return;
     console.log(`[feed-view] handleDropColumn: column=${column}, id=${id?.slice(0,8)}`);
     if (column === "done") {
       updateTask(id, { status: "done", needsInput: false, errorMessage: null, completedAt: new Date().toISOString() });
-    } else if (column === "inReview") {
-      // Moving to review means it needs input
-      updateTask(id, { status: "running", needsInput: true, completedAt: null });
     } else {
-      // Moving to in-progress: re-queue and clear review/done state
+      // Moving to goals: re-queue and clear done state
       updateTask(id, { status: "queued", needsInput: false, errorMessage: null, completedAt: null });
     }
     setDraggingId(null);
@@ -3567,14 +4235,14 @@ export function FeedView({
     setDropOverColumn(null);
   }, [draggingId, updateTask]);
 
-  const handleDragOverColumn = useCallback((_column: "inProgress" | "inReview" | "done", e: React.DragEvent) => {
+  const handleDragOverColumn = useCallback((_column: "goals" | "done", e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
     setDropOverColumn(_column);
     setDropZoneOver(true);
   }, []);
 
-  const handleDragLeaveColumn = useCallback((_column: "inProgress" | "inReview" | "done") => {
+  const handleDragLeaveColumn = useCallback((_column: "goals" | "done") => {
     setDropOverColumn((prev) => prev === _column ? null : prev);
   }, []);
 
@@ -3638,6 +4306,12 @@ export function FeedView({
           setDetailFullscreen(false);
           setShowNewGoalPanel(true);
         }}
+      />
+
+      <TagFilterBar
+        tasks={tasks}
+        activeTag={activeTagFilter}
+        onTagChange={setActiveTagFilter}
       />
 
       {routingDecision && (
@@ -3712,14 +4386,16 @@ export function FeedView({
         dropOverColumn={dropOverColumn}
         isEmpty={activeGoals.length === 0 && achievedGoals.length === 0}
         hideDone={false}
+        doneFilter={doneFilter}
+        onDoneFilterChange={setDoneFilter}
+        groupByTag={groupByTag}
+        onToggleGroupByTag={() => setGroupByTag((v) => !v)}
         renderCard={(task, column) => {
           const focusId = focusCardTask?.id ?? null;
           const isFocus = task.id === focusId;
           const allColTasks = column === "done"
             ? achievedGoals
-            : column === "inReview"
-            ? bucketedLanes.lanes.flatMap((l) => l.inReview)
-            : activeGoals;
+            : bucketedLanes.lanes.flatMap((l) => l.goals);
           const dropIndicator =
             dropTarget && dropTarget.id === task.id && draggingId && draggingId !== task.id
               ? dropTarget.position
@@ -3734,7 +4410,10 @@ export function FeedView({
               dimmed={!!focusId && !isFocus}
               isDragging={draggingId === task.id}
               dropIndicator={dropIndicator}
-              unseen={taskNeedsInput(task) && !seenTaskIdsRef.current.has(task.id)}
+              unseen={
+                (taskNeedsInput(task) && !seenTaskIdsRef.current.has(task.id))
+                || filtered.some((t) => t.parentId === task.id && taskNeedsInput(t) && !seenTaskIdsRef.current.has(t.id))
+              }
               onSelect={toggleSelect}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
@@ -3755,14 +4434,11 @@ export function FeedView({
                 // When dropping onto a card in a different column, change status too
                 const draggedTask = filtered.find((t) => t.id === draggingId);
                 if (draggedTask) {
-                  const draggedColumn = draggedTask.status === "done" ? "done"
-                    : effectiveNeedsInput(draggedTask, filtered) ? "inReview" : "inProgress";
+                  const draggedColumn = draggedTask.status === "done" ? "done" : "goals";
                   if (draggedColumn !== column) {
                     // Cross-column drop: update status to match destination
                     if (column === "done") {
                       updateTask(draggingId, { status: "done", needsInput: false, errorMessage: null, completedAt: new Date().toISOString() });
-                    } else if (column === "inReview") {
-                      updateTask(draggingId, { status: "running", needsInput: true, completedAt: null });
                     } else {
                       updateTask(draggingId, { status: "queued", needsInput: false, errorMessage: null, completedAt: null });
                     }

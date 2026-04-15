@@ -129,7 +129,13 @@ export class ClaudeOutputParser {
       // Fallback: prose question detection
       const questionText = detectQuestion(visibleText);
       if (questionText) {
-        this.callbacks.onQuestion?.(questionText);
+        // Check if this is a permission/approval prompt — synthesize interactive options
+        const permissionSpec = detectPermissionPrompt(visibleText, questionText);
+        if (permissionSpec && this.callbacks.onStructuredQuestion) {
+          this.callbacks.onStructuredQuestion(permissionSpec);
+        } else {
+          this.callbacks.onQuestion?.(questionText);
+        }
       }
     }
   }
@@ -328,6 +334,68 @@ function detectQuestion(text: string): string | null {
     }
   }
   return null;
+}
+
+/**
+ * Detect if a question is actually a permission/approval prompt and synthesize
+ * interactive options so the UI renders selectable buttons instead of plain text.
+ *
+ * Returns QuestionSpec[] if the text matches a permission pattern, null otherwise.
+ */
+function detectPermissionPrompt(fullText: string, questionText: string): QuestionSpec[] | null {
+  const lower = fullText.toLowerCase();
+
+  // Permission patterns — phrases that indicate Claude is asking for approval
+  // to run a command or take an action
+  const permissionPatterns = [
+    /once you (approve|confirm|allow|authorize)/i,
+    /needs? your (approval|permission|authorization)/i,
+    /approve (it|the|this)/i,
+    /waiting for (your approval|permission|you to (approve|confirm|allow))/i,
+    /you should be seeing a prompt/i,
+    /shall I (go ahead|proceed|run|execute|continue)/i,
+    /would you like me to (go ahead|proceed|run|execute|continue)/i,
+    /do you want me to (go ahead|proceed|run|execute|continue)/i,
+    /can I (go ahead|proceed|run|execute|continue)/i,
+    /ready to (run|execute|proceed|continue)/i,
+    /please (approve|confirm|allow|authorize) (the|this)/i,
+  ];
+
+  const isPermissionPrompt = permissionPatterns.some((p) => p.test(fullText));
+  if (!isPermissionPrompt) return null;
+
+  // Try to extract what command/action is being requested
+  let actionDescription = "this action";
+  const commandMatch = fullText.match(
+    /(?:approve|run|execute|allow|confirm)\s+(?:the\s+)?[`"]([^`"]+)[`"]/i
+  );
+  if (commandMatch?.[1]) {
+    actionDescription = commandMatch[1];
+  } else {
+    // Try backtick-wrapped command mentions
+    const backtickMatch = fullText.match(/`([^`]{3,60})`/);
+    if (backtickMatch?.[1] && /^[a-zA-Z]/.test(backtickMatch[1])) {
+      actionDescription = backtickMatch[1];
+    }
+  }
+
+  const truncatedAction = actionDescription.length > 60
+    ? actionDescription.slice(0, 57) + "..."
+    : actionDescription;
+
+  return [
+    {
+      id: "permission",
+      prompt: `Approve: ${truncatedAction}`,
+      type: "select",
+      options: [
+        "Yes, go ahead",
+        "Yes, and don't ask again for this task",
+        "No, don't do this",
+      ],
+      required: true,
+    },
+  ];
 }
 
 /**
