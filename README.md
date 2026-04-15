@@ -75,6 +75,7 @@ Agentic OS is built on three layers:
 | `viz-nano-banana` | AI image generation in 5 visual styles | `GEMINI_API_KEY` |
 | `viz-ugc-heygen` | AI avatar videos via HeyGen | `HEYGEN_API_KEY` |
 | `str-ai-seo` | Optimize content for AI search engines and LLM citations | -- |
+| `viz-interface-design` | Design dashboards, admin panels, and SaaS UIs | -- |
 | `ops-cron` | Schedule recurring Claude Code tasks | -- |
 | `tool-stitch` | Fetch UI designs from Google Stitch projects | gcloud auth |
 | `viz-stitch-design` | Design and iterate on UI screens with Google Stitch | gcloud auth |
@@ -345,8 +346,8 @@ For a quick reference, see [docs/cheat-sheet.md](docs/cheat-sheet.md).
 ├── projects/              <- All generated output
 │   ├── mkt-copywriting/   <- Single task category folders (Level 1)
 │   └── briefs/            <- Multi-deliverable projects (Level 2/3)
-│       └── q2-launch/     <- Project folders with brief.md
-├── .planning/             <- GSD project artifacts (Level 3, one at a time)
+│       └── q2-launch/     <- Project folder with brief.md
+│           └── .planning/ <- GSD artifacts (Level 3, per project)
 ├── scripts/               <- Install, update, manage skills, watchdog
 ├── AGENTS.md              <- Canonical shared instructions
 └── CLAUDE.md              <- Claude wrapper that imports AGENTS.md
