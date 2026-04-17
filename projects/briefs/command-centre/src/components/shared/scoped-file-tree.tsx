@@ -13,6 +13,8 @@ interface ScopedFileTreeProps {
   selectedPath: string | null;
   /** Called when the user clicks a file leaf. */
   onSelectFile: (relativePath: string) => void;
+  /** Override the active workspace for task-scoped previews. */
+  clientId?: string | null;
 }
 
 /**
@@ -24,8 +26,10 @@ export function ScopedFileTree({
   rootDir,
   selectedPath,
   onSelectFile,
+  clientId: clientIdOverride,
 }: ScopedFileTreeProps) {
-  const clientId = useClientId();
+  const selectedClientId = useClientId();
+  const clientId = clientIdOverride ?? selectedClientId;
   const [rootNodes, setRootNodes] = useState<FileNode[]>([]);
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set());
   const [childrenMap, setChildrenMap] = useState<Record<string, FileNode[]>>({});
@@ -82,7 +86,7 @@ export function ScopedFileTree({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rootDir]);
+  }, [ancestorDirs, fetchDir, rootDir]);
 
   const toggleDir = useCallback(
     async (dirPath: string) => {

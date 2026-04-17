@@ -10,6 +10,12 @@ import { PermissionPicker } from "@/components/shared/permission-picker";
 import { ModelPicker } from "@/components/shared/model-picker";
 import { TasksPopover, type SubtaskSummary } from "@/components/shared/tasks-popover";
 import { parseTodosFromInput } from "@/lib/claude-parser";
+import {
+  getExecutionPermissionMode,
+  getPermissionStateForPickerChange,
+  getPickerPermissionMode,
+  normalizePermissionMode,
+} from "@/lib/permission-mode";
 import type { SlashCommand } from "@/lib/slash-commands";
 import { recordTagUsage } from "@/components/board/goal-chips";
 
@@ -98,6 +104,8 @@ interface ReplyInputProps {
   onOptimisticReply?: (entry: LogEntry) => void;
   /** Initial permission mode (sourced from the task row). */
   initialPermissionMode?: PermissionMode;
+  /** Execution mode staged while the task is in plan mode. */
+  initialExecutionPermissionMode?: PermissionMode | null;
   /** Initial model selection (sourced from the task row). */
   initialModel?: ClaudeModel | null;
   /** Real child subtasks for the Subtasks popover. */
@@ -118,7 +126,7 @@ interface ReplyInputProps {
   onRunSubtaskInPane?: (subtaskId: string, paneId: string) => void;
   /** When set, the first message creates a new pane task instead of replying.
    *  Returns the new task ID on success, null on failure. */
-  onCreatePaneTask?: (message: string, permissionMode: string) => Promise<string | null>;
+  onCreatePaneTask?: (message: string, permissionMode: string, model: ClaudeModel | null) => Promise<string | null>;
   /** Compact mode — shrink toolbar elements (for multi-pane layouts) */
   compact?: boolean;
   /** Project slug — used to pin the relevant brief at the top of the @ menu */
@@ -134,6 +142,7 @@ export function ReplyInput({
   taskStatus,
   onOptimisticReply,
   initialPermissionMode = "bypassPermissions",
+  initialExecutionPermissionMode = null,
   initialModel = null,
   subtasks,
   onSelectSubtask,
@@ -156,7 +165,15 @@ export function ReplyInput({
   const [showTagMenu, setShowTagMenu] = useState(false);
   const [tagQuery, setTagQuery] = useState("");
   const [promptTags, setPromptTags] = useState<TagItem[]>([]);
-  const [permissionMode, setPermissionMode] = useState<PermissionMode>(initialPermissionMode);
+  const [activePermissionMode, setActivePermissionMode] = useState<PermissionMode>(
+    normalizePermissionMode(initialPermissionMode, "bypassPermissions"),
+  );
+  const [executionPermissionMode, setExecutionPermissionMode] = useState<PermissionMode>(
+    getExecutionPermissionMode(
+      initialExecutionPermissionMode ?? initialPermissionMode,
+      "bypassPermissions",
+    ),
+  );
   const [model, setModel] = useState<ClaudeModel | null>(initialModel);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -165,6 +182,11 @@ export function ReplyInput({
   const createTask = useTaskStore((s) => s.createTask);
   const updateTask = useTaskStore((s) => s.updateTask);
   const logEntries = useTaskStore((s) => s.logEntries[taskId]) ?? [];
+
+  const permissionMode = useMemo(
+    () => getPickerPermissionMode(activePermissionMode, executionPermissionMode, taskStatus),
+    [activePermissionMode, executionPermissionMode, taskStatus],
+  );
 
   // Fetch prompt tags on mount
   useEffect(() => {
@@ -176,9 +198,15 @@ export function ReplyInput({
 
   // Re-sync when switching tasks
   useEffect(() => {
-    setPermissionMode(initialPermissionMode);
+    setActivePermissionMode(normalizePermissionMode(initialPermissionMode, "bypassPermissions"));
+    setExecutionPermissionMode(
+      getExecutionPermissionMode(
+        initialExecutionPermissionMode ?? initialPermissionMode,
+        "bypassPermissions",
+      ),
+    );
     setModel(initialModel);
-  }, [taskId, initialPermissionMode, initialModel]);
+  }, [taskId, initialPermissionMode, initialExecutionPermissionMode, initialModel]);
 
   const latestTodos: Todo[] = useMemo(() => {
     for (let i = logEntries.length - 1; i >= 0; i--) {
@@ -245,6 +273,27 @@ export function ReplyInput({
     }
   }, [handleFileUpload, message]);
 
+  const handlePermissionModeChange = useCallback((nextMode: "bypassPermissions" | "default" | "plan") => {
+    const nextState = getPermissionStateForPickerChange(
+      nextMode,
+      activePermissionMode,
+      executionPermissionMode,
+      "bypassPermissions",
+    );
+    setActivePermissionMode(nextState.permissionMode);
+    setExecutionPermissionMode(nextState.executionPermissionMode);
+    if (!onCreatePaneTask) {
+      void updateTask(taskId, nextState);
+    }
+  }, [activePermissionMode, executionPermissionMode, onCreatePaneTask, taskId, updateTask]);
+
+  const handleModelChange = useCallback((nextModel: ClaudeModel | null) => {
+    setModel(nextModel);
+    if (!onCreatePaneTask) {
+      void updateTask(taskId, { model: nextModel });
+    }
+  }, [onCreatePaneTask, taskId, updateTask]);
+
   const handleSubmit = useCallback(async () => {
     const trimmed = message.trim();
     if (!trimmed && attachments.length === 0) return;
@@ -278,7 +327,11 @@ export function ReplyInput({
       setMessage("");
       setAttachments([]);
       try {
-        await onCreatePaneTask(finalMessage, permissionMode);
+        await onCreatePaneTask(
+          finalMessage,
+          activePermissionMode === "plan" ? "plan" : permissionMode,
+          model,
+        );
       } catch {
         setError("Failed to start conversation");
         setTimeout(() => setError(null), 3000);
@@ -295,7 +348,7 @@ export function ReplyInput({
         type: "user_reply",
         timestamp: new Date().toISOString(),
         content: finalMessage,
-        permissionMode,
+        permissionMode: activePermissionMode === "plan" ? "plan" : permissionMode,
       };
       onOptimisticReply(entry);
     }
@@ -315,7 +368,12 @@ export function ReplyInput({
       const res = await fetch(`/api/tasks/${taskId}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: finalMessage, permissionMode, model }),
+        body: JSON.stringify({
+          message: finalMessage,
+          permissionMode: activePermissionMode === "plan" ? "plan" : permissionMode,
+          executionPermissionMode,
+          model,
+        }),
       });
       if (!res.ok) {
         console.error(`[reply-input] Reply failed: ${res.status}`);
@@ -328,7 +386,18 @@ export function ReplyInput({
     } finally {
       setIsSending(false);
     }
-  }, [message, attachments, isSending, taskId, onOptimisticReply, onCreatePaneTask, permissionMode, model]);
+  }, [
+    message,
+    attachments,
+    isSending,
+    taskId,
+    onOptimisticReply,
+    onCreatePaneTask,
+    activePermissionMode,
+    permissionMode,
+    executionPermissionMode,
+    model,
+  ]);
 
   const handleSlashSelect = useCallback(async (cmd: SlashCommand) => {
     setShowSlashMenu(false);
@@ -582,8 +651,8 @@ export function ReplyInput({
           >
             <Paperclip size={14} />
           </button>
-          <ModelPicker value={model} onChange={setModel} />
-          <PermissionPicker value={permissionMode} onChange={setPermissionMode} />
+          <ModelPicker value={model} onChange={handleModelChange} />
+          <PermissionPicker value={permissionMode} onChange={handlePermissionModeChange} />
           {!hideTasksPopover && (
           <TasksPopover
             todos={latestTodos}

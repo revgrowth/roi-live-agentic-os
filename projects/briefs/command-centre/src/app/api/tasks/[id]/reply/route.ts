@@ -1,22 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
+import { saveApprovedPlanToBrief } from "@/lib/plan-brief.server";
+import { getActivePermissionMode, getExecutionPermissionMode, VALID_PERMISSION_MODES } from "@/lib/permission-mode";
 import { processManager } from "@/lib/process-manager";
 import type { Task, PermissionMode, ClaudeModel } from "@/types/task";
 import {
   parseQuestionSpecs,
   serializeAnswersToProse,
+  type QuestionSpec,
   type QuestionAnswers,
 } from "@/types/question-spec";
-
-const VALID_PERMISSION_MODES: PermissionMode[] = [
-  "plan",
-  "default",
-  "acceptEdits",
-  "auto",
-  "bypassPermissions",
-];
 const VALID_MODELS: ClaudeModel[] = ["opus", "sonnet", "haiku"];
+
+function getStructuredAnswerText(
+  questions: QuestionSpec[],
+  answers: QuestionAnswers,
+  message: string | null,
+): string {
+  const structured = serializeAnswersToProse(questions, answers);
+  if (message && message.trim().length > 0) {
+    return `${structured}\n\nAdditional note:\n${message.trim()}`;
+  }
+  return structured;
+}
+
+function getPlanApprovalAction(
+  questions: QuestionSpec[],
+  answers: QuestionAnswers,
+): string | null {
+  const actionQuestion = questions.find((q) => q.intent === "plan_approval" || q.id === "plan_action");
+  if (!actionQuestion) return null;
+  const raw = answers[actionQuestion.id];
+  return typeof raw === "string" ? raw.trim() : null;
+}
 
 export async function POST(
   request: NextRequest,
@@ -28,6 +45,7 @@ export async function POST(
     message?: string;
     structuredAnswers?: QuestionAnswers;
     permissionMode?: PermissionMode;
+    executionPermissionMode?: PermissionMode | null;
     model?: ClaudeModel | null;
   };
   try {
@@ -36,7 +54,7 @@ export async function POST(
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { message, structuredAnswers, permissionMode, model } = body;
+  const { message, structuredAnswers, permissionMode, executionPermissionMode, model } = body;
 
   const db = getDb();
   const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id) as Task | undefined;
@@ -48,9 +66,12 @@ export async function POST(
   // If structured answers were provided, find the most recent unanswered
   // structured_question log entry and serialise its spec + the answers into
   // a prose message for the Claude continuation.
-  let resolvedMessage: string | null =
+  const userMessage =
     typeof message === "string" && message.trim().length > 0 ? message.trim() : null;
+  let resolvedMessage: string | null = userMessage;
   let answeredLogId: string | null = null;
+  let pendingQuestions: QuestionSpec[] = [];
+  let planApprovalAction: string | null = null;
 
   if (structuredAnswers && typeof structuredAnswers === "object") {
     const pending = db
@@ -64,9 +85,11 @@ export async function POST(
     if (pending?.questionSpec) {
       try {
         const spec = parseQuestionSpecs(JSON.parse(pending.questionSpec));
+        pendingQuestions = spec;
         if (spec.length > 0) {
-          resolvedMessage = serializeAnswersToProse(spec, structuredAnswers);
+          resolvedMessage = getStructuredAnswerText(spec, structuredAnswers, userMessage);
           answeredLogId = pending.id;
+          planApprovalAction = getPlanApprovalAction(spec, structuredAnswers);
         }
       } catch (err) {
         console.error("[reply-route] Failed to parse pending questionSpec:", err);
@@ -102,9 +125,12 @@ export async function POST(
     ).run(JSON.stringify(structuredAnswers), answeredLogId);
   }
 
-  // Persist user reply as log entry — include the permissionMode active at reply time
+  // Persist user reply as log entry — include the permission mode chosen at reply time
   const entryId = crypto.randomUUID();
-  const replyPermMode = (permissionMode && VALID_PERMISSION_MODES.includes(permissionMode)) ? permissionMode : (task.permissionMode || null);
+  const normalizedReplyPermission = permissionMode && VALID_PERMISSION_MODES.includes(permissionMode)
+    ? getActivePermissionMode(permissionMode, task.permissionMode || "bypassPermissions")
+    : null;
+  const replyPermMode = normalizedReplyPermission ?? (task.permissionMode || null);
   db.prepare(
     "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers, permissionMode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
   ).run(entryId, id, "user_reply", now, trimmed, null, null, null, 0, null, null, replyPermMode);
@@ -112,15 +138,108 @@ export async function POST(
   // Title is set once at creation (via AI generation or fallback).
   // User replies are follow-ups, not new goals — don't overwrite the title.
 
-  // Persist permissionMode + model on the task BEFORE spawning so the next
-  // turn picks them up. The reply input is the source of truth.
-  if (permissionMode && VALID_PERMISSION_MODES.includes(permissionMode)) {
-    db.prepare("UPDATE tasks SET permissionMode = ? WHERE id = ?").run(permissionMode, id);
+  // Persist permission settings + model on the task BEFORE spawning so the next
+  // turn picks them up. In plan mode, picker changes stage the execution mode.
+  if (normalizedReplyPermission) {
+    const activeMode = getActivePermissionMode(
+      normalizedReplyPermission,
+      task.permissionMode || "bypassPermissions",
+    );
+    const nextExecutionMode =
+      activeMode === "plan"
+        ? getExecutionPermissionMode(
+            executionPermissionMode ?? task.executionPermissionMode ?? task.permissionMode,
+            "bypassPermissions",
+          )
+        : activeMode;
+    db.prepare("UPDATE tasks SET permissionMode = ?, executionPermissionMode = ? WHERE id = ?").run(
+      activeMode,
+      nextExecutionMode,
+      id,
+    );
+  } else if (executionPermissionMode && VALID_PERMISSION_MODES.includes(executionPermissionMode)) {
+    db.prepare("UPDATE tasks SET executionPermissionMode = ? WHERE id = ?").run(
+      getExecutionPermissionMode(executionPermissionMode, "bypassPermissions"),
+      id,
+    );
   }
   if (model === null) {
     db.prepare("UPDATE tasks SET model = NULL WHERE id = ?").run(id);
   } else if (model && VALID_MODELS.includes(model)) {
     db.prepare("UPDATE tasks SET model = ? WHERE id = ?").run(model, id);
+  }
+
+  if (planApprovalAction && pendingQuestions.length > 0) {
+    if (planApprovalAction === "Approve and start") {
+      const logEntries = db.prepare(
+        `SELECT id, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers, permissionMode
+         FROM task_logs WHERE taskId = ? ORDER BY rowid ASC`
+      ).all(id) as import("@/types/task").LogEntry[];
+      const refreshedTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id) as Task;
+      const briefPath = saveApprovedPlanToBrief(refreshedTask, logEntries);
+      const executionMode = getActivePermissionMode(
+        refreshedTask.executionPermissionMode ?? refreshedTask.permissionMode,
+        "bypassPermissions",
+      );
+
+      if (briefPath) {
+        db.prepare(
+          "INSERT INTO task_logs (id, taskId, type, timestamp, content, toolName, toolArgs, toolResult, isCollapsed, questionSpec, questionAnswers, permissionMode) VALUES (?, ?, 'system', ?, ?, NULL, NULL, NULL, 0, NULL, NULL, ?)"
+        ).run(
+          crypto.randomUUID(),
+          id,
+          now,
+          `Approved plan saved to ${briefPath}`,
+          executionMode,
+        );
+      }
+
+      db.prepare(
+        "UPDATE tasks SET status = 'running', permissionMode = ?, executionPermissionMode = ?, updatedAt = ?, lastReplyAt = ?, activityLabel = ?, needsInput = 0, errorMessage = NULL, startedAt = COALESCE(startedAt, ?) WHERE id = ?"
+      ).run(executionMode, executionMode, now, now, "Plan approved — starting execution", now, id);
+
+      const updatedAfterApproval = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id) as Task;
+      emitTaskEvent({
+        type: "task:status",
+        task: { ...updatedAfterApproval, needsInput: false },
+        timestamp: now,
+      });
+
+      try {
+        const success = await processManager.replyToTask(
+          id,
+          "Plan approved. Exit plan mode, use the approved brief.md as the source of truth, and execute now.",
+        );
+        if (!success) {
+          await processManager.spawnContinueTurn(
+            id,
+            "Plan approved. Exit plan mode, use the approved brief.md as the source of truth, and execute now.",
+            true,
+          );
+        }
+      } catch (err) {
+        console.error(`[reply-route] Plan approval resume failed:`, err);
+      }
+
+      return NextResponse.json({ ok: true, action: "approved" });
+    }
+
+    if (planApprovalAction === "Cancel") {
+      const executionMode = getExecutionPermissionMode(
+        task.executionPermissionMode ?? task.permissionMode,
+        "bypassPermissions",
+      );
+      db.prepare(
+        "UPDATE tasks SET status = 'review', permissionMode = ?, executionPermissionMode = ?, updatedAt = ?, lastReplyAt = ?, activityLabel = ?, needsInput = 0 WHERE id = ?"
+      ).run(executionMode, executionMode, now, now, "Plan canceled", id);
+      const canceledTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id) as Task;
+      emitTaskEvent({
+        type: "task:status",
+        task: { ...canceledTask, needsInput: false },
+        timestamp: now,
+      });
+      return NextResponse.json({ ok: true, action: "canceled" });
+    }
   }
 
   // Reactivate the task to running (set startedAt if not already set, track lastReplyAt)

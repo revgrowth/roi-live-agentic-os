@@ -4,6 +4,7 @@ import path from "path";
 import { getConfig, getClientAgenticOsDir } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
+import { getActivePermissionMode, getExecutionPermissionMode } from "@/lib/permission-mode";
 import type { Task } from "@/types/task";
 
 /**
@@ -79,10 +80,23 @@ export async function POST(
       );
     }
 
+    const parentTask = db
+      .prepare("SELECT * FROM tasks WHERE id = ?")
+      .get(parentId) as Task | undefined;
+    const inheritedPermissionMode = getActivePermissionMode(
+      parentTask?.permissionMode ?? "bypassPermissions",
+      "bypassPermissions",
+    );
+    const inheritedExecutionMode = getExecutionPermissionMode(
+      parentTask?.executionPermissionMode ?? parentTask?.permissionMode,
+      "bypassPermissions",
+    );
+    const inheritedModel = parentTask?.model ?? null;
+
     // Create subtasks
     const insertStmt = db.prepare(
-      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode, dependsOnTaskIds)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode, executionPermissionMode, model, dependsOnTaskIds)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     );
 
     const minOrderRow = db
@@ -123,7 +137,9 @@ export async function POST(
         contextSources: null,
         cronJobSlug: null,
         claudeSessionId: null,
-        permissionMode: "default",
+        permissionMode: inheritedPermissionMode,
+        executionPermissionMode: inheritedExecutionMode,
+        model: inheritedModel,
         lastReplyAt: null,
         goalGroup: null,
         tag: null,
@@ -135,7 +151,7 @@ export async function POST(
         task.id, task.title, task.description, task.status, task.level,
         task.parentId, task.projectSlug, task.columnOrder, task.createdAt,
         task.updatedAt, null, null, null, null, null, null, null,
-        task.clientId, 0, null, null, null, task.permissionMode, null
+        task.clientId, 0, null, null, null, task.permissionMode, task.executionPermissionMode, task.model, null
       );
 
       emitTaskEvent({

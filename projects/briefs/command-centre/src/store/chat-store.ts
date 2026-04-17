@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { Conversation, Message, AgentDecision, ChatEvent } from "@/types/chat";
+import type { ClaudeModel, PermissionMode } from "@/types/task";
 
 interface ChatState {
   /** The active conversation (only one at a time) */
@@ -15,7 +16,7 @@ interface ChatState {
 
   // Actions
   loadOrCreateConversation: (clientId?: string | null) => Promise<Conversation>;
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (content: string, options?: { permissionMode?: PermissionMode; model?: ClaudeModel | null }) => Promise<void>;
   replyToQuestion: (messageId: string, content: string) => Promise<void>;
   fetchMessages: (conversationId: string) => Promise<void>;
   applyChatSSE: (event: ChatEvent) => void;
@@ -58,7 +59,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     return conv;
   },
 
-  sendMessage: async (content: string) => {
+  sendMessage: async (content: string, options) => {
     const { conversation } = get();
     if (!conversation) return;
 
@@ -85,6 +86,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
         body: JSON.stringify({
           conversationId: conversation.id,
           content,
+          permissionMode: options?.permissionMode,
+          model: options?.model ?? undefined,
         }),
       });
 

@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
+import { getActivePermissionMode, getExecutionPermissionMode } from "@/lib/permission-mode";
 import type { Message } from "@/types/chat";
-import type { Task } from "@/types/task";
+import type { ClaudeModel, PermissionMode, Task } from "@/types/task";
+
+const VALID_MODELS: ClaudeModel[] = ["opus", "sonnet", "haiku"];
 
 export async function POST(request: NextRequest) {
   try {
     const db = getDb();
     const body = await request.json();
-    const { conversationId, content, replyToMessageId } = body;
+    const { conversationId, content, replyToMessageId, permissionMode: requestedPermissionMode, model: requestedModel } = body as {
+      conversationId?: string;
+      content?: string;
+      replyToMessageId?: string;
+      permissionMode?: PermissionMode;
+      model?: ClaudeModel | null;
+    };
 
     if (!conversationId || !content?.trim()) {
       return NextResponse.json(
@@ -80,7 +89,11 @@ export async function POST(request: NextRequest) {
           await fetch(new URL(`/api/tasks/${taskId}/reply`, request.url), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: content.trim() }),
+            body: JSON.stringify({
+              message: content.trim(),
+              permissionMode: requestedPermissionMode,
+              model: requestedModel ?? undefined,
+            }),
           });
         } catch (err) {
           console.error("Failed to route reply to task:", err);
@@ -109,7 +122,11 @@ export async function POST(request: NextRequest) {
           await fetch(replyUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: content.trim() }),
+            body: JSON.stringify({
+              message: content.trim(),
+              permissionMode: requestedPermissionMode,
+              model: requestedModel ?? undefined,
+            }),
           });
 
           orchestratorMessage = {
@@ -145,6 +162,14 @@ export async function POST(request: NextRequest) {
 
       // No pending task — create a new one
       const taskId = crypto.randomUUID();
+      const permissionMode = getActivePermissionMode(requestedPermissionMode, "bypassPermissions");
+      const executionPermissionMode = getExecutionPermissionMode(requestedPermissionMode, "bypassPermissions");
+      const model =
+        requestedModel === null
+          ? null
+          : requestedModel && VALID_MODELS.includes(requestedModel)
+            ? requestedModel
+            : null;
       const task: Task = {
         id: taskId,
         title: content.trim().length > 100
@@ -172,7 +197,9 @@ export async function POST(request: NextRequest) {
         contextSources: null,
         cronJobSlug: null,
         claudeSessionId: null,
-        permissionMode: "default",
+        permissionMode,
+        executionPermissionMode,
+        model,
         lastReplyAt: null,
         goalGroup: null,
         tag: null,
@@ -182,12 +209,13 @@ export async function POST(request: NextRequest) {
       };
 
       db.prepare(
-        `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, needsInput, permissionMode, conversationId, originMessageId)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, needsInput, permissionMode, executionPermissionMode, model, conversationId, originMessageId)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).run(
         task.id, task.title, task.description, task.status, task.level,
         task.parentId, task.projectSlug, task.columnOrder,
-        task.createdAt, task.updatedAt, task.clientId, 0, task.permissionMode,
+        task.createdAt, task.updatedAt, task.clientId, 0, task.permissionMode, task.executionPermissionMode,
+        task.model,
         task.conversationId, task.originMessageId
       );
 

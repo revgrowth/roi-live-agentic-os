@@ -1,6 +1,7 @@
 import type { ChildProcess } from "child_process";
 import { createInterface } from "readline";
 import fs from "fs";
+import os from "os";
 import path from "path";
 import crypto from "crypto";
 import { getDb } from "./db";
@@ -11,6 +12,7 @@ import { ClaudeOutputParser } from "./claude-parser";
 import { fileWatcher } from "./file-watcher";
 import { buildSiblingContextBlock } from "./gather-context";
 import { killChildProcessTree, spawnManagedTaskProcess } from "./subprocess";
+import { getActivePermissionMode, getExecutionPermissionMode } from "./permission-mode";
 import type { Task, LogEntry } from "@/types/task";
 import type { QuestionSpec } from "@/types/question-spec";
 
@@ -21,6 +23,16 @@ import type { QuestionSpec } from "@/types/question-spec";
  * ignores this instruction.
  */
 const STRUCTURED_QUESTION_ADDENDUM = `\n\n---\nWhen you need clarification from the user, do NOT ask in prose. Instead emit a fenced code block with the language tag \`ask-user-questions\` containing a JSON array of typed question objects. Each object has: id (short string), prompt (the question), type ("text" | "multiline" | "select" | "multiselect"), required (boolean), and options (array of strings, only for select/multiselect). Prefer select/multiselect when the set of reasonable answers is small. Example:\n\n\`\`\`ask-user-questions\n[\n  { "id": "audience", "prompt": "Who is the primary audience?", "type": "text", "required": true },\n  { "id": "tone", "prompt": "What tone should this take?", "type": "select", "options": ["Formal", "Casual", "Playful"], "required": true }\n]\n\`\`\`\n\nEmit the block and stop — the system will surface it to the user, collect answers, and resume you with their replies.\n---\n`;
+const PERMISSION_BRIDGE_SERVER = "permissions";
+const PERMISSION_BRIDGE_TOOL_NAME = "approval_prompt";
+const PERMISSION_BRIDGE_TOOL_ID = `mcp__${PERMISSION_BRIDGE_SERVER}__${PERMISSION_BRIDGE_TOOL_NAME}`;
+const PERMISSION_BRIDGE_RELATIVE_PATH = path.join(
+  "projects",
+  "briefs",
+  "command-centre",
+  "scripts",
+  "permission-prompt-mcp.cjs",
+);
 
 /**
  * Manages Claude CLI child processes for task execution.
@@ -61,6 +73,59 @@ class ProcessManager {
       this.waitingForReply.has(taskId) ||
       this.startingTasks.has(taskId)
     );
+  }
+
+  private resolvePermissionPromptScriptPath(agenticOsDir: string): string {
+    const absolutePath = path.join(agenticOsDir, PERMISSION_BRIDGE_RELATIVE_PATH);
+    if (!fs.existsSync(absolutePath)) {
+      throw new Error(`Permission bridge script is missing at ${absolutePath}`);
+    }
+    return absolutePath;
+  }
+
+  private reportPermissionBridgeFailure(taskId: string, summary: string, detail?: string): void {
+    const timestamp = new Date().toISOString();
+    this.addLogEntry(taskId, {
+      id: crypto.randomUUID(),
+      type: "system",
+      timestamp,
+      content: detail ? `${summary} ${detail}` : summary,
+    });
+    this.handleTaskError(taskId, summary);
+  }
+
+  private classifyPermissionBridgeFailure(stderr: string): {
+    summary: string;
+    detail?: string;
+  } | null {
+    const normalizedStderr = stderr.trim();
+    if (!normalizedStderr) {
+      return null;
+    }
+
+    if (
+      /permission-prompt-tool/i.test(normalizedStderr) &&
+      /not found/i.test(normalizedStderr) &&
+      (new RegExp(PERMISSION_BRIDGE_TOOL_ID, "i").test(normalizedStderr) ||
+        new RegExp(PERMISSION_BRIDGE_TOOL_NAME, "i").test(normalizedStderr))
+    ) {
+      return {
+        summary: "Ask mode permission bridge failed: Claude could not find the approval prompt tool.",
+        detail: `Expected ${PERMISSION_BRIDGE_TOOL_ID} from the temporary ${PERMISSION_BRIDGE_SERVER} MCP server. This usually means the server stayed pending and never finished connecting.`,
+      };
+    }
+
+    if (
+      /(mcp|permission)/i.test(normalizedStderr) &&
+      /(failed|error|unexpectedly|exited|spawn|startup|connect|handshake|stdio)/i.test(normalizedStderr)
+    ) {
+      return {
+        summary: "Ask mode permission bridge failed: the temporary MCP server could not start.",
+        detail: normalizedStderr.slice(0, 300),
+      };
+    }
+
+    return null;
   }
 
   /**
@@ -302,9 +367,10 @@ class ProcessManager {
         }
         prompt += task.description ? `Task: ${task.title}\n\n${task.description}` : task.title;
 
-        // Plan mode instruction — tell Claude to write the plan into brief.md
+        // Plan mode is read-only. Claude should prepare the exact brief content
+        // and ask for approval before any project files are changed.
         if (task.permissionMode === "plan" && task.projectSlug) {
-          prompt += `\n\n---\n\n[Plan Mode] You are running in plan mode. After researching and planning:\n1. Update the brief at projects/briefs/${task.projectSlug}/brief.md with the full plan — fill in the Deliverables and Acceptance Criteria sections with concrete items (use checkbox format: - [ ] Item)\n2. Show what you researched, what tools/skills you used, and what context you loaded\n3. Present the plan clearly in the conversation with your reasoning\n4. Wait for the user to approve before executing`;
+          prompt += `\n\n---\n\n[Plan Mode] You are running in read-only plan mode.\n1. Do NOT edit any files yet.\n2. Research and prepare the exact markdown that should be saved to projects/briefs/${task.projectSlug}/brief.md.\n3. Present a short planning summary in normal prose.\n4. Then emit a fenced code block tagged \`approved-brief\` containing ONLY the markdown that should be saved to brief.md. If you need code examples inside that block, use \`~~~\` fences or indented code blocks instead of nested triple backticks when possible.\n5. Then emit a fenced \`ask-user-questions\` block with exactly one select question using this shape:\n\`\`\`ask-user-questions\n[\n  {\n    "id": "plan_action",\n    "prompt": "The plan is ready. What should I do next?",\n    "type": "select",\n    "options": ["Approve and start", "Ask for changes", "Cancel"],\n    "required": true,\n    "intent": "plan_approval",\n    "metadata": { "briefFile": "projects/briefs/${task.projectSlug}/brief.md" }\n  }\n]\n\`\`\`\n6. After emitting those blocks, stop and wait. Do not execute anything until the user approves.\n---`;
         }
       }
 
@@ -1002,7 +1068,10 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
         contextSources: null,
         cronJobSlug: null,
         claudeSessionId: null,
-        permissionMode: "default",
+        permissionMode: parentTask.permissionMode ?? "bypassPermissions",
+        executionPermissionMode:
+          parentTask.executionPermissionMode ?? parentTask.permissionMode ?? "bypassPermissions",
+        model: parentTask.model ?? null,
         lastReplyAt: null,
         goalGroup: null,
         tag: null,
@@ -1010,14 +1079,15 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
       };
 
       db.prepare(
-        `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, permissionMode, executionPermissionMode, model)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).run(
         child.id, child.title, child.description, child.status, child.level,
         child.parentId, child.projectSlug, child.columnOrder, child.createdAt,
         child.updatedAt, child.costUsd, child.tokensUsed, child.durationMs,
         child.activityLabel, child.errorMessage, child.startedAt, child.completedAt,
-        child.clientId, 0, child.phaseNumber, child.gsdStep
+        child.clientId, 0, child.phaseNumber, child.gsdStep,
+        child.permissionMode, child.executionPermissionMode, child.model
       );
 
       emitTaskEvent({ type: "task:created", task: child, timestamp: now });
@@ -1100,6 +1170,7 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
   ): void {
     const cleanEnv = { ...process.env };
     delete cleanEnv.CLAUDECODE;
+    const config = getConfig();
 
     // Read the task's permission mode + model from the DB
     const db = getDb();
@@ -1133,8 +1204,64 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     }
 
     // Pre-approve safe read-only tools (not needed in plan mode or bypass mode)
+    let permissionConfigPath: string | null = null;
+    let permissionSettingsPath: string | null = null;
     if (permissionMode !== "plan" && permissionMode !== "bypassPermissions") {
-      args.push("--allowedTools", "Read,Glob,Grep,WebSearch,WebFetch");
+      try {
+        const permissionPromptScriptPath = this.resolvePermissionPromptScriptPath(config.agenticOsDir);
+        args.push("--allowedTools", "Read,Glob,Grep,WebSearch,WebFetch,mcp__permissions");
+        permissionConfigPath = path.join(
+          os.tmpdir(),
+          `aios-permissions-${taskId}-${Date.now()}.json`,
+        );
+        permissionSettingsPath = path.join(
+          os.tmpdir(),
+          `aios-permissions-settings-${taskId}-${Date.now()}.json`,
+        );
+        const mcpConfig = {
+          mcpServers: {
+            permissions: {
+              type: "stdio",
+              command: process.execPath,
+              args: [
+                permissionPromptScriptPath,
+                "--task-id",
+                taskId,
+                "--db-path",
+                config.dbPath,
+              ],
+              env: {
+                AGENTIC_OS_DIR: config.agenticOsDir,
+              },
+            },
+          },
+        };
+        const permissionSettings = {
+          permissions: {
+            allow: [
+              "Read(*)",
+              "Glob(*)",
+              "Grep(*)",
+              "WebSearch",
+              "WebFetch",
+              "mcp__permissions",
+            ],
+          },
+        };
+        fs.writeFileSync(permissionConfigPath, JSON.stringify(mcpConfig), "utf-8");
+        fs.writeFileSync(permissionSettingsPath, JSON.stringify(permissionSettings), "utf-8");
+        args.push("--setting-sources", "user");
+        args.push("--settings", permissionSettingsPath);
+        args.push("--mcp-config", permissionConfigPath);
+        args.push("--permission-prompt-tool", PERMISSION_BRIDGE_TOOL_ID);
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        const summary = /missing at/i.test(detail)
+          ? "Ask mode permission bridge failed: the bridge script path is missing."
+          : "Ask mode permission bridge failed to start.";
+        this.reportPermissionBridgeFailure(taskId, summary, detail);
+        return;
+      }
     }
 
     if (isContinuation) {
@@ -1175,6 +1302,20 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
         proc.stdin.end();
       }
     } catch (err) {
+      if (permissionConfigPath) {
+        try {
+          fs.unlinkSync(permissionConfigPath);
+        } catch {
+          // Ignore temp-file cleanup failure
+        }
+      }
+      if (permissionSettingsPath) {
+        try {
+          fs.unlinkSync(permissionSettingsPath);
+        } catch {
+          // Ignore temp-file cleanup failure
+        }
+      }
       console.error(`[process-manager] Spawn failed:`, err);
       this.handleSpawnError(taskId, err);
       return;
@@ -1193,8 +1334,28 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     this.sessions.set(taskId, session);
 
     const parser = new ClauseOutputParserWithTurnAwareness(taskId, session, this);
+    const cleanupPermissionConfig = () => {
+      if (!permissionConfigPath) return;
+      try {
+        fs.unlinkSync(permissionConfigPath);
+      } catch {
+        // Ignore temp-file cleanup failure
+      }
+      permissionConfigPath = null;
+    };
+    const cleanupPermissionSettings = () => {
+      if (!permissionSettingsPath) return;
+      try {
+        fs.unlinkSync(permissionSettingsPath);
+      } catch {
+        // Ignore temp-file cleanup failure
+      }
+      permissionSettingsPath = null;
+    };
 
     proc.on("error", (err) => {
+      cleanupPermissionConfig();
+      cleanupPermissionSettings();
       if ((err as NodeJS.ErrnoException).code === "ENOENT") {
         this.handleTaskError(taskId, "Claude CLI not found. Ensure 'claude' is installed and in your PATH.");
       } else {
@@ -1220,6 +1381,8 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     }
 
     proc.on("close", (code) => {
+      cleanupPermissionConfig();
+      cleanupPermissionSettings();
       // Check if this process is still the current one for this task.
       // If not (e.g., replyToTask killed it and spawned a new one), ignore this close.
       const currentSession = this.sessions.get(taskId);
@@ -1247,8 +1410,24 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
       // Parser didn't fire — handle based on exit code
       // NOTE: Do NOT delete the session yet — handleTurnComplete/handleTaskError need it
       if (code !== 0) {
-        const errorMsg = stderrBuffer.trim()
-          ? `Claude CLI exited with code ${code}: ${stderrBuffer.trim().slice(0, 500)}`
+        const trimmedStderr = stderrBuffer.trim();
+        const permissionBridgeFailure =
+          permissionMode !== "plan" && permissionMode !== "bypassPermissions"
+            ? this.classifyPermissionBridgeFailure(trimmedStderr)
+            : null;
+
+        if (permissionBridgeFailure) {
+          this.reportPermissionBridgeFailure(
+            taskId,
+            permissionBridgeFailure.summary,
+            permissionBridgeFailure.detail,
+          );
+          this.lastProgressEmit.delete(taskId);
+          return;
+        }
+
+        const errorMsg = trimmedStderr
+          ? `Claude CLI exited with code ${code}: ${trimmedStderr.slice(0, 500)}`
           : `Claude CLI exited with code ${code}`;
         this.handleTaskError(taskId, errorMsg);
       } else {
@@ -1292,6 +1471,31 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
 
     const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
     emitTaskEvent({ type: "task:progress", task: this.normalizeTask(updated), timestamp: new Date().toISOString() });
+  }
+
+  private promoteExecutionPermissionMode(taskId: string): void {
+    const db = getDb();
+    const modeRow = db.prepare(
+      "SELECT permissionMode, executionPermissionMode FROM tasks WHERE id = ?"
+    ).get(taskId) as { permissionMode: string | null; executionPermissionMode: string | null } | undefined;
+
+    if (!modeRow) return;
+
+    const currentMode = getActivePermissionMode(modeRow.permissionMode, "bypassPermissions");
+    if (currentMode === "plan") {
+      return;
+    }
+
+    const nextMode = getExecutionPermissionMode(
+      modeRow.executionPermissionMode ?? modeRow.permissionMode,
+      currentMode,
+    );
+
+    if (nextMode !== currentMode) {
+      db.prepare(
+        "UPDATE tasks SET permissionMode = ?, executionPermissionMode = ? WHERE id = ?"
+      ).run(nextMode, nextMode, taskId);
+    }
   }
 
   /**
@@ -1365,6 +1569,8 @@ Keep subtasks high-level — one per major deliverable, not every granular step.
     const taskCheck = db.prepare("SELECT level, parentId, completedAt FROM tasks WHERE id = ?").get(taskId) as
       { level: string; parentId: string | null; completedAt: string | null } | undefined;
     const isSubtask = !!taskCheck?.parentId;
+
+    this.promoteExecutionPermissionMode(taskId);
 
     console.log(`[process-manager] handleTurnComplete(${taskId.slice(0, 8)}): questionAsked=${questionAsked}, isCronTask=${isCronTask}, isSubtask=${isSubtask}, hasSession=${!!session}`);
 

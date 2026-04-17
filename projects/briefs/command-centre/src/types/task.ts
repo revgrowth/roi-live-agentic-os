@@ -85,6 +85,7 @@ export interface Task {
   claudeSessionId: string | null;
   claudePid?: number | null;
   permissionMode: PermissionMode;
+  executionPermissionMode?: PermissionMode | null;
   model?: ClaudeModel | null;
   lastReplyAt: string | null;
   conversationId?: string | null;
@@ -125,6 +126,8 @@ export interface TaskCreateInput {
   phaseNumber?: number | null;
   gsdStep?: GsdStep | null;
   permissionMode?: PermissionMode;
+  executionPermissionMode?: PermissionMode | null;
+  model?: ClaudeModel | null;
   conversationId?: string | null;
   originMessageId?: string | null;
 }
@@ -151,6 +154,7 @@ export type TaskUpdateInput = Partial<
     | "phaseNumber"
     | "gsdStep"
     | "permissionMode"
+    | "executionPermissionMode"
     | "model"
     | "conversationId"
     | "originMessageId"

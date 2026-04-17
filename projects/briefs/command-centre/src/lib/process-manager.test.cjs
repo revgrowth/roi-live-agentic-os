@@ -1,7 +1,9 @@
 const assert = require("node:assert/strict");
+const { EventEmitter } = require("node:events");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
+const { Readable } = require("node:stream");
 const test = require("node:test");
 const ts = require("typescript");
 
@@ -35,6 +37,35 @@ function createFakeDb(task) {
         get(...args) {
           if (normalized.includes("SELECT * FROM tasks WHERE id = ?")) {
             return args[0] === state.task.id ? cloneTask() : undefined;
+          }
+
+          if (normalized.includes("SELECT conversationId, title FROM tasks WHERE id = ?")) {
+            return args[0] === state.task.id
+              ? {
+                  conversationId: state.task.conversationId ?? null,
+                  title: state.task.title,
+                }
+              : undefined;
+          }
+
+          if (normalized.includes("SELECT permissionMode, model, cronJobSlug, projectSlug FROM tasks WHERE id = ?")) {
+            return args[0] === state.task.id
+              ? {
+                  permissionMode: state.task.permissionMode ?? null,
+                  model: state.task.model ?? null,
+                  cronJobSlug: state.task.cronJobSlug ?? null,
+                  projectSlug: state.task.projectSlug ?? null,
+                }
+              : undefined;
+          }
+
+          if (normalized.includes("SELECT permissionMode, executionPermissionMode FROM tasks WHERE id = ?")) {
+            return args[0] === state.task.id
+              ? {
+                  permissionMode: state.task.permissionMode ?? null,
+                  executionPermissionMode: state.task.executionPermissionMode ?? null,
+                }
+              : undefined;
           }
 
           if (normalized.includes("SELECT COUNT(*) as count FROM tasks WHERE parentId = ?")) {
@@ -103,6 +134,15 @@ function createFakeDb(task) {
             return { changes: 1 };
           }
 
+          if (normalized.includes("UPDATE tasks SET permissionMode = ?, executionPermissionMode = ? WHERE id = ?")) {
+            const [permissionMode, executionPermissionMode, taskId] = args;
+            if (taskId === state.task.id) {
+              state.task.permissionMode = permissionMode;
+              state.task.executionPermissionMode = executionPermissionMode;
+            }
+            return { changes: 1 };
+          }
+
           throw new Error(`Unhandled run SQL: ${normalized}`);
         },
         all() {
@@ -158,6 +198,24 @@ function createCronQuestionDb(task, runningRowSequence = [true]) {
             return args[0] === state.task.id ? cloneTask() : undefined;
           }
 
+          if (normalized.includes("SELECT permissionMode, executionPermissionMode FROM tasks WHERE id = ?")) {
+            return args[0] === state.task.id
+              ? {
+                  permissionMode: state.task.permissionMode ?? null,
+                  executionPermissionMode: state.task.executionPermissionMode ?? null,
+                }
+              : undefined;
+          }
+
+          if (normalized.includes("SELECT conversationId, title FROM tasks WHERE id = ?")) {
+            return args[0] === state.task.id
+              ? {
+                  conversationId: state.task.conversationId ?? null,
+                  title: state.task.title,
+                }
+              : undefined;
+          }
+
           if (normalized.includes("SELECT id FROM cron_runs WHERE taskId = ? AND result = 'running' LIMIT 1")) {
             const next = state.runningRowSequence.length > 0
               ? state.runningRowSequence.shift()
@@ -178,7 +236,7 @@ function createCronQuestionDb(task, runningRowSequence = [true]) {
             return { changes: 1 };
           }
 
-          if (normalized.includes("UPDATE tasks SET status = 'review', completedAt = NULL, updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, needsInput = 1 WHERE id = ?")) {
+          if (normalized.includes("UPDATE tasks SET status = 'review', completedAt = NULL, updatedAt = ?, costUsd = ?, tokensUsed = ?, durationMs = ?, needsInput = 1, activityLabel = NULL WHERE id = ?")) {
             const [updatedAt, costUsd, tokensUsed, durationMs, taskId] = args;
             if (taskId === state.task.id) {
               state.task.status = "review";
@@ -188,6 +246,15 @@ function createCronQuestionDb(task, runningRowSequence = [true]) {
               state.task.tokensUsed = tokensUsed;
               state.task.durationMs = durationMs;
               state.task.needsInput = 1;
+            }
+            return { changes: 1 };
+          }
+
+          if (normalized.includes("UPDATE tasks SET permissionMode = ?, executionPermissionMode = ? WHERE id = ?")) {
+            const [permissionMode, executionPermissionMode, taskId] = args;
+            if (taskId === state.task.id) {
+              state.task.permissionMode = permissionMode;
+              state.task.executionPermissionMode = executionPermissionMode;
             }
             return { changes: 1 };
           }
@@ -231,6 +298,17 @@ function loadProcessManagerModule(stubs = {}) {
     },
     "./prompt-tags": {
       expandPromptTags: (prompt) => prompt,
+    },
+    "./permission-mode": {
+      getActivePermissionMode: (value, fallback = "bypassPermissions") => {
+        if (!value) return fallback;
+        return value === "auto" ? "bypassPermissions" : value;
+      },
+      getExecutionPermissionMode: (value, fallback = "bypassPermissions") => {
+        if (!value) return fallback;
+        const normalized = value === "auto" ? "bypassPermissions" : value;
+        return normalized === "plan" ? fallback : normalized;
+      },
     },
     ...stubs,
   };
@@ -360,6 +438,157 @@ test("executeTask only claims one start for near-simultaneous queued cron calls"
     delete global.__processManager;
     cleanupTempWorkspace(workspaceDir);
   }
+});
+
+test("ask mode spawn wires the permission bridge and isolated settings", () => {
+  const workspaceDir = makeTempWorkspace();
+  const bridgeScriptPath = path.join(
+    workspaceDir,
+    "projects",
+    "briefs",
+    "command-centre",
+    "scripts",
+    "permission-prompt-mcp.cjs",
+  );
+  fs.mkdirSync(path.dirname(bridgeScriptPath), { recursive: true });
+  fs.writeFileSync(bridgeScriptPath, "#!/usr/bin/env node\n", "utf-8");
+  const now = new Date().toISOString();
+  const task = {
+    id: "task-ask-mode",
+    title: "Ask mode task",
+    description: "Verify Ask mode spawn arguments",
+    status: "running",
+    level: "task",
+    parentId: null,
+    projectSlug: "preview-task",
+    clientId: null,
+    needsInput: 0,
+    phaseNumber: null,
+    gsdStep: null,
+    cronJobSlug: null,
+    permissionMode: "default",
+    model: "sonnet",
+    createdAt: now,
+    updatedAt: now,
+    costUsd: null,
+    tokensUsed: null,
+    durationMs: null,
+    activityLabel: null,
+    errorMessage: null,
+  };
+  const db = createFakeDb(task);
+  const spawnCalls = [];
+
+  try {
+    const { processManager } = loadProcessManagerModule({
+      "./db": { getDb: () => db },
+      "./event-bus": {
+        emitTaskEvent: () => {},
+        emitChatEvent: () => {},
+      },
+      "./config": {
+        getConfig: () => ({
+          agenticOsDir: workspaceDir,
+          dbPath: path.join(workspaceDir, ".command-centre", "data.db"),
+        }),
+        getClientAgenticOsDir: (clientId) => path.join(workspaceDir, "clients", clientId),
+      },
+      "./claude-parser": {
+        ClaudeOutputParser: class {
+          constructor() {}
+          feedLine() {}
+          get isCompleted() {
+            return false;
+          }
+        },
+      },
+      "./subprocess": {
+        spawnManagedTaskProcess: (command, args) => {
+          spawnCalls.push({ command, args: [...args] });
+          const proc = new EventEmitter();
+          proc.stdout = new Readable({
+            read() {
+              this.push(null);
+            },
+          });
+          proc.stderr = new Readable({
+            read() {
+              this.push(null);
+            },
+          });
+          proc.stdin = { end() {} };
+          proc.unref = () => {};
+          proc.pid = 12345;
+          return proc;
+        },
+        killChildProcessTree: () => {},
+      },
+    });
+
+    processManager.spawnClaudeTurn(task.id, "Check Ask mode", workspaceDir, false, false);
+
+    assert.equal(spawnCalls.length, 1);
+    const [{ command, args }] = spawnCalls;
+    assert.equal(command, "claude");
+    assert.ok(args.includes("--permission-mode"));
+    assert.ok(args.includes("default"));
+    assert.ok(args.includes("--allowedTools"));
+    assert.ok(args.includes("Read,Glob,Grep,WebSearch,WebFetch,mcp__permissions"));
+    assert.ok(args.includes("--permission-prompt-tool"));
+    assert.ok(args.includes("mcp__permissions__approval_prompt"));
+    assert.ok(args.includes("--setting-sources"));
+    assert.ok(args.includes("user"));
+    assert.ok(args.includes("--settings"));
+    assert.ok(args.includes("--mcp-config"));
+
+    const settingsPath = args[args.indexOf("--settings") + 1];
+    const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"));
+    assert.deepEqual(settings.permissions.allow, [
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebSearch",
+      "WebFetch",
+      "mcp__permissions",
+    ]);
+    const mcpConfigPath = args[args.indexOf("--mcp-config") + 1];
+    const mcpConfig = JSON.parse(fs.readFileSync(mcpConfigPath, "utf-8"));
+    assert.equal(mcpConfig.mcpServers.permissions.type, "stdio");
+    assert.equal(mcpConfig.mcpServers.permissions.args[0], bridgeScriptPath);
+    fs.unlinkSync(settingsPath);
+    fs.unlinkSync(mcpConfigPath);
+  } finally {
+    delete global.__processManager;
+    cleanupTempWorkspace(workspaceDir);
+  }
+});
+
+test("ask mode bridge failure hint mentions a pending MCP server", () => {
+  const { processManager } = loadProcessManagerModule({
+    "./db": { getDb: () => createFakeDb({ id: "unused", status: "queued" }) },
+    "./event-bus": {
+      emitTaskEvent: () => {},
+      emitChatEvent: () => {},
+    },
+    "./claude-parser": {
+      ClaudeOutputParser: class {
+        constructor() {}
+        feedLine() {}
+        get isCompleted() {
+          return false;
+        }
+      },
+    },
+  });
+  const failure = processManager.classifyPermissionBridgeFailure(
+    "Error: MCP tool mcp__permissions__approval_prompt (passed via --permission-prompt-tool) not found. Available MCP tools: ReadMcpResourceTool"
+  );
+
+  assert.equal(
+    failure?.summary,
+    "Ask mode permission bridge failed: Claude could not find the approval prompt tool."
+  );
+  assert.match(failure?.detail ?? "", /stayed pending and never finished connecting/i);
 });
 
 test("cron prose questions stay in review and record needs_input instead of done", () => {

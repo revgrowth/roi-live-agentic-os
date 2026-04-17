@@ -4,6 +4,7 @@ import path from "path";
 import { getConfig, getClientAgenticOsDir } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
+import { getActivePermissionMode, getExecutionPermissionMode } from "@/lib/permission-mode";
 import type { Task } from "@/types/task";
 import type { ScopeResult } from "@/app/api/tasks/scope-goal/route";
 
@@ -95,8 +96,8 @@ export async function POST(
         .get() as { minOrder: number };
 
       db.prepare(
-        `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, needsInput, permissionMode)
-         VALUES (?, ?, ?, 'backlog', ?, NULL, ?, ?, ?, ?, ?, 0, 'bypassPermissions')`
+        `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, needsInput, permissionMode, executionPermissionMode)
+         VALUES (?, ?, ?, 'backlog', ?, NULL, ?, ?, ?, ?, ?, 0, 'bypassPermissions', 'bypassPermissions')`
       ).run(
         parentTaskId,
         projectName,
@@ -123,13 +124,26 @@ export async function POST(
       }
     }
 
+    const parentTask = db
+      .prepare("SELECT * FROM tasks WHERE id = ?")
+      .get(parentId) as Task | undefined;
+    const inheritedPermissionMode = getActivePermissionMode(
+      parentTask?.permissionMode ?? "bypassPermissions",
+      "bypassPermissions",
+    );
+    const inheritedExecutionMode = getExecutionPermissionMode(
+      parentTask?.executionPermissionMode ?? parentTask?.permissionMode,
+      "bypassPermissions",
+    );
+    const inheritedModel = parentTask?.model ?? null;
+
     // Pass 1: insert a row for each suggested subtask.
     const createdIds: string[] = [];
     const createdTasks: Task[] = [];
 
     const insertStmt = db.prepare(
-      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode, dependsOnTaskIds)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode, executionPermissionMode, model, dependsOnTaskIds)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     );
 
     // Get min columnOrder so new tasks sort to the top of queued, matching the /api/tasks POST behaviour.
@@ -171,7 +185,9 @@ export async function POST(
         contextSources: null,
         cronJobSlug: null,
         claudeSessionId: null,
-        permissionMode: "default",
+        permissionMode: inheritedPermissionMode,
+        executionPermissionMode: inheritedExecutionMode,
+        model: inheritedModel,
         lastReplyAt: null,
         goalGroup: null,
         tag: null,
@@ -203,6 +219,8 @@ export async function POST(
         task.gsdStep,
         task.cronJobSlug,
         task.permissionMode,
+        task.executionPermissionMode,
+        task.model,
         null
       );
 

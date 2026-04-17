@@ -14,6 +14,8 @@ cd agentic-os
 bash scripts/centre.sh
 ```
 
+**Test edit**: Added this line to test file editing permissions at 2026-04-16.
+
 Replace `<YOUR-TOKEN>` with the access token from the [Agentic Academy classroom](https://www.skool.com/scrapes/classroom/d1cfafed?md=552b0ba753df4c738843913fb3eb8312).
 
 On first launch, `centre.sh` runs the guided bootstrap automatically. It checks your system, prepares the local files Agentic OS needs, repairs missing dependencies when needed, and asks the one-time setup questions.

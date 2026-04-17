@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS tasks (
   phaseNumber INTEGER,
   gsdStep TEXT CHECK (gsdStep IN ('discuss', 'plan', 'execute', 'verify')),
   claudePid INTEGER,
+  permissionMode TEXT DEFAULT 'bypassPermissions',
+  executionPermissionMode TEXT DEFAULT 'bypassPermissions',
   model TEXT,
   dependsOnTaskIds TEXT,
   startSnapshot TEXT,
@@ -74,6 +76,24 @@ CREATE TABLE IF NOT EXISTS task_logs (
   FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_task_logs_taskId ON task_logs(taskId);
+
+CREATE TABLE IF NOT EXISTS approval_requests (
+  id TEXT PRIMARY KEY,
+  taskId TEXT NOT NULL,
+  kind TEXT NOT NULL CHECK (kind IN ('permission')),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'denied')),
+  title TEXT NOT NULL,
+  description TEXT,
+  toolName TEXT NOT NULL,
+  inputJson TEXT NOT NULL,
+  decision TEXT,
+  decisionMessage TEXT,
+  createdAt TEXT NOT NULL,
+  resolvedAt TEXT,
+  FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_approval_requests_taskId ON approval_requests(taskId);
+CREATE INDEX IF NOT EXISTS idx_approval_requests_status ON approval_requests(status);
 
 -- Autonomous mode: conversations between user and orchestrator
 CREATE TABLE IF NOT EXISTS conversations (

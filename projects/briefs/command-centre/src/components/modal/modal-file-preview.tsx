@@ -13,10 +13,12 @@ import { MarkdownPreview } from "../shared/markdown-preview";
 import { ResizablePane } from "../shared/resizable-pane";
 import { ScopedFileTree } from "../shared/scoped-file-tree";
 import { getFileIcon, getFileIconColor } from "@/lib/file-icons";
+import { appendClientId } from "@/hooks/use-client-id";
 
 interface ModalFilePreviewProps {
   fileName: string;
   relativePath: string;
+  clientId?: string | null;
   onBack: () => void;
   onNewTask: (fileName: string, relativePath: string) => void;
   /** Optional: called when the user picks a sibling file in the sidebar. */
@@ -44,6 +46,7 @@ function computeRootDir(relativePath: string): string {
 export function ModalFilePreview({
   fileName,
   relativePath,
+  clientId = null,
   onBack,
   onNewTask,
   onSelectFile,
@@ -64,6 +67,18 @@ export function ModalFilePreview({
   });
 
   const isHtml = /\.(html?|htm)$/i.test(fileName);
+  const fileUrl = useMemo(
+    () => appendClientId(`/api/files/${relativePath}`, clientId),
+    [clientId, relativePath],
+  );
+  const previewUrl = useMemo(
+    () => appendClientId(`/api/files/preview?path=${encodeURIComponent(relativePath)}`, clientId),
+    [clientId, relativePath],
+  );
+  const downloadUrl = useMemo(
+    () => appendClientId(`/api/files/download?path=${encodeURIComponent(relativePath)}`, clientId),
+    [clientId, relativePath],
+  );
 
   useEffect(() => {
     // HTML files are rendered directly in an iframe — no need to fetch content.
@@ -75,7 +90,7 @@ export function ModalFilePreview({
     }
     setIsLoading(true);
     setError(null);
-    fetch(`/api/files/${relativePath}`)
+    fetch(fileUrl)
       .then(async (res) => {
         if (!res.ok) throw new Error("Failed to load file");
         const json = await res.json();
@@ -83,7 +98,7 @@ export function ModalFilePreview({
       })
       .catch((err) => setError(err.message))
       .finally(() => setIsLoading(false));
-  }, [relativePath, isHtml]);
+  }, [fileUrl, isHtml]);
 
   const toggleSidebar = () => {
     setSidebarOpen((prev) => {
@@ -127,6 +142,7 @@ export function ModalFilePreview({
       <ScopedFileTree
         rootDir={rootDir}
         selectedPath={relativePath}
+        clientId={clientId}
         onSelectFile={(path) => onSelectFile?.(path)}
       />
     </div>
@@ -296,10 +312,7 @@ export function ModalFilePreview({
           </button>
           <button
             onClick={() => {
-              window.open(
-                `/api/files/download?path=${encodeURIComponent(relativePath)}`,
-                "_blank"
-              );
+              window.open(downloadUrl, "_blank");
             }}
             title="Download"
             style={{
@@ -348,7 +361,7 @@ export function ModalFilePreview({
 
         {!isLoading && !error && isHtml && (
           <iframe
-            src={`/api/files/preview?path=${encodeURIComponent(relativePath)}`}
+            src={previewUrl}
             title={fileName}
             sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
             style={{
@@ -367,7 +380,7 @@ export function ModalFilePreview({
             {isImage ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={`/api/files/preview?path=${encodeURIComponent(relativePath)}`}
+                src={previewUrl}
                 alt={fileName}
                 style={{ maxWidth: "100%", borderRadius: 8 }}
               />
