@@ -7,6 +7,12 @@ import {
 } from "lucide-react";
 import type { Task, LogEntry } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
+import { parseQuestionSpecs, type QuestionSpec } from "@/types/question-spec";
+import {
+  PermissionApprovalActions,
+  PlanApprovalActions,
+} from "@/components/shared/task-approval-actions";
+import { isTaskWaitingOnPermission } from "@/lib/task-permissions";
 
 // ── Paste handling ──────────────────────────────────────────────
 interface PastedChip {
@@ -176,6 +182,32 @@ export function ReviewQueue({ tasks, allTasks }: { tasks: Task[]; allTasks?: Tas
 
   const logEntries = current ? (allLogEntries[current.id] ?? []) : [];
   const lastInteracted = getLastUserIntent(logEntries).timestamp || current?.lastReplyAt;
+  const pendingStructured = useMemo((): QuestionSpec[] => {
+    if (!current || current.needsInput !== true) return [];
+    for (let i = logEntries.length - 1; i >= 0; i--) {
+      const entry = logEntries[i];
+      if (entry.type !== "structured_question" || entry.questionAnswers) continue;
+      if (!entry.questionSpec) return [];
+      try {
+        return parseQuestionSpecs(JSON.parse(entry.questionSpec));
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  }, [current, logEntries]);
+  const planApprovalQuestion =
+    pendingStructured.find(
+      (question) => question.intent === "plan_approval" || question.id === "plan_action",
+    ) ?? null;
+  const isInput = current.needsInput === true;
+  const isPermissionWaiting =
+    !planApprovalQuestion &&
+    isTaskWaitingOnPermission({
+      needsInput: isInput,
+      activityLabel: current?.activityLabel,
+      errorMessage: current?.errorMessage,
+    });
 
   // ── Derived data ──
 
@@ -331,16 +363,27 @@ export function ReviewQueue({ tasks, allTasks }: { tasks: Task[]; allTasks?: Tas
 
   if (!current || queue.length === 0) return null;
 
-  const isInput = current.needsInput === true;
   const isError = !!(current.errorMessage && current.status !== "done");
   const accentColor = isError ? "#C04030" : isInput ? "#D2783C" : "#93452A";
-  const labelText = isError ? "Error" : isInput ? "Waiting for you" : "Review";
+  const labelText = isError
+    ? "Error"
+    : planApprovalQuestion
+      ? "Plan ready"
+      : isPermissionWaiting
+        ? "Needs permission"
+        : isInput
+          ? "Needs input"
+          : "Review";
 
   const rawPrompt = isError
     ? cleanErrorMessage(current.errorMessage || "Something went wrong.")
-    : isInput
-      ? cleanText(current.errorMessage || current.activityLabel || "Claude needs your input.")
-      : null;
+    : planApprovalQuestion
+      ? planApprovalQuestion.prompt
+      : isPermissionWaiting
+        ? cleanText(current.activityLabel || "Claude is waiting for permission to continue.")
+        : isInput
+          ? cleanText(current.errorMessage || current.activityLabel || "Claude needs your input.")
+          : null;
   const prompt = rawPrompt && rawPrompt !== claudeStatus
     ? (rawPrompt.length > 200 ? rawPrompt.slice(0, 197) + "\u2026" : rawPrompt)
     : null;
@@ -549,6 +592,30 @@ export function ReviewQueue({ tasks, allTasks }: { tasks: Task[]; allTasks?: Tas
 
       {/* ── Input ── */}
       <div style={{ padding: "6px 14px 10px", borderTop: "1px solid rgba(218, 193, 185, 0.08)" }}>
+        {(planApprovalQuestion || isInput || current.status === "review") && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }}>
+            {planApprovalQuestion && (
+              <PlanApprovalActions
+                taskId={current.id}
+                question={planApprovalQuestion}
+                message={message}
+                onSubmitted={() => {
+                  setMessage("");
+                  fetchLogEntries(current.id);
+                }}
+              />
+            )}
+            <PermissionApprovalActions
+              taskId={current.id}
+              isPermissionWaiting={isPermissionWaiting}
+              activityLabel={current.activityLabel}
+              errorMessage={current.errorMessage}
+              onResolved={() => {
+                fetchLogEntries(current.id);
+              }}
+            />
+          </div>
+        )}
         {justSent ? (
           <div style={{ fontSize: 12, fontFamily: "var(--font-inter), Inter, sans-serif", color: "#6B8E6B", padding: "5px 0", display: "flex", alignItems: "center", gap: 6 }}>
             <MessageCircle size={12} /> Sent{queue.length > 1 ? " — next" : ""}
@@ -582,7 +649,16 @@ export function ReviewQueue({ tasks, allTasks }: { tasks: Task[]; allTasks?: Tas
               <input ref={fileInputRef} type="file" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = ""; }} style={{ display: "none" }} accept="image/*,.pdf,.md,.txt,.csv,.json,.html" />
               <textarea
                 ref={textareaRef} value={message} onChange={(e) => setMessage(e.target.value)} onPaste={handlePaste} onKeyDown={handleKeyDown}
-                placeholder={isInput ? "Reply to Claude\u2026" : "Follow up or approve\u2026"} rows={1}
+                placeholder={
+                  planApprovalQuestion
+                    ? "Add changes or context before choosing an action..."
+                    : isPermissionWaiting
+                      ? "Add context or follow up..."
+                      : isInput
+                        ? "Reply to Claude..."
+                        : "Follow up..."
+                }
+                rows={1}
                 style={{
                   width: "100%", fontSize: 13, fontFamily: "var(--font-inter), Inter, sans-serif",
                   padding: "8px 62px 8px 12px", backgroundColor: "#FFFFFF",

@@ -13,12 +13,21 @@ import { ChatList } from "./chat-list";
 import { PaneContainer } from "./pane-container";
 import { PanelOutputs } from "../panel/panel-outputs";
 import { QuestionModal } from "@/components/shared/question-modal";
+import {
+  DraftPlanPreviewModal,
+  DraftPlanPreviewPanel,
+} from "@/components/shared/draft-plan-preview";
 import { usePaneState } from "@/hooks/use-pane-state";
 import {
   parseQuestionSpecs,
   type QuestionSpec,
   type QuestionAnswers,
 } from "@/types/question-spec";
+import {
+  extractPendingApprovedBriefFromLogs,
+  getPendingPlanApprovalQuestion,
+} from "@/lib/plan-brief";
+import { getInheritedPermissionModes } from "@/lib/permission-mode";
 
 // Stable reference to avoid infinite re-render loop in Zustand selector
 const EMPTY_LOG_ENTRIES: LogEntry[] = [];
@@ -42,6 +51,7 @@ export function TaskModal() {
   const [activeFile, setActiveFile] = useState<OutputFile | null>(null);
   const [activeTab, setActiveTab] = useState<ModalTab>("conversation");
   const [newTaskAttachment, setNewTaskAttachment] = useState<{ fileName: string; relativePath: string } | null>(null);
+  const [showDraftPlanModal, setShowDraftPlanModal] = useState(false);
   // Tracks which HTML outputs we've already auto-previewed for each task so we
   // don't re-open them if the user navigates away. Keyed by `${taskId}:${id}`.
   const autoPreviewedRef = useRef<Set<string>>(new Set());
@@ -341,6 +351,12 @@ export function TaskModal() {
   const [structuredAnswers, setStructuredAnswers] = useState<QuestionAnswers>({});
   const [structuredSubmitting, setStructuredSubmitting] = useState(false);
   const pendingEntryId = pendingStructured?.entryId ?? null;
+  const planApprovalQuestion =
+    getPendingPlanApprovalQuestion(logEntries)
+    ?? pendingStructured?.specs.find(
+      (question) => question.intent === "plan_approval" || question.id === "plan_action",
+    ) ?? null;
+  const pendingApprovedBrief = extractPendingApprovedBriefFromLogs(logEntries);
 
   // Reset answers when a new pending structured question appears
   useEffect(() => {
@@ -542,6 +558,7 @@ export function TaskModal() {
             <ModalFilePreview
               fileName={activeFile.fileName}
               relativePath={activeFile.relativePath}
+              clientId={task?.clientId ?? null}
               onBack={() => {
                 if (viewingTaskId) {
                   userDismissedAutoPreviewRef.current.add(viewingTaskId);
@@ -597,7 +614,14 @@ export function TaskModal() {
                     onRunSubtaskInNewChat={(id, title) => {
                       handleOpenSubtaskPane(id, title);
                       useTaskStore.getState().fetchLogEntries(id);
-                      updateTask(id, { status: "running", permissionMode: task.permissionMode ?? "bypassPermissions" });
+                      updateTask(id, {
+                        status: "running",
+                        ...getInheritedPermissionModes(
+                          task.permissionMode,
+                          task.executionPermissionMode,
+                          task.status,
+                        ),
+                      });
                       fetch(`/api/tasks/${id}/execute`, { method: "POST" });
                     }}
                     availablePanes={[
@@ -609,7 +633,14 @@ export function TaskModal() {
                         handleAssignTaskToPane(paneId, subtaskId);
                         handleFocusPane(paneId);
                       }
-                      updateTask(subtaskId, { status: "running", permissionMode: task.permissionMode ?? "bypassPermissions" });
+                      updateTask(subtaskId, {
+                        status: "running",
+                        ...getInheritedPermissionModes(
+                          task.permissionMode,
+                          task.executionPermissionMode,
+                          task.status,
+                        ),
+                      });
                       useTaskStore.getState().fetchLogEntries(subtaskId);
                       fetch(`/api/tasks/${subtaskId}/execute`, { method: "POST" });
                     }}
@@ -712,6 +743,7 @@ export function TaskModal() {
                             tokensUsed={task.tokensUsed}
                             errorMessage={task.errorMessage}
                             durationMs={task.durationMs}
+                            onRefresh={() => fetchLogEntries(task.id)}
                           />
                           <ReplyInput
                             taskId={task.id}
@@ -719,6 +751,7 @@ export function TaskModal() {
                             needsInput={task.needsInput === true}
                             taskStatus={task.status}
                             initialPermissionMode={task.permissionMode ?? "bypassPermissions"}
+                            initialExecutionPermissionMode={task.executionPermissionMode ?? null}
                             initialModel={task.model ?? null}
                             onOptimisticReply={handleOptimisticReply}
                             projectSlug={task.projectSlug}
@@ -754,29 +787,39 @@ export function TaskModal() {
           ) : activeTab === "plan" ? (
             task.projectSlug ? (
               <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                <ModalFilePreview
-                  fileName={task.level === "gsd" ? "ROADMAP.md" : "brief.md"}
-                  relativePath={
-                    task.level === "gsd"
-                      ? `projects/briefs/${task.projectSlug}/.planning/ROADMAP.md`
-                      : `projects/briefs/${task.projectSlug}/brief.md`
-                  }
-                  onBack={() => setActiveTab("conversation")}
-                  onNewTask={handleNewTaskFromOutput}
-                  onSelectFile={(path) => {
-                    const name = path.split("/").pop() ?? path;
-                    setActiveFile({
-                      id: `plan-nav-${path}`,
-                      taskId: task.id,
-                      fileName: name,
-                      relativePath: path,
-                      filePath: path,
-                      extension: name.includes(".") ? name.split(".").pop() ?? "" : "",
-                      sizeBytes: null,
-                      createdAt: new Date().toISOString(),
-                    });
-                  }}
-                />
+                {task.level !== "gsd" && pendingApprovedBrief ? (
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", padding: 20 }}>
+                    <DraftPlanPreviewPanel
+                      content={pendingApprovedBrief}
+                      onExpand={() => setShowDraftPlanModal(true)}
+                    />
+                  </div>
+                ) : (
+                  <ModalFilePreview
+                    fileName={task.level === "gsd" ? "ROADMAP.md" : "brief.md"}
+                    relativePath={
+                      task.level === "gsd"
+                        ? `projects/briefs/${task.projectSlug}/.planning/ROADMAP.md`
+                        : `projects/briefs/${task.projectSlug}/brief.md`
+                    }
+                    clientId={task.clientId}
+                    onBack={() => setActiveTab("conversation")}
+                    onNewTask={handleNewTaskFromOutput}
+                    onSelectFile={(path) => {
+                      const name = path.split("/").pop() ?? path;
+                      setActiveFile({
+                        id: `plan-nav-${path}`,
+                        taskId: task.id,
+                        fileName: name,
+                        relativePath: path,
+                        filePath: path,
+                        extension: name.includes(".") ? name.split(".").pop() ?? "" : "",
+                        sizeBytes: null,
+                        createdAt: new Date().toISOString(),
+                      });
+                    }}
+                  />
+                )}
                 <SyncDeliverablesBar
                   projectSlug={task.projectSlug}
                   parentId={task.id}
@@ -802,7 +845,7 @@ export function TaskModal() {
       </div>
 
       {/* Structured-question overlay — blocks the task panel until answered */}
-      {pendingStructured && (
+      {pendingStructured && !planApprovalQuestion && (
         <QuestionModal
           open
           variant="overlay"
@@ -813,6 +856,12 @@ export function TaskModal() {
           subtitle="Answer these so Claude can continue the task."
           submitLabel={structuredSubmitting ? "Sending…" : "Send answers"}
           onSubmit={handleStructuredSubmit}
+        />
+      )}
+      {showDraftPlanModal && pendingApprovedBrief && (
+        <DraftPlanPreviewModal
+          content={pendingApprovedBrief}
+          onClose={() => setShowDraftPlanModal(false)}
         />
       )}
     </>

@@ -2,6 +2,7 @@ import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 import { getConfig } from "./config";
+import { getExecutionPermissionMode, normalizePermissionMode } from "./permission-mode";
 
 let db: Database.Database | null = null;
 
@@ -144,11 +145,31 @@ export function getDb(): Database.Database {
   // Migration: add permissionMode column for controlling Claude CLI permission mode per task
   const permCol = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
   if (!permCol.some((c) => c.name === "permissionMode")) {
-    db.exec("ALTER TABLE tasks ADD COLUMN permissionMode TEXT DEFAULT 'default'");
+    db.exec("ALTER TABLE tasks ADD COLUMN permissionMode TEXT DEFAULT 'bypassPermissions'");
+  }
+  if (!permCol.some((c) => c.name === "executionPermissionMode")) {
+    db.exec("ALTER TABLE tasks ADD COLUMN executionPermissionMode TEXT DEFAULT 'bypassPermissions'");
   }
 
   // Fix cron tasks that were incorrectly stored with 'default' permission mode
   db.exec("UPDATE tasks SET permissionMode = 'bypassPermissions' WHERE cronJobSlug IS NOT NULL AND permissionMode = 'default'");
+  db.exec("UPDATE tasks SET permissionMode = 'bypassPermissions' WHERE permissionMode = 'auto'");
+  db.exec("UPDATE tasks SET executionPermissionMode = permissionMode WHERE executionPermissionMode IS NULL OR executionPermissionMode = ''");
+
+  // Normalize stored permission modes so UI and execution share the same canonical values
+  const taskPermissionRows = db.prepare(
+    "SELECT id, permissionMode, executionPermissionMode FROM tasks"
+  ).all() as Array<{ id: string; permissionMode: string | null; executionPermissionMode: string | null }>;
+  const updateTaskPerms = db.prepare(
+    "UPDATE tasks SET permissionMode = ?, executionPermissionMode = ? WHERE id = ?"
+  );
+  for (const row of taskPermissionRows) {
+    const normalizedPermission = normalizePermissionMode(row.permissionMode, "bypassPermissions");
+    const normalizedExecution = getExecutionPermissionMode(row.executionPermissionMode ?? row.permissionMode, "bypassPermissions");
+    if (normalizedPermission !== row.permissionMode || normalizedExecution !== row.executionPermissionMode) {
+      updateTaskPerms.run(normalizedPermission, normalizedExecution, row.id);
+    }
+  }
 
   // Migration: add model column for selecting Claude model per task
   const modelCol = db.prepare("PRAGMA table_info(tasks)").all() as Array<{ name: string }>;
@@ -291,6 +312,26 @@ export function getDb(): Database.Database {
     const msg = err instanceof Error ? err.message : String(err);
     if (!/duplicate column/i.test(msg)) throw err;
   }
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS approval_requests (
+      id TEXT PRIMARY KEY,
+      taskId TEXT NOT NULL,
+      kind TEXT NOT NULL CHECK (kind IN ('permission')),
+      status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'denied')),
+      title TEXT NOT NULL,
+      description TEXT,
+      toolName TEXT NOT NULL,
+      inputJson TEXT NOT NULL,
+      decision TEXT,
+      decisionMessage TEXT,
+      createdAt TEXT NOT NULL,
+      resolvedAt TEXT,
+      FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE
+    )
+  `);
+  db.exec("CREATE INDEX IF NOT EXISTS idx_approval_requests_taskId ON approval_requests(taskId)");
+  db.exec("CREATE INDEX IF NOT EXISTS idx_approval_requests_status ON approval_requests(status)");
 
   return db;
 }

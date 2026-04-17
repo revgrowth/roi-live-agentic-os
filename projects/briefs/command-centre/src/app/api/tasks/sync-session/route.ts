@@ -130,7 +130,8 @@ export async function POST(request: NextRequest) {
       cronJobSlug: null,
       claudeSessionId: sessionId,
       claudePid: claudePid ?? null,
-      permissionMode: "default",
+      permissionMode: "bypassPermissions",
+      executionPermissionMode: "bypassPermissions",
       lastReplyAt: null,
       goalGroup: null,
       tag: null,
@@ -138,15 +139,16 @@ export async function POST(request: NextRequest) {
     };
 
     db.prepare(
-      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, contextSources, cronJobSlug, claudeSessionId, claudePid)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, contextSources, cronJobSlug, claudeSessionId, claudePid, permissionMode, executionPermissionMode)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       task.id, task.title, task.description, task.status, task.level,
       task.parentId, task.projectSlug, task.columnOrder, task.createdAt,
       task.updatedAt, task.costUsd, task.tokensUsed, task.durationMs,
       task.activityLabel, task.errorMessage, task.startedAt, task.completedAt,
       task.clientId, task.needsInput ? 1 : 0, task.phaseNumber, task.gsdStep,
-      task.contextSources, task.cronJobSlug, task.claudeSessionId, task.claudePid
+      task.contextSources, task.cronJobSlug, task.claudeSessionId, task.claudePid,
+      task.permissionMode, task.executionPermissionMode
     );
 
     emitTaskEvent({ type: "task:created", task, timestamp: now });

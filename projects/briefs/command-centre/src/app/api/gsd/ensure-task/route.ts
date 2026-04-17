@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import { getConfig, resolvePlanningDir } from "@/lib/config";
 import { parseRoadmap } from "@/lib/gsd-parser";
 import { emitTaskEvent } from "@/lib/event-bus";
+import { getActivePermissionMode, getExecutionPermissionMode } from "@/lib/permission-mode";
 import type { Task, GsdStep } from "@/types/task";
 
 /**
@@ -129,7 +130,8 @@ export async function POST(request: Request) {
         contextSources: null,
         cronJobSlug: null,
         claudeSessionId: null,
-        permissionMode: "default",
+        permissionMode: "bypassPermissions",
+        executionPermissionMode: "bypassPermissions",
         lastReplyAt: null,
         goalGroup: null,
         tag: null,
@@ -137,15 +139,15 @@ export async function POST(request: Request) {
       };
 
       db.prepare(
-        `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode, executionPermissionMode)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).run(
         task.id, task.title, task.description, task.status, task.level,
         task.parentId, task.projectSlug, task.columnOrder,
         task.createdAt, task.updatedAt, task.costUsd, task.tokensUsed,
         task.durationMs, task.activityLabel, task.errorMessage,
         task.startedAt, task.completedAt, task.clientId, 0,
-        task.phaseNumber, task.gsdStep, task.cronJobSlug
+        task.phaseNumber, task.gsdStep, task.cronJobSlug, task.permissionMode, task.executionPermissionMode
       );
 
       emitTaskEvent({ type: "task:created", task, timestamp: now });
@@ -236,6 +238,14 @@ export async function POST(request: Request) {
         const title = `Phase ${phase.number}: ${STEP_TITLES[step]} — ${phase.name}`;
         const columnOrder = phase.number * 100 + stepIdx;
 
+        const inheritedPermissionMode = getActivePermissionMode(
+          parentTask.permissionMode ?? "bypassPermissions",
+          "bypassPermissions",
+        );
+        const inheritedExecutionMode = getExecutionPermissionMode(
+          parentTask.executionPermissionMode ?? parentTask.permissionMode,
+          "bypassPermissions",
+        );
         const task: Task = {
           id: crypto.randomUUID(),
           title,
@@ -261,7 +271,9 @@ export async function POST(request: Request) {
           contextSources: null,
           cronJobSlug: null,
           claudeSessionId: null,
-          permissionMode: "default",
+          permissionMode: inheritedPermissionMode,
+          executionPermissionMode: inheritedExecutionMode,
+          model: parentTask.model ?? null,
           lastReplyAt: null,
           goalGroup: null,
           tag: null,
@@ -269,15 +281,15 @@ export async function POST(request: Request) {
         };
 
         db.prepare(
-          `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, permissionMode, executionPermissionMode, model)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
         ).run(
           task.id, task.title, task.description, task.status, task.level,
           task.parentId, task.projectSlug, task.columnOrder,
           task.createdAt, task.updatedAt, task.costUsd, task.tokensUsed,
           task.durationMs, task.activityLabel, task.errorMessage,
           task.startedAt, task.completedAt, task.clientId, 0,
-          task.phaseNumber, task.gsdStep
+          task.phaseNumber, task.gsdStep, task.permissionMode, task.executionPermissionMode, task.model
         );
 
         emitTaskEvent({ type: "task:created", task, timestamp: now });

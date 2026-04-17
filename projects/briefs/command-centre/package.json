@@ -9,7 +9,7 @@
     "build": "node scripts/next-run.cjs build",
     "start": "node scripts/next-run.cjs start",
     "lint": "next lint",
-    "test:cron": "node --no-deprecation --test src/lib/cron-runtime.test.cjs src/lib/process-manager.test.cjs src/lib/queue-watcher.test.cjs"
+    "test:cron": "node --no-deprecation --test src/lib/cron-runtime.test.cjs src/lib/process-manager.test.cjs src/lib/queue-watcher.test.cjs src/lib/plan-review-flows.test.cjs src/lib/permission-prompt-mcp.test.cjs src/lib/task-chat.test.cjs"
   },
   "repository": {
     "type": "git",

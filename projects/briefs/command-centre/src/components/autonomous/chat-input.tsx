@@ -30,7 +30,7 @@ function getAttachmentIcon(ext: string) {
 }
 
 interface ChatInputProps {
-  onSend: (message: string) => void;
+  onSend: (message: string, options: { permissionMode: PermissionMode; model: ClaudeModel | null }) => void;
   disabled?: boolean;
   placeholder?: string;
 }
@@ -124,10 +124,10 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
         : `Attached files:\n${attachmentLines}`;
     }
 
-    onSend(finalMessage);
+    onSend(finalMessage, { permissionMode, model });
     setValue("");
     setAttachments([]);
-  }, [value, attachments, disabled, onSend]);
+  }, [value, attachments, disabled, model, onSend, permissionMode]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (shouldInsertModifierNewline(e)) {

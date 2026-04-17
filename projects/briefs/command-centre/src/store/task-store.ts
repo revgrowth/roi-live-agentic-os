@@ -1,7 +1,11 @@
 import { create } from "zustand";
-import type { Task, TaskLevel, TaskUpdateInput, OutputFile, LogEntry } from "@/types/task";
+import type { Task, TaskLevel, TaskUpdateInput, OutputFile, LogEntry, ClaudeModel } from "@/types/task";
 import type { TaskEvent } from "@/lib/event-bus";
 import { isLegacyCronFallbackLogEntry, isLegacyCronFallbackLogSet } from "@/lib/task-logs";
+import {
+  getActivePermissionMode,
+  getExecutionPermissionMode,
+} from "@/lib/permission-mode";
 import { useClientStore } from "./client-store";
 
 // SSE dedup: track IDs we created so SSE echoes are suppressed
@@ -31,7 +35,7 @@ interface TaskStore {
 
   // Actions
   fetchTasks: () => Promise<void>;
-  createTask: (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null, permissionMode?: string, initialStatus?: string, clientId?: string | null) => Promise<string | null>;
+  createTask: (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null, permissionMode?: string, initialStatus?: string, clientId?: string | null, model?: ClaudeModel | null) => Promise<string | null>;
   updateTask: (id: string, updates: TaskUpdateInput) => Promise<void>;
   moveTask: (id: string, newStatus: string, newOrder: number) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -129,10 +133,12 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }
   },
 
-  createTask: async (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null, permissionMode?: string, initialStatus?: string, clientIdOverride?: string | null) => {
+  createTask: async (title: string, description: string | null, level: TaskLevel, projectSlug?: string | null, parentId?: string | null, permissionMode?: string, initialStatus?: string, clientIdOverride?: string | null, model?: ClaudeModel | null) => {
     const tempId = "temp-" + crypto.randomUUID();
     const now = new Date().toISOString();
     const currentClientId = clientIdOverride !== undefined ? clientIdOverride : useClientStore.getState().selectedClientId;
+    const activePermissionMode = getActivePermissionMode(permissionMode, "bypassPermissions");
+    const executionPermissionMode = getExecutionPermissionMode(permissionMode, "bypassPermissions");
     const tempTask: Task = {
       id: tempId,
       title,
@@ -158,7 +164,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       contextSources: null,
       cronJobSlug: null,
       claudeSessionId: null,
-      permissionMode: (permissionMode as Task["permissionMode"]) || "default",
+      permissionMode: activePermissionMode,
+      executionPermissionMode,
+      model: model ?? null,
       lastReplyAt: null,
       goalGroup: null,
       tag: null,
@@ -176,7 +184,18 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, level, projectSlug, clientId, parentId, permissionMode: permissionMode || "default", status: initialStatus }),
+        body: JSON.stringify({
+          title,
+          description,
+          level,
+          projectSlug,
+          clientId,
+          parentId,
+          permissionMode: activePermissionMode,
+          executionPermissionMode,
+          model,
+          status: initialStatus,
+        }),
       });
       if (!res.ok) throw new Error("Failed to create task");
       const realTask = await res.json();

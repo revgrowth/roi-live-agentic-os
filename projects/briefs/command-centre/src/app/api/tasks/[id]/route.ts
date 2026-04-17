@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
+import { getActivePermissionMode, getExecutionPermissionMode } from "@/lib/permission-mode";
 import { processManager } from "@/lib/process-manager";
 import type { Task, TaskUpdateInput } from "@/types/task";
 import type Database from "better-sqlite3";
@@ -188,8 +189,8 @@ function autoQueueNextPhase(db: Database.Database, completedChild: Task, now: st
   const nextTitle = `Phase ${nextPhase}: discuss`;
 
   db.prepare(
-    `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, phaseNumber, gsdStep, permissionMode)
-     VALUES (?, ?, ?, 'queued', 'gsd', ?, ?, ?, ?, ?, ?, 'discuss', ?)`
+    `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, phaseNumber, gsdStep, permissionMode, executionPermissionMode, model)
+     VALUES (?, ?, ?, 'queued', 'gsd', ?, ?, ?, ?, ?, ?, 'discuss', ?, ?, ?)`
   ).run(
     nextPhaseId,
     nextTitle,
@@ -200,7 +201,9 @@ function autoQueueNextPhase(db: Database.Database, completedChild: Task, now: st
     now,
     now,
     nextPhase,
-    parent.permissionMode || "default"
+    parent.permissionMode || "bypassPermissions",
+    parent.executionPermissionMode || parent.permissionMode || "bypassPermissions",
+    parent.model ?? null,
   );
 
   const newPhaseTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(nextPhaseId) as Task;
@@ -257,6 +260,30 @@ export async function PATCH(
     const body = (await request.json()) as TaskUpdateInput;
     const now = new Date().toISOString();
 
+    if ("permissionMode" in body) {
+      const normalizedPermission = getActivePermissionMode(
+        body.permissionMode ?? existing.permissionMode,
+        existing.permissionMode ?? "bypassPermissions",
+      );
+      body.permissionMode = normalizedPermission;
+      if (!("executionPermissionMode" in body)) {
+        body.executionPermissionMode =
+          normalizedPermission === "plan"
+            ? getExecutionPermissionMode(
+                existing.executionPermissionMode ?? existing.permissionMode,
+                "bypassPermissions",
+              )
+            : normalizedPermission;
+      }
+    }
+
+    if ("executionPermissionMode" in body) {
+      body.executionPermissionMode = getExecutionPermissionMode(
+        body.executionPermissionMode ?? body.permissionMode ?? existing.executionPermissionMode ?? existing.permissionMode,
+        existing.executionPermissionMode ?? "bypassPermissions",
+      );
+    }
+
     // Build dynamic update
     const updates: string[] = ["updatedAt = ?"];
     const values: unknown[] = [now];
@@ -279,6 +306,8 @@ export async function PATCH(
       "phaseNumber",
       "gsdStep",
       "permissionMode",
+      "executionPermissionMode",
+      "model",
       "tag",
       "pinnedAt",
     ];

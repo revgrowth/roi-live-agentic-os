@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import { X, ChevronDown, Trash2, Terminal, Copy } from "lucide-react";
-import type { Task, TaskStatus, PermissionMode } from "@/types/task";
-import { PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS } from "@/types/task";
+import type { Task, TaskStatus } from "@/types/task";
 import { useTaskStore } from "@/store/task-store";
 import { LevelBadge } from "@/components/board/level-badge";
+import { PermissionPicker } from "@/components/shared/permission-picker";
+import { getPermissionStateForPickerChange, getPickerPermissionMode } from "@/lib/permission-mode";
 
 const statusColorMap: Record<string, string> = {
   backlog: "#5E5E65",
@@ -14,24 +15,6 @@ const statusColorMap: Record<string, string> = {
   review: "#B25D3F",
   done: "#6B8E6B",
 };
-
-const MODE_BG: Record<PermissionMode, string> = {
-  plan: "#E0E7FF",
-  default: "#F3F4F6",
-  acceptEdits: "#FEF3C7",
-  auto: "#D1FAE5",
-  bypassPermissions: "#FEE2E2",
-};
-
-const MODE_TEXT: Record<PermissionMode, string> = {
-  plan: "#3730A3",
-  default: "#374151",
-  acceptEdits: "#92400E",
-  auto: "#065F46",
-  bypassPermissions: "#991B1B",
-};
-
-const ALL_MODES: PermissionMode[] = ["plan", "default", "acceptEdits", "auto", "bypassPermissions"];
 
 const ALL_STATUSES: TaskStatus[] = ["backlog", "queued", "running", "review", "done"];
 
@@ -53,8 +36,11 @@ export function ModalHeader({
   const updateTask = useTaskStore((s) => s.updateTask);
   const deleteTask = useTaskStore((s) => s.deleteTask);
   const statusColor = statusColorMap[task.status] || "#5E5E65";
-  // Can change mode anytime except while actively running — next turn picks it up
-  const canChangeMode = task.status !== "running";
+  const pickerMode = getPickerPermissionMode(
+    task.permissionMode,
+    task.executionPermissionMode,
+    task.status,
+  );
 
   const [statusOpen, setStatusOpen] = useState(false);
   const statusRef = useRef<HTMLDivElement>(null);
@@ -70,6 +56,18 @@ export function ModalHeader({
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [statusOpen]);
+
+  const handlePermissionModeChange = (mode: "bypassPermissions" | "default" | "plan") => {
+    void updateTask(
+      task.id,
+      getPermissionStateForPickerChange(
+        mode,
+        task.permissionMode,
+        task.executionPermissionMode,
+        "bypassPermissions",
+      ),
+    );
+  };
 
   return (
     <div style={{ flexShrink: 0 }}>
@@ -258,53 +256,26 @@ export function ModalHeader({
             >
               Mode
             </span>
-            <div
-              style={{
-                display: "flex",
-                gap: 2,
-                backgroundColor: "#EAE8E6",
-                borderRadius: 4,
-                padding: 2,
-                height: 24,
-                alignItems: "center",
-              }}
-            >
-              {ALL_MODES.map((mode) => {
-                const isActive = (task.permissionMode || "default") === mode;
-                return (
-                  <button
-                    key={mode}
-                    onClick={() => {
-                      if (canChangeMode) {
-                        updateTask(task.id, { permissionMode: mode });
-                      }
-                    }}
-                    disabled={!canChangeMode}
-                    title={
-                      canChangeMode
-                        ? PERMISSION_MODE_HINTS[mode]
-                        : "Mode locked while running — takes effect on next turn"
-                    }
-                    style={{
-                      padding: "0 8px",
-                      fontSize: 10,
-                      fontWeight: 600,
-                      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                      border: "none",
-                      cursor: canChangeMode ? "pointer" : "default",
-                      borderRadius: 3,
-                      height: 20,
-                      backgroundColor: isActive ? MODE_BG[mode] : "transparent",
-                      color: isActive ? MODE_TEXT[mode] : "#9C9CA0",
-                      opacity: canChangeMode ? 1 : 0.5,
-                      transition: "all 150ms ease",
-                    }}
-                  >
-                    {PERMISSION_MODE_LABELS[mode]}
-                  </button>
-                );
-              })}
-            </div>
+            <PermissionPicker value={pickerMode} onChange={handlePermissionModeChange} />
+            {task.permissionMode === "plan" && (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  padding: "2px 8px",
+                  borderRadius: 999,
+                  backgroundColor: "#E0E7FF",
+                  color: "#3730A3",
+                  fontSize: 10,
+                  fontWeight: 600,
+                  fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                  letterSpacing: "0.03em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Plan active
+              </span>
+            )}
           </div>
         </div>
 

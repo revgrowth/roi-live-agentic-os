@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { Tag, X, Check } from "lucide-react";
 
 const MONO = "'DM Mono', monospace";
@@ -10,38 +11,86 @@ interface TagPickerProps {
   onChange: (tag: string | null) => void;
   /** Inline mode renders just the pill (click to edit). Panel mode renders the full dropdown. */
   mode?: "inline" | "panel";
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function TagPicker({ value, onChange, mode = "inline" }: TagPickerProps) {
-  const [open, setOpen] = useState(false);
+type DropdownPosition = {
+  top: number;
+  left: number;
+  width: number;
+};
+
+const DEFAULT_DROPDOWN_POSITION: DropdownPosition = {
+  top: 0,
+  left: 0,
+  width: 200,
+};
+
+export function TagPicker({ value, onChange, mode = "inline", open, onOpenChange }: TagPickerProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition>(DEFAULT_DROPDOWN_POSITION);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const isOpen = open ?? internalOpen;
+  const setOpen = useCallback((next: boolean) => {
+    if (open === undefined) {
+      setInternalOpen(next);
+    }
+    onOpenChange?.(next);
+  }, [onOpenChange, open]);
+
+  const updateDropdownPosition = useCallback(() => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setDropdownPosition({
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: Math.max(rect.width, 200),
+    });
+  }, []);
 
   // Fetch existing tags when dropdown opens
   useEffect(() => {
-    if (!open) return;
+    if (!isOpen) return;
     fetch("/api/tasks/tags")
       .then((r) => r.json())
       .then((data: string[]) => setTags(data))
       .catch(() => {});
+    updateDropdownPosition();
     // Focus input after opening
     requestAnimationFrame(() => inputRef.current?.focus());
-  }, [open]);
+  }, [isOpen, updateDropdownPosition]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleWindowChange = () => updateDropdownPosition();
+    window.addEventListener("resize", handleWindowChange);
+    window.addEventListener("scroll", handleWindowChange, true);
+    return () => {
+      window.removeEventListener("resize", handleWindowChange);
+      window.removeEventListener("scroll", handleWindowChange, true);
+    };
+  }, [isOpen, updateDropdownPosition]);
 
   // Close on outside click
   useEffect(() => {
-    if (!open) return;
+    if (!isOpen) return;
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const clickedTrigger = containerRef.current?.contains(target);
+      const clickedMenu = dropdownRef.current?.contains(target);
+      if (!clickedTrigger && !clickedMenu) {
         setOpen(false);
         setQuery("");
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+  }, [isOpen, setOpen]);
 
   const filtered = tags.filter(
     (t) => !query || t.toLowerCase().includes(query.toLowerCase())
@@ -84,9 +133,10 @@ export function TagPicker({ value, onChange, mode = "inline" }: TagPickerProps) 
     <div ref={containerRef} style={{ position: "relative", display: "inline-flex" }}>
       {/* Trigger — tag pill or "add tag" button */}
       <button
+        type="button"
         onClick={(e) => {
           e.stopPropagation();
-          setOpen(!open);
+          setOpen(!isOpen);
         }}
         style={{
           display: "inline-flex",
@@ -128,23 +178,23 @@ export function TagPicker({ value, onChange, mode = "inline" }: TagPickerProps) 
         )}
       </button>
 
-      {/* Dropdown — uses fixed positioning to escape parent opacity */}
-      {open && (
+      {isOpen && typeof document !== "undefined" && createPortal(
         <div
+          ref={dropdownRef}
           style={{
             position: "fixed",
-            top: (containerRef.current?.getBoundingClientRect().bottom ?? 0) + 4,
-            left: containerRef.current?.getBoundingClientRect().left ?? 0,
+            top: dropdownPosition.top,
+            left: dropdownPosition.left,
             backgroundColor: "#FFFFFF",
             borderRadius: 8,
-            boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.18)",
             border: "1px solid #e5e1dc",
             padding: 4,
-            zIndex: 300,
-            width: 200,
+            zIndex: 1000,
+            width: dropdownPosition.width,
+            opacity: 1,
           }}
         >
-          {/* Search/create input */}
           <div style={{ padding: "4px 6px" }}>
             <input
               ref={inputRef}
@@ -167,11 +217,11 @@ export function TagPicker({ value, onChange, mode = "inline" }: TagPickerProps) 
             />
           </div>
 
-          {/* Existing tags */}
           <div style={{ maxHeight: 160, overflowY: "auto" }}>
             {filtered.map((tag) => (
               <button
                 key={tag}
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   selectTag(tag);
@@ -203,9 +253,9 @@ export function TagPicker({ value, onChange, mode = "inline" }: TagPickerProps) 
               </button>
             ))}
 
-            {/* Create new tag option */}
             {showCreate && (
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   selectTag(query.trim());
@@ -252,10 +302,10 @@ export function TagPicker({ value, onChange, mode = "inline" }: TagPickerProps) 
             )}
           </div>
 
-          {/* Remove tag option (when a tag is set) */}
           {value && (
             <div style={{ borderTop: "1px solid #e5e1dc", marginTop: 2, paddingTop: 2 }}>
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onChange(null);
@@ -289,7 +339,8 @@ export function TagPicker({ value, onChange, mode = "inline" }: TagPickerProps) 
               </button>
             </div>
           )}
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

@@ -53,6 +53,7 @@ export function ChatPane({
   onRunSubtaskInPane,
 }: ChatPaneProps) {
   const appendLogEntry = useTaskStore((s) => s.appendLogEntry);
+  const fetchLogEntries = useTaskStore((s) => s.fetchLogEntries);
   const updateTask = useTaskStore((s) => s.updateTask);
   const allTasks = useTaskStore((s) => s.tasks);
   const [resumeCopied, setResumeCopied] = useState(false);
@@ -243,8 +244,6 @@ export function ChatPane({
           </span>
         </div>
       )}
-
-      {/* Chat area */}
       <ModalChat
         taskId={task.id}
         logEntries={logEntries}
@@ -271,6 +270,7 @@ export function ChatPane({
         tokensUsed={task.tokensUsed}
         errorMessage={task.errorMessage}
         durationMs={task.durationMs}
+        onRefresh={() => fetchLogEntries(task.id)}
       />
 
       {/* Reply input — hidden when done */}
@@ -281,6 +281,7 @@ export function ChatPane({
           needsInput={needsInput}
           taskStatus={task.status}
           initialPermissionMode={task.permissionMode ?? "bypassPermissions"}
+          initialExecutionPermissionMode={task.executionPermissionMode ?? null}
           initialModel={task.model ?? null}
           onOptimisticReply={(entry: LogEntry) => appendLogEntry(task.id, entry)}
           subtasks={subtasks}

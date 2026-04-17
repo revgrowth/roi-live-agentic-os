@@ -5,11 +5,14 @@ import { useRouter } from "next/navigation";
 import { Check, X, CheckCircle2, Paperclip, Download, Eye, ExternalLink, FileText, Play, ArrowLeft, Maximize2, Minimize2, Plus, Pencil, Terminal, Copy, PanelRight, PanelRightClose, Pin } from "lucide-react";
 import { useTaskStore } from "@/store/task-store";
 import type { Task, LogEntry, TaskLevel, PermissionMode, ClaudeModel, Todo } from "@/types/task";
-import { PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS } from "@/types/task";
 import { getPendingTaskQuestionPreview } from "@/lib/task-logs";
 import { PermissionPicker } from "@/components/shared/permission-picker";
 import { ModelPicker } from "@/components/shared/model-picker";
 import { TasksPopover } from "@/components/shared/tasks-popover";
+import {
+  DraftPlanPreviewModal,
+  DraftPlanPreviewPanel,
+} from "@/components/shared/draft-plan-preview";
 import { parseTodosFromInput } from "@/lib/claude-parser";
 import { NewGoalPanel } from "./new-goal-panel";
 import { LevelBadge } from "./level-badge";
@@ -32,6 +35,16 @@ import { usePaneState, MAIN_PANE_ID, type PaneItem } from "@/hooks/use-pane-stat
 import { SlashCommandMenu, type TagItem } from "@/components/shared/slash-command-menu";
 import type { SlashCommand } from "@/lib/slash-commands";
 import { TagPicker, TagPill, TagFilterBar } from "@/components/shared/tag-picker";
+import { appendClientId } from "@/hooks/use-client-id";
+import {
+  getExecutionPermissionMode,
+  getPermissionStateForPickerChange,
+  getPickerPermissionMode,
+  normalizePermissionMode,
+} from "@/lib/permission-mode";
+import {
+  extractPendingApprovedBriefFromLogs,
+} from "@/lib/plan-brief";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -241,6 +254,7 @@ function GoalCard({
   unseen?: boolean;
 }) {
   const [hover, setHover] = useState(false);
+  const [tagPickerOpen, setTagPickerOpen] = useState(false);
   const updateTask = useTaskStore((s) => s.updateTask);
   const isPinned = !!task.pinnedAt;
   const isProjectParent = task.level === "project" || task.level === "gsd";
@@ -269,6 +283,7 @@ function GoalCard({
     ? activeRunningChildren.length > 0
     : parentSelfRunning;
   const isDone = isAchieved(task);
+  const showTagEditor = hover || tagPickerOpen || isDone;
 
   // Conversation status counts — the main chat (parent task) is always
   // conversation #1. Additional child chat windows (non-GSD) are also counted.
@@ -474,10 +489,11 @@ function GoalCard({
               {task.level !== "task" && (
                 <LevelBadge level={task.level} projectSlug={task.projectSlug} />
               )}
-              {hover ? (
+              {showTagEditor ? (
                 <TagPicker
                   value={task.tag}
                   onChange={(tag) => updateTask(task.id, { tag })}
+                  onOpenChange={setTagPickerOpen}
                 />
               ) : task.tag ? (
                 <TagPill tag={task.tag} />
@@ -1554,7 +1570,7 @@ function toggleCheckboxInMarkdown(md: string, label: string, checked: boolean): 
 
 const PREVIEWABLE = new Set(["md", "txt", "csv", "json", "html", "xml", "yaml", "yml", "toml", "excalidraw"]);
 
-function FilePreviewInline({ relativePath, extension, onClose, fillHeight, onCheckboxToggle, editable }: {
+function FilePreviewInline({ relativePath, extension, onClose, fillHeight, onCheckboxToggle, editable, clientId }: {
   relativePath: string;
   extension: string;
   onClose: () => void;
@@ -1563,6 +1579,8 @@ function FilePreviewInline({ relativePath, extension, onClose, fillHeight, onChe
   onCheckboxToggle?: (label: string, checked: boolean) => void;
   /** Allow inline editing of the file content */
   editable?: boolean;
+  /** Optional task workspace override for preview/download/edit calls. */
+  clientId?: string | null;
 }) {
   const router = useRouter();
   const [content, setContent] = useState<string | null>(null);
@@ -1570,22 +1588,30 @@ function FilePreviewInline({ relativePath, extension, onClose, fillHeight, onChe
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState("");
   const [saving, setSaving] = useState(false);
+  const previewUrl = useMemo(
+    () => appendClientId(`/api/files/preview?path=${encodeURIComponent(relativePath)}`, clientId ?? null),
+    [clientId, relativePath],
+  );
+  const fileUrl = useMemo(
+    () => appendClientId(`/api/files/${relativePath}`, clientId ?? null),
+    [clientId, relativePath],
+  );
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/files/preview?path=${encodeURIComponent(relativePath)}`)
+    fetch(previewUrl)
       .then((r) => r.json())
       .then((data) => { setContent(data.content ?? null); })
       .catch(() => setContent(null))
       .finally(() => setLoading(false));
-  }, [relativePath]);
+  }, [previewUrl]);
 
   const parts = relativePath.split("/").filter(Boolean);
   const dirParts = parts.slice(0, -1);
   const fileName = parts[parts.length - 1] || relativePath;
 
   const openPath = (subPath: string) => {
-    router.push(`/?tab=docs&file=${encodeURIComponent(subPath)}`);
+    router.push(appendClientId(`/?tab=docs&file=${encodeURIComponent(subPath)}`, clientId ?? null));
   };
 
   return (
@@ -1700,7 +1726,7 @@ function FilePreviewInline({ relativePath, extension, onClose, fillHeight, onChe
                 onClick={async () => {
                   setSaving(true);
                   try {
-                    await fetch(`/api/files/${relativePath}`, {
+                    await fetch(fileUrl, {
                       method: "PUT",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ content: editContent }),
@@ -1884,6 +1910,7 @@ function DetailPanel({
   const [viewingPlanningDoc, setViewingPlanningDoc] = useState<string | null>(null);
   const [mainTab, setMainTab] = useState<"chat" | "files" | "plan">("chat");
   const [planDocked, setPlanDocked] = useState(false);
+  const [showDraftPlanModal, setShowDraftPlanModal] = useState(false);
 
   // ── Docked plan panel resize ──────────────────────────────────
   const [dockedPlanPct, setDockedPlanPct] = useState(50); // percentage of container width
@@ -1911,13 +1938,22 @@ function DetailPanel({
       window.removeEventListener("mouseup", onUp);
     };
   }, []);
-  const [permissionMode, setPermissionMode] = useState<PermissionMode>(task.permissionMode ?? "bypassPermissions");
+  const [activePermissionMode, setActivePermissionMode] = useState<PermissionMode>(
+    normalizePermissionMode(task.permissionMode, "bypassPermissions"),
+  );
+  const [executionPermissionMode, setExecutionPermissionMode] = useState<PermissionMode>(
+    getExecutionPermissionMode(task.executionPermissionMode ?? task.permissionMode, "bypassPermissions"),
+  );
   const [model, setModel] = useState<ClaudeModel | null>(task.model ?? null);
   const [changedOnly, setChangedOnly] = useState(false);
   const [scrollToTaskId, setScrollToTaskId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
   const activityRef = useRef<HTMLDivElement>(null);
+  const permissionMode = useMemo(
+    () => getPickerPermissionMode(activePermissionMode, executionPermissionMode, task.status),
+    [activePermissionMode, executionPermissionMode, task.status],
+  );
 
   // ── VS Code-style multi-pane state ──────────────────────────────
   const {
@@ -1988,9 +2024,12 @@ function DetailPanel({
 
   // Re-sync picker state when switching to a different task
   useEffect(() => {
-    setPermissionMode(task.permissionMode ?? "bypassPermissions");
+    setActivePermissionMode(normalizePermissionMode(task.permissionMode, "bypassPermissions"));
+    setExecutionPermissionMode(
+      getExecutionPermissionMode(task.executionPermissionMode ?? task.permissionMode, "bypassPermissions"),
+    );
     setModel(task.model ?? null);
-  }, [task.id, task.permissionMode, task.model]);
+  }, [task.id, task.permissionMode, task.executionPermissionMode, task.model]);
 
   // Derive latest TodoWrite snapshot from streamed log entries.
   const latestTodos: Todo[] = useMemo(() => {
@@ -2056,6 +2095,7 @@ function DetailPanel({
   const updateTask = useTaskStore((s) => s.updateTask);
   const needsInput = taskNeedsInput(task);
   const isDone = isAchieved(task);
+  const pendingApprovedBrief = extractPendingApprovedBriefFromLogs(logEntries);
 
   // Plan checkbox toggle: check/uncheck deliverable in brief.md + update matching subtask
   const handlePlanCheckboxToggle = useCallback(async (label: string, checked: boolean) => {
@@ -2192,6 +2232,23 @@ function DetailPanel({
     }
   }, []);
 
+  const handlePermissionModeChange = useCallback((nextMode: "bypassPermissions" | "default" | "plan") => {
+    const nextState = getPermissionStateForPickerChange(
+      nextMode,
+      activePermissionMode,
+      executionPermissionMode,
+      "bypassPermissions",
+    );
+    setActivePermissionMode(nextState.permissionMode);
+    setExecutionPermissionMode(nextState.executionPermissionMode);
+    void updateTask(task.id, nextState);
+  }, [activePermissionMode, executionPermissionMode, task.id, updateTask]);
+
+  const handleModelChange = useCallback((nextModel: ClaudeModel | null) => {
+    setModel(nextModel);
+    void updateTask(task.id, { model: nextModel });
+  }, [task.id, updateTask]);
+
   const handleReply = async () => {
     const trimmed = replyText.trim();
     if ((!trimmed && replyAttachments.length === 0 && pastedChips.length === 0) || isSending) return;
@@ -2227,14 +2284,19 @@ function DetailPanel({
       type: "user_reply",
       content: fullMessage,
       timestamp: new Date().toISOString(),
-      permissionMode,
+      permissionMode: activePermissionMode === "plan" ? "plan" : permissionMode,
     });
 
     try {
       await fetch(`/api/tasks/${task.id}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: fullMessage, permissionMode, model }),
+        body: JSON.stringify({
+          message: fullMessage,
+          permissionMode: activePermissionMode === "plan" ? "plan" : permissionMode,
+          executionPermissionMode,
+          model,
+        }),
       });
     } catch { /* silently fail */ }
     finally {
@@ -2649,6 +2711,7 @@ function DetailPanel({
                 tokensUsed={task.tokensUsed}
                 errorMessage={task.errorMessage}
                 durationMs={task.durationMs}
+                onRefresh={() => fetchLogEntries(task.id)}
               />
             </div>
             </>
@@ -2861,8 +2924,8 @@ function DetailPanel({
                   <Paperclip size={14} />
                 </button>
 
-                <ModelPicker value={model} onChange={setModel} />
-                <PermissionPicker value={permissionMode} onChange={setPermissionMode} />
+                <ModelPicker value={model} onChange={handleModelChange} />
+                <PermissionPicker value={permissionMode} onChange={handlePermissionModeChange} />
                 {task.level !== "task" && (
                 <TasksPopover
                   todos={latestTodos}
@@ -2978,14 +3041,22 @@ function DetailPanel({
                 <PanelRightClose size={13} />
               </button>
             </div>
-            <FilePreviewInline
-              relativePath={`projects/briefs/${task.projectSlug}/brief.md`}
-              extension="md"
-              onClose={() => setPlanDocked(false)}
-              fillHeight
-              onCheckboxToggle={handlePlanCheckboxToggle}
-              editable
-            />
+            {pendingApprovedBrief ? (
+              <DraftPlanPreviewPanel
+                content={pendingApprovedBrief}
+                onExpand={() => setShowDraftPlanModal(true)}
+              />
+            ) : (
+              <FilePreviewInline
+                relativePath={`projects/briefs/${task.projectSlug}/brief.md`}
+                extension="md"
+                clientId={task.clientId}
+                onClose={() => setPlanDocked(false)}
+                fillHeight
+                onCheckboxToggle={handlePlanCheckboxToggle}
+                editable
+              />
+            )}
           </div>
           </>
         )}
@@ -2996,14 +3067,22 @@ function DetailPanel({
         {/* Plan tab — show brief.md for project tasks (full-screen) */}
         {mainTab === "plan" && task.projectSlug && (
           <div style={{ flex: 1, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-            <FilePreviewInline
-              relativePath={`projects/briefs/${task.projectSlug}/brief.md`}
-              extension="md"
-              onClose={() => setMainTab("chat")}
-              fillHeight
-              onCheckboxToggle={handlePlanCheckboxToggle}
-              editable
-            />
+            {pendingApprovedBrief ? (
+              <DraftPlanPreviewPanel
+                content={pendingApprovedBrief}
+                onExpand={() => setShowDraftPlanModal(true)}
+              />
+            ) : (
+              <FilePreviewInline
+                relativePath={`projects/briefs/${task.projectSlug}/brief.md`}
+                extension="md"
+                clientId={task.clientId}
+                onClose={() => setMainTab("chat")}
+                fillHeight
+                onCheckboxToggle={handlePlanCheckboxToggle}
+                editable
+              />
+            )}
             {!planDocked && (
               <div style={{ padding: "8px 12px", borderTop: "1px solid #e8e4df", background: "#f3f0ee", flexShrink: 0 }}>
                 <button
@@ -3289,7 +3368,10 @@ function DetailPanel({
                             <ExternalLink size={11} /> Docs
                           </a>
                           <button
-                            onClick={() => window.open(`/api/files/download?path=${encodeURIComponent(file.relativePath)}`, "_blank")}
+                            onClick={() => window.open(
+                              appendClientId(`/api/files/download?path=${encodeURIComponent(file.relativePath)}`, task.clientId),
+                              "_blank",
+                            )}
                             title="Download"
                             style={{
                               display: "flex", alignItems: "center", gap: 4,
@@ -3310,6 +3392,7 @@ function DetailPanel({
                       <FilePreviewInline
                         relativePath={previewFile.relativePath}
                         extension={previewFile.extension}
+                        clientId={task.clientId}
                         onClose={() => setPreviewFile(null)}
                         fillHeight
                         onCheckboxToggle={previewFile.relativePath.endsWith("brief.md") ? handlePlanCheckboxToggle : undefined}
@@ -3325,6 +3408,12 @@ function DetailPanel({
         </div>
         )}
       </div>
+      )}
+      {showDraftPlanModal && pendingApprovedBrief && (
+        <DraftPlanPreviewModal
+          content={pendingApprovedBrief}
+          onClose={() => setShowDraftPlanModal(false)}
+        />
       )}
     </div>
   );
@@ -3734,6 +3823,7 @@ interface RecentOutput {
   taskTitle: string;
   taskLevel: string;
   projectSlug: string | null;
+  clientId?: string | null;
 }
 
 function RecentOutputsSection({
@@ -3801,7 +3891,10 @@ function RecentOutputsSection({
                         if (canPreview) {
                           setPreviewOutput(isActive ? null : o);
                         } else {
-                          window.open(`/api/files/download?path=${encodeURIComponent(o.relativePath)}`, "_blank");
+                          window.open(
+                            appendClientId(`/api/files/download?path=${encodeURIComponent(o.relativePath)}`, o.clientId ?? null),
+                            "_blank",
+                          );
                         }
                       }}
                       style={{
@@ -3837,6 +3930,7 @@ function RecentOutputsSection({
                     <FilePreviewInline
                       relativePath={o.relativePath}
                       extension={o.extension}
+                      clientId={o.clientId ?? null}
                       onClose={() => setPreviewOutput(null)}
                     />
                   </div>

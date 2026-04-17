@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import { getConfig, getClientAgenticOsDir, resolvePlanningDir } from "@/lib/config";
 import { emitTaskEvent } from "@/lib/event-bus";
 import { parseRoadmap } from "@/lib/gsd-parser";
+import { getActivePermissionMode, getExecutionPermissionMode } from "@/lib/permission-mode";
 import type { Task, GsdStep } from "@/types/task";
 
 const GSD_STEPS: GsdStep[] = ["discuss", "plan", "execute", "verify"];
@@ -61,8 +62,8 @@ export async function POST(request: NextRequest) {
         ).get() as { minOrder: number };
 
         db.prepare(
-          `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, permissionMode)
-           VALUES (?, ?, ?, 'running', ?, NULL, ?, ?, ?, ?, ?, 'default')`
+          `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, permissionMode, executionPermissionMode)
+           VALUES (?, ?, ?, 'running', ?, NULL, ?, ?, ?, ?, ?, 'bypassPermissions', 'bypassPermissions')`
         ).run(
           id,
           parsed.name,
@@ -124,16 +125,24 @@ export async function POST(request: NextRequest) {
               const title = `Phase ${phase.number}: ${STEP_TITLES[step]} — ${phase.name}`;
               const columnOrder = phase.number * 100 + stepIdx;
 
+              const inheritedPermissionMode = getActivePermissionMode(
+                parentTask.permissionMode ?? "bypassPermissions",
+                "bypassPermissions",
+              );
+              const inheritedExecutionMode = getExecutionPermissionMode(
+                parentTask.executionPermissionMode ?? parentTask.permissionMode,
+                "bypassPermissions",
+              );
               db.prepare(
-                `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, needsInput, phaseNumber, gsdStep, permissionMode)
-                 VALUES (?, ?, ?, ?, 'task', ?, ?, ?, ?, ?, ?, 0, ?, ?, 'default')`
+                `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, needsInput, phaseNumber, gsdStep, permissionMode, executionPermissionMode, model)
+                 VALUES (?, ?, ?, ?, 'task', ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?)`
               ).run(
                 taskId, title,
                 `Run /gsd:${step === "execute" ? "execute-phase" : step === "verify" ? "verify-work" : step === "plan" ? "plan-phase" : "discuss-phase"} for Phase ${phase.number}`,
                 status,
                 parentTask!.id, parentTask!.projectSlug, columnOrder,
                 now, now, parentTask!.clientId,
-                phase.number, step,
+                phase.number, step, inheritedPermissionMode, inheritedExecutionMode, parentTask!.model ?? null,
               );
 
               const childTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as Task;
@@ -187,12 +196,15 @@ export async function POST(request: NextRequest) {
 
             const taskId = crypto.randomUUID();
             db.prepare(
-              `INSERT INTO tasks (id, title, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, needsInput, permissionMode)
-               VALUES (?, ?, 'backlog', 'task', ?, ?, ?, ?, ?, ?, 0, 'default')`
+              `INSERT INTO tasks (id, title, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, clientId, needsInput, permissionMode, executionPermissionMode, model)
+               VALUES (?, ?, 'backlog', 'task', ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`
             ).run(
               taskId, title,
               parentTask.id, parentTask.projectSlug, order++,
               now, now, parentTask.clientId,
+              getActivePermissionMode(parentTask.permissionMode ?? "bypassPermissions", "bypassPermissions"),
+              getExecutionPermissionMode(parentTask.executionPermissionMode ?? parentTask.permissionMode, "bypassPermissions"),
+              parentTask.model ?? null,
             );
           }
         }
