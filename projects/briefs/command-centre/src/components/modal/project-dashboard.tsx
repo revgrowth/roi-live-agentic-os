@@ -25,6 +25,7 @@ import { ModalChat } from "./modal-chat";
 import { ReplyInput } from "./reply-input";
 import { NextActionChips } from "./next-action-chips";
 import { getPendingTaskQuestionPreview } from "@/lib/task-logs";
+import { getInheritedPermissionModes } from "@/lib/permission-mode";
 
 type StatusKey = "backlog" | "queued" | "running" | "review" | "done";
 
@@ -144,7 +145,11 @@ export function ProjectDashboard({
       // Inherit parent's permission mode so the subtask runs with the same permissions.
       await updateTask(child.id, {
         status: "running",
-        permissionMode: task.permissionMode ?? "bypassPermissions",
+        ...getInheritedPermissionModes(
+          task.permissionMode,
+          task.executionPermissionMode,
+          task.status,
+        ),
       });
       fetchLogEntries(child.id);
       const ok = await runTask(child.id);
@@ -152,21 +157,25 @@ export function ProjectDashboard({
         await updateTask(child.id, { status: "queued" });
       }
     },
-    [updateTask, fetchLogEntries, task.permissionMode],
+    [updateTask, fetchLogEntries, task.executionPermissionMode, task.permissionMode, task.status],
   );
 
   const handleRunAll = useCallback(async () => {
     for (const child of backlogChildren) {
       await updateTask(child.id, {
         status: "running",
-        permissionMode: task.permissionMode ?? "bypassPermissions",
+        ...getInheritedPermissionModes(
+          task.permissionMode,
+          task.executionPermissionMode,
+          task.status,
+        ),
       });
       const ok = await runTask(child.id);
       if (!ok) {
         await updateTask(child.id, { status: "queued" });
       }
     }
-  }, [backlogChildren, updateTask, task.permissionMode]);
+  }, [backlogChildren, updateTask, task.executionPermissionMode, task.permissionMode, task.status]);
 
   /** Find which pane (if any) a subtask is currently open in */
   const getPaneForSubtask = useCallback(
@@ -197,7 +206,11 @@ export function ProjectDashboard({
       // Optimistic: show running state immediately + inherit parent permissions
       await updateTask(child.id, {
         status: "running",
-        permissionMode: task.permissionMode ?? "bypassPermissions",
+        ...getInheritedPermissionModes(
+          task.permissionMode,
+          task.executionPermissionMode,
+          task.status,
+        ),
       });
       // Then execute the task (logs will stream into the pane via SSE)
       const ok = await runTask(child.id);
@@ -205,7 +218,7 @@ export function ProjectDashboard({
         await updateTask(child.id, { status: "queued" });
       }
     },
-    [onOpenSubtaskPane, fetchLogEntries, updateTask, task.permissionMode],
+    [onOpenSubtaskPane, fetchLogEntries, updateTask, task.executionPermissionMode, task.permissionMode, task.status],
   );
 
   /** Available chat panes for "Add to existing chat" picker */
@@ -238,12 +251,16 @@ export function ProjectDashboard({
       }
       await updateTask(child.id, {
         status: "running",
-        permissionMode: task.permissionMode ?? "bypassPermissions",
+        ...getInheritedPermissionModes(
+          task.permissionMode,
+          task.executionPermissionMode,
+          task.status,
+        ),
       });
       fetchLogEntries(child.id);
       await runTask(child.id);
     },
-    [childTasks, onAssignSubtaskToPane, onFocusPane, fetchLogEntries, updateTask, task.permissionMode],
+    [childTasks, onAssignSubtaskToPane, onFocusPane, fetchLogEntries, updateTask, task.executionPermissionMode, task.permissionMode, task.status],
   );
 
   /** Handle clicking a subtask row — navigate to its chat */
@@ -927,6 +944,7 @@ export function ProjectDashboard({
           });
         }}
         durationMs={task.durationMs}
+        onRefresh={() => fetchLogEntries(task.id)}
       />
 
       {/* Next action chips — between chat and reply input */}
@@ -943,6 +961,7 @@ export function ProjectDashboard({
         needsInput={needsInput}
         taskStatus={status}
         initialPermissionMode={task.permissionMode ?? "bypassPermissions"}
+        initialExecutionPermissionMode={task.executionPermissionMode ?? null}
         initialModel={task.model ?? null}
         onOptimisticReply={onOptimisticReply}
         subtasks={childTasks.map(c => ({ id: c.id, title: c.title, status: c.status, phaseNumber: c.phaseNumber, gsdStep: c.gsdStep, needsInput: c.needsInput === true }))}

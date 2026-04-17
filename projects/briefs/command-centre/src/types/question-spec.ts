@@ -26,6 +26,10 @@ export interface QuestionSpec {
   required?: boolean;
   /** Optional hint text for text/multiline inputs */
   placeholder?: string;
+  /** Optional semantic hint so the UI can render first-class actions */
+  intent?: "plan_approval";
+  /** Optional metadata payload used by the reply route / UI */
+  metadata?: Record<string, unknown>;
 }
 
 /** Answer map keyed by QuestionSpec.id */
@@ -71,6 +75,10 @@ export function parseQuestionSpecs(raw: unknown): QuestionSpec[] {
     };
     if (options && options.length > 0) spec.options = options;
     if (typeof q.placeholder === "string") spec.placeholder = q.placeholder;
+    if (q.intent === "plan_approval") spec.intent = "plan_approval";
+    if (q.metadata && typeof q.metadata === "object" && !Array.isArray(q.metadata)) {
+      spec.metadata = q.metadata as Record<string, unknown>;
+    }
     out.push(spec);
   }
   return out;

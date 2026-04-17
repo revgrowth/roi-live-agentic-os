@@ -159,13 +159,15 @@ export function PaneContainer({
           isVisible={true}
           needsInput={false}
           taskStatus="backlog"
-          initialPermissionMode="bypassPermissions"
+          initialPermissionMode={parentTask?.permissionMode ?? "bypassPermissions"}
+          initialExecutionPermissionMode={parentTask?.executionPermissionMode ?? null}
+          initialModel={parentTask?.model ?? null}
           subtasks={subtasks}
           onSelectSubtask={onSelectSubtask}
           onRunSubtask={onRunSubtask}
           onRunAll={onRunAll}
           compact={multiPane}
-          onCreatePaneTask={async (msg: string, permMode: string) => {
+          onCreatePaneTask={async (msg: string, permMode: string, model) => {
             if (!parentTask) return null;
             const title = msg.length > 80 ? msg.slice(0, 77) + "..." : msg;
             const autoLabel = msg.length > 40 ? msg.slice(0, 37) + "..." : msg;
@@ -177,6 +179,8 @@ export function PaneContainer({
               parentTask.id,
               permMode,
               "queued",
+              parentTask.clientId,
+              model,
             );
             if (newId) {
               onAssignTaskToPane?.(paneItem.id, newId);

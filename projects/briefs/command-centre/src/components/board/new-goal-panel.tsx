@@ -86,6 +86,7 @@ export function NewGoalPanel({
   onCreated,
   onStartDrawerDrag,
 }: NewGoalPanelProps) {
+  const storeSelectedClientId = useClientStore((s) => s.selectedClientId);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [level, setLevel] = useState<TaskLevel>("task");
@@ -103,7 +104,7 @@ export function NewGoalPanel({
   const [promptTags, setPromptTags] = useState<TagItem[]>([]);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(storeSelectedClientId);
   const [showClientMenu, setShowClientMenu] = useState(false);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
@@ -112,6 +113,7 @@ export function NewGoalPanel({
   const levelMenuRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const clientMenuRef = useRef<HTMLDivElement>(null);
+  const clientSelectionTouchedRef = useRef(false);
 
   const createTask = useTaskStore((s) => s.createTask);
   const updateTask = useTaskStore((s) => s.updateTask);
@@ -134,6 +136,11 @@ export function NewGoalPanel({
 
   // Auto-focus title input
   useEffect(() => { titleRef.current?.focus(); }, []);
+
+  useEffect(() => {
+    if (clientSelectionTouchedRef.current) return;
+    setSelectedClientId(storeSelectedClientId);
+  }, [storeSelectedClientId]);
 
   // Close level menu on outside click
   useEffect(() => {
@@ -194,13 +201,13 @@ export function NewGoalPanel({
         } catch { /* non-critical */ }
       }
 
-      await createTask(goalTitle, fullDescription, taskLevel, taskProjectSlug, undefined, permissionMode, undefined, selectedClientId);
+      await createTask(goalTitle, fullDescription, taskLevel, taskProjectSlug, undefined, permissionMode, undefined, selectedClientId, model);
 
       const tasks = useTaskStore.getState().tasks;
       const created = tasks.find((t) => t.title === goalTitle && t.description === fullDescription);
       return created?.id ?? null;
     },
-    [createTask, permissionMode, selectedClientId]
+    [createTask, model, permissionMode, selectedClientId]
   );
 
   const handleSubmit = useCallback(async () => {
@@ -928,7 +935,11 @@ export function NewGoalPanel({
               >
                 {/* Root option */}
                 <button
-                  onClick={() => { setSelectedClientId(null); setShowClientMenu(false); }}
+                  onClick={() => {
+                    clientSelectionTouchedRef.current = true;
+                    setSelectedClientId(null);
+                    setShowClientMenu(false);
+                  }}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -954,7 +965,11 @@ export function NewGoalPanel({
                 {clients.map((c) => (
                   <button
                     key={c.slug}
-                    onClick={() => { setSelectedClientId(c.slug); setShowClientMenu(false); }}
+                    onClick={() => {
+                      clientSelectionTouchedRef.current = true;
+                      setSelectedClientId(c.slug);
+                      setShowClientMenu(false);
+                    }}
                     style={{
                       display: "flex",
                       alignItems: "center",

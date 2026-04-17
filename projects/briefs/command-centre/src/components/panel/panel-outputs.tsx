@@ -5,6 +5,7 @@ import { FileText, Image, FileType, Download, ExternalLink, Eye } from "lucide-r
 import { useTaskStore } from "@/store/task-store";
 import type { OutputFile } from "@/types/task";
 import { slugToName, getClientColor } from "@/types/client";
+import { appendClientId } from "@/hooks/use-client-id";
 
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg"]);
 const PDF_EXTENSIONS = new Set(["pdf"]);
@@ -198,6 +199,8 @@ export function PanelOutputs({ taskId, clientId, projectSlug, taskLevel, onFileC
           {outputFiles.map((file) => {
             const Icon = getFileIcon(file.extension);
             const docsHref = `/?tab=docs&file=${encodeURIComponent(file.relativePath)}`;
+            const previewUrl = appendClientId(`/api/files/preview?path=${encodeURIComponent(file.relativePath)}`, clientId ?? null);
+            const downloadUrl = appendClientId(`/api/files/download?path=${encodeURIComponent(file.relativePath)}`, clientId ?? null);
             const isImage = IMAGE_EXTENSIONS.has(file.extension);
             const isHovered = hoveredFileId === file.id;
             const breadcrumb = buildBreadcrumb(file.relativePath, clientId);
@@ -234,7 +237,7 @@ export function PanelOutputs({ taskId, clientId, projectSlug, taskLevel, onFileC
                   {isImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={`/api/files/preview?path=${encodeURIComponent(file.relativePath)}`}
+                      src={previewUrl}
                       alt=""
                       style={{
                         width: 32,
@@ -404,7 +407,7 @@ export function PanelOutputs({ taskId, clientId, projectSlug, taskLevel, onFileC
                       onClick={(e) => {
                         e.stopPropagation();
                         window.open(
-                          `/api/files/download?path=${encodeURIComponent(file.relativePath)}`,
+                          downloadUrl,
                           "_blank"
                         );
                       }}

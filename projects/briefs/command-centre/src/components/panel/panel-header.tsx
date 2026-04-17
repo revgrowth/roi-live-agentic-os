@@ -1,10 +1,11 @@
 "use client";
 
 import { X } from "lucide-react";
-import type { Task, PermissionMode } from "@/types/task";
-import { PERMISSION_MODE_LABELS, PERMISSION_MODE_HINTS } from "@/types/task";
+import type { Task } from "@/types/task";
 import { LevelBadge } from "../board/level-badge";
 import { useTaskStore } from "@/store/task-store";
+import { PermissionPicker } from "@/components/shared/permission-picker";
+import { getExecutionPermissionMode, getPickerPermissionMode } from "@/lib/permission-mode";
 
 function getSkillLabel(activityLabel: string | null): string {
   if (!activityLabel) return "General";
@@ -15,24 +16,6 @@ function getSkillLabel(activityLabel: string | null): string {
   return match ? match[0] : "General";
 }
 
-const MODE_BG: Record<PermissionMode, string> = {
-  plan: "#E0E7FF",
-  default: "#F3F4F6",
-  acceptEdits: "#FEF3C7",
-  auto: "#D1FAE5",
-  bypassPermissions: "#FEE2E2",
-};
-
-const MODE_TEXT: Record<PermissionMode, string> = {
-  plan: "#3730A3",
-  default: "#374151",
-  acceptEdits: "#92400E",
-  auto: "#065F46",
-  bypassPermissions: "#991B1B",
-};
-
-const ALL_MODES: PermissionMode[] = ["plan", "default", "acceptEdits", "auto", "bypassPermissions"];
-
 export function PanelHeader({
   task,
   onClose,
@@ -41,8 +24,39 @@ export function PanelHeader({
   onClose: () => void;
 }) {
   const updateTask = useTaskStore((s) => s.updateTask);
-  // Can change mode anytime except while actively running — next turn picks it up
-  const canChangeMode = task.status !== "running";
+  const pickerMode = getPickerPermissionMode(
+    task.permissionMode,
+    task.executionPermissionMode,
+    task.status,
+  );
+
+  const handlePermissionModeChange = (mode: "bypassPermissions" | "default" | "plan") => {
+    if (mode === "plan") {
+      void updateTask(task.id, {
+        permissionMode: "plan",
+        executionPermissionMode: getExecutionPermissionMode(
+          task.executionPermissionMode ?? task.permissionMode,
+          "bypassPermissions",
+        ),
+      });
+      return;
+    }
+
+    if (task.permissionMode === "plan") {
+      void updateTask(task.id, { executionPermissionMode: mode });
+      return;
+    }
+
+    if (task.status === "running") {
+      void updateTask(task.id, { executionPermissionMode: mode });
+      return;
+    }
+
+    void updateTask(task.id, {
+      permissionMode: mode,
+      executionPermissionMode: mode,
+    });
+  };
 
   return (
     <div>
@@ -89,54 +103,27 @@ export function PanelHeader({
             >
               {getSkillLabel(task.activityLabel)}
             </span>
-            {/* Permission mode selector */}
-            <div
-              style={{
-                display: "flex",
-                gap: 1,
-                backgroundColor: "#EAE8E6",
-                borderRadius: 4,
-                padding: 1,
-                height: 22,
-                alignItems: "center",
-                marginLeft: 4,
-              }}
-            >
-              {ALL_MODES.map((mode) => {
-                const isActive = (task.permissionMode || "default") === mode;
-                return (
-                  <button
-                    key={mode}
-                    onClick={() => {
-                      if (canChangeMode) {
-                        updateTask(task.id, { permissionMode: mode });
-                      }
-                    }}
-                    disabled={!canChangeMode}
-                    title={
-                      canChangeMode
-                        ? PERMISSION_MODE_HINTS[mode]
-                        : "Mode locked while task is running — change takes effect on next turn"
-                    }
-                    style={{
-                      padding: "0 6px",
-                      fontSize: 9,
-                      fontWeight: 600,
-                      fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
-                      border: "none",
-                      cursor: canChangeMode ? "pointer" : "default",
-                      borderRadius: 3,
-                      height: 20,
-                      backgroundColor: isActive ? MODE_BG[mode] : "transparent",
-                      color: isActive ? MODE_TEXT[mode] : "#9C9CA0",
-                      opacity: canChangeMode ? 1 : 0.6,
-                      transition: "all 150ms ease",
-                    }}
-                  >
-                    {PERMISSION_MODE_LABELS[mode]}
-                  </button>
-                );
-              })}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 4 }}>
+              <PermissionPicker value={pickerMode} onChange={handlePermissionModeChange} />
+              {task.permissionMode === "plan" && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    padding: "2px 8px",
+                    borderRadius: 999,
+                    backgroundColor: "#E0E7FF",
+                    color: "#3730A3",
+                    fontSize: 10,
+                    fontWeight: 600,
+                    fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                    letterSpacing: "0.03em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Plan active
+                </span>
+              )}
             </div>
           </div>
         </div>

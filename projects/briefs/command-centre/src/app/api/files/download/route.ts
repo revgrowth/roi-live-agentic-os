@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
-import { getConfig } from "@/lib/config";
+import { getClientAgenticOsDir } from "@/lib/config";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const filePath = request.nextUrl.searchParams.get("path");
+  const clientId = request.nextUrl.searchParams.get("clientId");
 
   if (!filePath) {
     return NextResponse.json({ error: "Missing path parameter" }, { status: 400 });
@@ -15,11 +16,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Path traversal not allowed" }, { status: 403 });
   }
 
-  const config = getConfig();
-  const resolvedPath = path.resolve(config.agenticOsDir, filePath);
+  const baseDir = getClientAgenticOsDir(clientId);
+  const resolvedPath = path.resolve(baseDir, filePath);
 
-  // Path traversal protection: ensure resolved path is within agenticOsDir
-  if (!resolvedPath.startsWith(config.agenticOsDir)) {
+  // Path traversal protection: ensure resolved path is within the active workspace
+  if (!resolvedPath.startsWith(baseDir)) {
     return NextResponse.json({ error: "Path traversal not allowed" }, { status: 403 });
   }
 

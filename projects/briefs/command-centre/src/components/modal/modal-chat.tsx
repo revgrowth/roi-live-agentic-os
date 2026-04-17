@@ -7,9 +7,24 @@ import { ChatEntry, TextGroup, FileOutputCard, SkillInvocationCard, isFileOutput
 import { parseTodosFromInput } from "@/lib/claude-parser";
 import { shouldShowTaskErrorBanner } from "@/lib/task-logs";
 import {
+  PermissionApprovalActions,
+  PlanApprovalActions,
+} from "@/components/shared/task-approval-actions";
+import {
+  DraftPlanPreviewCard,
+  DraftPlanPreviewModal,
+} from "@/components/shared/draft-plan-preview";
+import {
+  getPendingPlanReviewData,
+  stripApprovedBriefBlockFromText,
+} from "@/lib/plan-brief";
+import {
+  parseQuestionSpecs,
   extractQuestionSpecsFromText,
   stripQuestionSpecsFromText,
 } from "@/types/question-spec";
+import { isTaskWaitingOnPermission } from "@/lib/task-permissions";
+import { hasVisibleAssistantResponse, shouldShowInitialTaskSpinner } from "@/lib/task-chat";
 
 /* ── Claude-style spinner verbs ─────────────────────────────────────── */
 
@@ -660,6 +675,13 @@ function groupEntries(entries: LogEntry[]): RenderItem[] {
           entry = { ...entry, content: cleaned };
         }
       }
+      const cleanedApprovedBrief = stripApprovedBriefBlockFromText(entry.content);
+      if (!cleanedApprovedBrief) {
+        continue;
+      }
+      if (cleanedApprovedBrief !== entry.content) {
+        entry = { ...entry, content: cleanedApprovedBrief };
+      }
     }
 
     if (entry.type === "text" || entry.type === "question") {
@@ -800,6 +822,19 @@ function buildMergedTimeline(
   return result;
 }
 
+function isPendingPlanApprovalEntry(entry: LogEntry): boolean {
+  if (entry.type !== "structured_question" || entry.questionAnswers || !entry.questionSpec) {
+    return false;
+  }
+
+  try {
+    const specs = parseQuestionSpecs(JSON.parse(entry.questionSpec));
+    return specs.some((question) => question.intent === "plan_approval" || question.id === "plan_action");
+  } catch {
+    return false;
+  }
+}
+
 /** Compact inline reply input for child task questions */
 function ChildReplyInput({ childTaskId, onReplySent }: { childTaskId: string; onReplySent: (childId: string, message: string) => void }) {
   const [message, setMessage] = useState("");
@@ -918,6 +953,8 @@ interface ModalChatProps {
   errorMessage?: string | null;
   /** Actual Claude CLI compute time in ms (accumulated across turns) */
   durationMs?: number | null;
+  /** Re-fetch parent state after inline approval actions */
+  onRefresh?: () => void;
 }
 
 export function ModalChat({
@@ -941,10 +978,65 @@ export function ModalChat({
   tokensUsed,
   errorMessage,
   durationMs,
+  onRefresh,
 }: ModalChatProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showJumpButton, setShowJumpButton] = useState(false);
+  const [showDraftPlanModal, setShowDraftPlanModal] = useState(false);
   const prevLengthRef = useRef(logEntries.length);
+  const pendingPlanReview = useMemo(() => getPendingPlanReviewData(logEntries), [logEntries]);
+  const planApprovalQuestion = pendingPlanReview?.question ?? null;
+  const pendingApprovedBrief = pendingPlanReview?.briefContent ?? null;
+  const showInlinePlanReview = Boolean(planApprovalQuestion || pendingApprovedBrief);
+  const displayLogEntries = useMemo(() => {
+    if (!pendingPlanReview) {
+      return logEntries;
+    }
+
+    const hiddenEntryIds = new Set(pendingPlanReview.turnTextEntryIds);
+    if (hiddenEntryIds.size === 0) {
+      return logEntries;
+    }
+
+    const summaryInsertId = pendingPlanReview.turnTextEntryIds[0] ?? pendingPlanReview.questionEntryId;
+    const summaryAnchor = logEntries.find((entry) => entry.id === summaryInsertId)
+      ?? logEntries.find((entry) => entry.id === pendingPlanReview.questionEntryId)
+      ?? logEntries[0];
+    const summaryEntry = pendingPlanReview.summaryText && summaryAnchor
+      ? {
+          id: `${pendingPlanReview.questionEntryId}:plan-summary`,
+          type: "text" as const,
+          timestamp: summaryAnchor.timestamp,
+          content: pendingPlanReview.summaryText,
+        }
+      : null;
+
+    const rebuilt: LogEntry[] = [];
+    let insertedSummary = false;
+
+    for (const entry of logEntries) {
+      if (!insertedSummary && summaryEntry && entry.id === summaryInsertId) {
+        rebuilt.push(summaryEntry);
+        insertedSummary = true;
+      }
+
+      if (hiddenEntryIds.has(entry.id)) {
+        continue;
+      }
+
+      rebuilt.push(entry);
+    }
+
+    if (!insertedSummary && summaryEntry) {
+      rebuilt.push(summaryEntry);
+    }
+
+    return rebuilt;
+  }, [logEntries, pendingPlanReview]);
+  const isPermissionWaiting = useMemo(
+    () => !planApprovalQuestion && isTaskWaitingOnPermission({ needsInput, activityLabel, errorMessage }),
+    [activityLabel, errorMessage, needsInput, planApprovalQuestion],
+  );
 
   // Use the actual Claude CLI compute time (durationMs) when available.
   // Falls back to log-based estimation, capped per-turn to avoid wall-clock inflation.
@@ -1065,12 +1157,24 @@ export function ModalChat({
   }, []);
 
   const hasChildren = childTasks.length > 0;
-  const hasEntries = logEntries.length > 0;
+  const hasEntries = displayLogEntries.length > 0;
   const neverStarted = status === "backlog" || status === "queued";
   const showEmpty = !hasEntries && !hasChildren && neverStarted;
   const isTerminal = status === "done" || status === "review" || status === "error";
   const showLoading = !hasEntries && !hasChildren && !neverStarted && !isRunning && !isTerminal;
-  const showTyping = isRunning && !hasEntries && !needsInput;
+  const hasVisibleResponse = useMemo(
+    () => hasVisibleAssistantResponse(displayLogEntries) || showInlinePlanReview,
+    [displayLogEntries, showInlinePlanReview],
+  );
+  const showInitialSpinner = useMemo(
+    () => shouldShowInitialTaskSpinner({
+      status,
+      isRunning,
+      needsInput,
+      hasVisibleResponse,
+    }),
+    [hasVisibleResponse, isRunning, needsInput, status],
+  );
 
   // Determine if Claude is actively working right now. Use the last log entry
   // timestamp as a staleness check — if the last entry was > 60s ago and there's
@@ -1085,13 +1189,14 @@ export function ModalChat({
     if (isNaN(lastTs)) return true;
     const age = Date.now() - lastTs;
     return age < 60_000; // active if last entry was within 60 seconds
-  }, [isRunning, needsInput, hasEntries, activityLabel, logEntries]);
+  }, [isRunning, needsInput, hasEntries, activityLabel, displayLogEntries]);
+  const showWorkingSpinner = isActivelyWorking && !showInitialSpinner;
 
   // Build merged timeline when there are child tasks, otherwise use simple grouping
   const renderItems = useMemo(() => {
     const grouped = hasChildren
-      ? buildMergedTimeline(logEntries, childTasks, childLogEntries)
-      : groupEntries(logEntries);
+      ? buildMergedTimeline(displayLogEntries, childTasks, childLogEntries)
+      : groupEntries(displayLogEntries);
 
     // Collapse thinking into collapsible groups, working at the TURN level.
     // A "turn" = everything between user messages (single items like user_reply).
@@ -1180,7 +1285,7 @@ export function ModalChat({
     }
 
     return result;
-  }, [hasChildren, logEntries, childTasks, childLogEntries, isRunning]);
+  }, [hasChildren, displayLogEntries, childTasks, childLogEntries, isRunning]);
 
   // Set of child task IDs that currently need input (have unanswered questions)
   const childrenNeedingInput = new Set(
@@ -1188,15 +1293,15 @@ export function ModalChat({
   );
 
   const hasPendingStructuredQuestion = useMemo(() => {
-    for (let i = logEntries.length - 1; i >= 0; i--) {
-      const e = logEntries[i];
+    for (let i = displayLogEntries.length - 1; i >= 0; i--) {
+      const e = displayLogEntries[i];
       if (e.type === "structured_question" && !e.questionAnswers) {
         return true;
       }
     }
     return false;
-  }, [logEntries]);
-  const showErrorBanner = shouldShowTaskErrorBanner(logEntries, errorMessage);
+  }, [displayLogEntries]);
+  const showErrorBanner = shouldShowTaskErrorBanner(displayLogEntries, errorMessage);
 
   return (
     <div
@@ -1223,7 +1328,7 @@ export function ModalChat({
         }}
       >
         {/* Empty state */}
-        {showEmpty && (
+        {showEmpty && !showInitialSpinner && (
           <div
             style={{
               flex: 1,
@@ -1287,9 +1392,6 @@ export function ModalChat({
             </span>
           </div>
         )}
-
-        {/* Typing indicator — before any entries arrive */}
-        {showTyping && <SpinnerVerb startedAt={startedAt} lastReplyAt={lastReplyAt} activityLabel={activityLabel} />}
 
         {/* Log entries — business-focused grouping with child task events */}
         {renderItems.map((item, index) => {
@@ -1527,6 +1629,9 @@ export function ModalChat({
             );
           }
           if (item.kind === "single") {
+            if (showInlinePlanReview && isPendingPlanApprovalEntry(item.entry)) {
+              return null;
+            }
             return (
               <div key={item.entry.id} data-source-task={sourceId} style={{ marginTop: 20, marginBottom: 10 }}>
                 <ChatEntry entry={item.entry} permissionMode={permissionMode} taskId={taskId} readOnly={readOnly} />
@@ -1536,8 +1641,38 @@ export function ModalChat({
           return null;
         })}
 
+        {/* First-turn spinner — show after the user's first message, before later review/actions */}
+        {showInitialSpinner && <SpinnerVerb startedAt={startedAt} lastReplyAt={lastReplyAt} activityLabel={activityLabel} />}
+
+        {showInlinePlanReview && (
+          <div style={{ marginTop: 8, marginBottom: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+            {pendingApprovedBrief && (
+              <DraftPlanPreviewCard
+                content={pendingApprovedBrief}
+                onExpand={() => setShowDraftPlanModal(true)}
+                compact
+              />
+            )}
+            {planApprovalQuestion && (
+              <PlanApprovalActions
+                taskId={taskId}
+                question={planApprovalQuestion}
+                onSubmitted={onRefresh}
+              />
+            )}
+          </div>
+        )}
+
+        <PermissionApprovalActions
+          taskId={taskId}
+          isPermissionWaiting={isPermissionWaiting}
+          activityLabel={activityLabel}
+          errorMessage={errorMessage}
+          onResolved={onRefresh}
+        />
+
         {/* Spinner verb — shown while Claude is actively working */}
-        {isActivelyWorking && <SpinnerVerb startedAt={startedAt} lastReplyAt={lastReplyAt} activityLabel={activityLabel} />}
+        {showWorkingSpinner && <SpinnerVerb startedAt={startedAt} lastReplyAt={lastReplyAt} activityLabel={activityLabel} />}
 
         {/* Error banner — shown when task failed */}
         {showErrorBanner && errorMessage && <ErrorBanner message={errorMessage} />}
@@ -1581,6 +1716,12 @@ export function ModalChat({
         >
           Jump to latest
         </button>
+      )}
+      {showDraftPlanModal && pendingApprovedBrief && (
+        <DraftPlanPreviewModal
+          content={pendingApprovedBrief}
+          onClose={() => setShowDraftPlanModal(false)}
+        />
       )}
     </div>
   );

@@ -6,6 +6,7 @@ import { ChatInput } from "./chat-input";
 import { BubbledQuestion } from "./bubbled-question";
 import { Bot, User } from "lucide-react";
 import type { Message } from "@/types/chat";
+import type { ClaudeModel, PermissionMode } from "@/types/task";
 
 function formatTime(dateStr: string): string {
   const d = new Date(dateStr);
@@ -98,8 +99,8 @@ export function ChatView() {
     el.scrollTop = el.scrollHeight;
   }, [messages.length]);
 
-  const handleSend = useCallback((content: string) => {
-    sendMessage(content);
+  const handleSend = useCallback((content: string, options: { permissionMode: PermissionMode; model: ClaudeModel | null }) => {
+    sendMessage(content, options);
   }, [sendMessage]);
 
   const handleReply = useCallback((messageId: string, content: string) => {

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
-import type { Task, TaskCreateInput } from "@/types/task";
+import { getActivePermissionMode, getExecutionPermissionMode } from "@/lib/permission-mode";
+import type { ClaudeModel, Task, TaskCreateInput } from "@/types/task";
+
+const VALID_MODELS: ClaudeModel[] = ["opus", "sonnet", "haiku"];
 
 export async function GET(request: NextRequest) {
   try {
@@ -86,7 +89,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate input
-    const { title, description, level, projectSlug: bodyProjectSlug, clientId: bodyClientId, parentId: bodyParentId, phaseNumber: bodyPhaseNumber, gsdStep: bodyGsdStep, cronJobSlug: bodyCronJobSlug, permissionMode: bodyPermissionMode, status: bodyStatus, dependsOnTaskIds: bodyDependsOnTaskIds } = body as TaskCreateInput & { cronJobSlug?: string; status?: string; dependsOnTaskIds?: string[] };
+    const { title, description, level, projectSlug: bodyProjectSlug, clientId: bodyClientId, parentId: bodyParentId, phaseNumber: bodyPhaseNumber, gsdStep: bodyGsdStep, cronJobSlug: bodyCronJobSlug, permissionMode: bodyPermissionMode, executionPermissionMode: bodyExecutionPermissionMode, status: bodyStatus, dependsOnTaskIds: bodyDependsOnTaskIds, model: bodyModel } = body as TaskCreateInput & { cronJobSlug?: string; status?: string; dependsOnTaskIds?: string[] };
     if (!title || typeof title !== "string" || title.trim().length === 0) {
       return NextResponse.json(
         { error: "title is required and must be a non-empty string" },
@@ -96,6 +99,12 @@ export async function POST(request: NextRequest) {
     if (!level || !["task", "project", "gsd"].includes(level)) {
       return NextResponse.json(
         { error: 'level is required and must be "task", "project", or "gsd"' },
+        { status: 400 }
+      );
+    }
+    if (bodyModel !== undefined && bodyModel !== null && !VALID_MODELS.includes(bodyModel)) {
+      return NextResponse.json(
+        { error: 'model must be "opus", "sonnet", "haiku", or null' },
         { status: 400 }
       );
     }
@@ -116,6 +125,13 @@ export async function POST(request: NextRequest) {
     const initialStatus = (bodyStatus && validStatuses.includes(bodyStatus)
       ? bodyStatus
       : bodyParentId ? "backlog" : "queued") as Task["status"];
+    const requestedPermissionMode = bodyCronJobSlug ? "bypassPermissions" : bodyPermissionMode;
+    const permissionMode = getActivePermissionMode(requestedPermissionMode, "bypassPermissions");
+    const executionPermissionMode = getExecutionPermissionMode(
+      bodyExecutionPermissionMode ?? requestedPermissionMode,
+      "bypassPermissions",
+    );
+
     const task: Task = {
       id: crypto.randomUUID(),
       title: title.trim(),
@@ -141,7 +157,9 @@ export async function POST(request: NextRequest) {
       contextSources: null,
       cronJobSlug: bodyCronJobSlug || null,
       claudeSessionId: null,
-      permissionMode: bodyPermissionMode || "default",
+      permissionMode,
+      executionPermissionMode,
+      model: bodyModel ?? null,
       lastReplyAt: null,
       goalGroup: null,
       tag: null,
@@ -153,8 +171,8 @@ export async function POST(request: NextRequest) {
     };
 
     db.prepare(
-      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode, dependsOnTaskIds)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (id, title, description, status, level, parentId, projectSlug, columnOrder, createdAt, updatedAt, costUsd, tokensUsed, durationMs, activityLabel, errorMessage, startedAt, completedAt, clientId, needsInput, phaseNumber, gsdStep, cronJobSlug, permissionMode, executionPermissionMode, model, dependsOnTaskIds)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       task.id,
       task.title,
@@ -179,6 +197,8 @@ export async function POST(request: NextRequest) {
       task.gsdStep,
       task.cronJobSlug,
       task.permissionMode,
+      task.executionPermissionMode,
+      task.model,
       task.dependsOnTaskIds ? JSON.stringify(task.dependsOnTaskIds) : null
     );
 
