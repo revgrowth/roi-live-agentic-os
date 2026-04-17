@@ -15,6 +15,8 @@ jobs:
       content-only: ${{ steps.filter.outputs.content-only }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - id: filter
         name: Classify changed files into zones
@@ -124,8 +126,8 @@ jobs:
               EXIT_CODE=1
             fi
 
-            # Check frontmatter length
-            FRONTMATTER=$(sed -n '/^---$/,/^---$/p' "$SKILL_FILE")
+            # Check frontmatter length (awk exits after the second ---, so markdown body dividers don't get counted)
+            FRONTMATTER=$(awk '/^---$/{c++; print; if(c==2) exit; next} c==1' "$SKILL_FILE")
             FM_LENGTH=${#FRONTMATTER}
             if [ "$FM_LENGTH" -gt 1024 ]; then
               echo "ERROR: $SKILL_FILE — frontmatter is ${FM_LENGTH} chars (max 1024)"
