@@ -138,6 +138,7 @@ export function PaneContainer({
           flexDirection: "column",
           overflow: "hidden",
           minWidth: 0,
+          minHeight: 0,
         }}
       >
         <div style={{
@@ -243,7 +244,7 @@ export function PaneContainer({
     const pane = visiblePanes[0];
     return (
       <div
-        style={{ flex: 1, display: "flex", overflow: "hidden" }}
+        style={{ flex: 1, display: "flex", overflow: "hidden", minWidth: 0, minHeight: 0 }}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -265,6 +266,8 @@ export function PaneContainer({
         flexDirection: "column",
         overflow: "hidden",
         position: "relative",
+        minWidth: 0,
+        minHeight: 0,
       }}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -306,7 +309,7 @@ export function PaneContainer({
 
       {useGrid ? (
         /* Grid: 2 panes = vertical stack, 3-4 panes = 2x2 grid */
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
           {visiblePanes.length <= 2 ? (
             /* Vertical stack — each pane in its own row */
             visiblePanes.map((pane, idx) => (
@@ -377,7 +380,7 @@ export function PaneContainer({
         </div>
       ) : (
         /* Horizontal row */
-        <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+        <div style={{ flex: 1, display: "flex", overflow: "hidden", minWidth: 0, minHeight: 0 }}>
           {visiblePanes.map((pane, idx) => (
             <PaneWrapper
               key={pane.id}

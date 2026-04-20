@@ -1311,6 +1311,8 @@ export function ModalChat({
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
+        minWidth: 0,
+        minHeight: 0,
       }}
     >
       {/* "Waiting for your reply" banner removed — the reply input box is sufficient */}
@@ -1325,6 +1327,8 @@ export function ModalChat({
           display: "flex",
           flexDirection: "column",
           gap: 6,
+          minWidth: 0,
+          minHeight: 0,
         }}
       >
         {/* Empty state */}

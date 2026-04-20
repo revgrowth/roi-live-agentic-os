@@ -9,6 +9,7 @@ import type { TagItem } from "@/components/shared/slash-command-menu";
 import { PermissionPicker } from "@/components/shared/permission-picker";
 import { ModelPicker } from "@/components/shared/model-picker";
 import { TasksPopover, type SubtaskSummary } from "@/components/shared/tasks-popover";
+import { PastedTextCard } from "@/components/shared/pasted-text-card";
 import { parseTodosFromInput } from "@/lib/claude-parser";
 import {
   getExecutionPermissionMode,
@@ -18,6 +19,15 @@ import {
 } from "@/lib/permission-mode";
 import type { SlashCommand } from "@/lib/slash-commands";
 import { recordTagUsage } from "@/components/board/goal-chips";
+import {
+  appendPendingPastedText,
+  insertPastedTextAtSelection,
+  removePendingPastedText,
+  shouldCapturePastedText,
+  type PendingPastedTextBlock,
+} from "@/lib/pasted-text";
+import { syncComposerTextareaHeight } from "@/lib/composer";
+import { useComposerResize } from "@/hooks/use-composer-resize";
 
 // ── Attachment helpers ──────────────────────────────────────────
 
@@ -38,7 +48,17 @@ function getAttachmentIcon(ext: string) {
 
 /** Renders a highlight mirror behind a transparent textarea so @tags and
  *  /commands appear colored while the user types normally. */
-export function HighlightMirror({ text, style }: { text: string; style: React.CSSProperties }) {
+export function HighlightMirror({
+  text,
+  style,
+  scrollTop = 0,
+  scrollLeft = 0,
+}: {
+  text: string;
+  style: React.CSSProperties;
+  scrollTop?: number;
+  scrollLeft?: number;
+}) {
   // Split text into segments: @tag, /command, or plain text
   const parts: { text: string; kind: "tag" | "command" | "plain" }[] = [];
   const re = /((?:^|\s)(@[\w\/-]+))|((?:^|\s)(\/[\w:.-]+))/g;
@@ -70,28 +90,44 @@ export function HighlightMirror({ text, style }: { text: string; style: React.CS
     <div
       aria-hidden
       style={{
-        ...style,
         position: "absolute",
         top: 0,
         left: 0,
         right: 0,
+        bottom: 0,
         pointerEvents: "none",
-        whiteSpace: "pre-wrap",
-        wordWrap: "break-word",
-        color: "#1B1C1B",
+        overflow: "hidden",
       }}
     >
-      {parts.map((p, i) =>
-        p.kind === "tag" ? (
-          <span key={i} style={{ color: "#93452A" }}>{p.text}</span>
-        ) : p.kind === "command" ? (
-          <span key={i} style={{ color: "#6D28D9" }}>{p.text}</span>
-        ) : (
-          <span key={i}>{p.text}</span>
-        )
-      )}
-      {/* Trailing space to match textarea line height */}
-      {"\u200B"}
+      <div
+        style={{
+          ...style,
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          whiteSpace: "pre-wrap",
+          overflow: "hidden",
+          overflowWrap: "anywhere",
+          wordBreak: "break-word",
+          wordWrap: "break-word",
+          maxWidth: "100%",
+          color: "#1B1C1B",
+          transform: `translate(${-scrollLeft}px, ${-scrollTop}px)`,
+        }}
+      >
+        {parts.map((p, i) =>
+          p.kind === "tag" ? (
+            <span key={i} style={{ color: "#93452A" }}>{p.text}</span>
+          ) : p.kind === "command" ? (
+            <span key={i} style={{ color: "#6D28D9" }}>{p.text}</span>
+          ) : (
+            <span key={i}>{p.text}</span>
+          )
+        )}
+        {/* Trailing space to match textarea line height */}
+        {"\u200B"}
+      </div>
     </div>
   );
 }
@@ -176,12 +212,21 @@ export function ReplyInput({
   );
   const [model, setModel] = useState<ClaudeModel | null>(initialModel);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [pastedTextBlocks, setPastedTextBlocks] = useState<PendingPastedTextBlock[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [mirrorScroll, setMirrorScroll] = useState({ top: 0, left: 0 });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const createTask = useTaskStore((s) => s.createTask);
   const updateTask = useTaskStore((s) => s.updateTask);
   const logEntries = useTaskStore((s) => s.logEntries[taskId]) ?? [];
+  const minComposerHeight = compact ? 44 : 60;
+  const maxComposerHeight = compact ? 220 : 320;
+  const { composerHeight, hasUserResized, handleResizePointerDown } = useComposerResize({
+    minHeight: minComposerHeight,
+    maxHeight: maxComposerHeight,
+    initialHeight: minComposerHeight,
+  });
 
   const permissionMode = useMemo(
     () => getPickerPermissionMode(activePermissionMode, executionPermissionMode, taskStatus),
@@ -207,6 +252,27 @@ export function ReplyInput({
     );
     setModel(initialModel);
   }, [taskId, initialPermissionMode, initialExecutionPermissionMode, initialModel]);
+
+  useEffect(() => {
+    syncComposerTextareaHeight(textareaRef.current, {
+      minHeight: minComposerHeight,
+      maxHeight: maxComposerHeight,
+      targetHeight: hasUserResized ? composerHeight : null,
+    });
+  }, [composerHeight, hasUserResized, maxComposerHeight, message, minComposerHeight]);
+
+  const syncMirrorScroll = useCallback(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    setMirrorScroll((current) => {
+      const next = { top: textarea.scrollTop, left: textarea.scrollLeft };
+      return current.top === next.top && current.left === next.left ? current : next;
+    });
+  }, []);
+
+  useEffect(() => {
+    requestAnimationFrame(() => syncMirrorScroll());
+  }, [message, syncMirrorScroll]);
 
   const latestTodos: Todo[] = useMemo(() => {
     for (let i = logEntries.length - 1; i >= 0; i--) {
@@ -253,25 +319,12 @@ export function ReplyInput({
         return;
       }
     }
-    // Large text paste — collapse into a placeholder, expand on submit
     const text = e.clipboardData?.getData("text/plain") ?? "";
-    const lineCount = text.split("\n").length;
-    if (lineCount > 10) {
+    if (shouldCapturePastedText(text)) {
       e.preventDefault();
-      const label = `[Pasted text +${lineCount} lines]`;
-      const ta = textareaRef.current;
-      if (ta) {
-        const start = ta.selectionStart;
-        const end = ta.selectionEnd;
-        const before = message.slice(0, start);
-        const after = message.slice(end);
-        const pastedBlocks = (ta.dataset.pastedBlocks ? JSON.parse(ta.dataset.pastedBlocks) : []) as Array<{ label: string; text: string }>;
-        pastedBlocks.push({ label, text });
-        ta.dataset.pastedBlocks = JSON.stringify(pastedBlocks);
-        setMessage(before + label + after);
-      }
+      setPastedTextBlocks((prev) => [...prev, { id: crypto.randomUUID(), text }]);
     }
-  }, [handleFileUpload, message]);
+  }, [handleFileUpload]);
 
   const handlePermissionModeChange = useCallback((nextMode: "bypassPermissions" | "default" | "plan") => {
     const nextState = getPermissionStateForPickerChange(
@@ -294,25 +347,47 @@ export function ReplyInput({
     }
   }, [onCreatePaneTask, taskId, updateTask]);
 
+  const focusTextarea = useCallback((selectionStart?: number, selectionEnd = selectionStart) => {
+    requestAnimationFrame(() => {
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+      textarea.focus();
+      if (selectionStart == null || selectionEnd == null) return;
+      textarea.setSelectionRange(selectionStart, selectionEnd);
+    });
+  }, []);
+
+  const handleInsertPastedText = useCallback((block: PendingPastedTextBlock) => {
+    const textarea = textareaRef.current;
+    const selectionStart = textarea?.selectionStart ?? message.length;
+    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
+    const insertion = insertPastedTextAtSelection(
+      message,
+      block.text,
+      selectionStart,
+      selectionEnd,
+    );
+
+    setMessage(insertion.value);
+    setPastedTextBlocks((prev) => removePendingPastedText(prev, block.id));
+    focusTextarea(insertion.selectionStart, insertion.selectionEnd);
+    requestAnimationFrame(() => {
+      syncComposerTextareaHeight(textareaRef.current, {
+        minHeight: minComposerHeight,
+        maxHeight: maxComposerHeight,
+        targetHeight: hasUserResized ? composerHeight : null,
+      });
+      syncMirrorScroll();
+    });
+  }, [composerHeight, focusTextarea, hasUserResized, maxComposerHeight, message, minComposerHeight, syncMirrorScroll]);
+
   const handleSubmit = useCallback(async () => {
     const trimmed = message.trim();
-    if (!trimmed && attachments.length === 0) return;
+    if (!trimmed && attachments.length === 0 && pastedTextBlocks.length === 0) return;
     if (isSending) return;
 
-    // Expand collapsed pasted text blocks back to full content
-    let expanded = trimmed;
-    if (textareaRef.current?.dataset.pastedBlocks) {
-      try {
-        const blocks = JSON.parse(textareaRef.current.dataset.pastedBlocks) as Array<{ label: string; text: string }>;
-        for (const block of blocks) {
-          expanded = expanded.replace(block.label, block.text);
-        }
-      } catch { /* ignore */ }
-      textareaRef.current.dataset.pastedBlocks = "";
-    }
-
     // Build final message with attachment paths
-    let finalMessage = expanded;
+    let finalMessage = appendPendingPastedText(trimmed, pastedTextBlocks);
     if (attachments.length > 0) {
       const attachmentLines = attachments.map((a) => `- ${a.relativePath}`).join("\n");
       finalMessage = finalMessage
@@ -326,6 +401,7 @@ export function ReplyInput({
     if (onCreatePaneTask) {
       setMessage("");
       setAttachments([]);
+      setPastedTextBlocks([]);
       try {
         await onCreatePaneTask(
           finalMessage,
@@ -363,6 +439,7 @@ export function ReplyInput({
 
     setMessage("");
     setAttachments([]);
+    setPastedTextBlocks([]);
 
     try {
       const res = await fetch(`/api/tasks/${taskId}/reply`, {
@@ -397,6 +474,7 @@ export function ReplyInput({
     permissionMode,
     executionPermissionMode,
     model,
+    pastedTextBlocks,
   ]);
 
   const handleSlashSelect = useCallback(async (cmd: SlashCommand) => {
@@ -462,12 +540,14 @@ export function ReplyInput({
     : taskStatus === "review" || taskStatus === "done"
       ? "Send a follow-up or type / for commands or skills..."
       : "Send a message...  Type / for commands or skills, @ for tags";
+  const canSubmit = message.trim().length > 0 || attachments.length > 0 || pastedTextBlocks.length > 0;
 
   return (
     <div
       style={{
         padding: compact ? "6px 12px 8px 12px" : "12px 24px 16px 24px",
         borderTop: "1px solid #EAE8E6",
+        flexShrink: 0,
       }}
     >
       {error && (
@@ -484,7 +564,22 @@ export function ReplyInput({
           position: "relative",
         }}
       >
-        <div style={{ position: "relative", padding: compact ? "6px 10px 4px" : "12px 14px 8px" }}>
+        <div style={{ display: "flex", justifyContent: "center", padding: compact ? "6px 10px 0" : "8px 14px 0" }}>
+          <button
+            type="button"
+            aria-label="Drag to resize input"
+            onPointerDown={handleResizePointerDown}
+            style={{
+              width: compact ? 36 : 44,
+              height: compact ? 6 : 8,
+              border: "none",
+              borderRadius: 999,
+              backgroundColor: "rgba(156, 156, 160, 0.32)",
+              cursor: "ns-resize",
+            }}
+          />
+        </div>
+          <div style={{ position: "relative", padding: compact ? "6px 10px 4px" : "12px 14px 8px", minWidth: 0 }}>
           {showSlashMenu && (
             <SlashCommandMenu
               query={slashQuery}
@@ -530,12 +625,26 @@ export function ReplyInput({
               }}
             />
           )}
+          {pastedTextBlocks.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: compact ? 6 : 8 }}>
+              {pastedTextBlocks.map((block) => (
+                <PastedTextCard
+                  key={block.id}
+                  text={block.text}
+                  onInsert={() => handleInsertPastedText(block)}
+                  onRemove={() => setPastedTextBlocks((prev) => removePendingPastedText(prev, block.id))}
+                />
+              ))}
+            </div>
+          )}
           {/* Inner wrapper — position:relative so the highlight mirror
               aligns exactly with the textarea (not offset by parent padding). */}
-          <div style={{ position: "relative" }}>
+          <div style={{ position: "relative", minWidth: 0, overflow: "hidden" }}>
             {(message.includes("@") || message.includes("/")) && (
               <HighlightMirror
                 text={message}
+                scrollTop={mirrorScroll.top}
+                scrollLeft={mirrorScroll.left}
                 style={{
                   fontSize: 14,
                   fontFamily: "var(--font-inter), Inter, sans-serif",
@@ -550,6 +659,7 @@ export function ReplyInput({
               onChange={(e) => handleChange(e.target.value)}
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
+              onScroll={syncMirrorScroll}
               placeholder={placeholder}
               rows={compact ? 1 : 3}
               style={{
@@ -557,16 +667,24 @@ export function ReplyInput({
                 fontSize: compact ? 13 : 14,
                 fontFamily: "var(--font-inter), Inter, sans-serif",
                 padding: compact ? "2px 0" : "4px 0",
-                minHeight: compact ? 28 : 60,
+                boxSizing: "border-box" as const,
+                minHeight: minComposerHeight,
+                maxHeight: hasUserResized ? composerHeight : maxComposerHeight,
+                maxWidth: "100%",
                 backgroundColor: "transparent",
                 outline: "none",
                 border: "none",
                 resize: "none",
                 lineHeight: 1.5,
+                whiteSpace: "pre-wrap",
+                overflowWrap: "anywhere",
+                wordBreak: "break-word",
                 color: (message.includes("@") || message.includes("/")) ? "transparent" : "#1B1C1B",
                 caretColor: "#1B1C1B",
                 position: "relative",
                 zIndex: 1,
+                overflowX: "hidden",
+                overflowY: "auto",
               }}
             />
           </div>
@@ -671,18 +789,18 @@ export function ReplyInput({
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={(!message.trim() && attachments.length === 0) || isSending}
+            disabled={!canSubmit || isSending}
             style={{
               width: 28,
               height: 26,
               borderRadius: 6,
               border: "none",
               background:
-                (message.trim() || attachments.length > 0) && !isSending
+                canSubmit && !isSending
                   ? "linear-gradient(135deg, #93452A, #B25D3F)"
                   : "#e8e4df",
-              color: (message.trim() || attachments.length > 0) && !isSending ? "#FFFFFF" : "#5E5E65",
-              cursor: (message.trim() || attachments.length > 0) && !isSending ? "pointer" : "default",
+              color: canSubmit && !isSending ? "#FFFFFF" : "#5E5E65",
+              cursor: canSubmit && !isSending ? "pointer" : "default",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
