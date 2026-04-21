@@ -8,6 +8,7 @@ const modulePath = path.resolve(__dirname, "goal-drafts.ts");
 const drafts = loadTsModule(modulePath, {
   stubs: {
     "@/types/goal-draft": {},
+    "@/types/chat-composer": {},
   },
 });
 
@@ -104,5 +105,57 @@ test("goal draft snapshot changes when the body changes", () => {
   assert.notEqual(
     drafts.buildGoalDraftSnapshot(baseDraft),
     drafts.buildGoalDraftSnapshot(editedDraft),
+  );
+});
+
+test("goal draft content ignores workspace and settings-only changes", () => {
+  assert.equal(
+    drafts.hasGoalDraftContent({
+      title: "  ",
+      message: "  ",
+      attachments: [],
+      pastedBlocks: [],
+    }),
+    false,
+  );
+
+  assert.equal(
+    drafts.hasGoalDraftContent({
+      title: "Goal title",
+      message: "  ",
+      attachments: [],
+      pastedBlocks: [],
+    }),
+    true,
+  );
+
+  assert.equal(
+    drafts.hasGoalDraftContent({
+      title: "  ",
+      message: "Goal body",
+      attachments: [],
+      pastedBlocks: [],
+    }),
+    true,
+  );
+
+  assert.equal(
+    drafts.hasGoalDraftContent({
+      title: "  ",
+      message: "  ",
+      attachments: [{ fileName: "notes.md" }],
+      pastedBlocks: [],
+    }),
+    true,
+  );
+
+  assert.equal(
+    drafts.hasGoalDraftContent({
+      title: "  ",
+      message: "  ",
+      attachments: [],
+      pastedBlocks: [{ id: "p-1", text: "pasted content" }],
+    }),
+    true,
   );
 });

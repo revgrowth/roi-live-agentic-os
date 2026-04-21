@@ -1,4 +1,5 @@
 import type { GoalDraftPayload } from "@/types/goal-draft";
+import type { ChatPastedBlock } from "@/types/chat-composer";
 
 const STORAGE_KEY = "cc.goal-drafts:v1";
 
@@ -45,6 +46,25 @@ export function buildGoalDraftSnapshot(draft: GoalDraftPayload): string {
     pastedBlocks: draft.pastedBlocks,
     createdAt: draft.createdAt,
   });
+}
+
+export function hasGoalDraftContent({
+  title,
+  message,
+  attachments,
+  pastedBlocks,
+}: {
+  title: string;
+  message: string;
+  attachments: unknown[];
+  pastedBlocks: ChatPastedBlock[];
+}): boolean {
+  return (
+    title.trim().length > 0 ||
+    message.trim().length > 0 ||
+    attachments.length > 0 ||
+    pastedBlocks.length > 0
+  );
 }
 
 function writeGoalDrafts(drafts: GoalDraftPayload[], storage?: StorageLike): void {

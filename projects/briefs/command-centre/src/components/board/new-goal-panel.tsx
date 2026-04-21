@@ -24,7 +24,7 @@ import {
   getChatAttachmentValidationError,
 } from "@/lib/chat-attachment-policy";
 import { expandComposerPastedBlocks } from "@/lib/chat-message-content";
-import { buildGoalDraftSnapshot } from "@/lib/goal-drafts";
+import { buildGoalDraftSnapshot, hasGoalDraftContent } from "@/lib/goal-drafts";
 
 const MONO = "'DM Mono', monospace";
 
@@ -228,16 +228,12 @@ export function NewGoalPanel({
   ]);
 
   useEffect(() => {
-    const hasMeaningfulContent =
-      title.trim().length > 0 ||
-      message.trim().length > 0 ||
-      attachments.length > 0 ||
-      pastedBlocks.length > 0 ||
-      level !== "task" ||
-      permissionMode !== "bypassPermissions" ||
-      model !== null ||
-      selectedTag !== null ||
-      selectedClientId !== storeSelectedClientId;
+    const hasMeaningfulContent = hasGoalDraftContent({
+      title,
+      message,
+      attachments,
+      pastedBlocks,
+    });
 
     if (!hasMaterializedDraft && !hasMeaningfulContent) {
       return;
