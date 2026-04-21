@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import fs from "fs";
 import path from "path";
 import { getConfig } from "./config";
@@ -37,22 +38,62 @@ export function getRootName(): string {
 }
 
 /**
+ * Return a short stable workspace ID for browser-scoped state keys.
+ */
+export function getWorkspaceId(): string {
+  const config = getConfig();
+  const normalizedPath = path
+    .resolve(config.agenticOsDir)
+    .replace(/\\/g, "/")
+    .toLowerCase();
+
+  return createHash("sha256").update(normalizedPath).digest("hex").slice(0, 12);
+}
+
+/**
+ * Normalize incoming client IDs so "root" behaves like the workspace root.
+ */
+export function normalizeClientId(clientId: string | null | undefined): string | null {
+  if (!clientId || clientId === "root") {
+    return null;
+  }
+
+  return clientId;
+}
+
+/**
+ * Validate a client ID against the current workspace.
+ * Returns null for root, or the normalized slug for a real client.
+ * Throws with a user-facing message when the client does not exist.
+ */
+export function assertValidClientId(clientId: string | null | undefined): string | null {
+  const normalized = normalizeClientId(clientId);
+  if (!normalized) {
+    return null;
+  }
+
+  const config = getConfig();
+  const clientDir = path.join(config.agenticOsDir, "clients", normalized);
+
+  if (!fs.existsSync(clientDir)) {
+    throw new Error(`Client directory not found: clients/${normalized}`);
+  }
+
+  return normalized;
+}
+
+/**
  * Resolve the absolute directory for a given client.
  * If clientId is null/undefined, returns the agentic-os root.
  * Throws if the resolved directory does not exist.
  */
 export function getClientDir(clientId: string | null): string {
   const config = getConfig();
+  const normalized = assertValidClientId(clientId);
 
-  if (!clientId) {
+  if (!normalized) {
     return config.agenticOsDir;
   }
 
-  const dir = path.join(config.agenticOsDir, "clients", clientId);
-
-  if (!fs.existsSync(dir)) {
-    throw new Error(`Client directory not found: ${dir}`);
-  }
-
-  return dir;
+  return path.join(config.agenticOsDir, "clients", normalized);
 }

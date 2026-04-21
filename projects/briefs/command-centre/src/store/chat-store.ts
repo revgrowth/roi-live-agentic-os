@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Conversation, Message, AgentDecision, ChatEvent } from "@/types/chat";
 import type { ClaudeModel, PermissionMode } from "@/types/task";
+import { readApiError } from "@/lib/api-error";
 
 interface ChatState {
   /** The active conversation (only one at a time) */
@@ -38,14 +39,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
     params.set("status", "active");
 
     const res = await fetch(`/api/chat/conversations?${params}`);
-    if (res.ok) {
-      const conversations: Conversation[] = await res.json();
-      if (conversations.length > 0) {
-        const conv = conversations[0];
-        set({ conversation: conv });
-        await get().fetchMessages(conv.id);
-        return conv;
-      }
+    if (!res.ok) {
+      throw new Error(await readApiError(res, "Failed to load conversations"));
+    }
+
+    const conversations: Conversation[] = await res.json();
+    if (conversations.length > 0) {
+      const conv = conversations[0];
+      set({ conversation: conv });
+      await get().fetchMessages(conv.id);
+      return conv;
     }
 
     // No active conversation — create one
@@ -54,6 +57,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ clientId }),
     });
+    if (!createRes.ok) {
+      throw new Error(await readApiError(createRes, "Failed to create conversation"));
+    }
     const conv: Conversation = await createRes.json();
     set({ conversation: conv, messages: [], decisions: [], pendingQuestions: [] });
     return conv;
