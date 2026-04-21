@@ -57,14 +57,9 @@ export async function POST(request: NextRequest) {
 
     const stream = new ReadableStream({
       start(controller) {
-        const proc = spawnUiProcess("bash", [scriptPath, ...argValues], {
-          cwd: config.agenticOsDir,
-          stdio: ["pipe", "pipe", "pipe"],
-        });
-
-        if (proc.stdin) {
-          proc.stdin.end();
-        }
+        let finalized = false;
+        let streamClosed = false;
+        let proc: ReturnType<typeof spawnUiProcess>;
 
         const enqueue = (obj: Record<string, unknown>) => {
           try {
@@ -73,6 +68,42 @@ export async function POST(request: NextRequest) {
             // Stream may have been closed by client
           }
         };
+
+        const closeStream = () => {
+          if (streamClosed) return;
+          streamClosed = true;
+          try {
+            controller.close();
+          } catch {
+            // Stream may already be closed.
+          }
+        };
+
+        const finalize = (code: number, errorMessage?: string) => {
+          if (finalized) return;
+          finalized = true;
+          if (errorMessage) {
+            enqueue({ type: "stderr", data: errorMessage });
+          }
+          enqueue({ type: "exit", code });
+          runningScripts.delete(scriptId);
+          closeStream();
+        };
+
+        try {
+          proc = spawnUiProcess("bash", [scriptPath, ...argValues], {
+            cwd: config.agenticOsDir,
+            stdio: ["pipe", "pipe", "pipe"],
+          });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Failed to start script";
+          finalize(1, `Process error: ${message}`);
+          return;
+        }
+
+        if (proc.stdin) {
+          proc.stdin.end();
+        }
 
         if (proc.stdout) {
           proc.stdout.on("data", (chunk: Buffer) => {
@@ -87,16 +118,11 @@ export async function POST(request: NextRequest) {
         }
 
         proc.on("error", (err) => {
-          enqueue({ type: "stderr", data: `Process error: ${err.message}` });
-          enqueue({ type: "exit", code: 1 });
-          runningScripts.delete(scriptId);
-          controller.close();
+          finalize(1, `Process error: ${err.message}`);
         });
 
         proc.on("close", (code) => {
-          enqueue({ type: "exit", code: code ?? 1 });
-          runningScripts.delete(scriptId);
-          controller.close();
+          finalize(code ?? 1);
         });
       },
     });
