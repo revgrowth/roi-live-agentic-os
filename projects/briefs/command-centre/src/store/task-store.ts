@@ -6,6 +6,7 @@ import {
   getActivePermissionMode,
   getExecutionPermissionMode,
 } from "@/lib/permission-mode";
+import { readApiError } from "@/lib/api-error";
 import { useClientStore } from "./client-store";
 
 // SSE dedup: track IDs we created so SSE echoes are suppressed
@@ -197,7 +198,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
           status: initialStatus,
         }),
       });
-      if (!res.ok) throw new Error("Failed to create task");
+      if (!res.ok) {
+        throw new Error(await readApiError(res, "Failed to create task"));
+      }
       const realTask = await res.json();
 
       _pendingCreates.delete(tempId);

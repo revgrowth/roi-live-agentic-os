@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { assertValidClientId } from "@/lib/clients";
 import type { Conversation } from "@/types/chat";
 
 export async function GET(request: NextRequest) {
@@ -37,7 +38,16 @@ export async function POST(request: NextRequest) {
   try {
     const db = getDb();
     const body = await request.json();
-    const { clientId, title } = body;
+    const { clientId: rawClientId, title } = body;
+
+    let clientId: string | null;
+    try {
+      clientId = assertValidClientId(rawClientId);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Invalid client selection";
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
 
     const now = new Date().toISOString();
     const conversation: Conversation = {
@@ -46,7 +56,7 @@ export async function POST(request: NextRequest) {
       status: "active",
       createdAt: now,
       updatedAt: now,
-      clientId: clientId || null,
+      clientId,
     };
 
     db.prepare(

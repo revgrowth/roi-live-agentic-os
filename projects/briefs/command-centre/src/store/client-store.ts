@@ -1,10 +1,23 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import type { Client } from "@/types/client";
+
+const STORAGE_KEY_PREFIX = "command-centre-client:";
+
+interface PersistedClientState {
+  activeClientSlugs?: string[] | null;
+  selectedClientId?: string | null;
+}
+
+interface ClientsResponse {
+  clients?: Client[];
+  rootName?: string;
+  workspaceId?: string;
+}
 
 interface ClientStore {
   clients: Client[];
   rootName: string;
+  workspaceId: string | null;
   /**
    * Feed-only visibility filter.
    * null  = show all clients in Feed
@@ -28,111 +41,248 @@ interface ClientStore {
   getSelectedClient: () => Client | null;
 }
 
-function normalizeClientId(clientId: string | null): string | null {
+function normalizeClientId(clientId: string | null | undefined): string | null {
   if (!clientId || clientId === "root") {
     return null;
   }
   return clientId;
 }
 
+function normalizeFeedScopeSlug(slug: string | null | undefined): string | null {
+  if (!slug) {
+    return null;
+  }
+  if (slug === "_root" || slug === "root") {
+    return "_root";
+  }
+  return normalizeClientId(slug);
+}
+
 function getDefaultFeedScope(clientId: string | null): string[] | null {
   return clientId ? [clientId] : null;
 }
 
-export const useClientStore = create<ClientStore>()(
-  persist(
-    (set, get) => ({
-      clients: [],
-      rootName: "Root",
-      activeClientSlugs: null,
-      selectedClientId: null,
-      isLoading: false,
-      error: null,
+function getStorageKey(workspaceId: string): string {
+  return `${STORAGE_KEY_PREFIX}${workspaceId}`;
+}
 
-      fetchClients: async () => {
-        set({ isLoading: true, error: null });
-        try {
-          const res = await fetch("/api/clients");
-          if (!res.ok) throw new Error("Failed to fetch clients");
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            set({ clients: data, isLoading: false });
-            return;
-          }
+function isBrowser(): boolean {
+  return typeof window !== "undefined";
+}
 
-          set({
-            clients: data.clients ?? [],
-            rootName: data.rootName ?? "Root",
-            isLoading: false,
-          });
-        } catch (err) {
-          set({
-            error: err instanceof Error ? err.message : "Unknown error",
-            isLoading: false,
-          });
-        }
-      },
+function loadPersistedClientState(workspaceId: string): PersistedClientState | null {
+  if (!isBrowser()) {
+    return null;
+  }
 
-      toggleClient: (slug: string) => {
-        const { activeClientSlugs, clients } = get();
-        const allSlugs = ["_root", ...clients.map((c) => c.slug)];
+  try {
+    const raw = window.localStorage.getItem(getStorageKey(workspaceId));
+    if (!raw) {
+      return null;
+    }
 
-        let next: string[] | null;
-        if (activeClientSlugs === null) {
-          next = allSlugs.filter((s) => s !== slug);
-        } else if (activeClientSlugs.includes(slug)) {
-          next = activeClientSlugs.filter((s) => s !== slug);
-        } else {
-          next = [...activeClientSlugs, slug];
-        }
+    const parsed = JSON.parse(raw) as PersistedClientState;
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
 
-        const nextSelection = next;
-        if (Array.isArray(nextSelection) && allSlugs.every((s) => nextSelection.includes(s))) {
-          next = null;
-        }
+function savePersistedClientState(
+  workspaceId: string,
+  state: Pick<ClientStore, "activeClientSlugs" | "selectedClientId">
+): void {
+  if (!isBrowser()) {
+    return;
+  }
 
-        set({ activeClientSlugs: next });
-      },
-
-      setAllActive: () => {
-        set({ activeClientSlugs: null });
-      },
-
-      isClientActive: (slug: string) => {
-        const { activeClientSlugs } = get();
-        if (activeClientSlugs === null) return true;
-        return activeClientSlugs.includes(slug);
-      },
-
-      setSelectedClient: (clientId: string | null) => {
-        const normalized = normalizeClientId(clientId);
-        set({
-          selectedClientId: normalized,
-          activeClientSlugs: getDefaultFeedScope(normalized),
-        });
-      },
-
-      getSelectedClient: () => {
-        const { clients, selectedClientId } = get();
-        if (!selectedClientId) return null;
-        return clients.find((c) => c.slug === selectedClientId) || null;
-      },
-    }),
-    {
-      name: "command-centre-client",
-      partialize: (state) => ({
+  try {
+    window.localStorage.setItem(
+      getStorageKey(workspaceId),
+      JSON.stringify({
         activeClientSlugs: state.activeClientSlugs,
         selectedClientId: state.selectedClientId,
-      }),
-      onRehydrateStorage: () => (state) => {
-        if (!state) return;
+      })
+    );
+  } catch {
+    // Ignore storage failures and keep the in-memory state working.
+  }
+}
 
-        state.selectedClientId = normalizeClientId(state.selectedClientId ?? null);
+function persistClientPreferences(
+  state: Pick<ClientStore, "workspaceId" | "activeClientSlugs" | "selectedClientId">
+): void {
+  if (!state.workspaceId) {
+    return;
+  }
 
-        if (state.activeClientSlugs === undefined) {
-          state.activeClientSlugs = getDefaultFeedScope(state.selectedClientId);
-        }
-      },
+  savePersistedClientState(state.workspaceId, state);
+}
+
+function sanitizePersistedState(
+  persisted: PersistedClientState | null,
+  clients: Client[]
+): Pick<ClientStore, "activeClientSlugs" | "selectedClientId"> {
+  const validClientSlugs = new Set(clients.map((client) => client.slug));
+  const requestedClientId = normalizeClientId(persisted?.selectedClientId ?? null);
+  const selectedClientId =
+    requestedClientId && validClientSlugs.has(requestedClientId)
+      ? requestedClientId
+      : null;
+
+  const rawScope = persisted?.activeClientSlugs;
+  if (rawScope === undefined) {
+    return {
+      selectedClientId,
+      activeClientSlugs: getDefaultFeedScope(selectedClientId),
+    };
+  }
+
+  if (rawScope === null) {
+    return {
+      selectedClientId,
+      activeClientSlugs: null,
+    };
+  }
+
+  if (!Array.isArray(rawScope)) {
+    return {
+      selectedClientId,
+      activeClientSlugs: getDefaultFeedScope(selectedClientId),
+    };
+  }
+
+  if (rawScope.length === 0) {
+    return {
+      selectedClientId,
+      activeClientSlugs: [],
+    };
+  }
+
+  const filteredScope = Array.from(
+    new Set(
+      rawScope
+        .map((slug) => normalizeFeedScopeSlug(slug))
+        .filter((slug): slug is string => {
+          if (!slug) return false;
+          if (slug === "_root") return true;
+          return validClientSlugs.has(slug);
+        })
+    )
+  );
+
+  if (filteredScope.length === 0) {
+    return {
+      selectedClientId,
+      activeClientSlugs: getDefaultFeedScope(selectedClientId),
+    };
+  }
+
+  return {
+    selectedClientId,
+    activeClientSlugs: filteredScope,
+  };
+}
+
+export const useClientStore = create<ClientStore>((set, get) => ({
+  clients: [],
+  rootName: "Root",
+  workspaceId: null,
+  activeClientSlugs: null,
+  selectedClientId: null,
+  isLoading: false,
+  error: null,
+
+  fetchClients: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch("/api/clients");
+      if (!res.ok) throw new Error("Failed to fetch clients");
+      const data = await res.json() as Client[] | ClientsResponse;
+
+      if (Array.isArray(data)) {
+        set({
+          clients: data,
+          rootName: "Root",
+          workspaceId: null,
+          selectedClientId: null,
+          activeClientSlugs: null,
+          isLoading: false,
+        });
+        return;
+      }
+
+      const clients = data.clients ?? [];
+      const rootName = data.rootName ?? "Root";
+      const workspaceId = data.workspaceId ?? null;
+      const persisted = workspaceId ? loadPersistedClientState(workspaceId) : null;
+      const sanitized = sanitizePersistedState(persisted, clients);
+
+      set({
+        clients,
+        rootName,
+        workspaceId,
+        selectedClientId: sanitized.selectedClientId,
+        activeClientSlugs: sanitized.activeClientSlugs,
+        isLoading: false,
+      });
+
+      if (workspaceId) {
+        savePersistedClientState(workspaceId, sanitized);
+      }
+    } catch (err) {
+      set({
+        error: err instanceof Error ? err.message : "Unknown error",
+        isLoading: false,
+      });
     }
-  )
-);
+  },
+
+  toggleClient: (slug: string) => {
+    const { activeClientSlugs, clients } = get();
+    const allSlugs = ["_root", ...clients.map((c) => c.slug)];
+
+    let next: string[] | null;
+    if (activeClientSlugs === null) {
+      next = allSlugs.filter((value) => value !== slug);
+    } else if (activeClientSlugs.includes(slug)) {
+      next = activeClientSlugs.filter((value) => value !== slug);
+    } else {
+      next = [...activeClientSlugs, slug];
+    }
+
+    const nextSelection = next;
+    if (Array.isArray(nextSelection) && allSlugs.every((value) => nextSelection.includes(value))) {
+      next = null;
+    }
+
+    set({ activeClientSlugs: next });
+    persistClientPreferences(get());
+  },
+
+  setAllActive: () => {
+    set({ activeClientSlugs: null });
+    persistClientPreferences(get());
+  },
+
+  isClientActive: (slug: string) => {
+    const { activeClientSlugs } = get();
+    if (activeClientSlugs === null) return true;
+    return activeClientSlugs.includes(slug);
+  },
+
+  setSelectedClient: (clientId: string | null) => {
+    const normalized = normalizeClientId(clientId);
+    set({
+      selectedClientId: normalized,
+      activeClientSlugs: getDefaultFeedScope(normalized),
+    });
+    persistClientPreferences(get());
+  },
+
+  getSelectedClient: () => {
+    const { clients, selectedClientId } = get();
+    if (!selectedClientId) return null;
+    return clients.find((c) => c.slug === selectedClientId) || null;
+  },
+}));

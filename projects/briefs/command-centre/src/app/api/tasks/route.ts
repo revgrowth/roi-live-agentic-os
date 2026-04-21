@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
+import { assertValidClientId } from "@/lib/clients";
 import { getActivePermissionMode, getExecutionPermissionMode } from "@/lib/permission-mode";
 import type { ClaudeModel, Task, TaskCreateInput } from "@/types/task";
 
@@ -109,6 +110,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let clientId: string | null;
+    try {
+      clientId = assertValidClientId(bodyClientId);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Invalid client selection";
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+
     // Get min columnOrder in queued — new tasks get lowest value to sort to top
     const minOrder = db
       .prepare(
@@ -150,7 +160,7 @@ export async function POST(request: NextRequest) {
       errorMessage: null,
       startedAt: null,
       completedAt: null,
-      clientId: bodyClientId || null,
+      clientId,
       needsInput: false,
       phaseNumber: bodyPhaseNumber ?? null,
       gsdStep: bodyGsdStep ?? null,
