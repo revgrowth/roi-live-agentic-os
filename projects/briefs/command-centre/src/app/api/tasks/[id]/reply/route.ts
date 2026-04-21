@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { emitTaskEvent } from "@/lib/event-bus";
+import { cleanupChatAttachmentStorage, copyChatAttachmentsToSent, deleteSourceDraftAttachments } from "@/lib/chat-attachment-service";
+import { composeMessageWithAttachments } from "@/lib/chat-message-content";
 import { saveApprovedPlanToBrief } from "@/lib/plan-brief.server";
 import { getActivePermissionMode, getExecutionPermissionMode, VALID_PERMISSION_MODES } from "@/lib/permission-mode";
 import { processManager } from "@/lib/process-manager";
+import type { ChatAttachment } from "@/types/chat-composer";
 import type { Task, PermissionMode, ClaudeModel } from "@/types/task";
 import {
   parseQuestionSpecs,
@@ -12,6 +15,19 @@ import {
   type QuestionAnswers,
 } from "@/types/question-spec";
 const VALID_MODELS: ClaudeModel[] = ["opus", "sonnet", "haiku"];
+
+function normalizeAttachments(value: unknown): ChatAttachment[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is ChatAttachment => {
+    return Boolean(
+      item &&
+      typeof item === "object" &&
+      typeof (item as ChatAttachment).id === "string" &&
+      typeof (item as ChatAttachment).relativePath === "string" &&
+      typeof (item as ChatAttachment).fileName === "string",
+    );
+  });
+}
 
 function getStructuredAnswerText(
   questions: QuestionSpec[],
@@ -43,6 +59,7 @@ export async function POST(
 
   let body: {
     message?: string;
+    attachments?: ChatAttachment[];
     structuredAnswers?: QuestionAnswers;
     permissionMode?: PermissionMode;
     executionPermissionMode?: PermissionMode | null;
@@ -54,7 +71,7 @@ export async function POST(
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { message, structuredAnswers, permissionMode, executionPermissionMode, model } = body;
+  const { message, attachments: attachmentPayload, structuredAnswers, permissionMode, executionPermissionMode, model } = body;
 
   const db = getDb();
   const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id) as Task | undefined;
@@ -68,6 +85,7 @@ export async function POST(
   // a prose message for the Claude continuation.
   const userMessage =
     typeof message === "string" && message.trim().length > 0 ? message.trim() : null;
+  const incomingAttachments = normalizeAttachments(attachmentPayload);
   let resolvedMessage: string | null = userMessage;
   let answeredLogId: string | null = null;
   let pendingQuestions: QuestionSpec[] = [];
@@ -97,10 +115,6 @@ export async function POST(
     }
   }
 
-  if (!resolvedMessage || resolvedMessage.trim().length === 0) {
-    return NextResponse.json({ error: "message is required" }, { status: 400 });
-  }
-
   const needsInput = Boolean(task.needsInput);
   const isResuming = task.status === "review" || task.status === "done";
   const isRunning = task.status === "running";
@@ -116,7 +130,20 @@ export async function POST(
   }
 
   const now = new Date().toISOString();
-  const trimmed = resolvedMessage.trim();
+  const entryId = crypto.randomUUID();
+  const attachments = incomingAttachments.length > 0
+    ? copyChatAttachmentsToSent({
+        surface: "task",
+        scopeId: id,
+        referenceId: entryId,
+        attachments: incomingAttachments,
+      })
+    : [];
+  const trimmed = composeMessageWithAttachments(resolvedMessage ?? "", attachments).trim();
+
+  if (!trimmed) {
+    return NextResponse.json({ error: "message is required" }, { status: 400 });
+  }
 
   // If this reply answers a structured_question entry, store the answers on it
   if (answeredLogId && structuredAnswers) {
@@ -126,7 +153,6 @@ export async function POST(
   }
 
   // Persist user reply as log entry — include the permission mode chosen at reply time
-  const entryId = crypto.randomUUID();
   const normalizedReplyPermission = permissionMode && VALID_PERMISSION_MODES.includes(permissionMode)
     ? getActivePermissionMode(permissionMode, task.permissionMode || "bypassPermissions")
     : null;
@@ -221,6 +247,8 @@ export async function POST(
         console.error(`[reply-route] Plan approval resume failed:`, err);
       }
 
+      deleteSourceDraftAttachments(incomingAttachments);
+      cleanupChatAttachmentStorage({ surface: "task", scopeId: id });
       return NextResponse.json({ ok: true, action: "approved" });
     }
 
@@ -238,6 +266,8 @@ export async function POST(
         task: { ...canceledTask, needsInput: false },
         timestamp: now,
       });
+      deleteSourceDraftAttachments(incomingAttachments);
+      cleanupChatAttachmentStorage({ surface: "task", scopeId: id });
       return NextResponse.json({ ok: true, action: "canceled" });
     }
   }
@@ -284,5 +314,7 @@ export async function POST(
     console.error(`[reply-route] Reply spawn failed:`, err);
   }
 
+  deleteSourceDraftAttachments(incomingAttachments);
+  cleanupChatAttachmentStorage({ surface: "task", scopeId: id });
   return NextResponse.json({ ok: true });
 }

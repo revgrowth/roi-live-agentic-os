@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { useChatStore } from "@/store/chat-store";
+import { useClientStore } from "@/store/client-store";
 import { ChatInput } from "./chat-input";
 import { BubbledQuestion } from "./bubbled-question";
+import { ChatMessageAttachmentList } from "@/components/shared/chat-attachment-strip";
 import { Bot } from "lucide-react";
 import type { Message } from "@/types/chat";
 import type { ClaudeModel, PermissionMode } from "@/types/task";
+import type { ChatAttachment } from "@/types/chat-composer";
 
 function formatTime(dateStr: string): string {
   const d = new Date(dateStr);
@@ -80,17 +83,41 @@ function ChatMessage({ message }: { message: Message }) {
         }}>
           {message.content}
         </div>
+        <ChatMessageAttachmentList attachments={message.metadata?.attachments ?? []} />
       </div>
     </div>
   );
 }
 
 export function ChatPanel() {
+  const conversation = useChatStore((s) => s.conversation);
   const messages = useChatStore((s) => s.messages);
   const isProcessing = useChatStore((s) => s.isProcessing);
+  const loadOrCreateConversation = useChatStore((s) => s.loadOrCreateConversation);
   const sendMessage = useChatStore((s) => s.sendMessage);
   const replyToQuestion = useChatStore((s) => s.replyToQuestion);
+  const selectedClientId = useClientStore((s) => s.selectedClientId);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isConversationLoading, setIsConversationLoading] = useState(false);
+
+  useEffect(() => {
+    let isCancelled = false;
+    setIsConversationLoading(true);
+
+    void loadOrCreateConversation(selectedClientId ?? null)
+      .catch((error) => {
+        console.error("Failed to load chat conversation:", error);
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setIsConversationLoading(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [loadOrCreateConversation, selectedClientId]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -99,12 +126,12 @@ export function ChatPanel() {
     el.scrollTop = el.scrollHeight;
   }, [messages.length]);
 
-  const handleSend = useCallback((content: string, options: { permissionMode: PermissionMode; model: ClaudeModel | null }) => {
+  const handleSend = useCallback((content: string, options: { permissionMode: PermissionMode; model: ClaudeModel | null; attachments: ChatAttachment[] }) => {
     sendMessage(content, options);
   }, [sendMessage]);
 
-  const handleReply = useCallback((messageId: string, content: string) => {
-    replyToQuestion(messageId, content);
+  const handleReply = useCallback((messageId: string, content: string, attachments: ChatAttachment[] = []) => {
+    replyToQuestion(messageId, content, attachments);
   }, [replyToQuestion]);
 
   return (
@@ -216,8 +243,9 @@ export function ChatPanel() {
 
       {/* Input */}
       <ChatInput
+        scopeId={conversation?.id}
         onSend={handleSend}
-        disabled={isProcessing}
+        disabled={isProcessing || isConversationLoading}
         placeholder="Type a message..."
       />
     </div>

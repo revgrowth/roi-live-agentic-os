@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
-import { getClientAgenticOsDir } from "@/lib/config";
+import { getClientAgenticOsDir, getConfig } from "@/lib/config";
+import { getDb } from "@/lib/db";
+import type { ChatComposerSurface } from "@/types/chat-composer";
 
 const MAX_PREVIEW_SIZE = 1024 * 1024; // 1MB
 
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg", "ico"]);
-const BINARY_EXTENSIONS = new Set(["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "zip", "tar", "gz", "mp4", "mp3", "wav", "ogg", "webm"]);
+const PREVIEW_BINARY_EXTENSIONS = new Set(["pdf"]);
+const BINARY_EXTENSIONS = new Set(["doc", "docx", "xls", "xlsx", "ppt", "pptx", "zip", "tar", "gz", "mp4", "mp3", "wav", "ogg", "webm"]);
 const RAW_TEXT_EXTENSIONS = new Set(["html", "htm"]);
 
 const MIME_TYPES: Record<string, string> = {
@@ -22,10 +25,47 @@ const MIME_TYPES: Record<string, string> = {
   htm: "text/html; charset=utf-8",
 };
 
+function isChatComposerSurface(value: string | null): value is ChatComposerSurface {
+  return value === "conversation" || value === "task" || value === "question";
+}
+
+function getChatScopeClientId(surface: ChatComposerSurface, scopeId: string): string | null {
+  const db = getDb();
+
+  if (surface === "conversation") {
+    const row = db.prepare("SELECT clientId FROM conversations WHERE id = ?").get(scopeId) as { clientId: string | null } | undefined;
+    return row?.clientId ?? null;
+  }
+
+  if (surface === "task") {
+    const row = db.prepare("SELECT clientId FROM tasks WHERE id = ?").get(scopeId) as { clientId: string | null } | undefined;
+    return row?.clientId ?? null;
+  }
+
+  const row = db.prepare(
+    `SELECT c.clientId
+     FROM messages m
+     LEFT JOIN conversations c ON c.id = m.conversationId
+     WHERE m.id = ?`
+  ).get(scopeId) as { clientId: string | null } | undefined;
+  return row?.clientId ?? null;
+}
+
+function getBaseDir(request: NextRequest, filePath: string): string {
+  const surface = request.nextUrl.searchParams.get("surface");
+  const scopeId = request.nextUrl.searchParams.get("scopeId");
+
+  if (filePath.startsWith(".tmp/chat-drafts/") && isChatComposerSurface(surface) && scopeId) {
+    const clientId = getChatScopeClientId(surface, scopeId);
+    return clientId ? getClientAgenticOsDir(clientId) : getConfig().agenticOsDir;
+  }
+
+  const clientId = request.nextUrl.searchParams.get("clientId");
+  return getClientAgenticOsDir(clientId);
+}
+
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const filePath = request.nextUrl.searchParams.get("path");
-  const clientId = request.nextUrl.searchParams.get("clientId");
-
   if (!filePath) {
     return NextResponse.json({ error: "Missing path parameter" }, { status: 400 });
   }
@@ -35,7 +75,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Path traversal not allowed" }, { status: 403 });
   }
 
-  const baseDir = getClientAgenticOsDir(clientId);
+  const baseDir = getBaseDir(request, filePath);
   const resolvedPath = path.resolve(baseDir, filePath);
 
   // Path traversal protection: ensure resolved path is within the active workspace
@@ -52,7 +92,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const stat = fs.statSync(resolvedPath);
 
   // Binary preview: serve the raw file with proper content-type (images, PDFs)
-  if (IMAGE_EXTENSIONS.has(ext)) {
+  if (IMAGE_EXTENSIONS.has(ext) || PREVIEW_BINARY_EXTENSIONS.has(ext)) {
     const mimeType = MIME_TYPES[ext] || "application/octet-stream";
     const fileBuffer = fs.readFileSync(resolvedPath);
     return new NextResponse(fileBuffer, {

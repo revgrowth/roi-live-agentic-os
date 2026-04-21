@@ -13,6 +13,7 @@ import {
   PlanApprovalActions,
 } from "@/components/shared/task-approval-actions";
 import { isTaskWaitingOnPermission } from "@/lib/task-permissions";
+import { CHAT_ATTACHMENT_ACCEPT_ATTR } from "@/lib/chat-attachment-policy";
 
 // ── Paste handling ──────────────────────────────────────────────
 interface PastedChip {
@@ -646,7 +647,7 @@ export function ReviewQueue({ tasks, allTasks }: { tasks: Task[]; allTasks?: Tas
               </div>
             )}
             <div style={{ position: "relative" }}>
-              <input ref={fileInputRef} type="file" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = ""; }} style={{ display: "none" }} accept="image/*,.pdf,.md,.txt,.csv,.json,.html" />
+              <input ref={fileInputRef} type="file" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = ""; }} style={{ display: "none" }} accept={CHAT_ATTACHMENT_ACCEPT_ATTR} />
               <textarea
                 ref={textareaRef} value={message} onChange={(e) => setMessage(e.target.value)} onPaste={handlePaste} onKeyDown={handleKeyDown}
                 placeholder={

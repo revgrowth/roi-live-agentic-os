@@ -3,7 +3,9 @@
 import React, { useState } from "react";
 import { X, Grid2x2, Columns2, Rows2, Terminal, Check } from "lucide-react";
 import type { Task, LogEntry, OutputFile } from "@/types/task";
+import type { ChatAttachment } from "@/types/chat-composer";
 import { MAIN_PANE_ID, type PaneItem, type PaneLayout } from "@/hooks/use-pane-state";
+import { composeMessageWithAttachments } from "@/lib/chat-message-content";
 import { useTaskStore } from "@/store/task-store";
 import { ChatPane } from "./chat-pane";
 import { ReplyInput } from "./reply-input";
@@ -167,14 +169,16 @@ export function PaneContainer({
           onRunSubtask={onRunSubtask}
           onRunAll={onRunAll}
           compact={multiPane}
-          onCreatePaneTask={async (msg: string, permMode: string, model) => {
+          onCreatePaneTask={async (msg: string, permMode: string, model, attachments: ChatAttachment[]) => {
             if (!parentTask) return null;
-            const title = msg.length > 80 ? msg.slice(0, 77) + "..." : msg;
-            const autoLabel = msg.length > 40 ? msg.slice(0, 37) + "..." : msg;
+            const fullMessage = composeMessageWithAttachments(msg, attachments);
+            const titleSource = msg.trim() || (attachments.length === 1 ? attachments[0].fileName : `Attached ${attachments.length} files`);
+            const title = titleSource.length > 80 ? titleSource.slice(0, 77) + "..." : titleSource;
+            const autoLabel = titleSource.length > 40 ? titleSource.slice(0, 37) + "..." : titleSource;
             onRenamePane?.(paneItem.id, autoLabel);
             const createTask = useTaskStore.getState().createTask;
             const newId = await createTask(
-              title, msg, "task",
+              title, fullMessage, "task",
               parentTask.projectSlug ?? null,
               parentTask.id,
               permMode,

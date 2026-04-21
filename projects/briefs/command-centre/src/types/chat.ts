@@ -1,3 +1,5 @@
+import type { ChatAttachment } from "@/types/chat-composer";
+
 export type MessageRole = "user" | "orchestrator" | "sub_agent" | "system";
 export type ConversationStatus = "active" | "archived";
 export type DecisionType = "scope" | "decompose" | "delegate" | "clarify" | "complete_inline";
@@ -33,6 +35,8 @@ export interface MessageMetadata {
   questionSpecs?: import("@/types/question-spec").QuestionSpec[];
   /** For reply messages: which question this answers */
   replyToMessageId?: string;
+  /** Files attached in the chat composer */
+  attachments?: ChatAttachment[];
   /** For task completion messages */
   outputFiles?: string[];
   /** Cost tracking */
