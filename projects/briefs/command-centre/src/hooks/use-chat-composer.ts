@@ -12,6 +12,11 @@ import {
 } from "@/lib/chat-drafts";
 import { CHAT_ATTACHMENT_ACCEPT_ATTR, getChatAttachmentExtension, getChatAttachmentValidationError } from "@/lib/chat-attachment-policy";
 import { expandComposerPastedBlocks, hasComposerContent } from "@/lib/chat-message-content";
+import {
+  insertPastedTextAtSelection,
+  removePendingPastedText,
+  shouldCapturePastedText,
+} from "@/lib/pasted-text";
 import type { ChatAttachment, ChatComposerSurface, ChatDraftPayload, ChatPastedBlock } from "@/types/chat-composer";
 import type { ComposerUploadItem } from "@/components/shared/chat-attachment-strip";
 
@@ -41,29 +46,6 @@ function ensureNamedFile(file: File): File {
   const extension = IMAGE_MIME_TO_EXTENSION[file.type] ?? "txt";
   return new File([file], `pasted-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension}`, {
     type: file.type,
-  });
-}
-
-function insertTextAtCursor(
-  textarea: HTMLTextAreaElement | null,
-  currentValue: string,
-  nextText: string,
-  setValue: (value: string) => void,
-): void {
-  if (!textarea) {
-    setValue(currentValue + nextText);
-    return;
-  }
-
-  const start = textarea.selectionStart ?? currentValue.length;
-  const end = textarea.selectionEnd ?? currentValue.length;
-  const nextValue = currentValue.slice(0, start) + nextText + currentValue.slice(end);
-  setValue(nextValue);
-
-  requestAnimationFrame(() => {
-    const cursor = start + nextText.length;
-    textarea.selectionStart = cursor;
-    textarea.selectionEnd = cursor;
   });
 }
 
@@ -326,17 +308,42 @@ export function useChatComposer(params: {
     }
 
     const text = event.clipboardData?.getData("text/plain") ?? "";
-    const lineCount = text.split("\n").length;
-    if (lineCount <= 10) {
+    if (!shouldCapturePastedText(text)) {
       return;
     }
 
     event.preventDefault();
-    const blockId = createId().slice(0, 6);
-    const label = `[Pasted text +${lineCount} lines ${blockId}]`;
-    setPastedBlocks((current) => [...current, { id: blockId, label, text }]);
-    insertTextAtCursor(textareaRef.current, message, label, setMessage);
-  }, [message, uploadFiles]);
+    setPastedBlocks((current) => [...current, { id: createId(), text }]);
+  }, [uploadFiles]);
+
+  const insertPastedTextBlock = useCallback((blockId: string) => {
+    const block = pastedBlocks.find((entry) => entry.id === blockId);
+    if (!block) return;
+
+    const textarea = textareaRef.current;
+    const selectionStart = textarea?.selectionStart ?? message.length;
+    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
+    const insertion = insertPastedTextAtSelection(
+      message,
+      block.text,
+      selectionStart,
+      selectionEnd,
+    );
+
+    setMessage(insertion.value);
+    setPastedBlocks((current) => removePendingPastedText(current, blockId));
+
+    requestAnimationFrame(() => {
+      const nextTextarea = textareaRef.current;
+      if (!nextTextarea) return;
+      nextTextarea.focus();
+      nextTextarea.setSelectionRange(insertion.selectionStart, insertion.selectionEnd);
+    });
+  }, [message, pastedBlocks]);
+
+  const removePastedTextBlock = useCallback((blockId: string) => {
+    setPastedBlocks((current) => removePendingPastedText(current, blockId));
+  }, []);
 
   const hasFileDragPayload = useCallback((dataTransfer: DataTransfer | null): boolean => {
     if (!dataTransfer) return false;
@@ -405,6 +412,7 @@ export function useChatComposer(params: {
     message,
     setMessage,
     attachments,
+    pastedBlocks,
     uploads,
     isUploading,
     isDragging,
@@ -422,6 +430,8 @@ export function useChatComposer(params: {
     removeAttachment,
     retryUpload,
     removeUpload,
+    insertPastedTextBlock,
+    removePastedTextBlock,
     discardDraft,
     buildSubmission,
     clearComposer,

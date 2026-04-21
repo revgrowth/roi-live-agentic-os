@@ -895,7 +895,7 @@ function AttachmentPreviewModal({
   );
 }
 
-function AttachmentAssetCard({
+export function AttachmentAssetCard({
   item,
   compact,
   onRemoveItem,

@@ -18,8 +18,8 @@ export interface ChatAttachment {
 
 export interface ChatPastedBlock {
   id: string;
-  label: string;
   text: string;
+  label?: string;
 }
 
 export interface ChatDraftPayload {

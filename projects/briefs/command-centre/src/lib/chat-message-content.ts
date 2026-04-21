@@ -1,11 +1,11 @@
 import type { ChatAttachment, ChatPastedBlock } from "@/types/chat-composer";
+import { appendPendingPastedText } from "@/lib/pasted-text";
 
 export function expandComposerPastedBlocks(message: string, pastedBlocks: ChatPastedBlock[]): string {
-  let expanded = message;
-  for (const block of pastedBlocks) {
-    expanded = expanded.replace(block.label, block.text);
-  }
-  return expanded;
+  return appendPendingPastedText(
+    message,
+    pastedBlocks.map((block) => ({ id: block.id, text: block.text })),
+  );
 }
 
 export function composeMessageWithAttachments(message: string, attachments: ChatAttachment[]): string {
