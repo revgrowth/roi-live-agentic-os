@@ -3,6 +3,7 @@ import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 interface SyncComposerTextareaOptions {
   maxHeight?: number;
   minHeight?: number;
+  targetHeight?: number | null;
 }
 
 export function shouldSubmitOnPlainEnter(
@@ -52,17 +53,29 @@ export function insertTextareaNewline(
 
 export function syncComposerTextareaHeight(
   textarea: HTMLTextAreaElement | null,
-  { maxHeight = 160, minHeight = 0 }: SyncComposerTextareaOptions = {},
+  { maxHeight = 160, minHeight = 0, targetHeight = null }: SyncComposerTextareaOptions = {},
 ): void {
   if (!textarea) return;
 
   textarea.style.height = "auto";
 
-  const nextHeight = Math.max(
+  const boundedTargetHeight =
+    targetHeight == null
+      ? null
+      : clampComposerHeight(targetHeight, minHeight, maxHeight);
+  const nextHeight = boundedTargetHeight ?? Math.max(
     minHeight,
     Math.min(textarea.scrollHeight, maxHeight),
   );
 
   textarea.style.height = `${nextHeight}px`;
-  textarea.style.overflowY = textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+  textarea.style.overflowY = textarea.scrollHeight > nextHeight ? "auto" : "hidden";
+}
+
+export function clampComposerHeight(
+  value: number,
+  minHeight: number,
+  maxHeight: number,
+): number {
+  return Math.max(minHeight, Math.min(value, maxHeight));
 }

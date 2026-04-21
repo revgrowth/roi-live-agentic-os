@@ -12,6 +12,7 @@ import { SlashCommandMenu } from "@/components/shared/slash-command-menu";
 import type { TagItem } from "@/components/shared/slash-command-menu";
 import type { SlashCommand } from "@/lib/slash-commands";
 import { GoalChips, recordTagUsage } from "./goal-chips";
+import { CHAT_ATTACHMENT_ACCEPT_ATTR } from "@/lib/chat-attachment-policy";
 
 // Minimal fallback questions — mirrors server-side fallbackQuestions but
 // kept local so the client can synthesise a scope result when scope-goal
@@ -628,7 +629,7 @@ export function TaskCreateInput({
             e.target.value = "";
           }}
           style={{ display: "none" }}
-          accept="image/*,.pdf,.md,.txt,.csv,.json,.html"
+          accept={CHAT_ATTACHMENT_ACCEPT_ATTR}
         />
 
         {attachments.length > 0 && (

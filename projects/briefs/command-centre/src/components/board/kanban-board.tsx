@@ -3,6 +3,7 @@
 import { useState, useEffect, Fragment, type ReactNode } from "react";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import type { Task } from "@/types/task";
+import type { GoalDraftPayload } from "@/types/goal-draft";
 
 const MONO = "'DM Mono', 'JetBrains Mono', 'SF Mono', ui-monospace, monospace";
 const PAGE_SIZE = 5;
@@ -14,6 +15,7 @@ export interface SwimLane {
   clientSlug: string | null;
   clientName: string;
   clientColor: string;
+  goalDrafts: GoalDraftPayload[];
   goals: Task[];
   done: Task[];
 }
@@ -24,6 +26,7 @@ export interface KanbanBoardProps {
   lanes: SwimLane[];
   singleLane: boolean;
   renderCard: (task: Task, column: ColKey) => ReactNode;
+  renderDraftCard?: (draft: GoalDraftPayload, laneClientSlug: string | null) => ReactNode;
   draggingId: string | null;
   onDropColumn: (column: ColKey, e: React.DragEvent) => void;
   onDragOverColumn: (column: ColKey, e: React.DragEvent) => void;
@@ -72,6 +75,7 @@ export function KanbanBoard({
   lanes,
   singleLane,
   renderCard,
+  renderDraftCard,
   draggingId,
   onDropColumn,
   onDragOverColumn,
@@ -107,7 +111,12 @@ export function KanbanBoard({
           }}
         >
           {visibleCols.map((col, i) => {
-            const count = lanes.reduce((sum, l) => sum + l[col.key].length, 0);
+            const count = lanes.reduce((sum, lane) => {
+              if (col.key === "goals") {
+                return sum + lane.goals.length + lane.goalDrafts.length;
+              }
+              return sum + lane.done.length;
+            }, 0);
             return (
               <Fragment key={col.key}>
                 {i > 0 && <div />}
@@ -223,6 +232,7 @@ export function KanbanBoard({
           lane={lane}
           singleLane={singleLane}
           renderCard={renderCard}
+          renderDraftCard={renderDraftCard}
           isDragging={isDragging}
           dropOverColumn={dropOverColumn}
           onDropColumn={onDropColumn}
@@ -242,6 +252,7 @@ function LaneRow({
   lane,
   singleLane,
   renderCard,
+  renderDraftCard,
   groupByTag,
   isDragging,
   dropOverColumn,
@@ -255,6 +266,7 @@ function LaneRow({
   lane: SwimLane;
   singleLane: boolean;
   renderCard: (task: Task, column: ColKey) => ReactNode;
+  renderDraftCard?: (draft: GoalDraftPayload, laneClientSlug: string | null) => ReactNode;
   isDragging: boolean;
   dropOverColumn: ColKey | null;
   onDropColumn: (column: ColKey, e: React.DragEvent) => void;
@@ -266,7 +278,7 @@ function LaneRow({
   groupByTag?: boolean;
 }) {
   const [laneCollapsed, setLaneCollapsed] = useState(false);
-  const totalTasks = lane.goals.length + lane.done.length;
+  const totalTasks = lane.goalDrafts.length + lane.goals.length + lane.done.length;
 
   return (
     <div style={{ marginBottom: singleLane ? 0 : 4 }}>
@@ -336,20 +348,23 @@ function LaneRow({
               {!isNarrow && i > 0 && (
                 <div style={{ backgroundColor: "rgba(218, 193, 185, 0.35)", alignSelf: "stretch" }} />
               )}
-              <ColumnCell
-                col={col}
-                tasks={lane[col.key]}
-                isNarrow={isNarrow}
-                isDragging={isDragging}
-                dropOverColumn={dropOverColumn}
-                onDropColumn={onDropColumn}
-                groupByTag={!!groupByTag}
-                onDragOverColumn={onDragOverColumn}
-                onDragLeaveColumn={onDragLeaveColumn}
-                renderCard={renderCard}
-              />
-            </Fragment>
-          ))}
+                <ColumnCell
+                  col={col}
+                  laneClientSlug={lane.clientSlug}
+                  tasks={lane[col.key]}
+                  drafts={col.key === "goals" ? lane.goalDrafts : []}
+                  isNarrow={isNarrow}
+                  isDragging={isDragging}
+                  dropOverColumn={dropOverColumn}
+                  onDropColumn={onDropColumn}
+                  groupByTag={!!groupByTag}
+                  onDragOverColumn={onDragOverColumn}
+                  onDragLeaveColumn={onDragLeaveColumn}
+                  renderCard={renderCard}
+                  renderDraftCard={renderDraftCard}
+                />
+              </Fragment>
+            ))}
         </div>
       )}
     </div>
@@ -359,7 +374,9 @@ function LaneRow({
 /** Column cell — shows PAGE_SIZE tasks, with expand/collapse when more exist */
 function ColumnCell({
   col,
+  laneClientSlug,
   tasks: allTasks,
+  drafts,
   isNarrow,
   isDragging,
   dropOverColumn,
@@ -367,10 +384,13 @@ function ColumnCell({
   onDragOverColumn,
   onDragLeaveColumn,
   renderCard,
+  renderDraftCard,
   groupByTag,
 }: {
   col: { key: ColKey; label: string; emptyText: string };
+  laneClientSlug: string | null;
   tasks: Task[];
+  drafts: GoalDraftPayload[];
   isNarrow: boolean;
   isDragging: boolean;
   dropOverColumn: ColKey | null;
@@ -378,6 +398,7 @@ function ColumnCell({
   onDragOverColumn: (column: ColKey, e: React.DragEvent) => void;
   onDragLeaveColumn: (column: ColKey) => void;
   renderCard: (task: Task, column: ColKey) => ReactNode;
+  renderDraftCard?: (draft: GoalDraftPayload, laneClientSlug: string | null) => ReactNode;
   groupByTag?: boolean;
 }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -457,10 +478,25 @@ function ColumnCell({
           gap: 0,
         }}
       >
-        {allTasks.length === 0 ? (
+        {allTasks.length === 0 && drafts.length === 0 ? (
           <EmptyColumn text={col.emptyText} compact={isNarrow} />
         ) : (
           <>
+            {drafts.length > 0 && renderDraftCard ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 0,
+                  borderRadius: 10,
+                  overflow: "hidden",
+                  borderBottom: "1px solid rgba(79, 124, 172, 0.22)",
+                  marginBottom: allTasks.length > 0 ? 8 : 0,
+                }}
+              >
+                {drafts.map((draft) => renderDraftCard(draft, laneClientSlug))}
+              </div>
+            ) : null}
             {(() => {
               if (groupByTag) {
                 // Group tasks by tag

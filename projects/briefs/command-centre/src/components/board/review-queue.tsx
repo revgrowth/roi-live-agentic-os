@@ -12,18 +12,26 @@ import {
   PermissionApprovalActions,
   PlanApprovalActions,
 } from "@/components/shared/task-approval-actions";
+import { PastedTextCard } from "@/components/shared/pasted-text-card";
 import { isTaskWaitingOnPermission } from "@/lib/task-permissions";
+import { syncComposerTextareaHeight } from "@/lib/composer";
+import {
+  appendPendingPastedText,
+  insertPastedTextAtSelection,
+  removePendingPastedText,
+  shouldCapturePastedText,
+} from "@/lib/pasted-text";
+import { CHAT_ATTACHMENT_ACCEPT_ATTR } from "@/lib/chat-attachment-policy";
 
 // ── Paste handling ──────────────────────────────────────────────
 interface PastedChip {
+  id: string;
   kind: "text" | "image";
   label: string;
   content: string;
 }
-const PASTE_LINE_THRESHOLD = 5;
-function buildPasteLabel(text: string): string {
-  const lines = text.split("\n").length;
-  return `${lines.toLocaleString()} line${lines === 1 ? "" : "s"}`;
+function buildImagePasteLabel(name: string): string {
+  return name || "screenshot.png";
 }
 
 function timeAgo(dateStr: string): string {
@@ -179,6 +187,9 @@ export function ReviewQueue({ tasks, allTasks }: { tasks: Task[]; allTasks?: Tas
   useEffect(() => { if (safeIndex !== currentIndex) setCurrentIndex(safeIndex); }, [safeIndex, currentIndex]);
   useEffect(() => { if (current && textareaRef.current) textareaRef.current.focus(); setAttachedFile(null); setPastedChips([]); }, [current?.id]);
   useEffect(() => { if (!justSent) return; const t = setTimeout(() => setJustSent(false), 1500); return () => clearTimeout(t); }, [justSent]);
+  useEffect(() => {
+    syncComposerTextareaHeight(textareaRef.current, { minHeight: 40, maxHeight: 220 });
+  }, [message]);
 
   const logEntries = current ? (allLogEntries[current.id] ?? []) : [];
   const lastInteracted = getLastUserIntent(logEntries).timestamp || current?.lastReplyAt;
@@ -295,29 +306,58 @@ export function ReviewQueue({ tasks, allTasks }: { tasks: Task[]; allTasks?: Tas
       if (file) {
         const reader = new FileReader();
         reader.onload = () => {
-          setPastedChips((prev) => [...prev, { kind: "image", label: file.name || "screenshot.png", content: reader.result as string }]);
+          setPastedChips((prev) => [...prev, {
+            id: crypto.randomUUID(),
+            kind: "image",
+            label: buildImagePasteLabel(file.name),
+            content: reader.result as string,
+          }]);
         };
         reader.readAsDataURL(file);
       }
       return;
     }
     const text = e.clipboardData.getData("text/plain");
-    if (text && text.split("\n").length > PASTE_LINE_THRESHOLD) {
+    if (shouldCapturePastedText(text)) {
       e.preventDefault();
-      setPastedChips((prev) => [...prev, { kind: "text", label: buildPasteLabel(text), content: text }]);
+      setPastedChips((prev) => [...prev, {
+        id: crypto.randomUUID(),
+        kind: "text",
+        label: "",
+        content: text,
+      }]);
     }
   }, []);
 
+  const handleInsertPastedText = useCallback((chip: PastedChip) => {
+    const textarea = textareaRef.current;
+    const selectionStart = textarea?.selectionStart ?? message.length;
+    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
+    const insertion = insertPastedTextAtSelection(
+      message,
+      chip.content,
+      selectionStart,
+      selectionEnd,
+    );
+
+    setMessage(insertion.value);
+    setPastedChips((prev) => removePendingPastedText(prev, chip.id));
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus();
+      textareaRef.current?.setSelectionRange(insertion.selectionStart, insertion.selectionEnd);
+      syncComposerTextareaHeight(textareaRef.current, { minHeight: 40, maxHeight: 220 });
+    });
+  }, [message]);
+
   const handleSubmit = useCallback(async () => {
     if (!current || (!message.trim() && pastedChips.length === 0) || isSending) return;
-    let trimmed = message.trim();
+    let trimmed = appendPendingPastedText(
+      message.trim(),
+      pastedChips
+        .filter((chip) => chip.kind === "text")
+        .map((chip) => ({ id: chip.id, text: chip.content })),
+    );
 
-    // Append pasted text chips
-    const pastedTexts = pastedChips.filter((c) => c.kind === "text").map((c) => c.content);
-    if (pastedTexts.length > 0) {
-      const block = pastedTexts.join("\n\n---\n\n");
-      trimmed = trimmed ? `${trimmed}\n\n${block}` : block;
-    }
     // Append pasted images
     const pastedImages = pastedChips.filter((c) => c.kind === "image");
     if (pastedImages.length > 0) {
@@ -623,15 +663,28 @@ export function ReviewQueue({ tasks, allTasks }: { tasks: Task[]; allTasks?: Tas
         ) : (
           <>
             {(attachedFile || pastedChips.length > 0) && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 5 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 8 }}>
+                {pastedChips.some((chip) => chip.kind === "text") && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {pastedChips.filter((chip) => chip.kind === "text").map((chip) => (
+                      <PastedTextCard
+                        key={chip.id}
+                        text={chip.content}
+                        onInsert={() => handleInsertPastedText(chip)}
+                        onRemove={() => setPastedChips((prev) => removePendingPastedText(prev, chip.id))}
+                      />
+                    ))}
+                  </div>
+                )}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                 {attachedFile && (
                   <div style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 7px", backgroundColor: "rgba(147, 69, 42, 0.06)", borderRadius: 4, fontSize: 11, fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif", color: "#93452A" }}>
                     <Paperclip size={9} /> {attachedFile.name}
                     <button onClick={() => setAttachedFile(null)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#9C9CA0", display: "flex" }}><X size={9} /></button>
                   </div>
                 )}
-                {pastedChips.map((chip, i) => (
-                  <div key={`paste-${i}`} style={{
+                {pastedChips.filter((chip) => chip.kind === "image").map((chip) => (
+                  <div key={chip.id} style={{
                     display: "inline-flex", alignItems: "center", gap: 4,
                     padding: "2px 7px", borderRadius: 4, fontSize: 11,
                     fontFamily: "'DM Mono', monospace",
@@ -640,13 +693,14 @@ export function ReviewQueue({ tasks, allTasks }: { tasks: Task[]; allTasks?: Tas
                   }}>
                     {chip.kind === "image" ? <span style={{ fontSize: 10 }}>&#128247;</span> : <FileText size={9} />}
                     <span>Pasted {chip.label}</span>
-                    <button onClick={() => setPastedChips((prev) => prev.filter((_, j) => j !== i))} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#9C9CA0", display: "flex" }}><X size={9} /></button>
+                    <button onClick={() => setPastedChips((prev) => removePendingPastedText(prev, chip.id))} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#9C9CA0", display: "flex" }}><X size={9} /></button>
                   </div>
                 ))}
+                </div>
               </div>
             )}
             <div style={{ position: "relative" }}>
-              <input ref={fileInputRef} type="file" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = ""; }} style={{ display: "none" }} accept="image/*,.pdf,.md,.txt,.csv,.json,.html" />
+              <input ref={fileInputRef} type="file" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = ""; }} style={{ display: "none" }} accept={CHAT_ATTACHMENT_ACCEPT_ATTR} />
               <textarea
                 ref={textareaRef} value={message} onChange={(e) => setMessage(e.target.value)} onPaste={handlePaste} onKeyDown={handleKeyDown}
                 placeholder={
@@ -664,6 +718,9 @@ export function ReviewQueue({ tasks, allTasks }: { tasks: Task[]; allTasks?: Tas
                   padding: "8px 62px 8px 12px", backgroundColor: "#FFFFFF",
                   outline: "1px solid rgba(218, 193, 185, 0.2)", borderRadius: 8,
                   border: "none", resize: "none", lineHeight: 1.5, color: "#1B1C1B", boxSizing: "border-box",
+                  minHeight: 40, maxHeight: 220, maxWidth: "100%",
+                  whiteSpace: "pre-wrap", overflowWrap: "anywhere", wordBreak: "break-word",
+                  overflowX: "hidden", overflowY: "auto",
                 }}
                 onFocus={(e) => { (e.target as HTMLTextAreaElement).style.outlineColor = accentColor; }}
                 onBlur={(e) => { (e.target as HTMLTextAreaElement).style.outlineColor = "rgba(218, 193, 185, 0.3)"; }}
@@ -673,12 +730,12 @@ export function ReviewQueue({ tasks, allTasks }: { tasks: Task[]; allTasks?: Tas
                   style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: 6, border: "none", background: "none", cursor: uploading ? "wait" : "pointer", color: attachedFile ? "#93452A" : "#B0B0B5", transition: "color 100ms ease" }}
                   onMouseEnter={(e) => { e.currentTarget.style.color = "#93452A"; }} onMouseLeave={(e) => { e.currentTarget.style.color = attachedFile ? "#93452A" : "#B0B0B5"; }}
                 >{uploading ? <span style={{ width: 11, height: 11, borderRadius: "50%", border: "2px solid #EAE8E6", borderTopColor: "#93452A", animation: "spin 1s linear infinite", display: "inline-block" }} /> : <Paperclip size={14} />}</button>
-                <button onClick={handleSubmit} disabled={!message.trim() || isSending}
+                <button onClick={handleSubmit} disabled={(!message.trim() && !attachedFile && pastedChips.length === 0) || isSending}
                   style={{
                     width: 26, height: 26, borderRadius: 5, border: "none",
-                    background: message.trim() && !isSending ? accentColor : "transparent",
-                    color: message.trim() && !isSending ? "#FFFFFF" : "#C0C0C4",
-                    cursor: message.trim() && !isSending ? "pointer" : "default",
+                    background: (message.trim() || attachedFile || pastedChips.length > 0) && !isSending ? accentColor : "transparent",
+                    color: (message.trim() || attachedFile || pastedChips.length > 0) && !isSending ? "#FFFFFF" : "#C0C0C4",
+                    cursor: (message.trim() || attachedFile || pastedChips.length > 0) && !isSending ? "pointer" : "default",
                     display: "flex", alignItems: "center", justifyContent: "center", transition: "all 150ms ease",
                   }}
                 ><ArrowUp size={13} /></button>

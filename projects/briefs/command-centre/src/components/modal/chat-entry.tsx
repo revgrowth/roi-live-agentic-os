@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, isValidElement } from "react";
 import {
+  Check,
+  Copy,
   FileText,
   FilePlus2,
   FileEdit,
@@ -58,6 +60,127 @@ function Timestamp({ iso }: { iso: string }) {
   );
 }
 
+function useHoverFocusVisibility() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  return {
+    isVisible,
+    bind: {
+      onMouseEnter: () => setIsVisible(true),
+      onMouseLeave: () => setIsVisible(false),
+      onFocusCapture: () => setIsVisible(true),
+      onBlurCapture: (event: React.FocusEvent<HTMLElement>) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setIsVisible(false);
+        }
+      },
+    },
+  };
+}
+
+function extractNodeText(node: React.ReactNode): string {
+  if (node == null || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(extractNodeText).join("");
+  if (isValidElement<{ children?: React.ReactNode }>(node)) {
+    return extractNodeText(node.props.children);
+  }
+  return "";
+}
+
+function CopyActionButton({
+  text,
+  label,
+  visible,
+  style,
+}: {
+  text: string;
+  label: string;
+  visible: boolean;
+  style?: React.CSSProperties;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timeoutId = window.setTimeout(() => setCopied(false), 1800);
+    return () => window.clearTimeout(timeoutId);
+  }, [copied]);
+
+  return (
+    <button
+      type="button"
+      aria-label={copied ? `${label} copied` : label}
+      title={copied ? "Copied" : label}
+      onClick={async (event) => {
+        event.stopPropagation();
+        try {
+          await navigator.clipboard.writeText(text);
+          setCopied(true);
+        } catch {
+          // Ignore clipboard failures silently; the button state stays unchanged.
+        }
+      }}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 24,
+        height: 24,
+        border: "1px solid rgba(218, 193, 185, 0.7)",
+        borderRadius: 6,
+        background: copied ? "rgba(107, 142, 107, 0.12)" : "rgba(255, 255, 255, 0.95)",
+        color: copied ? "#6B8E6B" : "#93452A",
+        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.08)",
+        cursor: "pointer",
+        opacity: visible ? 1 : 0,
+        pointerEvents: visible ? "auto" : "none",
+        transition: "opacity 120ms ease, color 120ms ease, background 120ms ease",
+        ...style,
+      }}
+    >
+      {copied ? <Check size={12} /> : <Copy size={12} />}
+    </button>
+  );
+}
+
+function CopyableCodeBlock({ children }: { children?: React.ReactNode }) {
+  const copyVisibility = useHoverFocusVisibility();
+  const codeText = useMemo(() => extractNodeText(children), [children]);
+
+  return (
+    <div
+      style={{ position: "relative" }}
+      {...copyVisibility.bind}
+    >
+      <CopyActionButton
+        text={codeText}
+        label="Copy code block"
+        visible={copyVisibility.isVisible}
+        style={{
+          position: "absolute",
+          top: 10,
+          right: 10,
+          zIndex: 1,
+        }}
+      />
+      <pre
+        style={{
+          backgroundColor: "rgba(0,0,0,0.04)",
+          padding: 16,
+          paddingRight: 46,
+          borderRadius: 6,
+          overflow: "auto",
+          margin: "16px 0",
+          fontSize: 13,
+        }}
+      >
+        {children}
+      </pre>
+    </div>
+  );
+}
+
 const markdownComponents = {
   p: ({ children }: { children?: React.ReactNode }) => (
     <p style={{ margin: "12px 0" }}>{children}</p>
@@ -103,20 +226,6 @@ const markdownComponents = {
         {children}
       </code>
     ),
-  pre: ({ children }: { children?: React.ReactNode }) => (
-    <pre
-      style={{
-        backgroundColor: "rgba(0,0,0,0.04)",
-        padding: 16,
-        borderRadius: 6,
-        overflow: "auto",
-        margin: "16px 0",
-        fontSize: 13,
-      }}
-    >
-      {children}
-    </pre>
-  ),
   ul: ({ children }: { children?: React.ReactNode }) => (
     <ul style={{ paddingLeft: 20, margin: "10px 0" }}>{children}</ul>
   ),
@@ -278,10 +387,18 @@ export function TextGroup({
   variant?: "answer" | "narration";
 }) {
   const [previewingPath, setPreviewingPath] = useState<{ relativePath: string; extension: string } | null>(null);
+  const copyVisibility = useHoverFocusVisibility();
+  const messageCopyText = useMemo(
+    () => entries.map((entry) => entry.content).filter(Boolean).join("\n\n"),
+    [entries],
+  );
 
   // Build markdown components with file-path-aware inline code
   const components = {
     ...markdownComponents,
+    pre: ({ children }: { children?: React.ReactNode }) => (
+      <CopyableCodeBlock>{children}</CopyableCodeBlock>
+    ),
     code: ({
       children,
       className: cn,
@@ -336,77 +453,118 @@ export function TextGroup({
     },
   };
 
+  if (variant === "narration") {
+    return (
+      <div style={{ padding: "2px 0" }}>
+        {entries.map((entry) => {
+          const isActiveQuestion = entry.type === "question";
+          return (
+            <div
+              key={entry.id}
+              className="chat-markdown"
+              style={{
+                width: "100%",
+                fontSize: 12,
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                color: "#7a7570",
+                lineHeight: 1.5,
+                ...(isActiveQuestion ? { fontWeight: 600 } : {}),
+              }}
+            >
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+                {entry.content}
+              </ReactMarkdown>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div
-      style={variant === "narration" ? {
-        padding: "2px 0",
-      } : {
-        backgroundColor: "#FBFAF9",
-        borderLeft: "3px solid rgba(218, 193, 185, 0.5)",
-        borderRadius: "0 6px 6px 0",
-        padding: "14px 18px",
+      {...copyVisibility.bind}
+      style={{
         maxWidth: 720,
       }}
     >
-      {entries.map((entry) => {
-        const isActiveQuestion = entry.type === "question";
-        return (
-          <div
-            key={entry.id}
-            className="chat-markdown"
-            style={variant === "narration" ? {
-              width: "100%",
-              fontSize: 12,
-              fontFamily: "var(--font-inter), Inter, sans-serif",
-              color: "#7a7570",
-              lineHeight: 1.5,
-              ...(isActiveQuestion ? { fontWeight: 600 } : {}),
-            } : {
-              width: "100%",
-              fontSize: 14,
-              fontFamily: "var(--font-inter), Inter, sans-serif",
-              color: "#1B1C1B",
-              lineHeight: 1.7,
-              ...(isActiveQuestion ? { fontWeight: 600 } : {}),
-            }}
-          >
-            <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-              {entry.content}
-            </ReactMarkdown>
-          </div>
-        );
-      })}
-      {previewingPath && (
-        <div style={{ width: "100%", marginTop: 4, marginBottom: 4 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "6px 10px",
-              background: "#f3f0ee",
-              border: "1px solid #93452A",
-              borderBottom: "none",
-              borderRadius: "6px 6px 0 0",
-              fontSize: 11,
-              fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace",
-              color: "#93452A",
-              fontWeight: 500,
-            }}
-          >
-            <span>{previewingPath.relativePath.split("/").pop()}</span>
-            <button
-              onClick={() => setPreviewingPath(null)}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#93452A", padding: 0, display: "flex" }}
+      <div
+        style={{
+          backgroundColor: "#FBFAF9",
+          borderLeft: "3px solid rgba(218, 193, 185, 0.5)",
+          borderRadius: "0 6px 6px 0",
+          padding: "14px 18px",
+        }}
+      >
+        {entries.map((entry) => {
+          const isActiveQuestion = entry.type === "question";
+          return (
+            <div
+              key={entry.id}
+              className="chat-markdown"
+              style={{
+                width: "100%",
+                fontSize: 14,
+                fontFamily: "var(--font-inter), Inter, sans-serif",
+                color: "#1B1C1B",
+                lineHeight: 1.7,
+                ...(isActiveQuestion ? { fontWeight: 600 } : {}),
+              }}
             >
-              <ChevronDown size={12} />
-            </button>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+                {entry.content}
+              </ReactMarkdown>
+            </div>
+          );
+        })}
+        {previewingPath && (
+          <div style={{ width: "100%", marginTop: 4, marginBottom: 4 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "6px 10px",
+                background: "#f3f0ee",
+                border: "1px solid #93452A",
+                borderBottom: "none",
+                borderRadius: "6px 6px 0 0",
+                fontSize: 11,
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, monospace",
+                color: "#93452A",
+                fontWeight: 500,
+              }}
+            >
+              <span>{previewingPath.relativePath.split("/").pop()}</span>
+              <button
+                onClick={() => setPreviewingPath(null)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#93452A", padding: 0, display: "flex" }}
+              >
+                <ChevronDown size={12} />
+              </button>
+            </div>
+            <InlinePreviewPanel
+              relativePath={previewingPath.relativePath}
+              extension={previewingPath.extension}
+              accentColor="#93452A"
+              borderRadius="0 0 6px 6px"
+            />
           </div>
-          <InlinePreviewPanel
-            relativePath={previewingPath.relativePath}
-            extension={previewingPath.extension}
-            accentColor="#93452A"
-            borderRadius="0 0 6px 6px"
+        )}
+      </div>
+      {messageCopyText && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            marginTop: 6,
+            paddingLeft: 2,
+          }}
+        >
+          <CopyActionButton
+            text={messageCopyText}
+            label="Copy message"
+            visible={copyVisibility.isVisible}
           />
         </div>
       )}
@@ -1083,6 +1241,7 @@ function stripInjectedContext(text: string): string {
 
 function UserReplyEntry({ entry, permissionMode }: { entry: LogEntry; permissionMode?: PermissionMode }) {
   const [collapsed, setCollapsed] = useState(false);
+  const copyVisibility = useHoverFocusVisibility();
   const displayContent = stripInjectedContext(entry.content);
   // Prefer the permission mode stored on the log entry (snapshot at send time)
   // over the task-level mode (which reflects the latest value)
@@ -1090,90 +1249,114 @@ function UserReplyEntry({ entry, permissionMode }: { entry: LogEntry; permission
 
   return (
     <div
+      {...copyVisibility.bind}
       style={{
         width: "100%",
-        border: "1px solid #EAE8E6",
-        borderRadius: 8,
-        backgroundColor: "#FFFFFF",
-        padding: "10px 14px 12px",
       }}
     >
-      {/* Header: icon + You label + permission mode + (collapse) */}
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: collapsed ? 0 : 6,
+          border: "1px solid #EAE8E6",
+          borderRadius: 8,
+          backgroundColor: "#FFFFFF",
+          padding: "10px 14px 12px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <UserIcon size={14} color="#5E5E65" />
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              fontFamily:
-                "var(--font-space-grotesk), Space Grotesk, sans-serif",
-              color: "#1B1C1B",
-            }}
-          >
-            You
-          </span>
-          {effectiveMode && (
-            <span
-              style={{
-                fontSize: 10,
-                fontFamily: "'DM Mono', monospace",
-                fontWeight: 500,
-                color:
-                  effectiveMode === "plan" ? "#16A34A"
-                  : effectiveMode === "bypassPermissions" || effectiveMode === "acceptEdits" || effectiveMode === "auto" ? "#DC2626"
-                  : "#7C3AED",
-                background:
-                  effectiveMode === "plan" ? "rgba(22, 163, 74, 0.08)"
-                  : effectiveMode === "bypassPermissions" || effectiveMode === "acceptEdits" || effectiveMode === "auto" ? "rgba(220, 38, 38, 0.08)"
-                  : "rgba(124, 58, 237, 0.08)",
-                padding: "2px 6px",
-                borderRadius: 3,
-              }}
-            >
-              {PERMISSION_MODE_LABELS[effectiveMode]?.toLowerCase() ?? effectiveMode} mode
-            </span>
-          )}
-          <Timestamp iso={entry.timestamp} />
-        </div>
-        <button
-          type="button"
-          onClick={() => setCollapsed((c) => !c)}
-          title={collapsed ? "Expand" : "Collapse"}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 22,
-            height: 22,
-            border: "none",
-            borderRadius: 4,
-            background: "transparent",
-            color: "#9C9CA0",
-            cursor: "pointer",
-          }}
-        >
-          {collapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
-        </button>
-      </div>
-      {!collapsed && (
+        {/* Header: icon + You label + permission mode + (collapse) */}
         <div
           style={{
-            fontSize: 13,
-            fontFamily: "var(--font-inter), Inter, sans-serif",
-            color: "#1B1C1B",
-            lineHeight: 1.6,
-            whiteSpace: "pre-wrap",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: collapsed ? 0 : 6,
           }}
         >
-          {displayContent}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <UserIcon size={14} color="#5E5E65" />
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                fontFamily:
+                  "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                color: "#1B1C1B",
+              }}
+            >
+              You
+            </span>
+            {effectiveMode && (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontFamily: "'DM Mono', monospace",
+                  fontWeight: 500,
+                  color:
+                    effectiveMode === "plan" ? "#16A34A"
+                    : effectiveMode === "bypassPermissions" || effectiveMode === "acceptEdits" || effectiveMode === "auto" ? "#DC2626"
+                    : "#7C3AED",
+                  background:
+                    effectiveMode === "plan" ? "rgba(22, 163, 74, 0.08)"
+                    : effectiveMode === "bypassPermissions" || effectiveMode === "acceptEdits" || effectiveMode === "auto" ? "rgba(220, 38, 38, 0.08)"
+                    : "rgba(124, 58, 237, 0.08)",
+                  padding: "2px 6px",
+                  borderRadius: 3,
+                }}
+              >
+                {PERMISSION_MODE_LABELS[effectiveMode]?.toLowerCase() ?? effectiveMode} mode
+              </span>
+            )}
+            <Timestamp iso={entry.timestamp} />
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <button
+              type="button"
+              onClick={() => setCollapsed((c) => !c)}
+              title={collapsed ? "Expand" : "Collapse"}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 22,
+                height: 22,
+                border: "none",
+                borderRadius: 4,
+                background: "transparent",
+                color: "#9C9CA0",
+                cursor: "pointer",
+              }}
+            >
+              {collapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
+            </button>
+          </div>
+        </div>
+        {!collapsed && (
+          <div
+            style={{
+              fontSize: 13,
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              color: "#1B1C1B",
+              lineHeight: 1.6,
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {displayContent}
+          </div>
+        )}
+      </div>
+      {displayContent && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            marginTop: 6,
+            paddingLeft: 2,
+          }}
+        >
+          <CopyActionButton
+            text={displayContent}
+            label="Copy message"
+            visible={copyVisibility.isVisible}
+          />
         </div>
       )}
     </div>

@@ -9,12 +9,14 @@ import { getPendingTaskQuestionPreview } from "@/lib/task-logs";
 import { PermissionPicker } from "@/components/shared/permission-picker";
 import { ModelPicker } from "@/components/shared/model-picker";
 import { TasksPopover } from "@/components/shared/tasks-popover";
+import { PastedTextCard } from "@/components/shared/pasted-text-card";
 import {
   DraftPlanPreviewModal,
   DraftPlanPreviewPanel,
 } from "@/components/shared/draft-plan-preview";
 import { parseTodosFromInput } from "@/lib/claude-parser";
 import { NewGoalPanel } from "./new-goal-panel";
+import { GoalDraftCard } from "./goal-draft-card";
 import { LevelBadge } from "./level-badge";
 import { RoutingDecisionCard } from "./routing-decision-card";
 import { ClientFilterBar } from "./client-filter-bar";
@@ -42,11 +44,29 @@ import {
   getPickerPermissionMode,
   normalizePermissionMode,
 } from "@/lib/permission-mode";
+import { loadGoalDrafts, removeGoalDraft, saveGoalDraft } from "@/lib/goal-drafts";
+import {
+  clearActiveGoalDraftPanel,
+  createGoalDraftPanelState,
+  openBlankGoalDraftPanel,
+  openSavedGoalDraftPanel,
+  saveDraftInOpenGoalPanel,
+} from "@/lib/goal-draft-panel-state";
 import {
   extractPendingApprovedBriefFromLogs,
 } from "@/lib/plan-brief";
+import { syncComposerTextareaHeight } from "@/lib/composer";
+import {
+  appendPendingPastedText,
+  insertPastedTextAtSelection,
+  removePendingPastedText,
+  shouldCapturePastedText,
+} from "@/lib/pasted-text";
+import { useComposerResize } from "@/hooks/use-composer-resize";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { CHAT_ATTACHMENT_ACCEPT_ATTR } from "@/lib/chat-attachment-policy";
+import type { GoalDraftPayload } from "@/types/goal-draft";
 
 const mdComponents = {
   p: ({ children }: { children?: React.ReactNode }) => <p style={{ margin: "6px 0" }}>{children}</p>,
@@ -73,16 +93,14 @@ const mdComponents = {
 // ── Paste chip type ─────────────────────────────────────────────
 
 interface PastedChip {
+  id: string;
   kind: "text" | "image";
   label: string;          // e.g. "47 lines" or "screenshot.png"
   content: string;        // full text or base64 data URI
 }
 
-const PASTE_LINE_THRESHOLD = 5;
-
-function buildPasteLabel(text: string): string {
-  const lines = text.split("\n").length;
-  return `${lines.toLocaleString()} line${lines === 1 ? "" : "s"}`;
+function buildImagePasteLabel(name: string): string {
+  return name || "screenshot.png";
 }
 
 // ── Helpers ──────────────────────────────────────────────────────
@@ -1904,6 +1922,7 @@ function DetailPanel({
   const [showInlineTagMenu, setShowInlineTagMenu] = useState(false);
   const [inlineTagQuery, setInlineTagQuery] = useState("");
   const [inlinePromptTags, setInlinePromptTags] = useState<TagItem[]>([]);
+  const [replyMirrorScroll, setReplyMirrorScroll] = useState({ top: 0, left: 0 });
   const [pastedChips, setPastedChips] = useState<PastedChip[]>([]);
   const [previewFile, setPreviewFile] = useState<{ relativePath: string; extension: string } | null>(null);
   const [planningFiles, setPlanningFiles] = useState<{ projectFiles: PlanningFile[]; phases: { phaseNumber: number; dirName: string; files: PlanningFile[] }[]; researchFiles: PlanningFile[] } | null>(null);
@@ -1911,11 +1930,43 @@ function DetailPanel({
   const [mainTab, setMainTab] = useState<"chat" | "files" | "plan">("chat");
   const [planDocked, setPlanDocked] = useState(false);
   const [showDraftPlanModal, setShowDraftPlanModal] = useState(false);
+  const replyMinHeight = 60;
+  const replyMaxHeight = 320;
+  const {
+    composerHeight: replyComposerHeight,
+    hasUserResized: hasReplyComposerResize,
+    handleResizePointerDown: handleReplyResizePointerDown,
+  } = useComposerResize({
+    minHeight: replyMinHeight,
+    maxHeight: replyMaxHeight,
+    initialHeight: replyMinHeight,
+  });
 
   // ── Docked plan panel resize ──────────────────────────────────
   const [dockedPlanPct, setDockedPlanPct] = useState(50); // percentage of container width
   const dockedContainerRef = useRef<HTMLDivElement>(null);
   const planDraggingRef = useRef(false);
+
+  useEffect(() => {
+    syncComposerTextareaHeight(replyTextareaRef.current, {
+      minHeight: replyMinHeight,
+      maxHeight: replyMaxHeight,
+      targetHeight: hasReplyComposerResize ? replyComposerHeight : null,
+    });
+  }, [hasReplyComposerResize, replyComposerHeight, replyMaxHeight, replyMinHeight, replyText]);
+
+  const syncReplyMirrorScroll = useCallback(() => {
+    const textarea = replyTextareaRef.current;
+    if (!textarea) return;
+    setReplyMirrorScroll((current) => {
+      const next = { top: textarea.scrollTop, left: textarea.scrollLeft };
+      return current.top === next.top && current.left === next.left ? current : next;
+    });
+  }, []);
+
+  useEffect(() => {
+    requestAnimationFrame(() => syncReplyMirrorScroll());
+  }, [replyText, syncReplyMirrorScroll]);
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -2058,7 +2109,12 @@ function DetailPanel({
         const reader = new FileReader();
         reader.onload = () => {
           const dataUri = reader.result as string;
-          setPastedChips((prev) => [...prev, { kind: "image", label: file.name || "screenshot.png", content: dataUri }]);
+          setPastedChips((prev) => [...prev, {
+            id: crypto.randomUUID(),
+            kind: "image",
+            label: buildImagePasteLabel(file.name),
+            content: dataUri,
+          }]);
         };
         reader.readAsDataURL(file);
       }
@@ -2066,9 +2122,14 @@ function DetailPanel({
     }
     // Handle large text paste
     const text = e.clipboardData.getData("text/plain");
-    if (text && text.split("\n").length > PASTE_LINE_THRESHOLD) {
+    if (shouldCapturePastedText(text)) {
       e.preventDefault();
-      setPastedChips((prev) => [...prev, { kind: "text", label: buildPasteLabel(text), content: text }]);
+      setPastedChips((prev) => [...prev, {
+        id: crypto.randomUUID(),
+        kind: "text",
+        label: "",
+        content: text,
+      }]);
     }
   }, []);
 
@@ -2232,6 +2293,31 @@ function DetailPanel({
     }
   }, []);
 
+  const handleInsertPastedText = useCallback((chip: PastedChip) => {
+    const textarea = replyTextareaRef.current;
+    const selectionStart = textarea?.selectionStart ?? replyText.length;
+    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
+    const insertion = insertPastedTextAtSelection(
+      replyText,
+      chip.content,
+      selectionStart,
+      selectionEnd,
+    );
+
+    setReplyText(insertion.value);
+    setPastedChips((prev) => removePendingPastedText(prev, chip.id));
+    requestAnimationFrame(() => {
+      replyTextareaRef.current?.focus();
+      replyTextareaRef.current?.setSelectionRange(insertion.selectionStart, insertion.selectionEnd);
+      syncComposerTextareaHeight(replyTextareaRef.current, {
+        minHeight: replyMinHeight,
+        maxHeight: replyMaxHeight,
+        targetHeight: hasReplyComposerResize ? replyComposerHeight : null,
+      });
+      syncReplyMirrorScroll();
+    });
+  }, [hasReplyComposerResize, replyComposerHeight, replyMaxHeight, replyMinHeight, replyText, syncReplyMirrorScroll]);
+
   const handlePermissionModeChange = useCallback((nextMode: "bypassPermissions" | "default" | "plan") => {
     const nextState = getPermissionStateForPickerChange(
       nextMode,
@@ -2254,14 +2340,12 @@ function DetailPanel({
     if ((!trimmed && replyAttachments.length === 0 && pastedChips.length === 0) || isSending) return;
     setIsSending(true);
 
-    let fullMessage = trimmed;
-
-    // Append pasted text chips
-    const pastedTexts = pastedChips.filter((c) => c.kind === "text").map((c) => c.content);
-    if (pastedTexts.length > 0) {
-      const pastedBlock = pastedTexts.join("\n\n---\n\n");
-      fullMessage = fullMessage ? `${fullMessage}\n\n${pastedBlock}` : pastedBlock;
-    }
+    let fullMessage = appendPendingPastedText(
+      trimmed,
+      pastedChips
+        .filter((chip) => chip.kind === "text")
+        .map((chip) => ({ id: chip.id, text: chip.content })),
+    );
 
     // Append pasted images as data URIs
     const pastedImages = pastedChips.filter((c) => c.kind === "image");
@@ -2740,56 +2824,66 @@ function DetailPanel({
             }}>
               {/* Attachment + pasted chips */}
               {(replyAttachments.length > 0 || pastedChips.length > 0) && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4, padding: "8px 10px 0" }}>
-                  {replyAttachments.map((a) => (
-                    <div key={a.relativePath} style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 4,
-                      padding: "3px 8px",
-                      borderRadius: 4,
-                      backgroundColor: "#f3f0ee",
-                      fontSize: 11,
-                      color: "#555",
-                    }}>
-                      <Paperclip size={10} />
-                      <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {a.fileName}
-                      </span>
-                      <button
-                        onClick={() => setReplyAttachments((prev) => prev.filter((x) => x.relativePath !== a.relativePath))}
-                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#aaa" }}
-                      >
-                        <X size={10} />
-                      </button>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "8px 10px 0" }}>
+                  {pastedChips.some((chip) => chip.kind === "text") && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {pastedChips.filter((chip) => chip.kind === "text").map((chip) => (
+                        <PastedTextCard
+                          key={chip.id}
+                          text={chip.content}
+                          onInsert={() => handleInsertPastedText(chip)}
+                          onRemove={() => setPastedChips((prev) => removePendingPastedText(prev, chip.id))}
+                        />
+                      ))}
                     </div>
-                  ))}
-                  {pastedChips.map((chip, i) => (
-                    <div key={`paste-${i}`} style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 4,
-                      padding: "3px 8px",
-                      borderRadius: 4,
-                      backgroundColor: chip.kind === "image" ? "rgba(147, 69, 42, 0.06)" : "rgba(59, 130, 246, 0.06)",
-                      fontSize: 11,
-                      color: chip.kind === "image" ? "#93452A" : "#3b6ec2",
-                      fontFamily: "'DM Mono', monospace",
-                    }}>
-                      {chip.kind === "image" ? (
+                  )}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                    {replyAttachments.map((a) => (
+                      <div key={a.relativePath} style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "3px 8px",
+                        borderRadius: 4,
+                        backgroundColor: "#f3f0ee",
+                        fontSize: 11,
+                        color: "#555",
+                      }}>
+                        <Paperclip size={10} />
+                        <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {a.fileName}
+                        </span>
+                        <button
+                          onClick={() => setReplyAttachments((prev) => prev.filter((x) => x.relativePath !== a.relativePath))}
+                          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#aaa" }}
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    ))}
+                    {pastedChips.filter((chip) => chip.kind === "image").map((chip) => (
+                      <div key={chip.id} style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "3px 8px",
+                        borderRadius: 4,
+                        backgroundColor: "rgba(147, 69, 42, 0.06)",
+                        fontSize: 11,
+                        color: "#93452A",
+                        fontFamily: "'DM Mono', monospace",
+                      }}>
                         <span style={{ fontSize: 10 }}>&#128247;</span>
-                      ) : (
-                        <FileText size={10} />
-                      )}
-                      <span>Pasted {chip.label}</span>
-                      <button
-                        onClick={() => setPastedChips((prev) => prev.filter((_, j) => j !== i))}
-                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#aaa" }}
-                      >
-                        <X size={10} />
-                      </button>
-                    </div>
-                  ))}
+                        <span>Pasted {chip.label}</span>
+                        <button
+                          onClick={() => setPastedChips((prev) => removePendingPastedText(prev, chip.id))}
+                          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#aaa" }}
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -2803,11 +2897,26 @@ function DetailPanel({
                   e.target.value = "";
                 }}
                 style={{ display: "none" }}
-                accept="image/*,.pdf,.md,.txt,.csv,.json,.html"
+                accept={CHAT_ATTACHMENT_ACCEPT_ATTR}
               />
 
               {/* Textarea on top */}
               <div style={{ position: "relative", padding: "10px 12px 6px" }}>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+                  <button
+                    type="button"
+                    aria-label="Drag to resize input"
+                    onPointerDown={handleReplyResizePointerDown}
+                    style={{
+                      width: 44,
+                      height: 8,
+                      border: "none",
+                      borderRadius: 999,
+                      backgroundColor: "rgba(156, 156, 160, 0.32)",
+                      cursor: "ns-resize",
+                    }}
+                  />
+                </div>
                 {showInlineTagMenu && inlinePromptTags.length > 0 && (
                   <SlashCommandMenu
                     query={inlineTagQuery}
@@ -2829,10 +2938,12 @@ function DetailPanel({
                     }}
                   />
                 )}
-                <div style={{ position: "relative" }}>
+                <div style={{ position: "relative", minWidth: 0, overflow: "hidden" }}>
                   {(replyText.includes("@") || replyText.includes("/")) && (
                     <HighlightMirror
                       text={replyText}
+                      scrollTop={replyMirrorScroll.top}
+                      scrollLeft={replyMirrorScroll.left}
                       style={{
                         fontSize: 13,
                         fontFamily: "inherit",
@@ -2846,6 +2957,7 @@ function DetailPanel({
                     value={replyText}
                     onChange={(e) => handleReplyChange(e.target.value)}
                     onPaste={handlePaste}
+                    onScroll={syncReplyMirrorScroll}
                     onKeyDown={(e) => {
                       if ((showSlashMenu || showInlineTagMenu) && ["ArrowDown", "ArrowUp", "Enter", "Tab", "Escape"].includes(e.key)) return;
                       if (e.key === "Enter" && !e.shiftKey) {
@@ -2860,7 +2972,8 @@ function DetailPanel({
                       fontSize: 13,
                       fontFamily: "inherit",
                       padding: "4px 0",
-                      minHeight: 60,
+                      minHeight: replyMinHeight,
+                      maxHeight: hasReplyComposerResize ? replyComposerHeight : replyMaxHeight,
                       backgroundColor: "transparent",
                       border: "none",
                       color: (replyText.includes("@") || replyText.includes("/")) ? "transparent" : "#1a1a1a",
@@ -2869,8 +2982,14 @@ function DetailPanel({
                       resize: "none",
                       boxSizing: "border-box" as const,
                       lineHeight: 1.5,
+                      maxWidth: "100%",
+                      whiteSpace: "pre-wrap",
+                      overflowWrap: "anywhere",
+                      wordBreak: "break-word",
                       position: "relative",
                       zIndex: 1,
+                      overflowX: "hidden",
+                      overflowY: "auto",
                     }}
                   />
                 </div>
@@ -2939,18 +3058,18 @@ function DetailPanel({
                 <button
                   type="button"
                   onClick={handleReply}
-                  disabled={(!replyText.trim() && replyAttachments.length === 0) || isSending}
+                  disabled={(!replyText.trim() && replyAttachments.length === 0 && pastedChips.length === 0) || isSending}
                   title="Send"
                   style={{
                     width: 28,
                     height: 26,
                     borderRadius: 6,
                     border: "none",
-                    background: (replyText.trim() || replyAttachments.length > 0) && !isSending
+                    background: (replyText.trim() || replyAttachments.length > 0 || pastedChips.length > 0) && !isSending
                       ? "linear-gradient(135deg, #93452A, #B25D3F)"
                       : "#e8e4df",
-                    color: (replyText.trim() || replyAttachments.length > 0) && !isSending ? "#fff" : "#999",
-                    cursor: (replyText.trim() || replyAttachments.length > 0) && !isSending ? "pointer" : "default",
+                    color: (replyText.trim() || replyAttachments.length > 0 || pastedChips.length > 0) && !isSending ? "#fff" : "#999",
+                    cursor: (replyText.trim() || replyAttachments.length > 0 || pastedChips.length > 0) && !isSending ? "pointer" : "default",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -4010,6 +4129,8 @@ export function FeedView({
   const [routingDecision, setRoutingDecision] = useState<{ scope: ScopeResult; goal: string } | null>(null);
   const [gsdGuardrail, setGsdGuardrail] = useState<{ scope: ScopeResult; goal: string } | null>(null);
   const [showNewGoalPanel, setShowNewGoalPanel] = useState(true);
+  const [goalDraftPanelState, setGoalDraftPanelState] = useState(() => createGoalDraftPanelState());
+  const [goalDrafts, setGoalDrafts] = useState<GoalDraftPayload[]>([]);
   const [activeTagFilter, setActiveTagFilter] = useState<string | null>(null);
   const createTaskAction = useTaskStore((s) => s.createTask);
   // Scope data for a task that needs project planning in the detail panel
@@ -4021,6 +4142,10 @@ export function FeedView({
   const DRAWER_MAX_RATIO = 0.6; // never wider than 60% of viewport
   const [drawerWidth, setDrawerWidth] = useState<number | null>(null);
   const drawerDraggingRef = useRef(false);
+
+  useEffect(() => {
+    setGoalDrafts(loadGoalDrafts());
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -4071,8 +4196,67 @@ export function FeedView({
     document.body.style.userSelect = "none";
   }, []);
 
+  const editingGoalDraft = useMemo(
+    () => goalDrafts.find((draft) => draft.id === goalDraftPanelState.activeDraftId) ?? null,
+    [goalDraftPanelState.activeDraftId, goalDrafts],
+  );
+
+  const handleOpenNewGoal = useCallback(() => {
+    setSelectedId(null);
+    setDetailFullscreen(false);
+    setGoalDraftPanelState((current) => openBlankGoalDraftPanel(current));
+    setShowNewGoalPanel(true);
+  }, []);
+
+  const handleOpenGoalDraft = useCallback((draftId: string) => {
+    setSelectedId(null);
+    setDetailFullscreen(false);
+    setGoalDraftPanelState((current) => openSavedGoalDraftPanel(current, draftId));
+    setShowNewGoalPanel(true);
+  }, []);
+
+  const handleGoalDraftSaved = useCallback((draft: GoalDraftPayload) => {
+    setGoalDrafts(saveGoalDraft(draft));
+    setGoalDraftPanelState((current) => saveDraftInOpenGoalPanel(current, draft.id));
+  }, []);
+
+  const handleGoalDraftDiscarded = useCallback(async (draftId: string | null) => {
+    if (draftId) {
+      const draft = goalDrafts.find((candidate) => candidate.id === draftId);
+      if (draft?.attachments.length) {
+        try {
+          await fetch("/api/goal-drafts/attachments", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              draftId,
+              clientId: draft.clientId,
+            }),
+          });
+        } catch {
+          // Best effort cleanup only.
+        }
+      }
+      setGoalDrafts(removeGoalDraft(draftId));
+    }
+    if (goalDraftPanelState.activeDraftId === draftId) {
+      setGoalDraftPanelState((current) => clearActiveGoalDraftPanel(current));
+    }
+    setShowNewGoalPanel(false);
+  }, [goalDraftPanelState.activeDraftId, goalDrafts]);
+
+  const handleGoalDraftSubmitted = useCallback((draftId: string | null | undefined) => {
+    if (draftId) {
+      setGoalDrafts(removeGoalDraft(draftId));
+    }
+    if (goalDraftPanelState.activeDraftId === draftId) {
+      setGoalDraftPanelState((current) => clearActiveGoalDraftPanel(current));
+    }
+  }, [goalDraftPanelState.activeDraftId]);
+
   const toggleSelect = useCallback((id: string) => {
     setShowNewGoalPanel(false);
+    setGoalDraftPanelState((current) => clearActiveGoalDraftPanel(current));
     setSelectedId((prev) => {
       if (prev === id) {
         setDetailFullscreen(false);
@@ -4148,6 +4332,21 @@ export function FeedView({
     });
   }, [tasks, activeClientSlugs, activeTagFilter]);
 
+  const visibleGoalDrafts = useMemo(() => {
+    return goalDrafts
+      .filter((draft) => {
+        if (activeClientSlugs !== null) {
+          const slug = draft.clientId || "_root";
+          if (!activeClientSlugs.includes(slug)) return false;
+        }
+        if (activeTagFilter && draft.tag !== activeTagFilter) {
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  }, [activeClientSlugs, activeTagFilter, goalDrafts]);
+
   // Slugs of projects (or GSD roots) that have a materialized parent row in
   // the feed. Any sibling task sharing that slug should be hidden from the
   // top-level feed and only appear inside the project parent's drill-in.
@@ -4217,16 +4416,22 @@ export function FeedView({
     const allTopLevel = [...activeGoals, ...achievedGoals];
 
     // Group by clientSlug
-    const byClient = new Map<string, Task[]>();
+    const byClient = new Map<string, { tasks: Task[]; drafts: GoalDraftPayload[] }>();
     for (const t of allTopLevel) {
       const key = t.clientId || "_root";
-      if (!byClient.has(key)) byClient.set(key, []);
-      byClient.get(key)!.push(t);
+      if (!byClient.has(key)) byClient.set(key, { tasks: [], drafts: [] });
+      byClient.get(key)!.tasks.push(t);
+    }
+    for (const draft of visibleGoalDrafts) {
+      const key = draft.clientId || "_root";
+      if (!byClient.has(key)) byClient.set(key, { tasks: [], drafts: [] });
+      byClient.get(key)!.drafts.push(draft);
     }
 
     const lanes: SwimLane[] = [];
 
-    for (const [slug, tasks] of byClient) {
+    for (const [slug, entry] of byClient) {
+      const tasks = entry.tasks;
       const client = slug !== "_root" ? clients.find((c) => c.slug === slug) : null;
       const goals: Task[] = [];
       const done: Task[] = [];
@@ -4261,6 +4466,7 @@ export function FeedView({
         clientSlug: slug === "_root" ? null : slug,
         clientName: client?.name || (slug === "_root" ? rootName : slug),
         clientColor: client?.color || "#999",
+        goalDrafts: entry.drafts.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()),
         goals,
         done,
       });
@@ -4268,11 +4474,11 @@ export function FeedView({
 
     // Show swim lane headers when multiple clients have active goals
     // (done-only lanes don't count — they shouldn't trigger headers by themselves)
-    const lanesWithActiveWork = lanes.filter((l) => l.goals.length > 0);
+    const lanesWithActiveWork = lanes.filter((lane) => lane.goals.length > 0 || lane.goalDrafts.length > 0);
     const singleLane = lanesWithActiveWork.length <= 1 && lanes.length <= 1;
 
     return { lanes, singleLane };
-  }, [activeGoals, achievedGoals, activeClientSlugs, clients, isInReview]);
+  }, [activeGoals, achievedGoals, clients, rootName, visibleGoalDrafts]);
 
   const [dropOverColumn, setDropOverColumn] = useState<"goals" | "done" | null>(null);
 
@@ -4395,11 +4601,7 @@ export function FeedView({
     >
       {/* Unified toolbar: client filters + New Goal */}
       <ClientFilterBar
-        onNewGoal={() => {
-          setSelectedId(null);
-          setDetailFullscreen(false);
-          setShowNewGoalPanel(true);
-        }}
+        onNewGoal={handleOpenNewGoal}
       />
 
       <TagFilterBar
@@ -4450,7 +4652,7 @@ export function FeedView({
           }}
           onChangeLevel={() => {
             setRoutingDecision(null);
-            setShowNewGoalPanel(true);
+            handleOpenNewGoal();
           }}
           onDismiss={() => setRoutingDecision(null)}
         />
@@ -4478,12 +4680,21 @@ export function FeedView({
         onDragOverColumn={handleDragOverColumn}
         onDragLeaveColumn={handleDragLeaveColumn}
         dropOverColumn={dropOverColumn}
-        isEmpty={activeGoals.length === 0 && achievedGoals.length === 0}
+        isEmpty={activeGoals.length === 0 && achievedGoals.length === 0 && visibleGoalDrafts.length === 0}
         hideDone={false}
         doneFilter={doneFilter}
         onDoneFilterChange={setDoneFilter}
         groupByTag={groupByTag}
         onToggleGroupByTag={() => setGroupByTag((v) => !v)}
+        renderDraftCard={(draft) => (
+          <GoalDraftCard
+            key={draft.id}
+            draft={draft}
+            isActive={goalDraftPanelState.activeDraftId === draft.id && showNewGoalPanel}
+            onOpen={handleOpenGoalDraft}
+            onDiscard={(draftId) => { void handleGoalDraftDiscarded(draftId); }}
+          />
+        )}
         renderCard={(task, column) => {
           const focusId = focusCardTask?.id ?? null;
           const isFocus = task.id === focusId;
@@ -4557,10 +4768,19 @@ export function FeedView({
       {/* New Goal panel — shown when creating, hidden when a task is selected */}
       {showNewGoalPanel && !selectedTask && (
         <NewGoalPanel
+          key={goalDraftPanelState.panelKey}
           drawerWidth={drawerWidth}
-          onClose={() => setShowNewGoalPanel(false)}
-          onCreated={(taskId) => {
+          draft={editingGoalDraft}
+          onClose={() => {
             setShowNewGoalPanel(false);
+            setGoalDraftPanelState((current) => clearActiveGoalDraftPanel(current));
+          }}
+          onDraftSaved={handleGoalDraftSaved}
+          onDiscarded={(draftId) => { void handleGoalDraftDiscarded(draftId); }}
+          onCreated={(taskId, draftId) => {
+            handleGoalDraftSubmitted(draftId);
+            setShowNewGoalPanel(false);
+            setGoalDraftPanelState((current) => clearActiveGoalDraftPanel(current));
             setSelectedId(taskId);
           }}
           onStartDrawerDrag={startDrawerDrag}

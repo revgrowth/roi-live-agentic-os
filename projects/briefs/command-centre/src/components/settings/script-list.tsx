@@ -12,6 +12,7 @@ export function ScriptList() {
   const [expandedScript, setExpandedScript] = useState<string | null>(null);
   const [argValues, setArgValues] = useState<Record<string, string>>({});
   const [runningScript, setRunningScript] = useState<{
+    executionId: string;
     id: string;
     label: string;
     args: Record<string, string>;
@@ -74,7 +75,12 @@ export function ScriptList() {
   );
 
   const startExecution = useCallback((script: ScriptDefinition, args: Record<string, string>) => {
-    setRunningScript({ id: script.id, label: script.label, args });
+    setRunningScript({
+      executionId: crypto.randomUUID(),
+      id: script.id,
+      label: script.label,
+      args,
+    });
     setExpandedScript(null);
     setConfirmScript(null);
   }, []);
@@ -358,6 +364,8 @@ export function ScriptList() {
       {/* Script runner */}
       {runningScript && (
         <ScriptRunner
+          key={runningScript.executionId}
+          executionId={runningScript.executionId}
           scriptId={runningScript.id}
           scriptLabel={runningScript.label}
           args={runningScript.args}

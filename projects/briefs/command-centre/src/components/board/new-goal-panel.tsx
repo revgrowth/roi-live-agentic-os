@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { X, ArrowUp, ChevronDown, Paperclip, Image, FileType, FileText } from "lucide-react";
+import { X, ArrowUp, ChevronDown, Paperclip, Trash2 } from "lucide-react";
 import type { TaskLevel, PermissionMode, ClaudeModel } from "@/types/task";
+import type { ChatPastedBlock } from "@/types/chat-composer";
+import type { GoalDraftAttachment, GoalDraftPayload } from "@/types/goal-draft";
 import { useTaskStore } from "@/store/task-store";
 import { useClientStore } from "@/store/client-store";
 import { SlashCommandMenu } from "@/components/shared/slash-command-menu";
@@ -12,25 +14,22 @@ import { HighlightMirror } from "@/components/modal/reply-input";
 import { ModelPicker } from "@/components/shared/model-picker";
 import { PermissionPicker } from "@/components/shared/permission-picker";
 import { TagPicker } from "@/components/shared/tag-picker";
+import { ComposerAssetTray } from "@/components/shared/composer-asset-tray";
+import { ComposerDraftAssetCollection } from "@/components/shared/composer-draft-asset-collection";
 import { recordTagUsage } from "./goal-chips";
 import { LEVEL_LABELS, LEVEL_HINTS } from "@/lib/levels";
-
-// ── Attachment helpers ──────────────────────────────────────────
-
-interface Attachment {
-  fileName: string;
-  relativePath: string;
-  extension: string;
-  sizeBytes: number;
-}
-
-const IMAGE_EXTS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg"]);
-
-function getAttachmentIcon(ext: string) {
-  if (IMAGE_EXTS.has(ext)) return Image;
-  if (ext === "pdf") return FileType;
-  return FileText;
-}
+import {
+  CHAT_ATTACHMENT_ACCEPT_ATTR,
+  getChatAttachmentExtension,
+  getChatAttachmentValidationError,
+} from "@/lib/chat-attachment-policy";
+import { expandComposerPastedBlocks } from "@/lib/chat-message-content";
+import { buildGoalDraftSnapshot, hasGoalDraftContent } from "@/lib/goal-drafts";
+import {
+  insertPastedTextAtSelection,
+  removePendingPastedText,
+  shouldCapturePastedText,
+} from "@/lib/pasted-text";
 
 const MONO = "'DM Mono', monospace";
 
@@ -75,24 +74,32 @@ const FLAG_OPTIONS: { flag: string; label: string; hint: string; level: TaskLeve
 
 interface NewGoalPanelProps {
   drawerWidth?: number | null;
+  draft?: GoalDraftPayload | null;
   onClose: () => void;
-  onCreated: (taskId: string) => void;
+  onCreated: (taskId: string, draftId?: string | null) => void;
+  onDraftSaved: (draft: GoalDraftPayload) => void;
+  onDiscarded: (draftId: string | null) => void;
   onStartDrawerDrag?: (e: React.MouseEvent) => void;
 }
 
 export function NewGoalPanel({
   drawerWidth,
+  draft,
   onClose,
   onCreated,
+  onDraftSaved,
+  onDiscarded,
   onStartDrawerDrag,
 }: NewGoalPanelProps) {
   const storeSelectedClientId = useClientStore((s) => s.selectedClientId);
-  const [title, setTitle] = useState("");
-  const [message, setMessage] = useState("");
-  const [level, setLevel] = useState<TaskLevel>("task");
+  const [draftId, setDraftId] = useState<string | null>(draft?.id ?? null);
+  const [createdAt, setCreatedAt] = useState<string | null>(draft?.createdAt ?? null);
+  const [title, setTitle] = useState(draft?.title ?? "");
+  const [message, setMessage] = useState(draft?.message ?? "");
+  const [level, setLevel] = useState<TaskLevel>(draft?.level ?? "task");
   const [showLevelMenu, setShowLevelMenu] = useState(false);
-  const [model, setModel] = useState<ClaudeModel | null>(null);
-  const [permissionMode, setPermissionMode] = useState<PermissionMode>("bypassPermissions");
+  const [model, setModel] = useState<ClaudeModel | null>(draft?.model ?? null);
+  const [permissionMode, setPermissionMode] = useState<PermissionMode>(draft?.permissionMode ?? "bypassPermissions");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSlashMenu, setShowSlashMenu] = useState(false);
   const [slashQuery, setSlashQuery] = useState("");
@@ -102,23 +109,32 @@ export function NewGoalPanel({
   const [flagQuery, setFlagQuery] = useState("");
   const [flagMenuIndex, setFlagMenuIndex] = useState(0);
   const [promptTags, setPromptTags] = useState<TagItem[]>([]);
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [attachments, setAttachments] = useState<GoalDraftAttachment[]>(draft?.attachments ?? []);
+  const [pastedBlocks, setPastedBlocks] = useState<ChatPastedBlock[]>(draft?.pastedBlocks ?? []);
   const [isUploading, setIsUploading] = useState(false);
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(storeSelectedClientId);
+  const [isDraggingFiles, setIsDraggingFiles] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(draft?.clientId ?? storeSelectedClientId);
   const [showClientMenu, setShowClientMenu] = useState(false);
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [descriptionMirrorScroll, setDescriptionMirrorScroll] = useState({ top: 0, left: 0 });
+  const [selectedTag, setSelectedTag] = useState<string | null>(draft?.tag ?? null);
 
   const titleRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLTextAreaElement>(null);
+  const dragDepthRef = useRef(0);
   const levelMenuRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const clientMenuRef = useRef<HTMLDivElement>(null);
-  const clientSelectionTouchedRef = useRef(false);
+  const clientSelectionTouchedRef = useRef(Boolean(draft));
+  const lastPersistedSnapshotRef = useRef<string | null>(
+    draft ? buildGoalDraftSnapshot(draft) : null,
+  );
 
   const createTask = useTaskStore((s) => s.createTask);
   const updateTask = useTaskStore((s) => s.updateTask);
   const clients = useClientStore((s) => s.clients);
   const rootName = useClientStore((s) => s.rootName);
+  const hasMaterializedDraft = draftId !== null;
 
   // Fetch prompt tags
   useEffect(() => {
@@ -138,9 +154,10 @@ export function NewGoalPanel({
   useEffect(() => { titleRef.current?.focus(); }, []);
 
   useEffect(() => {
+    if (draftId !== null) return;
     if (clientSelectionTouchedRef.current) return;
     setSelectedClientId(storeSelectedClientId);
-  }, [storeSelectedClientId]);
+  }, [draftId, storeSelectedClientId]);
 
   // Close level menu on outside click
   useEffect(() => {
@@ -175,6 +192,96 @@ export function NewGoalPanel({
   }, []);
 
   useEffect(() => { autoGrow(); }, [message, autoGrow]);
+
+  const syncDescriptionMirrorScroll = useCallback(() => {
+    const textarea = descRef.current;
+    if (!textarea) return;
+    setDescriptionMirrorScroll((current) => {
+      const next = { top: textarea.scrollTop, left: textarea.scrollLeft };
+      return current.top === next.top && current.left === next.left ? current : next;
+    });
+  }, []);
+
+  useEffect(() => {
+    requestAnimationFrame(() => syncDescriptionMirrorScroll());
+  }, [message, syncDescriptionMirrorScroll]);
+  const ensureDraftMaterialized = useCallback(() => {
+    const nextDraftId = draftId ?? crypto.randomUUID();
+    const nextCreatedAt = createdAt ?? new Date().toISOString();
+    if (!draftId) {
+      setDraftId(nextDraftId);
+    }
+    if (!createdAt) {
+      setCreatedAt(nextCreatedAt);
+    }
+    return { draftId: nextDraftId, createdAt: nextCreatedAt };
+  }, [createdAt, draftId]);
+
+  const buildDraftPayload = useCallback((nextDraftId: string, nextCreatedAt: string): GoalDraftPayload => {
+    return {
+      version: 1,
+      id: nextDraftId,
+      clientId: selectedClientId,
+      title,
+      message,
+      attachments,
+      level,
+      permissionMode,
+      model,
+      tag: selectedTag,
+      pastedBlocks,
+      createdAt: nextCreatedAt,
+      updatedAt: new Date().toISOString(),
+    };
+  }, [
+    attachments,
+    level,
+    message,
+    model,
+    pastedBlocks,
+    permissionMode,
+    selectedClientId,
+    selectedTag,
+    title,
+  ]);
+
+  useEffect(() => {
+    const hasMeaningfulContent = hasGoalDraftContent({
+      title,
+      message,
+      attachments,
+      pastedBlocks,
+    });
+
+    if (!hasMaterializedDraft && !hasMeaningfulContent) {
+      return;
+    }
+
+    const { draftId: nextDraftId, createdAt: nextCreatedAt } = ensureDraftMaterialized();
+    const nextDraft = buildDraftPayload(nextDraftId, nextCreatedAt);
+    const nextSnapshot = buildGoalDraftSnapshot(nextDraft);
+    if (lastPersistedSnapshotRef.current === nextSnapshot) {
+      return;
+    }
+
+    lastPersistedSnapshotRef.current = nextSnapshot;
+    onDraftSaved(nextDraft);
+  }, [
+    attachments,
+    buildDraftPayload,
+    ensureDraftMaterialized,
+    hasMaterializedDraft,
+    level,
+    message,
+    model,
+    onDraftSaved,
+    pastedBlocks,
+    permissionMode,
+    selectedClientId,
+    selectedTag,
+    storeSelectedClientId,
+    title,
+  ]);
 
   const createWithLevel = useCallback(
     async (goalTitle: string, fullDescription: string, taskLevel: TaskLevel) => {
@@ -213,7 +320,7 @@ export function NewGoalPanel({
   const handleSubmit = useCallback(async () => {
     const trimmed = message.trim();
     const trimmedTitle = title.trim();
-    if ((!trimmed && !trimmedTitle) || isSubmitting) return;
+    if ((!trimmed && !trimmedTitle && attachments.length === 0 && pastedBlocks.length === 0) || isSubmitting) return;
 
     // Detect and strip --project / --gsd flags
     const flagMatch = trimmed.match(/\s*--(project|gsd)\s*/i);
@@ -237,18 +344,7 @@ export function NewGoalPanel({
         : firstLine.slice(0, 57).replace(/\s+\S*$/, "") + "...";
     }
 
-    // Expand collapsed pasted text blocks back to full content
-    let expandedMessage = cleanMessage;
-    if (descRef.current?.dataset.pastedBlocks) {
-      try {
-        const blocks = JSON.parse(descRef.current.dataset.pastedBlocks) as Array<{ label: string; text: string }>;
-        for (const block of blocks) {
-          expandedMessage = expandedMessage.replace(block.label, block.text);
-        }
-      } catch { /* ignore */ }
-      descRef.current.dataset.pastedBlocks = "";
-    }
-
+    const expandedMessage = expandComposerPastedBlocks(cleanMessage, pastedBlocks);
     // Build description with attachment paths
     let fullDescription = expandedMessage || trimmedTitle;
     if (attachments.length > 0) {
@@ -264,8 +360,8 @@ export function NewGoalPanel({
       await updateTask(taskId, { tag: selectedTag });
     }
     setIsSubmitting(false);
-    if (taskId) onCreated(taskId);
-  }, [message, title, attachments, isSubmitting, level, createWithLevel, onCreated, selectedTag, updateTask]);
+    if (taskId) onCreated(taskId, draftId);
+  }, [attachments, createWithLevel, draftId, isSubmitting, level, message, onCreated, pastedBlocks, selectedTag, title, updateTask]);
 
   const handleMessageChange = useCallback((value: string) => {
     setMessage(value);
@@ -374,57 +470,159 @@ export function NewGoalPanel({
     [message]
   );
 
-  const handleFileUpload = useCallback(async (file: File) => {
+  const uploadFiles = useCallback(async (files: File[] | FileList | null) => {
+    const normalizedFiles = Array.from(files ?? []);
+    if (normalizedFiles.length === 0) return;
+
     setIsUploading(true);
+    setUploadError(null);
+
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("dir", "projects");
-      const res = await fetch("/api/files/upload", { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Upload failed");
-      const result: Attachment = await res.json();
-      setAttachments((prev) => [...prev, result]);
-    } catch { /* silently fail */ } finally {
+      const uploaded: GoalDraftAttachment[] = [];
+      const { draftId: nextDraftId } = ensureDraftMaterialized();
+
+      for (const file of normalizedFiles) {
+        const validationError = getChatAttachmentValidationError(file);
+        if (validationError) {
+          setUploadError(validationError);
+          continue;
+        }
+
+        const formData = new FormData();
+        formData.append("draftId", nextDraftId);
+        if (selectedClientId) {
+          formData.append("clientId", selectedClientId);
+        }
+        formData.append("files", file);
+
+        const res = await fetch("/api/goal-drafts/attachments", { method: "POST", body: formData });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          setUploadError(typeof data.error === "string" ? data.error : "Upload failed");
+          continue;
+        }
+
+        const result = await res.json();
+        uploaded.push(...(Array.isArray(result.attachments) ? result.attachments : []));
+      }
+
+      if (uploaded.length > 0) {
+        setAttachments((prev) => {
+          const seen = new Set(prev.map((item) => item.relativePath));
+          const next = [...prev];
+          for (const item of uploaded) {
+            if (seen.has(item.relativePath)) continue;
+            seen.add(item.relativePath);
+            next.push(item);
+          }
+          return next;
+        });
+      }
+    } finally {
       setIsUploading(false);
     }
-  }, []);
+  }, [ensureDraftMaterialized, selectedClientId]);
 
   const removeAttachment = useCallback((relativePath: string) => {
     setAttachments((prev) => prev.filter((a) => a.relativePath !== relativePath));
+    if (!draftId) return;
+
+    void fetch("/api/goal-drafts/attachments", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        draftId,
+        clientId: selectedClientId,
+        relativePath,
+      }),
+    }).catch(() => {
+      // Best effort cleanup only.
+    });
+  }, [draftId, selectedClientId]);
+
+  const focusDescription = useCallback((selectionStart?: number, selectionEnd = selectionStart) => {
+    requestAnimationFrame(() => {
+      const textarea = descRef.current;
+      if (!textarea) return;
+      textarea.focus();
+      if (selectionStart == null || selectionEnd == null) return;
+      textarea.setSelectionRange(selectionStart, selectionEnd);
+    });
   }, []);
 
+  const handleInsertPastedText = useCallback((block: ChatPastedBlock) => {
+    const textarea = descRef.current;
+    const selectionStart = textarea?.selectionStart ?? message.length;
+    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
+    const insertion = insertPastedTextAtSelection(
+      message,
+      block.text,
+      selectionStart,
+      selectionEnd,
+    );
+
+    handleMessageChange(insertion.value);
+    setPastedBlocks((prev) => removePendingPastedText(prev, block.id));
+    focusDescription(insertion.selectionStart, insertion.selectionEnd);
+    requestAnimationFrame(() => {
+      autoGrow();
+      syncDescriptionMirrorScroll();
+    });
+  }, [autoGrow, focusDescription, handleMessageChange, message, syncDescriptionMirrorScroll]);
+
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-    for (const item of items) {
-      if (item.type.startsWith("image/")) {
-        e.preventDefault();
-        const file = item.getAsFile();
-        if (file) handleFileUpload(file);
-        return;
-      }
-    }
-    // Large text paste — collapse into a single-line placeholder in the textarea
-    // but store the full text so it renders in the sent message
-    const text = e.clipboardData?.getData("text/plain") ?? "";
-    const lineCount = text.split("\n").length;
-    if (lineCount > 10) {
+    const fileItems = Array.from(e.clipboardData?.items ?? [])
+      .filter((item) => item.kind === "file")
+      .map((item) => item.getAsFile())
+      .filter((file): file is File => Boolean(file));
+
+    if (fileItems.length > 0) {
       e.preventDefault();
-      const label = `[Pasted text +${lineCount} lines]`;
-      const ta = descRef.current;
-      if (ta) {
-        const start = ta.selectionStart;
-        const end = ta.selectionEnd;
-        const before = message.slice(0, start);
-        const after = message.slice(end);
-        // Store full text in a data attribute on the textarea for retrieval at submit
-        const pastedBlocks = (ta.dataset.pastedBlocks ? JSON.parse(ta.dataset.pastedBlocks) : []) as Array<{ label: string; text: string }>;
-        pastedBlocks.push({ label, text });
-        ta.dataset.pastedBlocks = JSON.stringify(pastedBlocks);
-        handleMessageChange(before + label + after);
-      }
+      void uploadFiles(fileItems);
+      return;
     }
-  }, [handleFileUpload, message, handleMessageChange]);
+    const text = e.clipboardData?.getData("text/plain") ?? "";
+    if (shouldCapturePastedText(text)) {
+      e.preventDefault();
+      setPastedBlocks((prev) => [...prev, { id: crypto.randomUUID(), text }]);
+    }
+  }, [uploadFiles]);
+
+  const hasFileDragPayload = useCallback((dataTransfer: DataTransfer | null): boolean => {
+    if (!dataTransfer) return false;
+    return Array.from(dataTransfer.types).includes("Files");
+  }, []);
+
+  const handleDragEnter = useCallback((event: React.DragEvent<HTMLElement>) => {
+    if (!hasFileDragPayload(event.dataTransfer)) return;
+    event.preventDefault();
+    dragDepthRef.current += 1;
+    setIsDraggingFiles(true);
+  }, [hasFileDragPayload]);
+
+  const handleDragOver = useCallback((event: React.DragEvent<HTMLElement>) => {
+    if (!hasFileDragPayload(event.dataTransfer)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+    setIsDraggingFiles(true);
+  }, [hasFileDragPayload]);
+
+  const handleDragLeave = useCallback((event: React.DragEvent<HTMLElement>) => {
+    if (!hasFileDragPayload(event.dataTransfer)) return;
+    event.preventDefault();
+    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+    if (dragDepthRef.current === 0) {
+      setIsDraggingFiles(false);
+    }
+  }, [hasFileDragPayload]);
+
+  const handleDrop = useCallback((event: React.DragEvent<HTMLElement>) => {
+    if (!hasFileDragPayload(event.dataTransfer)) return;
+    event.preventDefault();
+    dragDepthRef.current = 0;
+    setIsDraggingFiles(false);
+    void uploadFiles(event.dataTransfer.files);
+  }, [hasFileDragPayload, uploadFiles]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -463,7 +661,9 @@ export function NewGoalPanel({
   );
 
   const hasHighlight = message.includes("@") || message.includes("/") || message.includes("--");
-  const canSubmit = (message.trim().length > 0 || title.trim().length > 0) && !isSubmitting;
+  const canSubmit =
+    (message.trim().length > 0 || title.trim().length > 0 || attachments.length > 0 || pastedBlocks.length > 0) &&
+    !isSubmitting;
 
   const suggestions = STATIC_SUGGESTIONS;
   const suggestionsLabel = "Try something like";
@@ -590,14 +790,46 @@ export function NewGoalPanel({
 
         {/* Grey input container — matches reply-input style */}
         <div
+          onDragEnter={handleDragEnter}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
           style={{
             background: "#f3f0ee",
-            border: "1px solid #e5e1dc",
+            border: isDraggingFiles ? "1px solid rgba(147, 69, 42, 0.45)" : "1px solid #e5e1dc",
             borderRadius: 10,
             overflow: "visible",
             position: "relative",
+            boxShadow: isDraggingFiles ? "0 0 0 3px rgba(147, 69, 42, 0.08)" : "none",
+            transition: "border-color 150ms ease, box-shadow 150ms ease",
           }}
         >
+          {(attachments.length > 0 || pastedBlocks.length > 0 || uploadError) ? (
+            <ComposerAssetTray error={uploadError}>
+              <ComposerDraftAssetCollection
+                pastedBlocks={pastedBlocks}
+                attachmentItems={attachments.map((att) => ({
+                  id: att.relativePath,
+                  fileName: att.fileName,
+                  extension: att.extension || getChatAttachmentExtension(att.fileName),
+                  sizeBytes: att.sizeBytes,
+                  previewPath: att.relativePath,
+                  previewClientId: selectedClientId,
+                }))}
+                padding="0"
+                onInsertPastedBlock={(blockId) => {
+                  const block = pastedBlocks.find((candidate) => candidate.id === blockId);
+                  if (block) {
+                    handleInsertPastedText(block);
+                  }
+                }}
+                onRemovePastedBlock={(blockId) => {
+                  setPastedBlocks((prev) => removePendingPastedText(prev, blockId));
+                }}
+                onRemoveAttachmentItem={(itemId) => removeAttachment(itemId)}
+              />
+            </ComposerAssetTray>
+          ) : null}
           {/* Description */}
           <div style={{ position: "relative", padding: "12px 14px 8px" }}>
             {showSlashMenu && (
@@ -688,10 +920,12 @@ export function NewGoalPanel({
                 ))}
               </div>
             )}
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", minWidth: 0, overflow: "hidden" }}>
               {hasHighlight && (
                 <HighlightMirror
                   text={message}
+                  scrollTop={descriptionMirrorScroll.top}
+                  scrollLeft={descriptionMirrorScroll.left}
                   style={{
                     fontSize: 14,
                     fontFamily: "var(--font-inter), Inter, sans-serif",
@@ -706,6 +940,7 @@ export function NewGoalPanel({
                 onChange={(e) => handleMessageChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onPaste={handlePaste}
+                onScroll={syncDescriptionMirrorScroll}
                 placeholder="What do you want to do? (/ commands, @ tags, -- flags)"
                 style={{
                   width: "100%",
@@ -720,60 +955,30 @@ export function NewGoalPanel({
                   resize: "none",
                   padding: "4px 0",
                   minHeight: 80,
+                  boxSizing: "border-box" as const,
+                  maxWidth: "100%",
+                  whiteSpace: "pre-wrap",
+                  overflowWrap: "anywhere",
+                  wordBreak: "break-word",
                   position: "relative",
                   zIndex: 1,
+                  overflowX: "hidden",
                 }}
               />
             </div>
           </div>
 
-          {/* Attachment chips */}
-          {attachments.length > 0 && (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "0 14px 8px" }}>
-              {attachments.map((att) => {
-                const Icon = getAttachmentIcon(att.extension);
-                return (
-                  <div
-                    key={att.relativePath}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 5,
-                      padding: "3px 8px",
-                      borderRadius: 6,
-                      backgroundColor: "rgba(218, 193, 185, 0.15)",
-                      fontSize: 11,
-                      fontFamily: MONO,
-                      color: "#5E5E65",
-                    }}
-                  >
-                    <Icon size={12} />
-                    <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {att.fileName}
-                    </span>
-                    <button
-                      onClick={() => removeAttachment(att.relativePath)}
-                      style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
-                    >
-                      <X size={10} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
           {/* Hidden file input */}
           <input
             ref={fileInputRef}
             type="file"
+            multiple
             onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleFileUpload(file);
+              void uploadFiles(e.target.files);
               e.target.value = "";
             }}
             style={{ display: "none" }}
-            accept="image/*,.pdf,.md,.txt,.csv,.json,.html"
+            accept={CHAT_ATTACHMENT_ACCEPT_ATTR}
           />
 
           {/* Toolbar */}
@@ -806,6 +1011,26 @@ export function NewGoalPanel({
           title="Attach file"
         >
           <Paperclip size={14} />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => { void onDiscarded(draftId); }}
+          disabled={!draftId && !title.trim() && !message.trim() && attachments.length === 0 && pastedBlocks.length === 0}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "4px 6px",
+            border: "none",
+            borderRadius: 5,
+            backgroundColor: "transparent",
+            color: !draftId && !title.trim() && !message.trim() && attachments.length === 0 && pastedBlocks.length === 0 ? "#bbb" : "#8A827D",
+            cursor: !draftId && !title.trim() && !message.trim() && attachments.length === 0 && pastedBlocks.length === 0 ? "not-allowed" : "pointer",
+          }}
+          title="Discard draft"
+        >
+          <Trash2 size={14} />
         </button>
 
         <ModelPicker value={model} onChange={setModel} />
@@ -892,7 +1117,11 @@ export function NewGoalPanel({
         {clients.length > 0 && (
           <div ref={clientMenuRef} style={{ position: "relative" }}>
             <button
-              onClick={() => setShowClientMenu(!showClientMenu)}
+              onClick={() => {
+                if (attachments.length > 0) return;
+                setShowClientMenu(!showClientMenu);
+              }}
+              disabled={attachments.length > 0}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -904,12 +1133,13 @@ export function NewGoalPanel({
                 border: "1px solid rgba(218, 193, 185, 0.4)",
                 borderRadius: 5,
                 backgroundColor: "transparent",
-                color: "#666",
-                cursor: "pointer",
+                color: attachments.length > 0 ? "#A9A39E" : "#666",
+                cursor: attachments.length > 0 ? "not-allowed" : "pointer",
                 transition: "all 120ms ease",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.7)"; }}
+              onMouseEnter={(e) => { if (attachments.length === 0) e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.7)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(218, 193, 185, 0.4)"; }}
+              title={attachments.length > 0 ? "Remove attachments before switching workspace" : "Choose workspace"}
             >
               {selectedClientId
                 ? (clients.find((c) => c.slug === selectedClientId)?.name ?? selectedClientId)

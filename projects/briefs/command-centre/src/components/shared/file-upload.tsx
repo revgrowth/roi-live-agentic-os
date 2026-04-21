@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { Upload, X, FileText, Image, FileType, Check } from "lucide-react";
+import { CHAT_ATTACHMENT_ACCEPT_ATTR } from "@/lib/chat-attachment-policy";
 
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg"]);
 const PDF_EXTENSIONS = new Set(["pdf"]);
@@ -102,7 +103,7 @@ export function FileUpload({ targetDir, onUpload, compact }: FileUploadProps) {
           type="file"
           onChange={handleFileInput}
           style={{ display: "none" }}
-          accept="image/*,.pdf,.md,.txt,.csv,.json,.html"
+          accept={CHAT_ATTACHMENT_ACCEPT_ATTR}
         />
         <button
           onClick={() => inputRef.current?.click()}
@@ -148,7 +149,7 @@ export function FileUpload({ targetDir, onUpload, compact }: FileUploadProps) {
         type="file"
         onChange={handleFileInput}
         style={{ display: "none" }}
-        accept="image/*,.pdf,.md,.txt,.csv,.json,.html"
+        accept={CHAT_ATTACHMENT_ACCEPT_ATTR}
       />
       <div
         onDrop={handleDrop}
@@ -227,7 +228,7 @@ export function FileUpload({ targetDir, onUpload, compact }: FileUploadProps) {
                 fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
               }}
             >
-              Images, PDFs, Markdown, CSV, JSON (max 10MB)
+              Images, PDFs, and common text or code files (max 10MB)
             </span>
           </div>
         )}

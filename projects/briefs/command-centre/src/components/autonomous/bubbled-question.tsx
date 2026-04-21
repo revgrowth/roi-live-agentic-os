@@ -1,10 +1,14 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { MessageCircleQuestion, Send, ChevronLeft, ChevronRight } from "lucide-react";
+import { MessageCircleQuestion, Send, ChevronLeft, ChevronRight, Paperclip } from "lucide-react";
 import type { Message } from "@/types/chat";
+import type { ChatAttachment } from "@/types/chat-composer";
 import type { QuestionSpec, QuestionAnswers } from "@/types/question-spec";
 import { areAnswersComplete, serializeAnswersToProse } from "@/types/question-spec";
+import { ChatAttachmentStrip } from "@/components/shared/chat-attachment-strip";
+import { ComposerAssetTray } from "@/components/shared/composer-asset-tray";
+import { useChatComposer } from "@/hooks/use-chat-composer";
 import {
   insertTextareaNewline,
   shouldInsertModifierNewline,
@@ -45,7 +49,7 @@ function buildMergedAnswers(
 
 interface BubbledQuestionProps {
   message: Message;
-  onReply: (messageId: string, content: string) => void;
+  onReply: (messageId: string, content: string, attachments?: ChatAttachment[]) => void;
 }
 
 export function BubbledQuestion({ message, onReply }: BubbledQuestionProps) {
@@ -68,7 +72,7 @@ function StructuredBubble({
 }: {
   message: Message;
   specs: QuestionSpec[];
-  onReply: (messageId: string, content: string) => void;
+  onReply: (messageId: string, content: string, attachments?: ChatAttachment[]) => void;
 }) {
   const [answers, setAnswers] = useState<QuestionAnswers>(() => {
     const init: QuestionAnswers = {};
@@ -516,28 +520,31 @@ function PlainBubble({
   onReply,
 }: {
   message: Message;
-  onReply: (messageId: string, content: string) => void;
+  onReply: (messageId: string, content: string, attachments?: ChatAttachment[]) => void;
 }) {
-  const [replyText, setReplyText] = useState("");
   const [showReply, setShowReply] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const composer = useChatComposer({
+    surface: "question",
+    scopeId: message.id,
+  });
   const maxHeight = 120;
+  const hasAssets = composer.attachments.length > 0 || composer.uploads.length > 0;
 
   const taskTitle = message.metadata?.questionText || message.content;
 
   useEffect(() => {
     if (!showReply) return;
-    syncComposerTextareaHeight(textareaRef.current, { maxHeight });
-  }, [replyText, showReply]);
+    syncComposerTextareaHeight(composer.textareaRef.current, { maxHeight });
+  }, [composer.message, composer.textareaRef, showReply]);
 
   const handleSend = useCallback(() => {
-    const trimmed = replyText.trim();
-    if (!trimmed) return;
+    const submission = composer.buildSubmission();
+    if (!submission.message && submission.attachments.length === 0) return;
 
-    onReply(message.id, trimmed);
-    setReplyText("");
+    onReply(message.id, submission.message, submission.attachments);
+    composer.clearComposer();
     setShowReply(false);
-  }, [message.id, onReply, replyText]);
+  }, [composer, message.id, onReply]);
 
   return (
     <div style={{
@@ -593,15 +600,43 @@ function PlainBubble({
           Reply to this &darr;
         </button>
       ) : (
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 6, marginTop: 4 }}>
+        <div
+          onDragEnter={composer.handleDragEnter}
+          onDragOver={composer.handleDragOver}
+          onDragLeave={composer.handleDragLeave}
+          onDrop={composer.handleDrop}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+            marginTop: 4,
+            border: composer.isDragging ? "1px solid rgba(147, 69, 42, 0.25)" : "none",
+            borderRadius: 8,
+            padding: composer.isDragging ? 6 : 0,
+          }}
+        >
+          {hasAssets ? (
+            <ComposerAssetTray compact>
+              <ChatAttachmentStrip
+                attachments={composer.attachments}
+                uploads={composer.uploads}
+                onRemoveAttachment={(attachment) => { void composer.removeAttachment(attachment); }}
+                onRetryUpload={(uploadId) => { void composer.retryUpload(uploadId); }}
+                onRemoveUpload={composer.removeUpload}
+                compact
+                padding="0"
+              />
+            </ComposerAssetTray>
+          ) : null}
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 6 }}>
           <textarea
-            ref={textareaRef}
-            value={replyText}
-            onChange={(e) => setReplyText(e.target.value)}
+            ref={composer.textareaRef}
+            value={composer.message}
+            onChange={(e) => composer.setMessage(e.target.value)}
             onKeyDown={(e) => {
               if (shouldInsertModifierNewline(e)) {
                 e.preventDefault();
-                insertTextareaNewline(e.currentTarget, setReplyText);
+                insertTextareaNewline(e.currentTarget, composer.setMessage);
                 return;
               }
               if (shouldSubmitOnPlainEnter(e)) {
@@ -609,6 +644,7 @@ function PlainBubble({
                 handleSend();
               }
             }}
+            onPaste={composer.handlePaste}
             placeholder="Type your reply..."
             rows={1}
             autoFocus
@@ -630,7 +666,7 @@ function PlainBubble({
           />
           <button
             onClick={handleSend}
-            disabled={!replyText.trim()}
+            disabled={!composer.message.trim() && composer.attachments.length === 0}
             style={{
               display: "flex",
               alignItems: "center",
@@ -639,13 +675,61 @@ function PlainBubble({
               height: 28,
               borderRadius: 6,
               border: "none",
-              backgroundColor: replyText.trim() ? ACCENT : "rgba(147, 69, 42, 0.15)",
-              color: replyText.trim() ? "#FFFFFF" : "#9C9CA0",
-              cursor: replyText.trim() ? "pointer" : "default",
+              backgroundColor: composer.message.trim() || composer.attachments.length > 0 ? ACCENT : "rgba(147, 69, 42, 0.15)",
+              color: composer.message.trim() || composer.attachments.length > 0 ? "#FFFFFF" : "#9C9CA0",
+              cursor: composer.message.trim() || composer.attachments.length > 0 ? "pointer" : "default",
             }}
           >
             <Send size={12} />
           </button>
+        </div>
+          <input
+            ref={composer.fileInputRef}
+            type="file"
+            multiple
+            onChange={composer.handleFileInputChange}
+            style={{ display: "none" }}
+            accept={composer.accept}
+          />
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <button
+              type="button"
+              onClick={composer.openFilePicker}
+              disabled={composer.isUploading}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                border: "none",
+                background: "transparent",
+                color: composer.isUploading ? "#bbb" : "#9C9CA0",
+                cursor: composer.isUploading ? "not-allowed" : "pointer",
+                padding: 0,
+                fontSize: 11,
+                fontFamily: FONT_SG,
+              }}
+            >
+              <Paperclip size={12} />
+              Attach
+            </button>
+            {composer.hasDraft && (
+              <button
+                type="button"
+                onClick={() => { void composer.discardDraft(); }}
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  color: "#9C9CA0",
+                  cursor: "pointer",
+                  padding: 0,
+                  fontSize: 11,
+                  fontFamily: FONT_SG,
+                }}
+              >
+                Discard draft
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import { createScriptRunnerSession, type ScriptRunnerSession } from "@/lib/script-runner-session";
 
 interface ScriptRunnerProps {
+  executionId: string;
   scriptId: string;
   scriptLabel: string;
   args: Record<string, string>;
@@ -17,6 +19,7 @@ interface OutputLine {
 }
 
 export function ScriptRunner({
+  executionId,
   scriptId,
   scriptLabel,
   args,
@@ -27,26 +30,50 @@ export function ScriptRunner({
   const [status, setStatus] = useState<"running" | "success" | "error">("running");
   const [exitCode, setExitCode] = useState<number | null>(null);
   const outputRef = useRef<HTMLDivElement>(null);
+  const sessionRef = useRef<ScriptRunnerSession | null>(null);
+  const onCompleteRef = useRef(onComplete);
+
+  if (!sessionRef.current) {
+    sessionRef.current = createScriptRunnerSession();
+  }
+
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
-    const controller = new AbortController();
-    let completed = false;
+    const session = sessionRef.current!;
+    const shouldStart = session.begin();
+
+    const completeOnce = (success: boolean, code: number) => {
+      if (!session.complete()) return;
+      if (session.isDisposed()) return;
+      setStatus(success ? "success" : "error");
+      setExitCode(code);
+      onCompleteRef.current(success);
+    };
+
+    if (!shouldStart) {
+      return () => {
+        session.dispose();
+      };
+    }
 
     async function run() {
+      const appendLine = (type: "stdout" | "stderr", data: string) => {
+        if (session.isDisposed()) return;
+        setLines((prev) => [...prev, { type, data }]);
+      };
+
       try {
         const response = await fetch("/api/settings/scripts/run", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ scriptId, args }),
-          signal: controller.signal,
         });
 
         if (!response.ok) {
           const text = await response.text();
-          setLines((prev) => [...prev, { type: "stderr", data: `Error: ${response.status} - ${text}` }]);
-          setStatus("error");
-          setExitCode(1);
-          onComplete(false);
+          appendLine("stderr", `Error: ${response.status} - ${text}`);
+          completeOnce(false, 1);
           return;
         }
 
@@ -67,13 +94,10 @@ export function ScriptRunner({
             try {
               const parsed = JSON.parse(part);
               if (parsed.type === "stdout" || parsed.type === "stderr") {
-                setLines((prev) => [...prev, { type: parsed.type, data: parsed.data || "" }]);
+                appendLine(parsed.type, parsed.data || "");
               } else if (parsed.type === "exit") {
                 const success = parsed.code === 0;
-                completed = true;
-                setStatus(success ? "success" : "error");
-                setExitCode(parsed.code);
-                onComplete(success);
+                completeOnce(success, parsed.code ?? 1);
               }
             } catch {
               // Skip malformed JSON lines
@@ -85,34 +109,26 @@ export function ScriptRunner({
         if (buffer.trim()) {
           try {
             const parsed = JSON.parse(buffer);
-            if (parsed.type === "exit" && !completed) {
+            if (parsed.type === "exit") {
               const success = parsed.code === 0;
-              setStatus(success ? "success" : "error");
-              setExitCode(parsed.code);
-              onComplete(success);
+              completeOnce(success, parsed.code ?? 1);
             }
           } catch {
             // Ignore
           }
         }
       } catch (err: unknown) {
-        if (err instanceof Error && err.name === "AbortError") return;
-        setLines((prev) => [
-          ...prev,
-          { type: "stderr", data: `Connection error: ${err instanceof Error ? err.message : "Unknown error"}` },
-        ]);
-        setStatus("error");
-        setExitCode(1);
-        onComplete(false);
+        appendLine("stderr", `Connection error: ${err instanceof Error ? err.message : "Unknown error"}`);
+        completeOnce(false, 1);
       }
     }
 
     run();
 
     return () => {
-      controller.abort();
+      session.dispose();
     };
-  }, [scriptId, args, onComplete]);
+  }, [args, executionId, scriptId]);
 
   useEffect(() => {
     outputRef.current?.scrollTo({ top: outputRef.current.scrollHeight });
