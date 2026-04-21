@@ -468,7 +468,7 @@ export function TaskModal() {
         </div>
 
         {/* Panel content */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, minHeight: 0 }}>
         {/* Header */}
         <ModalHeader task={task} onClose={closePanel} />
 
@@ -545,6 +545,7 @@ export function TaskModal() {
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
+            minHeight: 0,
           }}
         >
           {newTaskAttachment ? (
@@ -578,10 +579,10 @@ export function TaskModal() {
               }}
             />
           ) : activeTab === "conversation" ? (
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative", minWidth: 0, minHeight: 0 }}>
                 {/* Main content: panes when active, otherwise project dashboard / chat */}
                 <div style={{ flex: 1, display: "flex", overflow: "hidden", minWidth: 0, minHeight: 0 }}>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0, minHeight: 0 }}>
                   <PaneContainer
                     visiblePanes={visiblePanes}
                     allTasks={tasks}

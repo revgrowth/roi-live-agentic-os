@@ -9,6 +9,7 @@ import { getPendingTaskQuestionPreview } from "@/lib/task-logs";
 import { PermissionPicker } from "@/components/shared/permission-picker";
 import { ModelPicker } from "@/components/shared/model-picker";
 import { TasksPopover } from "@/components/shared/tasks-popover";
+import { PastedTextCard } from "@/components/shared/pasted-text-card";
 import {
   DraftPlanPreviewModal,
   DraftPlanPreviewPanel,
@@ -45,6 +46,14 @@ import {
 import {
   extractPendingApprovedBriefFromLogs,
 } from "@/lib/plan-brief";
+import { syncComposerTextareaHeight } from "@/lib/composer";
+import {
+  appendPendingPastedText,
+  insertPastedTextAtSelection,
+  removePendingPastedText,
+  shouldCapturePastedText,
+} from "@/lib/pasted-text";
+import { useComposerResize } from "@/hooks/use-composer-resize";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -73,16 +82,14 @@ const mdComponents = {
 // ── Paste chip type ─────────────────────────────────────────────
 
 interface PastedChip {
+  id: string;
   kind: "text" | "image";
   label: string;          // e.g. "47 lines" or "screenshot.png"
   content: string;        // full text or base64 data URI
 }
 
-const PASTE_LINE_THRESHOLD = 5;
-
-function buildPasteLabel(text: string): string {
-  const lines = text.split("\n").length;
-  return `${lines.toLocaleString()} line${lines === 1 ? "" : "s"}`;
+function buildImagePasteLabel(name: string): string {
+  return name || "screenshot.png";
 }
 
 // ── Helpers ──────────────────────────────────────────────────────
@@ -1904,6 +1911,7 @@ function DetailPanel({
   const [showInlineTagMenu, setShowInlineTagMenu] = useState(false);
   const [inlineTagQuery, setInlineTagQuery] = useState("");
   const [inlinePromptTags, setInlinePromptTags] = useState<TagItem[]>([]);
+  const [replyMirrorScroll, setReplyMirrorScroll] = useState({ top: 0, left: 0 });
   const [pastedChips, setPastedChips] = useState<PastedChip[]>([]);
   const [previewFile, setPreviewFile] = useState<{ relativePath: string; extension: string } | null>(null);
   const [planningFiles, setPlanningFiles] = useState<{ projectFiles: PlanningFile[]; phases: { phaseNumber: number; dirName: string; files: PlanningFile[] }[]; researchFiles: PlanningFile[] } | null>(null);
@@ -1911,11 +1919,43 @@ function DetailPanel({
   const [mainTab, setMainTab] = useState<"chat" | "files" | "plan">("chat");
   const [planDocked, setPlanDocked] = useState(false);
   const [showDraftPlanModal, setShowDraftPlanModal] = useState(false);
+  const replyMinHeight = 60;
+  const replyMaxHeight = 320;
+  const {
+    composerHeight: replyComposerHeight,
+    hasUserResized: hasReplyComposerResize,
+    handleResizePointerDown: handleReplyResizePointerDown,
+  } = useComposerResize({
+    minHeight: replyMinHeight,
+    maxHeight: replyMaxHeight,
+    initialHeight: replyMinHeight,
+  });
 
   // ── Docked plan panel resize ──────────────────────────────────
   const [dockedPlanPct, setDockedPlanPct] = useState(50); // percentage of container width
   const dockedContainerRef = useRef<HTMLDivElement>(null);
   const planDraggingRef = useRef(false);
+
+  useEffect(() => {
+    syncComposerTextareaHeight(replyTextareaRef.current, {
+      minHeight: replyMinHeight,
+      maxHeight: replyMaxHeight,
+      targetHeight: hasReplyComposerResize ? replyComposerHeight : null,
+    });
+  }, [hasReplyComposerResize, replyComposerHeight, replyMaxHeight, replyMinHeight, replyText]);
+
+  const syncReplyMirrorScroll = useCallback(() => {
+    const textarea = replyTextareaRef.current;
+    if (!textarea) return;
+    setReplyMirrorScroll((current) => {
+      const next = { top: textarea.scrollTop, left: textarea.scrollLeft };
+      return current.top === next.top && current.left === next.left ? current : next;
+    });
+  }, []);
+
+  useEffect(() => {
+    requestAnimationFrame(() => syncReplyMirrorScroll());
+  }, [replyText, syncReplyMirrorScroll]);
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -2058,7 +2098,12 @@ function DetailPanel({
         const reader = new FileReader();
         reader.onload = () => {
           const dataUri = reader.result as string;
-          setPastedChips((prev) => [...prev, { kind: "image", label: file.name || "screenshot.png", content: dataUri }]);
+          setPastedChips((prev) => [...prev, {
+            id: crypto.randomUUID(),
+            kind: "image",
+            label: buildImagePasteLabel(file.name),
+            content: dataUri,
+          }]);
         };
         reader.readAsDataURL(file);
       }
@@ -2066,9 +2111,14 @@ function DetailPanel({
     }
     // Handle large text paste
     const text = e.clipboardData.getData("text/plain");
-    if (text && text.split("\n").length > PASTE_LINE_THRESHOLD) {
+    if (shouldCapturePastedText(text)) {
       e.preventDefault();
-      setPastedChips((prev) => [...prev, { kind: "text", label: buildPasteLabel(text), content: text }]);
+      setPastedChips((prev) => [...prev, {
+        id: crypto.randomUUID(),
+        kind: "text",
+        label: "",
+        content: text,
+      }]);
     }
   }, []);
 
@@ -2232,6 +2282,31 @@ function DetailPanel({
     }
   }, []);
 
+  const handleInsertPastedText = useCallback((chip: PastedChip) => {
+    const textarea = replyTextareaRef.current;
+    const selectionStart = textarea?.selectionStart ?? replyText.length;
+    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
+    const insertion = insertPastedTextAtSelection(
+      replyText,
+      chip.content,
+      selectionStart,
+      selectionEnd,
+    );
+
+    setReplyText(insertion.value);
+    setPastedChips((prev) => removePendingPastedText(prev, chip.id));
+    requestAnimationFrame(() => {
+      replyTextareaRef.current?.focus();
+      replyTextareaRef.current?.setSelectionRange(insertion.selectionStart, insertion.selectionEnd);
+      syncComposerTextareaHeight(replyTextareaRef.current, {
+        minHeight: replyMinHeight,
+        maxHeight: replyMaxHeight,
+        targetHeight: hasReplyComposerResize ? replyComposerHeight : null,
+      });
+      syncReplyMirrorScroll();
+    });
+  }, [hasReplyComposerResize, replyComposerHeight, replyMaxHeight, replyMinHeight, replyText, syncReplyMirrorScroll]);
+
   const handlePermissionModeChange = useCallback((nextMode: "bypassPermissions" | "default" | "plan") => {
     const nextState = getPermissionStateForPickerChange(
       nextMode,
@@ -2254,14 +2329,12 @@ function DetailPanel({
     if ((!trimmed && replyAttachments.length === 0 && pastedChips.length === 0) || isSending) return;
     setIsSending(true);
 
-    let fullMessage = trimmed;
-
-    // Append pasted text chips
-    const pastedTexts = pastedChips.filter((c) => c.kind === "text").map((c) => c.content);
-    if (pastedTexts.length > 0) {
-      const pastedBlock = pastedTexts.join("\n\n---\n\n");
-      fullMessage = fullMessage ? `${fullMessage}\n\n${pastedBlock}` : pastedBlock;
-    }
+    let fullMessage = appendPendingPastedText(
+      trimmed,
+      pastedChips
+        .filter((chip) => chip.kind === "text")
+        .map((chip) => ({ id: chip.id, text: chip.content })),
+    );
 
     // Append pasted images as data URIs
     const pastedImages = pastedChips.filter((c) => c.kind === "image");
@@ -2740,56 +2813,66 @@ function DetailPanel({
             }}>
               {/* Attachment + pasted chips */}
               {(replyAttachments.length > 0 || pastedChips.length > 0) && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4, padding: "8px 10px 0" }}>
-                  {replyAttachments.map((a) => (
-                    <div key={a.relativePath} style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 4,
-                      padding: "3px 8px",
-                      borderRadius: 4,
-                      backgroundColor: "#f3f0ee",
-                      fontSize: 11,
-                      color: "#555",
-                    }}>
-                      <Paperclip size={10} />
-                      <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {a.fileName}
-                      </span>
-                      <button
-                        onClick={() => setReplyAttachments((prev) => prev.filter((x) => x.relativePath !== a.relativePath))}
-                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#aaa" }}
-                      >
-                        <X size={10} />
-                      </button>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "8px 10px 0" }}>
+                  {pastedChips.some((chip) => chip.kind === "text") && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {pastedChips.filter((chip) => chip.kind === "text").map((chip) => (
+                        <PastedTextCard
+                          key={chip.id}
+                          text={chip.content}
+                          onInsert={() => handleInsertPastedText(chip)}
+                          onRemove={() => setPastedChips((prev) => removePendingPastedText(prev, chip.id))}
+                        />
+                      ))}
                     </div>
-                  ))}
-                  {pastedChips.map((chip, i) => (
-                    <div key={`paste-${i}`} style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 4,
-                      padding: "3px 8px",
-                      borderRadius: 4,
-                      backgroundColor: chip.kind === "image" ? "rgba(147, 69, 42, 0.06)" : "rgba(59, 130, 246, 0.06)",
-                      fontSize: 11,
-                      color: chip.kind === "image" ? "#93452A" : "#3b6ec2",
-                      fontFamily: "'DM Mono', monospace",
-                    }}>
-                      {chip.kind === "image" ? (
+                  )}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                    {replyAttachments.map((a) => (
+                      <div key={a.relativePath} style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "3px 8px",
+                        borderRadius: 4,
+                        backgroundColor: "#f3f0ee",
+                        fontSize: 11,
+                        color: "#555",
+                      }}>
+                        <Paperclip size={10} />
+                        <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {a.fileName}
+                        </span>
+                        <button
+                          onClick={() => setReplyAttachments((prev) => prev.filter((x) => x.relativePath !== a.relativePath))}
+                          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#aaa" }}
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    ))}
+                    {pastedChips.filter((chip) => chip.kind === "image").map((chip) => (
+                      <div key={chip.id} style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "3px 8px",
+                        borderRadius: 4,
+                        backgroundColor: "rgba(147, 69, 42, 0.06)",
+                        fontSize: 11,
+                        color: "#93452A",
+                        fontFamily: "'DM Mono', monospace",
+                      }}>
                         <span style={{ fontSize: 10 }}>&#128247;</span>
-                      ) : (
-                        <FileText size={10} />
-                      )}
-                      <span>Pasted {chip.label}</span>
-                      <button
-                        onClick={() => setPastedChips((prev) => prev.filter((_, j) => j !== i))}
-                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#aaa" }}
-                      >
-                        <X size={10} />
-                      </button>
-                    </div>
-                  ))}
+                        <span>Pasted {chip.label}</span>
+                        <button
+                          onClick={() => setPastedChips((prev) => removePendingPastedText(prev, chip.id))}
+                          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#aaa" }}
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -2808,6 +2891,21 @@ function DetailPanel({
 
               {/* Textarea on top */}
               <div style={{ position: "relative", padding: "10px 12px 6px" }}>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+                  <button
+                    type="button"
+                    aria-label="Drag to resize input"
+                    onPointerDown={handleReplyResizePointerDown}
+                    style={{
+                      width: 44,
+                      height: 8,
+                      border: "none",
+                      borderRadius: 999,
+                      backgroundColor: "rgba(156, 156, 160, 0.32)",
+                      cursor: "ns-resize",
+                    }}
+                  />
+                </div>
                 {showInlineTagMenu && inlinePromptTags.length > 0 && (
                   <SlashCommandMenu
                     query={inlineTagQuery}
@@ -2829,10 +2927,12 @@ function DetailPanel({
                     }}
                   />
                 )}
-                <div style={{ position: "relative" }}>
+                <div style={{ position: "relative", minWidth: 0, overflow: "hidden" }}>
                   {(replyText.includes("@") || replyText.includes("/")) && (
                     <HighlightMirror
                       text={replyText}
+                      scrollTop={replyMirrorScroll.top}
+                      scrollLeft={replyMirrorScroll.left}
                       style={{
                         fontSize: 13,
                         fontFamily: "inherit",
@@ -2846,6 +2946,7 @@ function DetailPanel({
                     value={replyText}
                     onChange={(e) => handleReplyChange(e.target.value)}
                     onPaste={handlePaste}
+                    onScroll={syncReplyMirrorScroll}
                     onKeyDown={(e) => {
                       if ((showSlashMenu || showInlineTagMenu) && ["ArrowDown", "ArrowUp", "Enter", "Tab", "Escape"].includes(e.key)) return;
                       if (e.key === "Enter" && !e.shiftKey) {
@@ -2860,7 +2961,8 @@ function DetailPanel({
                       fontSize: 13,
                       fontFamily: "inherit",
                       padding: "4px 0",
-                      minHeight: 60,
+                      minHeight: replyMinHeight,
+                      maxHeight: hasReplyComposerResize ? replyComposerHeight : replyMaxHeight,
                       backgroundColor: "transparent",
                       border: "none",
                       color: (replyText.includes("@") || replyText.includes("/")) ? "transparent" : "#1a1a1a",
@@ -2869,8 +2971,14 @@ function DetailPanel({
                       resize: "none",
                       boxSizing: "border-box" as const,
                       lineHeight: 1.5,
+                      maxWidth: "100%",
+                      whiteSpace: "pre-wrap",
+                      overflowWrap: "anywhere",
+                      wordBreak: "break-word",
                       position: "relative",
                       zIndex: 1,
+                      overflowX: "hidden",
+                      overflowY: "auto",
                     }}
                   />
                 </div>
@@ -2939,18 +3047,18 @@ function DetailPanel({
                 <button
                   type="button"
                   onClick={handleReply}
-                  disabled={(!replyText.trim() && replyAttachments.length === 0) || isSending}
+                  disabled={(!replyText.trim() && replyAttachments.length === 0 && pastedChips.length === 0) || isSending}
                   title="Send"
                   style={{
                     width: 28,
                     height: 26,
                     borderRadius: 6,
                     border: "none",
-                    background: (replyText.trim() || replyAttachments.length > 0) && !isSending
+                    background: (replyText.trim() || replyAttachments.length > 0 || pastedChips.length > 0) && !isSending
                       ? "linear-gradient(135deg, #93452A, #B25D3F)"
                       : "#e8e4df",
-                    color: (replyText.trim() || replyAttachments.length > 0) && !isSending ? "#fff" : "#999",
-                    cursor: (replyText.trim() || replyAttachments.length > 0) && !isSending ? "pointer" : "default",
+                    color: (replyText.trim() || replyAttachments.length > 0 || pastedChips.length > 0) && !isSending ? "#fff" : "#999",
+                    cursor: (replyText.trim() || replyAttachments.length > 0 || pastedChips.length > 0) && !isSending ? "pointer" : "default",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",

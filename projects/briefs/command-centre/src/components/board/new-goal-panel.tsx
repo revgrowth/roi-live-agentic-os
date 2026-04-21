@@ -12,8 +12,16 @@ import { HighlightMirror } from "@/components/modal/reply-input";
 import { ModelPicker } from "@/components/shared/model-picker";
 import { PermissionPicker } from "@/components/shared/permission-picker";
 import { TagPicker } from "@/components/shared/tag-picker";
+import { PastedTextCard } from "@/components/shared/pasted-text-card";
 import { recordTagUsage } from "./goal-chips";
 import { LEVEL_LABELS, LEVEL_HINTS } from "@/lib/levels";
+import {
+  appendPendingPastedText,
+  insertPastedTextAtSelection,
+  removePendingPastedText,
+  shouldCapturePastedText,
+  type PendingPastedTextBlock,
+} from "@/lib/pasted-text";
 
 // ── Attachment helpers ──────────────────────────────────────────
 
@@ -103,10 +111,12 @@ export function NewGoalPanel({
   const [flagMenuIndex, setFlagMenuIndex] = useState(0);
   const [promptTags, setPromptTags] = useState<TagItem[]>([]);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [pastedTextBlocks, setPastedTextBlocks] = useState<PendingPastedTextBlock[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(storeSelectedClientId);
   const [showClientMenu, setShowClientMenu] = useState(false);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [descriptionMirrorScroll, setDescriptionMirrorScroll] = useState({ top: 0, left: 0 });
 
   const titleRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLTextAreaElement>(null);
@@ -176,6 +186,19 @@ export function NewGoalPanel({
 
   useEffect(() => { autoGrow(); }, [message, autoGrow]);
 
+  const syncDescriptionMirrorScroll = useCallback(() => {
+    const textarea = descRef.current;
+    if (!textarea) return;
+    setDescriptionMirrorScroll((current) => {
+      const next = { top: textarea.scrollTop, left: textarea.scrollLeft };
+      return current.top === next.top && current.left === next.left ? current : next;
+    });
+  }, []);
+
+  useEffect(() => {
+    requestAnimationFrame(() => syncDescriptionMirrorScroll());
+  }, [message, syncDescriptionMirrorScroll]);
+
   const createWithLevel = useCallback(
     async (goalTitle: string, fullDescription: string, taskLevel: TaskLevel) => {
       let taskProjectSlug: string | null = null;
@@ -213,7 +236,7 @@ export function NewGoalPanel({
   const handleSubmit = useCallback(async () => {
     const trimmed = message.trim();
     const trimmedTitle = title.trim();
-    if ((!trimmed && !trimmedTitle) || isSubmitting) return;
+    if ((!trimmed && !trimmedTitle && pastedTextBlocks.length === 0) || isSubmitting) return;
 
     // Detect and strip --project / --gsd flags
     const flagMatch = trimmed.match(/\s*--(project|gsd)\s*/i);
@@ -221,7 +244,10 @@ export function NewGoalPanel({
     if (flagMatch) {
       detectedLevel = flagMatch[1].toLowerCase() as TaskLevel;
     }
-    const cleanMessage = trimmed.replace(/\s*--(project|gsd)\s*/gi, " ").trim();
+    const cleanMessage = appendPendingPastedText(
+      trimmed.replace(/\s*--(project|gsd)\s*/gi, " ").trim(),
+      pastedTextBlocks,
+    );
 
     // Use the explicit title, or derive from first line of description
     let goalTitle: string;
@@ -237,20 +263,8 @@ export function NewGoalPanel({
         : firstLine.slice(0, 57).replace(/\s+\S*$/, "") + "...";
     }
 
-    // Expand collapsed pasted text blocks back to full content
-    let expandedMessage = cleanMessage;
-    if (descRef.current?.dataset.pastedBlocks) {
-      try {
-        const blocks = JSON.parse(descRef.current.dataset.pastedBlocks) as Array<{ label: string; text: string }>;
-        for (const block of blocks) {
-          expandedMessage = expandedMessage.replace(block.label, block.text);
-        }
-      } catch { /* ignore */ }
-      descRef.current.dataset.pastedBlocks = "";
-    }
-
     // Build description with attachment paths
-    let fullDescription = expandedMessage || trimmedTitle;
+    let fullDescription = cleanMessage || trimmedTitle;
     if (attachments.length > 0) {
       const attachmentLines = attachments.map((a) => `- ${a.relativePath}`).join("\n");
       fullDescription = fullDescription
@@ -265,7 +279,7 @@ export function NewGoalPanel({
     }
     setIsSubmitting(false);
     if (taskId) onCreated(taskId);
-  }, [message, title, attachments, isSubmitting, level, createWithLevel, onCreated, selectedTag, updateTask]);
+  }, [message, title, attachments, isSubmitting, level, createWithLevel, onCreated, pastedTextBlocks, selectedTag, updateTask]);
 
   const handleMessageChange = useCallback((value: string) => {
     setMessage(value);
@@ -393,6 +407,36 @@ export function NewGoalPanel({
     setAttachments((prev) => prev.filter((a) => a.relativePath !== relativePath));
   }, []);
 
+  const focusDescription = useCallback((selectionStart?: number, selectionEnd = selectionStart) => {
+    requestAnimationFrame(() => {
+      const textarea = descRef.current;
+      if (!textarea) return;
+      textarea.focus();
+      if (selectionStart == null || selectionEnd == null) return;
+      textarea.setSelectionRange(selectionStart, selectionEnd);
+    });
+  }, []);
+
+  const handleInsertPastedText = useCallback((block: PendingPastedTextBlock) => {
+    const textarea = descRef.current;
+    const selectionStart = textarea?.selectionStart ?? message.length;
+    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
+    const insertion = insertPastedTextAtSelection(
+      message,
+      block.text,
+      selectionStart,
+      selectionEnd,
+    );
+
+    handleMessageChange(insertion.value);
+    setPastedTextBlocks((prev) => removePendingPastedText(prev, block.id));
+    focusDescription(insertion.selectionStart, insertion.selectionEnd);
+    requestAnimationFrame(() => {
+      autoGrow();
+      syncDescriptionMirrorScroll();
+    });
+  }, [autoGrow, focusDescription, handleMessageChange, message, syncDescriptionMirrorScroll]);
+
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     const items = e.clipboardData?.items;
     if (!items) return;
@@ -404,25 +448,10 @@ export function NewGoalPanel({
         return;
       }
     }
-    // Large text paste — collapse into a single-line placeholder in the textarea
-    // but store the full text so it renders in the sent message
     const text = e.clipboardData?.getData("text/plain") ?? "";
-    const lineCount = text.split("\n").length;
-    if (lineCount > 10) {
+    if (shouldCapturePastedText(text)) {
       e.preventDefault();
-      const label = `[Pasted text +${lineCount} lines]`;
-      const ta = descRef.current;
-      if (ta) {
-        const start = ta.selectionStart;
-        const end = ta.selectionEnd;
-        const before = message.slice(0, start);
-        const after = message.slice(end);
-        // Store full text in a data attribute on the textarea for retrieval at submit
-        const pastedBlocks = (ta.dataset.pastedBlocks ? JSON.parse(ta.dataset.pastedBlocks) : []) as Array<{ label: string; text: string }>;
-        pastedBlocks.push({ label, text });
-        ta.dataset.pastedBlocks = JSON.stringify(pastedBlocks);
-        handleMessageChange(before + label + after);
-      }
+      setPastedTextBlocks((prev) => [...prev, { id: crypto.randomUUID(), text }]);
     }
   }, [handleFileUpload, message, handleMessageChange]);
 
@@ -463,7 +492,7 @@ export function NewGoalPanel({
   );
 
   const hasHighlight = message.includes("@") || message.includes("/") || message.includes("--");
-  const canSubmit = (message.trim().length > 0 || title.trim().length > 0) && !isSubmitting;
+  const canSubmit = (message.trim().length > 0 || title.trim().length > 0 || pastedTextBlocks.length > 0) && !isSubmitting;
 
   const suggestions = STATIC_SUGGESTIONS;
   const suggestionsLabel = "Try something like";
@@ -688,10 +717,54 @@ export function NewGoalPanel({
                 ))}
               </div>
             )}
-            <div style={{ position: "relative" }}>
+            {(pastedTextBlocks.length > 0 || attachments.length > 0) && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+                {pastedTextBlocks.map((block) => (
+                  <PastedTextCard
+                    key={block.id}
+                    text={block.text}
+                    onInsert={() => handleInsertPastedText(block)}
+                    onRemove={() => setPastedTextBlocks((prev) => removePendingPastedText(prev, block.id))}
+                  />
+                ))}
+                {attachments.map((att) => {
+                  const Icon = getAttachmentIcon(att.extension);
+                  return (
+                    <div
+                      key={att.relativePath}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 5,
+                        padding: "3px 8px",
+                        borderRadius: 6,
+                        backgroundColor: "rgba(218, 193, 185, 0.15)",
+                        fontSize: 11,
+                        fontFamily: MONO,
+                        color: "#5E5E65",
+                      }}
+                    >
+                      <Icon size={12} />
+                      <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {att.fileName}
+                      </span>
+                      <button
+                        onClick={() => removeAttachment(att.relativePath)}
+                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <div style={{ position: "relative", minWidth: 0, overflow: "hidden" }}>
               {hasHighlight && (
                 <HighlightMirror
                   text={message}
+                  scrollTop={descriptionMirrorScroll.top}
+                  scrollLeft={descriptionMirrorScroll.left}
                   style={{
                     fontSize: 14,
                     fontFamily: "var(--font-inter), Inter, sans-serif",
@@ -706,6 +779,7 @@ export function NewGoalPanel({
                 onChange={(e) => handleMessageChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onPaste={handlePaste}
+                onScroll={syncDescriptionMirrorScroll}
                 placeholder="What do you want to do? (/ commands, @ tags, -- flags)"
                 style={{
                   width: "100%",
@@ -720,49 +794,18 @@ export function NewGoalPanel({
                   resize: "none",
                   padding: "4px 0",
                   minHeight: 80,
+                  boxSizing: "border-box" as const,
+                  maxWidth: "100%",
+                  whiteSpace: "pre-wrap",
+                  overflowWrap: "anywhere",
+                  wordBreak: "break-word",
                   position: "relative",
                   zIndex: 1,
+                  overflowX: "hidden",
                 }}
               />
             </div>
           </div>
-
-          {/* Attachment chips */}
-          {attachments.length > 0 && (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "0 14px 8px" }}>
-              {attachments.map((att) => {
-                const Icon = getAttachmentIcon(att.extension);
-                return (
-                  <div
-                    key={att.relativePath}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 5,
-                      padding: "3px 8px",
-                      borderRadius: 6,
-                      backgroundColor: "rgba(218, 193, 185, 0.15)",
-                      fontSize: 11,
-                      fontFamily: MONO,
-                      color: "#5E5E65",
-                    }}
-                  >
-                    <Icon size={12} />
-                    <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {att.fileName}
-                    </span>
-                    <button
-                      onClick={() => removeAttachment(att.relativePath)}
-                      style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
-                    >
-                      <X size={10} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
           {/* Hidden file input */}
           <input
             ref={fileInputRef}

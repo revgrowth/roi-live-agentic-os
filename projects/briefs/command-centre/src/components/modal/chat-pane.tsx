@@ -98,6 +98,7 @@ export function ChatPane({
         flexDirection: "column",
         overflow: "hidden",
         minWidth: 0,
+        minHeight: 0,
         border: isDone ? "1px solid #E5E3E0" : "1px solid #e8e4df",
         borderRadius: 8,
         background: isDone ? "#F9F8F7" : "#fff",
