@@ -198,7 +198,7 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
           />
         </div>
 
-        {pastedTextBlocks.length > 0 && (
+        {(pastedTextBlocks.length > 0 || attachments.length > 0) && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: "8px 12px 0" }}>
             {pastedTextBlocks.map((block) => (
               <PastedTextCard
@@ -208,6 +208,36 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
                 onRemove={() => setPastedTextBlocks((prev) => removePendingPastedText(prev, block.id))}
               />
             ))}
+            {attachments.map((att) => {
+              const Icon = getAttachmentIcon(att.extension);
+              return (
+                <div
+                  key={att.relativePath}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    padding: "3px 8px",
+                    borderRadius: 6,
+                    backgroundColor: "rgba(218, 193, 185, 0.15)",
+                    fontSize: 11,
+                    fontFamily: "'DM Mono', monospace",
+                    color: "#5E5E65",
+                  }}
+                >
+                  <Icon size={12} />
+                  <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {att.fileName}
+                  </span>
+                  <button
+                    onClick={() => removeAttachment(att.relativePath)}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
+                  >
+                    <X size={10} />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -270,43 +300,6 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
             <Send size={16} />
           </button>
         </div>
-
-        {/* Attachment chips */}
-        {attachments.length > 0 && (
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "4px 12px 6px" }}>
-            {attachments.map((att) => {
-              const Icon = getAttachmentIcon(att.extension);
-              return (
-                <div
-                  key={att.relativePath}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 5,
-                    padding: "3px 8px",
-                    borderRadius: 6,
-                    backgroundColor: "rgba(218, 193, 185, 0.15)",
-                    fontSize: 11,
-                    fontFamily: "'DM Mono', monospace",
-                    color: "#5E5E65",
-                  }}
-                >
-                  <Icon size={12} />
-                  <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {att.fileName}
-                  </span>
-                  <button
-                    onClick={() => removeAttachment(att.relativePath)}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
-                  >
-                    <X size={10} />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
         {/* Hidden file input */}
         <input
           ref={fileInputRef}

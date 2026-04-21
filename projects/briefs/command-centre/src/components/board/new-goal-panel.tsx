@@ -717,7 +717,7 @@ export function NewGoalPanel({
                 ))}
               </div>
             )}
-            {pastedTextBlocks.length > 0 && (
+            {(pastedTextBlocks.length > 0 || attachments.length > 0) && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
                 {pastedTextBlocks.map((block) => (
                   <PastedTextCard
@@ -727,6 +727,36 @@ export function NewGoalPanel({
                     onRemove={() => setPastedTextBlocks((prev) => removePendingPastedText(prev, block.id))}
                   />
                 ))}
+                {attachments.map((att) => {
+                  const Icon = getAttachmentIcon(att.extension);
+                  return (
+                    <div
+                      key={att.relativePath}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 5,
+                        padding: "3px 8px",
+                        borderRadius: 6,
+                        backgroundColor: "rgba(218, 193, 185, 0.15)",
+                        fontSize: 11,
+                        fontFamily: MONO,
+                        color: "#5E5E65",
+                      }}
+                    >
+                      <Icon size={12} />
+                      <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {att.fileName}
+                      </span>
+                      <button
+                        onClick={() => removeAttachment(att.relativePath)}
+                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
             <div style={{ position: "relative", minWidth: 0, overflow: "hidden" }}>
@@ -776,43 +806,6 @@ export function NewGoalPanel({
               />
             </div>
           </div>
-
-          {/* Attachment chips */}
-          {attachments.length > 0 && (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "0 14px 8px" }}>
-              {attachments.map((att) => {
-                const Icon = getAttachmentIcon(att.extension);
-                return (
-                  <div
-                    key={att.relativePath}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 5,
-                      padding: "3px 8px",
-                      borderRadius: 6,
-                      backgroundColor: "rgba(218, 193, 185, 0.15)",
-                      fontSize: 11,
-                      fontFamily: MONO,
-                      color: "#5E5E65",
-                    }}
-                  >
-                    <Icon size={12} />
-                    <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {att.fileName}
-                    </span>
-                    <button
-                      onClick={() => removeAttachment(att.relativePath)}
-                      style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
-                    >
-                      <X size={10} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
           {/* Hidden file input */}
           <input
             ref={fileInputRef}
