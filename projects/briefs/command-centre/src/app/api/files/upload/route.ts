@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
+import {
+  CHAT_ATTACHMENT_MAX_BYTES,
+  getChatAttachmentExtension,
+  getChatAttachmentValidationError,
+} from "@/lib/chat-attachment-policy";
 import { getConfig } from "@/lib/config";
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-
-const ALLOWED_EXTENSIONS = new Set([
-  "png", "jpg", "jpeg", "gif", "webp", "svg",
-  "pdf",
-  "md", "txt", "csv", "json", "html", "log",
-  "yaml", "yml", "sh", "ts", "js", "py",
-]);
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
@@ -22,14 +18,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > CHAT_ATTACHMENT_MAX_BYTES) {
       return NextResponse.json({ error: "File too large (max 10MB)" }, { status: 400 });
     }
 
-    const ext = file.name.split(".").pop()?.toLowerCase() || "";
-    if (!ALLOWED_EXTENSIONS.has(ext)) {
+    const ext = getChatAttachmentExtension(file.name);
+    const validationError = getChatAttachmentValidationError(file);
+    if (validationError) {
       return NextResponse.json(
-        { error: `File type .${ext} is not allowed` },
+        { error: validationError },
         { status: 400 }
       );
     }

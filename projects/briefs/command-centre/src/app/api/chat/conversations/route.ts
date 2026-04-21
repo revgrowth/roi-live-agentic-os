@@ -17,7 +17,9 @@ export async function GET(request: NextRequest) {
       conditions.push("status = ?");
       params.push(status);
     }
-    if (clientId && clientId !== "root") {
+    if (clientId === "root") {
+      conditions.push("clientId IS NULL");
+    } else if (clientId) {
       conditions.push("clientId = ?");
       params.push(clientId);
     }

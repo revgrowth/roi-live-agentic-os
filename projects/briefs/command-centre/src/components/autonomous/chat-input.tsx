@@ -1,58 +1,39 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, KeyboardEvent } from "react";
-import { Send, Paperclip, X, Image, FileType, FileText } from "lucide-react";
+import { useCallback, useEffect, useState, KeyboardEvent } from "react";
+import { Paperclip, Send } from "lucide-react";
 import { PermissionPicker } from "@/components/shared/permission-picker";
 import { ModelPicker } from "@/components/shared/model-picker";
-import { PastedTextCard } from "@/components/shared/pasted-text-card";
-import type { PermissionMode, ClaudeModel } from "@/types/task";
-import {
-  insertTextareaNewline,
-  shouldInsertModifierNewline,
-  shouldSubmitOnPlainEnter,
-  syncComposerTextareaHeight,
-} from "@/lib/composer";
-import {
-  appendPendingPastedText,
-  insertPastedTextAtSelection,
-  removePendingPastedText,
-  shouldCapturePastedText,
-  type PendingPastedTextBlock,
-} from "@/lib/pasted-text";
+import { ComposerAssetTray } from "@/components/shared/composer-asset-tray";
+import { ComposerDraftAssetCollection } from "@/components/shared/composer-draft-asset-collection";
+import { useChatComposer } from "@/hooks/use-chat-composer";
 import { useComposerResize } from "@/hooks/use-composer-resize";
-
-// ── Attachment helpers ──────────────────────────────────────────
-
-interface Attachment {
-  fileName: string;
-  relativePath: string;
-  extension: string;
-  sizeBytes: number;
-}
-
-const IMAGE_EXTS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg"]);
-
-function getAttachmentIcon(ext: string) {
-  if (IMAGE_EXTS.has(ext)) return Image;
-  if (ext === "pdf") return FileType;
-  return FileText;
-}
+import type { PermissionMode, ClaudeModel } from "@/types/task";
+import type { ChatAttachment } from "@/types/chat-composer";
+import { insertTextareaNewline, shouldInsertModifierNewline, shouldSubmitOnPlainEnter, syncComposerTextareaHeight } from "@/lib/composer";
+import { getChatAttachmentExtension } from "@/lib/chat-attachment-policy";
 
 interface ChatInputProps {
-  onSend: (message: string, options: { permissionMode: PermissionMode; model: ClaudeModel | null }) => void;
+  scopeId?: string | null;
+  onSend: (
+    message: string,
+    options: {
+      permissionMode: PermissionMode;
+      model: ClaudeModel | null;
+      attachments: ChatAttachment[];
+    },
+  ) => void;
   disabled?: boolean;
   placeholder?: string;
 }
 
-export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
-  const [value, setValue] = useState("");
+export function ChatInput({ scopeId, onSend, disabled, placeholder }: ChatInputProps) {
   const [permissionMode, setPermissionMode] = useState<PermissionMode>("bypassPermissions");
   const [model, setModel] = useState<ClaudeModel | null>(null);
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [pastedTextBlocks, setPastedTextBlocks] = useState<PendingPastedTextBlock[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const composer = useChatComposer({
+    surface: "conversation",
+    scopeId,
+  });
   const minHeight = 60;
   const maxHeight = 320;
   const { composerHeight, hasUserResized, handleResizePointerDown } = useComposerResize({
@@ -60,127 +41,65 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
     maxHeight,
     initialHeight: minHeight,
   });
-
-  useEffect(() => {
-    syncComposerTextareaHeight(textareaRef.current, {
-      maxHeight,
-      minHeight,
-      targetHeight: hasUserResized ? composerHeight : null,
-    });
-  }, [composerHeight, hasUserResized, maxHeight, minHeight, value]);
-
-  const handleFileUpload = useCallback(async (file: File) => {
-    setIsUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("dir", ".tmp/attachments");
-      const res = await fetch("/api/files/upload", { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Upload failed");
-      const result: Attachment = await res.json();
-      setAttachments((prev) => [...prev, result]);
-    } catch { /* silently fail */ } finally {
-      setIsUploading(false);
-    }
-  }, []);
-
-  const removeAttachment = useCallback((relativePath: string) => {
-    setAttachments((prev) => prev.filter((a) => a.relativePath !== relativePath));
-  }, []);
-
-  const handlePaste = useCallback((e: React.ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-    for (const item of items) {
-      if (item.type.startsWith("image/")) {
-        e.preventDefault();
-        const file = item.getAsFile();
-        if (file) handleFileUpload(file);
-        return;
-      }
-    }
-    const text = e.clipboardData?.getData("text/plain") ?? "";
-    if (shouldCapturePastedText(text)) {
-      e.preventDefault();
-      setPastedTextBlocks((prev) => [...prev, { id: crypto.randomUUID(), text }]);
-    }
-  }, [handleFileUpload]);
-
-  const focusTextarea = useCallback((selectionStart?: number, selectionEnd = selectionStart) => {
-    requestAnimationFrame(() => {
-      const textarea = textareaRef.current;
-      if (!textarea) return;
-      textarea.focus();
-      if (selectionStart == null || selectionEnd == null) return;
-      textarea.setSelectionRange(selectionStart, selectionEnd);
-    });
-  }, []);
-
-  const handleInsertPastedText = useCallback((block: PendingPastedTextBlock) => {
-    const textarea = textareaRef.current;
-    const selectionStart = textarea?.selectionStart ?? value.length;
-    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
-    const insertion = insertPastedTextAtSelection(
-      value,
-      block.text,
-      selectionStart,
-      selectionEnd,
+  const hasAssets = composer.attachments.length > 0 || composer.uploads.length > 0 || composer.pastedBlocks.length > 0;
+  const canSend =
+    !disabled &&
+    (
+      composer.message.trim().length > 0 ||
+      composer.attachments.length > 0 ||
+      composer.pastedBlocks.length > 0
     );
 
-    setValue(insertion.value);
-    setPastedTextBlocks((prev) => removePendingPastedText(prev, block.id));
-    focusTextarea(insertion.selectionStart, insertion.selectionEnd);
-    requestAnimationFrame(() => {
-      syncComposerTextareaHeight(textareaRef.current, {
-        minHeight,
-        maxHeight,
-        targetHeight: hasUserResized ? composerHeight : null,
-      });
+  useEffect(() => {
+    syncComposerTextareaHeight(composer.textareaRef.current, {
+      minHeight,
+      maxHeight,
+      targetHeight: hasUserResized ? composerHeight : null,
     });
-  }, [composerHeight, focusTextarea, hasUserResized, maxHeight, minHeight, value]);
+  }, [composer.message, composer.textareaRef, composerHeight, hasUserResized, maxHeight, minHeight]);
 
   const handleSend = useCallback(() => {
-    const trimmed = value.trim();
-    if (!trimmed && attachments.length === 0 && pastedTextBlocks.length === 0) return;
-    if (disabled) return;
+    const submission = composer.buildSubmission();
+    if ((!submission.message && submission.attachments.length === 0) || disabled) return;
 
-    let finalMessage = appendPendingPastedText(trimmed, pastedTextBlocks);
-    if (attachments.length > 0) {
-      const attachmentLines = attachments.map((a) => `- ${a.relativePath}`).join("\n");
-      finalMessage = finalMessage
-        ? `${finalMessage}\n\nAttached files:\n${attachmentLines}`
-        : `Attached files:\n${attachmentLines}`;
-    }
+    onSend(submission.message, {
+      permissionMode,
+      model,
+      attachments: submission.attachments,
+    });
+    composer.clearComposer();
+  }, [composer, disabled, model, onSend, permissionMode]);
 
-    onSend(finalMessage, { permissionMode, model });
-    setValue("");
-    setAttachments([]);
-    setPastedTextBlocks([]);
-  }, [attachments, disabled, model, onSend, pastedTextBlocks, permissionMode, value]);
-
-  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (shouldInsertModifierNewline(e)) {
-      e.preventDefault();
-      insertTextareaNewline(e.currentTarget, setValue);
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (shouldInsertModifierNewline(event)) {
+      event.preventDefault();
+      insertTextareaNewline(event.currentTarget, composer.setMessage);
       return;
     }
-    if (shouldSubmitOnPlainEnter(e)) {
-      e.preventDefault();
+    if (shouldSubmitOnPlainEnter(event)) {
+      event.preventDefault();
       handleSend();
     }
-  }, [handleSend]);
+  }, [composer.setMessage, handleSend]);
 
   return (
-    <div style={{
-      padding: "12px 16px",
-      borderTop: "1px solid rgba(218, 193, 185, 0.15)",
-      backgroundColor: "#FFFFFF",
-    }}>
+    <div
+      onDragEnter={composer.handleDragEnter}
+      onDragOver={composer.handleDragOver}
+      onDragLeave={composer.handleDragLeave}
+      onDrop={composer.handleDrop}
+      style={{
+        padding: "12px 16px",
+        borderTop: "1px solid rgba(218, 193, 185, 0.15)",
+        backgroundColor: "#FFFFFF",
+      }}
+    >
       <div style={{
         backgroundColor: "#F6F3F1",
         borderRadius: 12,
-        border: "1px solid rgba(218, 193, 185, 0.2)",
-        transition: "border-color 150ms ease",
+        border: composer.isDragging ? "1px solid rgba(147, 69, 42, 0.45)" : "1px solid rgba(218, 193, 185, 0.2)",
+        boxShadow: composer.isDragging ? "0 0 0 3px rgba(147, 69, 42, 0.08)" : "none",
+        transition: "border-color 150ms ease, box-shadow 150ms ease",
       }}>
         <div style={{ display: "flex", justifyContent: "center", padding: "8px 12px 0" }}>
           <button
@@ -198,48 +117,45 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
           />
         </div>
 
-        {(pastedTextBlocks.length > 0 || attachments.length > 0) && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: "8px 12px 0" }}>
-            {pastedTextBlocks.map((block) => (
-              <PastedTextCard
-                key={block.id}
-                text={block.text}
-                onInsert={() => handleInsertPastedText(block)}
-                onRemove={() => setPastedTextBlocks((prev) => removePendingPastedText(prev, block.id))}
-              />
-            ))}
-            {attachments.map((att) => {
-              const Icon = getAttachmentIcon(att.extension);
-              return (
-                <div
-                  key={att.relativePath}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 5,
-                    padding: "3px 8px",
-                    borderRadius: 6,
-                    backgroundColor: "rgba(218, 193, 185, 0.15)",
-                    fontSize: 11,
-                    fontFamily: "'DM Mono', monospace",
-                    color: "#5E5E65",
-                  }}
-                >
-                  <Icon size={12} />
-                  <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {att.fileName}
-                  </span>
-                  <button
-                    onClick={() => removeAttachment(att.relativePath)}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
-                  >
-                    <X size={10} />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        {hasAssets ? (
+          <ComposerAssetTray>
+            <ComposerDraftAssetCollection
+              pastedBlocks={composer.pastedBlocks}
+              attachmentItems={[
+                ...composer.attachments.map((attachment) => ({
+                  id: attachment.id,
+                  fileName: attachment.fileName,
+                  extension: attachment.extension,
+                  sizeBytes: attachment.sizeBytes,
+                  contentType: attachment.contentType ?? null,
+                  previewPath: attachment.relativePath,
+                  previewSurface: attachment.surface,
+                  previewScopeId: attachment.scopeId,
+                  status: "ready" as const,
+                })),
+                ...composer.uploads.map((upload) => ({
+                  id: upload.id,
+                  fileName: upload.fileName,
+                  extension: getChatAttachmentExtension(upload.fileName),
+                  status: upload.status,
+                  error: upload.error,
+                })),
+              ]}
+              padding="0"
+              onInsertPastedBlock={composer.insertPastedTextBlock}
+              onRemovePastedBlock={composer.removePastedTextBlock}
+              onRemoveAttachmentItem={(itemId) => {
+                const attachment = composer.attachments.find((candidate) => candidate.id === itemId);
+                if (attachment) {
+                  void composer.removeAttachment(attachment);
+                  return;
+                }
+                composer.removeUpload(itemId);
+              }}
+              onRetryAttachmentItem={(itemId) => { void composer.retryUpload(itemId); }}
+            />
+          </ComposerAssetTray>
+        ) : null}
 
         <div style={{
           display: "flex",
@@ -249,11 +165,11 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
           minWidth: 0,
         }}>
           <textarea
-            ref={textareaRef}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            ref={composer.textareaRef}
+            value={composer.message}
+            onChange={(event) => composer.setMessage(event.target.value)}
             onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
+            onPaste={composer.handlePaste}
             placeholder={placeholder || "Type a message..."}
             disabled={disabled}
             rows={1}
@@ -281,7 +197,7 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
           />
           <button
             onClick={handleSend}
-            disabled={disabled || (!value.trim() && attachments.length === 0 && pastedTextBlocks.length === 0)}
+            disabled={!canSend}
             style={{
               display: "flex",
               alignItems: "center",
@@ -290,9 +206,9 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
               height: 32,
               borderRadius: 8,
               border: "none",
-              backgroundColor: (value.trim() || attachments.length > 0 || pastedTextBlocks.length > 0) && !disabled ? "#93452A" : "rgba(147, 69, 42, 0.15)",
-              color: (value.trim() || attachments.length > 0 || pastedTextBlocks.length > 0) && !disabled ? "#FFFFFF" : "#9C9CA0",
-              cursor: (value.trim() || attachments.length > 0 || pastedTextBlocks.length > 0) && !disabled ? "pointer" : "default",
+              backgroundColor: canSend ? "#93452A" : "rgba(147, 69, 42, 0.15)",
+              color: canSend ? "#FFFFFF" : "#9C9CA0",
+              cursor: canSend ? "pointer" : "default",
               flexShrink: 0,
               transition: "all 120ms ease",
             }}
@@ -300,20 +216,16 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
             <Send size={16} />
           </button>
         </div>
-        {/* Hidden file input */}
+
         <input
-          ref={fileInputRef}
+          ref={composer.fileInputRef}
           type="file"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFileUpload(file);
-            e.target.value = "";
-          }}
+          multiple
+          onChange={composer.handleFileInputChange}
           style={{ display: "none" }}
-          accept="image/*,.pdf,.md,.txt,.csv,.json,.html"
+          accept={composer.accept}
         />
 
-        {/* Toolbar with permission and model pickers */}
         <div style={{
           display: "flex",
           alignItems: "center",
@@ -321,11 +233,10 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
           padding: "4px 8px 6px",
           borderTop: "1px solid rgba(218, 193, 185, 0.15)",
         }}>
-          {/* Attach file */}
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
+            onClick={composer.openFilePicker}
+            disabled={composer.isUploading || !scopeId}
             style={{
               display: "flex",
               alignItems: "center",
@@ -334,15 +245,32 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
               border: "none",
               borderRadius: 5,
               backgroundColor: "transparent",
-              color: isUploading ? "#bbb" : "#5E5E65",
-              cursor: isUploading ? "not-allowed" : "pointer",
+              color: composer.isUploading || !scopeId ? "#bbb" : "#5E5E65",
+              cursor: composer.isUploading || !scopeId ? "not-allowed" : "pointer",
             }}
-            onMouseEnter={(e) => { if (!isUploading) e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.04)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
-            title="Attach file"
+            onMouseEnter={(event) => { if (!composer.isUploading && scopeId) event.currentTarget.style.backgroundColor = "rgba(0,0,0,0.04)"; }}
+            onMouseLeave={(event) => { event.currentTarget.style.backgroundColor = "transparent"; }}
+            title={scopeId ? "Attach files" : "Chat is still loading"}
           >
             <Paperclip size={14} />
           </button>
+          {composer.hasDraft && (
+            <button
+              type="button"
+              onClick={() => { void composer.discardDraft(); }}
+              style={{
+                border: "none",
+                background: "transparent",
+                color: "#9C9CA0",
+                fontSize: 11,
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                cursor: "pointer",
+                padding: "4px 6px",
+              }}
+            >
+              Discard draft
+            </button>
+          )}
           <ModelPicker value={model} onChange={setModel} />
           <PermissionPicker value={permissionMode} onChange={setPermissionMode} />
         </div>

@@ -1,16 +1,20 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { ArrowUp, Paperclip, X, Image, FileType, FileText } from "lucide-react";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { ArrowUp, Paperclip } from "lucide-react";
 import type { LogEntry, PermissionMode, ClaudeModel, Todo } from "@/types/task";
+import type { ChatAttachment } from "@/types/chat-composer";
 import { useTaskStore } from "@/store/task-store";
 import { SlashCommandMenu } from "@/components/shared/slash-command-menu";
 import type { TagItem } from "@/components/shared/slash-command-menu";
 import { PermissionPicker } from "@/components/shared/permission-picker";
 import { ModelPicker } from "@/components/shared/model-picker";
+import { ComposerAssetTray } from "@/components/shared/composer-asset-tray";
+import { ComposerDraftAssetCollection } from "@/components/shared/composer-draft-asset-collection";
 import { TasksPopover, type SubtaskSummary } from "@/components/shared/tasks-popover";
-import { PastedTextCard } from "@/components/shared/pasted-text-card";
 import { parseTodosFromInput } from "@/lib/claude-parser";
+import { useChatComposer } from "@/hooks/use-chat-composer";
+import { composeMessageWithAttachments } from "@/lib/chat-message-content";
 import {
   getExecutionPermissionMode,
   getPermissionStateForPickerChange,
@@ -19,32 +23,9 @@ import {
 } from "@/lib/permission-mode";
 import type { SlashCommand } from "@/lib/slash-commands";
 import { recordTagUsage } from "@/components/board/goal-chips";
-import {
-  appendPendingPastedText,
-  insertPastedTextAtSelection,
-  removePendingPastedText,
-  shouldCapturePastedText,
-  type PendingPastedTextBlock,
-} from "@/lib/pasted-text";
 import { syncComposerTextareaHeight } from "@/lib/composer";
 import { useComposerResize } from "@/hooks/use-composer-resize";
-
-// ── Attachment helpers ──────────────────────────────────────────
-
-interface Attachment {
-  fileName: string;
-  relativePath: string;
-  extension: string;
-  sizeBytes: number;
-}
-
-const IMAGE_EXTS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg"]);
-
-function getAttachmentIcon(ext: string) {
-  if (IMAGE_EXTS.has(ext)) return Image;
-  if (ext === "pdf") return FileType;
-  return FileText;
-}
+import { getChatAttachmentExtension } from "@/lib/chat-attachment-policy";
 
 /** Renders a highlight mirror behind a transparent textarea so @tags and
  *  /commands appear colored while the user types normally. */
@@ -162,7 +143,7 @@ interface ReplyInputProps {
   onRunSubtaskInPane?: (subtaskId: string, paneId: string) => void;
   /** When set, the first message creates a new pane task instead of replying.
    *  Returns the new task ID on success, null on failure. */
-  onCreatePaneTask?: (message: string, permissionMode: string, model: ClaudeModel | null) => Promise<string | null>;
+  onCreatePaneTask?: (message: string, permissionMode: string, model: ClaudeModel | null, attachments: ChatAttachment[]) => Promise<string | null>;
   /** Compact mode — shrink toolbar elements (for multi-pane layouts) */
   compact?: boolean;
   /** Project slug — used to pin the relevant brief at the top of the @ menu */
@@ -193,7 +174,6 @@ export function ReplyInput({
   projectSlug,
   hideTasksPopover,
 }: ReplyInputProps) {
-  const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSlashMenu, setShowSlashMenu] = useState(false);
@@ -211,15 +191,18 @@ export function ReplyInput({
     ),
   );
   const [model, setModel] = useState<ClaudeModel | null>(initialModel);
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [pastedTextBlocks, setPastedTextBlocks] = useState<PendingPastedTextBlock[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [mirrorScroll, setMirrorScroll] = useState({ top: 0, left: 0 });
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const composer = useChatComposer({
+    surface: "task",
+    scopeId: taskId,
+  });
   const createTask = useTaskStore((s) => s.createTask);
   const updateTask = useTaskStore((s) => s.updateTask);
   const logEntries = useTaskStore((s) => s.logEntries[taskId]) ?? [];
+  const hasAssets =
+    composer.attachments.length > 0 ||
+    composer.uploads.length > 0 ||
+    composer.pastedBlocks.length > 0;
+  const [mirrorScroll, setMirrorScroll] = useState({ top: 0, left: 0 });
   const minComposerHeight = compact ? 44 : 60;
   const maxComposerHeight = compact ? 220 : 320;
   const { composerHeight, hasUserResized, handleResizePointerDown } = useComposerResize({
@@ -254,25 +237,25 @@ export function ReplyInput({
   }, [taskId, initialPermissionMode, initialExecutionPermissionMode, initialModel]);
 
   useEffect(() => {
-    syncComposerTextareaHeight(textareaRef.current, {
+    syncComposerTextareaHeight(composer.textareaRef.current, {
       minHeight: minComposerHeight,
       maxHeight: maxComposerHeight,
       targetHeight: hasUserResized ? composerHeight : null,
     });
-  }, [composerHeight, hasUserResized, maxComposerHeight, message, minComposerHeight]);
+  }, [composer.message, composer.textareaRef, composerHeight, hasUserResized, maxComposerHeight, minComposerHeight]);
 
   const syncMirrorScroll = useCallback(() => {
-    const textarea = textareaRef.current;
+    const textarea = composer.textareaRef.current;
     if (!textarea) return;
     setMirrorScroll((current) => {
       const next = { top: textarea.scrollTop, left: textarea.scrollLeft };
       return current.top === next.top && current.left === next.left ? current : next;
     });
-  }, []);
+  }, [composer.textareaRef]);
 
   useEffect(() => {
     requestAnimationFrame(() => syncMirrorScroll());
-  }, [message, syncMirrorScroll]);
+  }, [composer.message, syncMirrorScroll]);
 
   const latestTodos: Todo[] = useMemo(() => {
     for (let i = logEntries.length - 1; i >= 0; i--) {
@@ -288,43 +271,6 @@ export function ReplyInput({
     }
     return [];
   }, [logEntries]);
-
-  const handleFileUpload = useCallback(async (file: File) => {
-    setIsUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("dir", ".tmp/attachments");
-      const res = await fetch("/api/files/upload", { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Upload failed");
-      const result: Attachment = await res.json();
-      setAttachments((prev) => [...prev, result]);
-    } catch { /* silently fail */ } finally {
-      setIsUploading(false);
-    }
-  }, []);
-
-  const removeAttachment = useCallback((relativePath: string) => {
-    setAttachments((prev) => prev.filter((a) => a.relativePath !== relativePath));
-  }, []);
-
-  const handlePaste = useCallback((e: React.ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-    for (const item of items) {
-      if (item.type.startsWith("image/")) {
-        e.preventDefault();
-        const file = item.getAsFile();
-        if (file) handleFileUpload(file);
-        return;
-      }
-    }
-    const text = e.clipboardData?.getData("text/plain") ?? "";
-    if (shouldCapturePastedText(text)) {
-      e.preventDefault();
-      setPastedTextBlocks((prev) => [...prev, { id: crypto.randomUUID(), text }]);
-    }
-  }, [handleFileUpload]);
 
   const handlePermissionModeChange = useCallback((nextMode: "bypassPermissions" | "default" | "plan") => {
     const nextState = getPermissionStateForPickerChange(
@@ -347,67 +293,24 @@ export function ReplyInput({
     }
   }, [onCreatePaneTask, taskId, updateTask]);
 
-  const focusTextarea = useCallback((selectionStart?: number, selectionEnd = selectionStart) => {
-    requestAnimationFrame(() => {
-      const textarea = textareaRef.current;
-      if (!textarea) return;
-      textarea.focus();
-      if (selectionStart == null || selectionEnd == null) return;
-      textarea.setSelectionRange(selectionStart, selectionEnd);
-    });
-  }, []);
-
-  const handleInsertPastedText = useCallback((block: PendingPastedTextBlock) => {
-    const textarea = textareaRef.current;
-    const selectionStart = textarea?.selectionStart ?? message.length;
-    const selectionEnd = textarea?.selectionEnd ?? selectionStart;
-    const insertion = insertPastedTextAtSelection(
-      message,
-      block.text,
-      selectionStart,
-      selectionEnd,
-    );
-
-    setMessage(insertion.value);
-    setPastedTextBlocks((prev) => removePendingPastedText(prev, block.id));
-    focusTextarea(insertion.selectionStart, insertion.selectionEnd);
-    requestAnimationFrame(() => {
-      syncComposerTextareaHeight(textareaRef.current, {
-        minHeight: minComposerHeight,
-        maxHeight: maxComposerHeight,
-        targetHeight: hasUserResized ? composerHeight : null,
-      });
-      syncMirrorScroll();
-    });
-  }, [composerHeight, focusTextarea, hasUserResized, maxComposerHeight, message, minComposerHeight, syncMirrorScroll]);
-
   const handleSubmit = useCallback(async () => {
-    const trimmed = message.trim();
-    if (!trimmed && attachments.length === 0 && pastedTextBlocks.length === 0) return;
+    const submission = composer.buildSubmission();
+    if (!submission.message && submission.attachments.length === 0) return;
     if (isSending) return;
-
-    // Build final message with attachment paths
-    let finalMessage = appendPendingPastedText(trimmed, pastedTextBlocks);
-    if (attachments.length > 0) {
-      const attachmentLines = attachments.map((a) => `- ${a.relativePath}`).join("\n");
-      finalMessage = finalMessage
-        ? `${finalMessage}\n\nAttached files:\n${attachmentLines}`
-        : `Attached files:\n${attachmentLines}`;
-    }
+    const finalMessage = composeMessageWithAttachments(submission.message, submission.attachments);
 
     setIsSending(true);
 
     // If this is an empty pane, create a new task instead of replying
     if (onCreatePaneTask) {
-      setMessage("");
-      setAttachments([]);
-      setPastedTextBlocks([]);
       try {
         await onCreatePaneTask(
-          finalMessage,
+          submission.message,
           activePermissionMode === "plan" ? "plan" : permissionMode,
           model,
+          submission.attachments,
         );
+        composer.clearComposer();
       } catch {
         setError("Failed to start conversation");
         setTimeout(() => setError(null), 3000);
@@ -437,16 +340,15 @@ export function ReplyInput({
       lastReplyAt: new Date().toISOString(),
     });
 
-    setMessage("");
-    setAttachments([]);
-    setPastedTextBlocks([]);
+    composer.clearComposer();
 
     try {
       const res = await fetch(`/api/tasks/${taskId}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: finalMessage,
+          message: submission.message,
+          attachments: submission.attachments,
           permissionMode: activePermissionMode === "plan" ? "plan" : permissionMode,
           executionPermissionMode,
           model,
@@ -464,8 +366,7 @@ export function ReplyInput({
       setIsSending(false);
     }
   }, [
-    message,
-    attachments,
+    composer,
     isSending,
     taskId,
     onOptimisticReply,
@@ -474,13 +375,12 @@ export function ReplyInput({
     permissionMode,
     executionPermissionMode,
     model,
-    pastedTextBlocks,
   ]);
 
   const handleSlashSelect = useCallback(async (cmd: SlashCommand) => {
     setShowSlashMenu(false);
     setSlashQuery("");
-    setMessage("");
+    composer.setMessage("");
 
     // Create a new task from the slash command and auto-queue it
     const taskTitle = cmd.label;
@@ -493,10 +393,10 @@ export function ReplyInput({
     if (newTask) {
       await updateTask(newTask.id, { status: "queued" });
     }
-  }, [createTask, updateTask]);
+  }, [composer, createTask, updateTask]);
 
   const handleChange = useCallback((value: string) => {
-    setMessage(value);
+    composer.setMessage(value);
     if (value.startsWith("/")) {
       setShowSlashMenu(true);
       setSlashQuery(value);
@@ -506,7 +406,7 @@ export function ReplyInput({
       setSlashQuery("");
     }
     // Detect @tag trigger
-    const el = textareaRef.current;
+    const el = composer.textareaRef.current;
     if (el && !value.startsWith("/")) {
       const cursor = el.selectionStart ?? value.length;
       const before = value.slice(0, cursor);
@@ -520,7 +420,7 @@ export function ReplyInput({
         setTagQuery("");
       }
     }
-  }, []);
+  }, [composer]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -540,10 +440,17 @@ export function ReplyInput({
     : taskStatus === "review" || taskStatus === "done"
       ? "Send a follow-up or type / for commands or skills..."
       : "Send a message...  Type / for commands or skills, @ for tags";
-  const canSubmit = message.trim().length > 0 || attachments.length > 0 || pastedTextBlocks.length > 0;
+  const canSubmit =
+    composer.message.trim().length > 0 ||
+    composer.attachments.length > 0 ||
+    composer.pastedBlocks.length > 0;
 
   return (
     <div
+      onDragEnter={composer.handleDragEnter}
+      onDragOver={composer.handleDragOver}
+      onDragLeave={composer.handleDragLeave}
+      onDrop={composer.handleDrop}
       style={{
         padding: compact ? "6px 12px 8px 12px" : "12px 24px 16px 24px",
         borderTop: "1px solid #EAE8E6",
@@ -558,10 +465,11 @@ export function ReplyInput({
       <div
         style={{
           background: "#f3f0ee",
-          border: "1px solid #e5e1dc",
+          border: composer.isDragging ? "1px solid rgba(147, 69, 42, 0.45)" : "1px solid #e5e1dc",
           borderRadius: 10,
           overflow: "visible",
           position: "relative",
+          boxShadow: composer.isDragging ? "0 0 0 3px rgba(147, 69, 42, 0.08)" : "none",
         }}
       >
         <div style={{ display: "flex", justifyContent: "center", padding: compact ? "6px 10px 0" : "8px 14px 0" }}>
@@ -579,7 +487,47 @@ export function ReplyInput({
             }}
           />
         </div>
-          <div style={{ position: "relative", padding: compact ? "6px 10px 4px" : "12px 14px 8px", minWidth: 0 }}>
+        {hasAssets ? (
+          <ComposerAssetTray compact={compact}>
+            <ComposerDraftAssetCollection
+              pastedBlocks={composer.pastedBlocks}
+              attachmentItems={[
+                ...composer.attachments.map((attachment) => ({
+                  id: attachment.id,
+                  fileName: attachment.fileName,
+                  extension: attachment.extension,
+                  sizeBytes: attachment.sizeBytes,
+                  contentType: attachment.contentType ?? null,
+                  previewPath: attachment.relativePath,
+                  previewSurface: attachment.surface,
+                  previewScopeId: attachment.scopeId,
+                  status: "ready" as const,
+                })),
+                ...composer.uploads.map((upload) => ({
+                  id: upload.id,
+                  fileName: upload.fileName,
+                  extension: getChatAttachmentExtension(upload.fileName),
+                  status: upload.status,
+                  error: upload.error,
+                })),
+              ]}
+              compact={compact}
+              padding="0"
+              onInsertPastedBlock={composer.insertPastedTextBlock}
+              onRemovePastedBlock={composer.removePastedTextBlock}
+              onRemoveAttachmentItem={(itemId) => {
+                const attachment = composer.attachments.find((candidate) => candidate.id === itemId);
+                if (attachment) {
+                  void composer.removeAttachment(attachment);
+                  return;
+                }
+                composer.removeUpload(itemId);
+              }}
+              onRetryAttachmentItem={(itemId) => { void composer.retryUpload(itemId); }}
+            />
+          </ComposerAssetTray>
+        ) : null}
+        <div style={{ position: "relative", padding: compact ? "6px 10px 4px" : "12px 14px 8px", minWidth: 0 }}>
           {showSlashMenu && (
             <SlashCommandMenu
               query={slashQuery}
@@ -608,71 +556,29 @@ export function ReplyInput({
                   return 0;
                 })}
               onTagSelect={(tag) => {
-                const el = textareaRef.current;
+                const el = composer.textareaRef.current;
                 if (el) {
-                  const cursor = el.selectionStart ?? message.length;
-                  const before = message.slice(0, cursor);
-                  const after = message.slice(cursor);
+                  const cursor = el.selectionStart ?? composer.message.length;
+                  const before = composer.message.slice(0, cursor);
+                  const after = composer.message.slice(cursor);
                   const replaced = before.replace(/(^|[\s])@[\w\/-]*$/, `$1@${tag.name} `);
-                  setMessage(replaced + after);
+                  composer.setMessage(replaced + after);
                 } else {
-                  setMessage((prev) => prev + `@${tag.name} `);
+                  composer.setMessage((prev) => prev + `@${tag.name} `);
                 }
                 recordTagUsage(tag.name);
                 setShowTagMenu(false);
                 setTagQuery("");
-                textareaRef.current?.focus();
+                composer.textareaRef.current?.focus();
               }}
             />
-          )}
-          {(pastedTextBlocks.length > 0 || attachments.length > 0) && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: compact ? 6 : 8 }}>
-              {pastedTextBlocks.map((block) => (
-                <PastedTextCard
-                  key={block.id}
-                  text={block.text}
-                  onInsert={() => handleInsertPastedText(block)}
-                  onRemove={() => setPastedTextBlocks((prev) => removePendingPastedText(prev, block.id))}
-                />
-              ))}
-              {attachments.map((att) => {
-                const Icon = getAttachmentIcon(att.extension);
-                return (
-                  <div
-                    key={att.relativePath}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 5,
-                      padding: "3px 8px",
-                      borderRadius: 6,
-                      backgroundColor: "rgba(218, 193, 185, 0.15)",
-                      fontSize: 11,
-                      fontFamily: "'DM Mono', monospace",
-                      color: "#5E5E65",
-                    }}
-                  >
-                    <Icon size={12} />
-                    <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {att.fileName}
-                    </span>
-                    <button
-                      onClick={() => removeAttachment(att.relativePath)}
-                      style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#9C9CA0" }}
-                    >
-                      <X size={10} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
           )}
           {/* Inner wrapper — position:relative so the highlight mirror
               aligns exactly with the textarea (not offset by parent padding). */}
           <div style={{ position: "relative", minWidth: 0, overflow: "hidden" }}>
-            {(message.includes("@") || message.includes("/")) && (
+            {(composer.message.includes("@") || composer.message.includes("/")) && (
               <HighlightMirror
-                text={message}
+                text={composer.message}
                 scrollTop={mirrorScroll.top}
                 scrollLeft={mirrorScroll.left}
                 style={{
@@ -684,11 +590,11 @@ export function ReplyInput({
               />
             )}
             <textarea
-              ref={textareaRef}
-              value={message}
+              ref={composer.textareaRef}
+              value={composer.message}
               onChange={(e) => handleChange(e.target.value)}
               onKeyDown={handleKeyDown}
-              onPaste={handlePaste}
+              onPaste={composer.handlePaste}
               onScroll={syncMirrorScroll}
               placeholder={placeholder}
               rows={compact ? 1 : 3}
@@ -709,7 +615,7 @@ export function ReplyInput({
                 whiteSpace: "pre-wrap",
                 overflowWrap: "anywhere",
                 wordBreak: "break-word",
-                color: (message.includes("@") || message.includes("/")) ? "transparent" : "#1B1C1B",
+                color: (composer.message.includes("@") || composer.message.includes("/")) ? "transparent" : "#1B1C1B",
                 caretColor: "#1B1C1B",
                 position: "relative",
                 zIndex: 1,
@@ -721,15 +627,12 @@ export function ReplyInput({
         </div>
         {/* Hidden file input */}
         <input
-          ref={fileInputRef}
+          ref={composer.fileInputRef}
           type="file"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFileUpload(file);
-            e.target.value = "";
-          }}
+          multiple
+          onChange={composer.handleFileInputChange}
           style={{ display: "none" }}
-          accept="image/*,.pdf,.md,.txt,.csv,.json,.html"
+          accept={composer.accept}
         />
 
         <div
@@ -744,8 +647,8 @@ export function ReplyInput({
           {/* Attach file */}
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
+            onClick={composer.openFilePicker}
+            disabled={composer.isUploading}
             style={{
               display: "flex",
               alignItems: "center",
@@ -754,15 +657,32 @@ export function ReplyInput({
               border: "none",
               borderRadius: 5,
               backgroundColor: "transparent",
-              color: isUploading ? "#bbb" : "#5E5E65",
-              cursor: isUploading ? "not-allowed" : "pointer",
+              color: composer.isUploading ? "#bbb" : "#5E5E65",
+              cursor: composer.isUploading ? "not-allowed" : "pointer",
             }}
-            onMouseEnter={(e) => { if (!isUploading) e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.04)"; }}
+            onMouseEnter={(e) => { if (!composer.isUploading) e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.04)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
             title="Attach file"
           >
             <Paperclip size={14} />
           </button>
+          {composer.hasDraft && (
+            <button
+              type="button"
+              onClick={() => { void composer.discardDraft(); }}
+              style={{
+                border: "none",
+                backgroundColor: "transparent",
+                color: "#9C9CA0",
+                fontSize: 11,
+                fontFamily: "var(--font-space-grotesk), Space Grotesk, sans-serif",
+                cursor: "pointer",
+                padding: "4px 6px",
+              }}
+            >
+              Discard draft
+            </button>
+          )}
           <ModelPicker value={model} onChange={handleModelChange} />
           <PermissionPicker value={permissionMode} onChange={handlePermissionModeChange} />
           {!hideTasksPopover && (

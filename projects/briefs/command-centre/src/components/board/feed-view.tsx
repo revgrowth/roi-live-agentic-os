@@ -16,6 +16,7 @@ import {
 } from "@/components/shared/draft-plan-preview";
 import { parseTodosFromInput } from "@/lib/claude-parser";
 import { NewGoalPanel } from "./new-goal-panel";
+import { GoalDraftCard } from "./goal-draft-card";
 import { LevelBadge } from "./level-badge";
 import { RoutingDecisionCard } from "./routing-decision-card";
 import { ClientFilterBar } from "./client-filter-bar";
@@ -43,6 +44,14 @@ import {
   getPickerPermissionMode,
   normalizePermissionMode,
 } from "@/lib/permission-mode";
+import { loadGoalDrafts, removeGoalDraft, saveGoalDraft } from "@/lib/goal-drafts";
+import {
+  clearActiveGoalDraftPanel,
+  createGoalDraftPanelState,
+  openBlankGoalDraftPanel,
+  openSavedGoalDraftPanel,
+  saveDraftInOpenGoalPanel,
+} from "@/lib/goal-draft-panel-state";
 import {
   extractPendingApprovedBriefFromLogs,
 } from "@/lib/plan-brief";
@@ -56,6 +65,8 @@ import {
 import { useComposerResize } from "@/hooks/use-composer-resize";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { CHAT_ATTACHMENT_ACCEPT_ATTR } from "@/lib/chat-attachment-policy";
+import type { GoalDraftPayload } from "@/types/goal-draft";
 
 const mdComponents = {
   p: ({ children }: { children?: React.ReactNode }) => <p style={{ margin: "6px 0" }}>{children}</p>,
@@ -2886,7 +2897,7 @@ function DetailPanel({
                   e.target.value = "";
                 }}
                 style={{ display: "none" }}
-                accept="image/*,.pdf,.md,.txt,.csv,.json,.html"
+                accept={CHAT_ATTACHMENT_ACCEPT_ATTR}
               />
 
               {/* Textarea on top */}
@@ -4118,6 +4129,8 @@ export function FeedView({
   const [routingDecision, setRoutingDecision] = useState<{ scope: ScopeResult; goal: string } | null>(null);
   const [gsdGuardrail, setGsdGuardrail] = useState<{ scope: ScopeResult; goal: string } | null>(null);
   const [showNewGoalPanel, setShowNewGoalPanel] = useState(true);
+  const [goalDraftPanelState, setGoalDraftPanelState] = useState(() => createGoalDraftPanelState());
+  const [goalDrafts, setGoalDrafts] = useState<GoalDraftPayload[]>([]);
   const [activeTagFilter, setActiveTagFilter] = useState<string | null>(null);
   const createTaskAction = useTaskStore((s) => s.createTask);
   // Scope data for a task that needs project planning in the detail panel
@@ -4129,6 +4142,10 @@ export function FeedView({
   const DRAWER_MAX_RATIO = 0.6; // never wider than 60% of viewport
   const [drawerWidth, setDrawerWidth] = useState<number | null>(null);
   const drawerDraggingRef = useRef(false);
+
+  useEffect(() => {
+    setGoalDrafts(loadGoalDrafts());
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -4179,8 +4196,67 @@ export function FeedView({
     document.body.style.userSelect = "none";
   }, []);
 
+  const editingGoalDraft = useMemo(
+    () => goalDrafts.find((draft) => draft.id === goalDraftPanelState.activeDraftId) ?? null,
+    [goalDraftPanelState.activeDraftId, goalDrafts],
+  );
+
+  const handleOpenNewGoal = useCallback(() => {
+    setSelectedId(null);
+    setDetailFullscreen(false);
+    setGoalDraftPanelState((current) => openBlankGoalDraftPanel(current));
+    setShowNewGoalPanel(true);
+  }, []);
+
+  const handleOpenGoalDraft = useCallback((draftId: string) => {
+    setSelectedId(null);
+    setDetailFullscreen(false);
+    setGoalDraftPanelState((current) => openSavedGoalDraftPanel(current, draftId));
+    setShowNewGoalPanel(true);
+  }, []);
+
+  const handleGoalDraftSaved = useCallback((draft: GoalDraftPayload) => {
+    setGoalDrafts(saveGoalDraft(draft));
+    setGoalDraftPanelState((current) => saveDraftInOpenGoalPanel(current, draft.id));
+  }, []);
+
+  const handleGoalDraftDiscarded = useCallback(async (draftId: string | null) => {
+    if (draftId) {
+      const draft = goalDrafts.find((candidate) => candidate.id === draftId);
+      if (draft?.attachments.length) {
+        try {
+          await fetch("/api/goal-drafts/attachments", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              draftId,
+              clientId: draft.clientId,
+            }),
+          });
+        } catch {
+          // Best effort cleanup only.
+        }
+      }
+      setGoalDrafts(removeGoalDraft(draftId));
+    }
+    if (goalDraftPanelState.activeDraftId === draftId) {
+      setGoalDraftPanelState((current) => clearActiveGoalDraftPanel(current));
+    }
+    setShowNewGoalPanel(false);
+  }, [goalDraftPanelState.activeDraftId, goalDrafts]);
+
+  const handleGoalDraftSubmitted = useCallback((draftId: string | null | undefined) => {
+    if (draftId) {
+      setGoalDrafts(removeGoalDraft(draftId));
+    }
+    if (goalDraftPanelState.activeDraftId === draftId) {
+      setGoalDraftPanelState((current) => clearActiveGoalDraftPanel(current));
+    }
+  }, [goalDraftPanelState.activeDraftId]);
+
   const toggleSelect = useCallback((id: string) => {
     setShowNewGoalPanel(false);
+    setGoalDraftPanelState((current) => clearActiveGoalDraftPanel(current));
     setSelectedId((prev) => {
       if (prev === id) {
         setDetailFullscreen(false);
@@ -4256,6 +4332,21 @@ export function FeedView({
     });
   }, [tasks, activeClientSlugs, activeTagFilter]);
 
+  const visibleGoalDrafts = useMemo(() => {
+    return goalDrafts
+      .filter((draft) => {
+        if (activeClientSlugs !== null) {
+          const slug = draft.clientId || "_root";
+          if (!activeClientSlugs.includes(slug)) return false;
+        }
+        if (activeTagFilter && draft.tag !== activeTagFilter) {
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  }, [activeClientSlugs, activeTagFilter, goalDrafts]);
+
   // Slugs of projects (or GSD roots) that have a materialized parent row in
   // the feed. Any sibling task sharing that slug should be hidden from the
   // top-level feed and only appear inside the project parent's drill-in.
@@ -4325,16 +4416,22 @@ export function FeedView({
     const allTopLevel = [...activeGoals, ...achievedGoals];
 
     // Group by clientSlug
-    const byClient = new Map<string, Task[]>();
+    const byClient = new Map<string, { tasks: Task[]; drafts: GoalDraftPayload[] }>();
     for (const t of allTopLevel) {
       const key = t.clientId || "_root";
-      if (!byClient.has(key)) byClient.set(key, []);
-      byClient.get(key)!.push(t);
+      if (!byClient.has(key)) byClient.set(key, { tasks: [], drafts: [] });
+      byClient.get(key)!.tasks.push(t);
+    }
+    for (const draft of visibleGoalDrafts) {
+      const key = draft.clientId || "_root";
+      if (!byClient.has(key)) byClient.set(key, { tasks: [], drafts: [] });
+      byClient.get(key)!.drafts.push(draft);
     }
 
     const lanes: SwimLane[] = [];
 
-    for (const [slug, tasks] of byClient) {
+    for (const [slug, entry] of byClient) {
+      const tasks = entry.tasks;
       const client = slug !== "_root" ? clients.find((c) => c.slug === slug) : null;
       const goals: Task[] = [];
       const done: Task[] = [];
@@ -4369,6 +4466,7 @@ export function FeedView({
         clientSlug: slug === "_root" ? null : slug,
         clientName: client?.name || (slug === "_root" ? rootName : slug),
         clientColor: client?.color || "#999",
+        goalDrafts: entry.drafts.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()),
         goals,
         done,
       });
@@ -4376,11 +4474,11 @@ export function FeedView({
 
     // Show swim lane headers when multiple clients have active goals
     // (done-only lanes don't count — they shouldn't trigger headers by themselves)
-    const lanesWithActiveWork = lanes.filter((l) => l.goals.length > 0);
+    const lanesWithActiveWork = lanes.filter((lane) => lane.goals.length > 0 || lane.goalDrafts.length > 0);
     const singleLane = lanesWithActiveWork.length <= 1 && lanes.length <= 1;
 
     return { lanes, singleLane };
-  }, [activeGoals, achievedGoals, activeClientSlugs, clients, isInReview]);
+  }, [activeGoals, achievedGoals, clients, rootName, visibleGoalDrafts]);
 
   const [dropOverColumn, setDropOverColumn] = useState<"goals" | "done" | null>(null);
 
@@ -4503,11 +4601,7 @@ export function FeedView({
     >
       {/* Unified toolbar: client filters + New Goal */}
       <ClientFilterBar
-        onNewGoal={() => {
-          setSelectedId(null);
-          setDetailFullscreen(false);
-          setShowNewGoalPanel(true);
-        }}
+        onNewGoal={handleOpenNewGoal}
       />
 
       <TagFilterBar
@@ -4558,7 +4652,7 @@ export function FeedView({
           }}
           onChangeLevel={() => {
             setRoutingDecision(null);
-            setShowNewGoalPanel(true);
+            handleOpenNewGoal();
           }}
           onDismiss={() => setRoutingDecision(null)}
         />
@@ -4586,12 +4680,21 @@ export function FeedView({
         onDragOverColumn={handleDragOverColumn}
         onDragLeaveColumn={handleDragLeaveColumn}
         dropOverColumn={dropOverColumn}
-        isEmpty={activeGoals.length === 0 && achievedGoals.length === 0}
+        isEmpty={activeGoals.length === 0 && achievedGoals.length === 0 && visibleGoalDrafts.length === 0}
         hideDone={false}
         doneFilter={doneFilter}
         onDoneFilterChange={setDoneFilter}
         groupByTag={groupByTag}
         onToggleGroupByTag={() => setGroupByTag((v) => !v)}
+        renderDraftCard={(draft) => (
+          <GoalDraftCard
+            key={draft.id}
+            draft={draft}
+            isActive={goalDraftPanelState.activeDraftId === draft.id && showNewGoalPanel}
+            onOpen={handleOpenGoalDraft}
+            onDiscard={(draftId) => { void handleGoalDraftDiscarded(draftId); }}
+          />
+        )}
         renderCard={(task, column) => {
           const focusId = focusCardTask?.id ?? null;
           const isFocus = task.id === focusId;
@@ -4665,10 +4768,19 @@ export function FeedView({
       {/* New Goal panel — shown when creating, hidden when a task is selected */}
       {showNewGoalPanel && !selectedTask && (
         <NewGoalPanel
+          key={goalDraftPanelState.panelKey}
           drawerWidth={drawerWidth}
-          onClose={() => setShowNewGoalPanel(false)}
-          onCreated={(taskId) => {
+          draft={editingGoalDraft}
+          onClose={() => {
             setShowNewGoalPanel(false);
+            setGoalDraftPanelState((current) => clearActiveGoalDraftPanel(current));
+          }}
+          onDraftSaved={handleGoalDraftSaved}
+          onDiscarded={(draftId) => { void handleGoalDraftDiscarded(draftId); }}
+          onCreated={(taskId, draftId) => {
+            handleGoalDraftSubmitted(draftId);
+            setShowNewGoalPanel(false);
+            setGoalDraftPanelState((current) => clearActiveGoalDraftPanel(current));
             setSelectedId(taskId);
           }}
           onStartDrawerDrag={startDrawerDrag}
