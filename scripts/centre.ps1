@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $ScriptDir
-$CentreDir = Join-Path $RepoRoot "projects\briefs\command-centre"
+$CentreDir = Join-Path $RepoRoot "command-centre"
 $Port = if ($env:PORT) { $env:PORT } else { "3000" }
 $Url = "http://localhost:$Port"
 $HelperScript = Join-Path $ScriptDir "launcher-bootstrap.py"

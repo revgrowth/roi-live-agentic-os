@@ -20,7 +20,7 @@ Three things drove this update:
 
 ## What's new
 
-- **Command Centre** — a full task board UI with Kanban view, project dashboards, cron scheduling, and client management. Lives inside `projects/briefs/command-centre/`.
+- **Command Centre** — a full task board UI with Kanban view, project dashboards, cron scheduling, and client management. It now lives at `command-centre/` in the repo root.
 - **Branching workflow** — `/new-feature` starts a feature branch, `/release` cuts a version. A branch-guard hook gently reminds you to use feature branches for code changes.
 - **Cron system** — scheduled jobs now run in-process (they stop when the server stops, no orphaned tasks). Full Windows support.
 - **4 new skills** — `ops-cron` (scheduled jobs), `tool-stitch` (fetch UI designs), `viz-interface-design` (dashboard/admin UI), `viz-stitch-design` (design generation).
@@ -71,18 +71,18 @@ Now, each project owns its `.planning/` folder inside its own directory under `p
 
 If you do have one:
 
-1. **Figure out which project it belongs to.** Open `.planning/PROJECT.md` — it'll have the project name. Find the matching folder in `projects/briefs/` if there is one (there may not be - in which case - you can create one). For example, if the project is "command-centre", the folder is `projects/briefs/command-centre/`.
+1. **Figure out which project it belongs to.** Open `.planning/PROJECT.md` — it'll have the project name. Find the matching folder in `projects/briefs/` if there is one (there may not be - in which case - you can create one). For example, if the project is "website-rebuild", the folder is `projects/briefs/website-rebuild/`.
 
 2. **Move the `.planning/` folder into that project folder:**
    ```
    Before:
    agentic-os/
    ├── .planning/           <-- sitting at the root
-   └── projects/briefs/command-centre/
+   └── projects/briefs/website-rebuild/
 
    After:
    agentic-os/
-   └── projects/briefs/command-centre/
+   └── projects/briefs/website-rebuild/
        └── .planning/       <-- now lives inside its project
    ```
 
@@ -201,7 +201,7 @@ If the `centre` command isn't recognised, it usually means your shell has not pi
 Navigate to the Command Centre folder and start it with npm:
 
 ```bash
-cd projects/briefs/command-centre
+cd command-centre
 npm install    # only needed the first time
 npm run dev
 ```
@@ -209,6 +209,8 @@ npm run dev
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 The Command Centre needs to stay running in its own terminal window. Open a separate terminal for Claude Code.
+
+If you still have an old `projects/briefs/command-centre/` folder from a previous install, that's now just a legacy copy. The active app is `command-centre/` at the repo root, so you can delete the old folder later once you've confirmed the new launcher works.
 
 ---
 

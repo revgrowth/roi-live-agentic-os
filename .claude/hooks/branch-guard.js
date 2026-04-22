@@ -6,7 +6,7 @@
 // Zones:
 //   Content (projects/, brand_context/, context/, cron/jobs/, clients/) — commit freely to dev
 //   Config  (SKILL.md, AGENTS.md, CLAUDE.md, .env.example, scripts/) — advisory: use feature branch
-//   Code    (command-centre/src/, .claude/hooks/, runtime JS/TS) — strong nudge: use feature branch
+//   Code    (command-centre/, .claude/hooks/, runtime JS/TS) — strong nudge: use feature branch
 //
 // On main: always warns (GitHub branch protection is the hard gate).
 // On feature/* or worktree-*: always allows.
@@ -15,7 +15,7 @@ const { execSync } = require('child_process');
 
 // Zone classification patterns
 const CODE_PATTERNS = [
-  /projects\/briefs\/command-centre\/src\//,
+  /^command-centre\//,
   /\.claude\/hooks\/.*\.(js|ts)$/,
 ];
 

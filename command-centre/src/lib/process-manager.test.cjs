@@ -444,8 +444,6 @@ test("ask mode spawn wires the permission bridge and isolated settings", () => {
   const workspaceDir = makeTempWorkspace();
   const bridgeScriptPath = path.join(
     workspaceDir,
-    "projects",
-    "briefs",
     "command-centre",
     "scripts",
     "permission-prompt-mcp.cjs",

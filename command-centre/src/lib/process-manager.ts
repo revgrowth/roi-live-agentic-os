@@ -27,8 +27,6 @@ const PERMISSION_BRIDGE_SERVER = "permissions";
 const PERMISSION_BRIDGE_TOOL_NAME = "approval_prompt";
 const PERMISSION_BRIDGE_TOOL_ID = `mcp__${PERMISSION_BRIDGE_SERVER}__${PERMISSION_BRIDGE_TOOL_NAME}`;
 const PERMISSION_BRIDGE_RELATIVE_PATH = path.join(
-  "projects",
-  "briefs",
   "command-centre",
   "scripts",
   "permission-prompt-mcp.cjs",

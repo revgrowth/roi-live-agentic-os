@@ -355,6 +355,7 @@ For a quick reference, see [docs/cheat-sheet.md](docs/cheat-sheet.md).
 │   └── memory/            <- Daily session logs (auto-links to active projects)
 ├── brand_context/         <- Your brand data (voice, positioning, ICP)
 ├── .claude/skills/        <- Installed skill packs
+├── command-centre/        <- Local UI and runtime app (versioned with the repo)
 ├── cron/jobs/             <- Scheduled job definitions
 ├── projects/              <- All generated output
 │   ├── mkt-copywriting/   <- Single task category folders (Level 1)

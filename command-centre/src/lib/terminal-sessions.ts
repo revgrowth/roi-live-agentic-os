@@ -1,8 +1,9 @@
 import { spawn, type ChildProcess } from "child_process";
-import path from "path";
+import { getConfig } from "./config";
 
-// Project root — two levels up from command-centre
-const PROJECT_ROOT = path.resolve(process.cwd(), "../..");
+function getWorkspaceRoot(): string {
+  return getConfig().agenticOsDir;
+}
 
 interface BufferedEvent {
   event: string;
@@ -26,7 +27,7 @@ export function createSession(id: string, cwd?: string): TerminalSession {
   destroySession(id);
 
   const proc = spawn("bash", ["-l"], {
-    cwd: cwd || PROJECT_ROOT,
+    cwd: cwd || getWorkspaceRoot(),
     env: {
       ...process.env,
       TERM: "dumb",

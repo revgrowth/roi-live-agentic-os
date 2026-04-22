@@ -5,7 +5,7 @@ param(
 )
 
 $RepoRoot = Split-Path -Parent $PSScriptRoot
-$CommandCentreDir = Join-Path $RepoRoot "projects\briefs\command-centre"
+$CommandCentreDir = Join-Path $RepoRoot "command-centre"
 
 Push-Location $CommandCentreDir
 try {

@@ -1,14 +1,14 @@
 const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
+const { findWorkspaceRoot, hasWorkspaceMarker, workspaceMarkers } = require("./workspace-root.cjs");
 
 const appRoot = path.resolve(__dirname, "..");
-const workspaceRoot = path.resolve(appRoot, "..", "..", "..");
+const workspaceRoot = findWorkspaceRoot(appRoot);
 const nextCliPath = path.join(appRoot, "node_modules", "next", "dist", "bin", "next");
 const supportedCommands = new Set(["dev", "build", "start"]);
 const bundlerFlags = new Set(["--webpack"]);
 const turbopackFlags = new Set(["--turbopack", "--turbo"]);
-const workspaceMarkers = ["AGENTS.md", "CLAUDE.md"];
 
 function fail(message) {
   console.error(`[next-run] ${message}`);
@@ -19,10 +19,6 @@ function assertFileExists(filePath, description) {
   if (!fs.existsSync(filePath)) {
     fail(`${description} not found at ${filePath}`);
   }
-}
-
-function hasWorkspaceMarker(targetPath) {
-  return workspaceMarkers.some((marker) => fs.existsSync(path.join(targetPath, marker)));
 }
 
 function hasFlag(args, flags) {
