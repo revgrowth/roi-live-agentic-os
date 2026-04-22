@@ -5,7 +5,7 @@ param(
 )
 
 $RepoRoot = Split-Path -Parent $PSScriptRoot
-$ScriptPath = Join-Path $RepoRoot "projects\briefs\command-centre\scripts\cron-daemon.cjs"
+$ScriptPath = Join-Path $RepoRoot "command-centre\scripts\cron-daemon.cjs"
 $CronUiPath = Join-Path $PSScriptRoot "lib\cron-ui.ps1"
 . $CronUiPath
 

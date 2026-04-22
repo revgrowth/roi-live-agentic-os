@@ -10,9 +10,12 @@ import Database from "better-sqlite3";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
+import { createRequire } from "module";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, "..", "..", "..", "..");
+const require = createRequire(import.meta.url);
+const { findWorkspaceRoot } = require("./workspace-root.cjs");
+const repoRoot = findWorkspaceRoot(__dirname);
 const dbPath = path.join(repoRoot, ".command-centre", "data.db");
 
 const db = new Database(dbPath);
@@ -67,12 +70,12 @@ push(
 // 2. Context reads (will collapse into a "files read" chip)
 push("tool_use", "", {
   toolName: "Read",
-  toolArgs: { file_path: path.join(repoRoot, "projects/briefs/command-centre/brief.md") },
+  toolArgs: { file_path: path.join(repoRoot, "docs/command-centre/legacy/brief.md") },
 });
 push("tool_result", "brief.md — 142 lines");
 push("tool_use", "", {
   toolName: "Grep",
-  toolArgs: { pattern: "Level 1|Level 2|GSD", path: "projects/briefs/command-centre" },
+  toolArgs: { pattern: "Level 1|Level 2|GSD", path: "docs/command-centre/legacy" },
 });
 push("tool_result", "8 matches across 3 files");
 
@@ -85,13 +88,13 @@ push(
 - **Planned project scoping wizard** that writes \`brief.md\` + proposes subtasks
 - Tighten **GSD guardrail CTAs** ("Open active GSD", "Archive current")
 
-I'll turn that into a concise UI spec you can hand to implementation: screens, components, states, and the exact copy/CTAs for Level 1 vs Level 2 vs GSD (including Auto routing). Then I'll save it inside the \`command-centre\` brief folder so it stays with the project.`
+ I'll turn that into a concise UI spec you can hand to implementation: screens, components, states, and the exact copy/CTAs for Level 1 vs Level 2 vs GSD (including Auto routing). Then I'll save it in the \`command-centre\` docs so it stays with the product history.`
 );
 
 // 4. Write tool_use — the spec file (this should render as a "Created" FileOutputCard)
 // Read the real file content so the preview pane shows actual markdown.
 import fs from "fs";
-const specPath = path.join(repoRoot, "projects/briefs/command-centre/2026-04-10_ui-levels-routing-ui-spec.md");
+const specPath = path.join(repoRoot, "docs/command-centre/legacy/2026-04-10_ui-levels-routing-ui-spec.md");
 const specContent = fs.existsSync(specPath) ? fs.readFileSync(specPath, "utf-8") : "# UI spec placeholder\n";
 
 push("tool_use", "", {
@@ -110,7 +113,7 @@ push("text", "UI spec saved. The card above should show the breadcrumb + line co
 push("tool_use", "", {
   toolName: "Edit",
   toolArgs: {
-    file_path: path.join(repoRoot, "projects/briefs/command-centre/src/components/modal/chat-entry.tsx"),
+    file_path: path.join(repoRoot, "command-centre/src/components/modal/chat-entry.tsx"),
     old_string: "export function FileOutputCard({ entry }: { entry: LogEntry }) {",
     new_string: "export function FileOutputCard({ entry }: { entry: LogEntry }) {\n  // Cursor-style inline file card",
   },
@@ -140,7 +143,7 @@ const outputs = [
     taskId: TASK_ID,
     fileName: "2026-04-10_ui-levels-routing-ui-spec.md",
     filePath: specPath,
-    relativePath: "projects/briefs/command-centre/2026-04-10_ui-levels-routing-ui-spec.md",
+    relativePath: "docs/command-centre/legacy/2026-04-10_ui-levels-routing-ui-spec.md",
     extension: "md",
     sizeBytes: fs.existsSync(specPath) ? fs.statSync(specPath).size : 0,
     createdAt: iso(-120),
@@ -149,8 +152,8 @@ const outputs = [
     id: crypto.randomUUID(),
     taskId: TASK_ID,
     fileName: "chat-entry.tsx",
-    filePath: path.join(repoRoot, "projects/briefs/command-centre/src/components/modal/chat-entry.tsx"),
-    relativePath: "projects/briefs/command-centre/src/components/modal/chat-entry.tsx",
+    filePath: path.join(repoRoot, "command-centre/src/components/modal/chat-entry.tsx"),
+    relativePath: "command-centre/src/components/modal/chat-entry.tsx",
     extension: "tsx",
     sizeBytes: 0,
     createdAt: iso(-70),

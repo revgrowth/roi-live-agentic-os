@@ -473,14 +473,14 @@ function readRunStatus(agenticOsDir, clientId, slug) {
   };
 }
 
-function readSchemaSql() {
+function readSchemaSql(agenticOsDir) {
   try {
     return fs.readFileSync(path.join(__dirname, "schema.sql"), "utf-8");
   } catch {
     // Turbopack inlines __dirname as a virtual path in bundled API routes, so
-    // fall back to a cwd-relative lookup (next dev runs from command-centre/).
+    // fall back to the repo-local command-centre source tree.
     return fs.readFileSync(
-      path.join(process.cwd(), "src", "lib", "schema.sql"),
+      path.join(agenticOsDir, "command-centre", "src", "lib", "schema.sql"),
       "utf-8"
     );
   }
@@ -501,7 +501,7 @@ function getDb(agenticOsDir) {
 
   const db = new Database(dbPath);
   db.pragma("journal_mode = WAL");
-  db.exec(readSchemaSql());
+  db.exec(readSchemaSql(agenticOsDir));
 
   ensureColumn(db, "tasks", "clientId", "ALTER TABLE tasks ADD COLUMN clientId TEXT");
   ensureColumn(db, "tasks", "description", "ALTER TABLE tasks ADD COLUMN description TEXT");

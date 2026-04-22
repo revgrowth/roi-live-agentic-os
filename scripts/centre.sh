@@ -10,7 +10,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-CENTRE_DIR="$REPO_ROOT/projects/briefs/command-centre"
+CENTRE_DIR="$REPO_ROOT/command-centre"
 PORT="${PORT:-3000}"
 URL="http://localhost:${PORT}"
 
