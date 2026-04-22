@@ -563,6 +563,7 @@ test("POST /api/tasks persists the selected model on first create", async () => 
   const route = loadTsModule(tasksCollectionRouteSourcePath, {
     "next/server": nextServer,
     "@/lib/db": { getDb: () => db },
+    "@/lib/clients": { assertValidClientId: (value) => value ?? null },
     "@/lib/event-bus": { emitTaskEvent: () => {} },
     "@/lib/permission-mode": permissionMode,
     "@/lib/process-manager": { processManager: { hasActiveSession: () => false, killSession: async () => {} } },
@@ -670,6 +671,12 @@ test("POST /api/tasks/[id]/reply keeps model changes and resumes the task", asyn
   const route = loadTsModule(replyRouteSourcePath, {
     "next/server": nextServer,
     "@/lib/db": { getDb: () => db },
+    "@/lib/chat-attachment-service": {
+      cleanupChatAttachmentStorage: () => {},
+      copyChatAttachmentsToSent: () => [],
+      deleteSourceDraftAttachments: () => {},
+    },
+    "@/lib/chat-message-content": { composeMessageWithAttachments: (message) => message },
     "@/lib/event-bus": { emitTaskEvent: () => {} },
     "@/lib/plan-brief.server": { saveApprovedPlanToBrief: () => null },
     "@/lib/permission-mode": permissionMode,
@@ -731,6 +738,12 @@ test("POST /api/tasks/[id]/reply cancel exits plan mode and restores the staged 
   const route = loadTsModule(replyRouteSourcePath, {
     "next/server": nextServer,
     "@/lib/db": { getDb: () => db },
+    "@/lib/chat-attachment-service": {
+      cleanupChatAttachmentStorage: () => {},
+      copyChatAttachmentsToSent: () => [],
+      deleteSourceDraftAttachments: () => {},
+    },
+    "@/lib/chat-message-content": { composeMessageWithAttachments: (message) => message },
     "@/lib/event-bus": { emitTaskEvent: () => {} },
     "@/lib/plan-brief.server": { saveApprovedPlanToBrief: () => null },
     "@/lib/permission-mode": permissionMode,

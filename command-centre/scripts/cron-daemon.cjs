@@ -4,13 +4,13 @@ const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
 const cronRuntime = require("../src/lib/cron-runtime.js");
+const { findWorkspaceRoot } = require("./workspace-root.cjs");
 
 const TICK_INTERVAL_MS = 60_000;
 const HEARTBEAT_INTERVAL_MS = 15_000;
 const QUEUE_POLL_INTERVAL_MS = 2_000;
-const DEFAULT_ROOT = path.resolve(__dirname, "..", "..", "..");
 const agenticOsDir = cronRuntime.resolveAgenticOsRoot(
-  process.env.AGENTIC_OS_DIR || DEFAULT_ROOT
+  process.env.AGENTIC_OS_DIR || findWorkspaceRoot(__dirname)
 );
 const command = process.argv[2] || "status";
 

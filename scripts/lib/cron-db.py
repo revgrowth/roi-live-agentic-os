@@ -91,6 +91,8 @@ def record_outputs(connection: sqlite3.Connection, payload: dict) -> None:
             continue
 
         relative = file_path.relative_to(project_dir).as_posix()
+        # Ignore the old in-project Command Centre location if a user still has
+        # that legacy folder after updating.
         if "/briefs/command-centre/" in relative or "/node_modules/" in relative:
             continue
         if any(part.startswith(".") for part in file_path.relative_to(project_dir).parts):

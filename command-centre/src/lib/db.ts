@@ -59,8 +59,8 @@ export function getDb(): Database.Database {
     schemaSql = fs.readFileSync(schemaPath, "utf-8");
   } catch {
     // In Next.js bundled environment, __dirname may not resolve correctly.
-    // Fall back to reading from src/lib/schema.sql relative to cwd.
-    const fallbackPath = path.join(process.cwd(), "src", "lib", "schema.sql");
+    // Fall back to the repo-local command-centre source tree.
+    const fallbackPath = path.join(config.agenticOsDir, "command-centre", "src", "lib", "schema.sql");
     schemaSql = fs.readFileSync(fallbackPath, "utf-8");
   }
 

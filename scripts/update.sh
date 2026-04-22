@@ -1503,6 +1503,14 @@ if [[ -d "${REPO_ROOT}/clients" ]]; then
     fi
 fi
 
+LEGACY_CENTRE_DIR="${REPO_ROOT}/projects/briefs/command-centre"
+if [[ -d "$LEGACY_CENTRE_DIR" ]]; then
+    echo ""
+    warn "Legacy Command Centre folder detected at projects/briefs/command-centre/"
+    info "The active app now lives in command-centre/ at the repo root."
+    info "The old folder is no longer used and can be deleted manually when you're ready."
+fi
+
 echo ""
 printf "${CYAN}${BOLD}═══════════════════════════════════════════════${NC}\n"
 echo ""

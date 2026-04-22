@@ -59,7 +59,7 @@ class FileWatcher {
         /(^|[/\\])\./,           // dotfiles
         /node_modules/,           // node_modules
         /\.next/,                 // Next.js build output
-        /briefs\/command-centre/, // dashboard source code (not deliverables)
+        /briefs\/command-centre/, // legacy in-project Command Centre folder
         /\.lock$/,                // lock files
         /tsconfig/,               // TypeScript configs
         /tsbuildinfo$/,           // TS build info
