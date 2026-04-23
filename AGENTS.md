@@ -267,30 +267,31 @@ Every skill and its output folder uses a category prefix.
 
 ---
 
+
 ## Context Matrix
 
-Load only the `brand_context/` files listed for each skill.
+Load only the `brand_context/` and `/agency/` files listed for each skill.
 
-| Skill | voice-profile | positioning | icp | samples | assets | learnings |
-|-------|:---:|:---:|:---:|:---:|:---:|:---:|
-| `mkt-brand-voice` | **writes** | summary | — | **writes** | **writes** (via firecrawl branding) | `## mkt-brand-voice` |
-| `mkt-positioning` | — | **writes** | full | — | — | `## mkt-positioning` |
-| `mkt-icp` | — | summary | **writes** | — | — | `## mkt-icp` |
-| `meta-wrap-up` | — | — | — | — | — | `## meta-wrap-up` |
-| `meta-goal-breakdown` | — | summary | summary | — | — | `## meta-goal-breakdown` |
-| `str-ai-seo` | tone only | summary | full | — | — | `## str-ai-seo` |
-| `tool-stitch` | — | — | — | — | — | `## tool-stitch` |
-| `viz-stitch-design` | tone only | summary | language section | — | — | `## viz-stitch-design` |
-| `viz-interface-design` | tone only | summary | language section | — | — | `## viz-interface-design` |
-| `ops-cron` | — | — | — | — | — | `## ops-cron` |
-| `ops-new-feature` | — | — | — | — | — | `## ops-new-feature` |
-| `ops-release` | — | — | — | — | — | `## ops-release` |
+| Skill | voice-profile | positioning | icp | agency | samples | assets | learnings |
+|-------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| `mkt-brand-voice` | **writes** | summary | — | — | **writes** | **writes** (via firecrawl branding) | `## mkt-brand-voice` |
+| `mkt-positioning` | — | **writes** | full | — | — | — | `## mkt-positioning` |
+| `mkt-icp` | — | summary | **writes** | — | — | — | `## mkt-icp` |
+| `meta-wrap-up` | — | — | — | — | — | — | `## meta-wrap-up` |
+| `meta-goal-breakdown` | — | summary | summary | core-only | — | — | `## meta-goal-breakdown` |
+| `str-ai-seo` | tone only | summary | full | core + page-SOP | — | — | `## str-ai-seo` |
+| `tool-stitch` | — | — | — | — | — | — | `## tool-stitch` |
+| `viz-stitch-design` | tone only | summary | language section | — | — | — | `## viz-stitch-design` |
+| `viz-interface-design` | tone only | summary | language section | — | — | — | `## viz-interface-design` |
+| `ops-cron` | — | — | — | — | — | — | `## ops-cron` |
+| `ops-new-feature` | — | — | — | — | — | — | `## ops-new-feature` |
+| `ops-release` | — | — | — | — | — | — | `## ops-release` |
 
-**Matrix key:** `writes` = creates file | `full` = entire file | `summary` = 1-2 sentences | `tone only` = tone + vocabulary | `language section` = words-they-use section | `## skill-name` = read only that section from `context/learnings.md`
+**Matrix key:** `writes` = creates file | `full` = entire file | `summary` = 1-2 sentences | `tone only` = tone + vocabulary | `language section` = words-they-use section | `core-only` = Core Standards only | `core + page-SOP` = Core Standards + matching page-type SOP from `/agency/sops/` | `## skill-name` = read only that section from `context/learnings.md`
+
+**Agency column rule:** For client work, skills with a non-dash agency value must load the specified agency files BEFORE executing. Foundation skills (`mkt-brand-voice`, `mkt-positioning`, `mkt-icp`) do not load agency files — they create client-specific brand context, not agency deliverables. When working on ROI.LIVE itself as a client, agency loading still applies.
 
 **Learnings rule:** Every skill reads and writes to its own section in `context/learnings.md`. Cross-skill insights go under `# General`. Skill-specific entries go under `# Individual Skills` → `## {folder-name}`.
-
----
 
 ## Output Standards
 
@@ -444,3 +445,50 @@ Some skills use external services for enhanced functionality. API keys are store
 `.claude/settings.json` allows: `cat`, `ls`, `npm run *`, basic git commands, and edits to `/src/**`
 
 Denied: package installs, `rm`/`curl`/`wget`/`ssh`, reading `.env`/`.env.local` or credential files. `.env.example` is readable and editable.
+
+---
+
+## Agency Standards Inheritance
+
+ROI.LIVE is an SEO/AEO agency. All client work (including work for ROI.LIVE as its own client) is governed by agency-level standards that live in `/agency/`.
+
+### Required reading before any client execution work
+
+1. `/agency/README.md` — index of what exists and when to apply it
+2. `/agency/sops/ROI-LIVE-Agency-Core-Standards-v1.1.md` — the base framework that every page-type SOP inherits from
+
+Read these at the start of any client execution session. They are the default quality bar.
+
+### Page-type SOP loading
+
+When building a specific page type, load the matching SOP from `/agency/sops/` in addition to Core Standards:
+
+| Task | Load |
+|---|---|
+| Homepage | `ROI-LIVE-Agency-Homepage-SOP-v1.md` |
+| Service page | `ROI-LIVE-Agency-Service-Page-SOP-v1.1.md` |
+| Blog article | `ROI-LIVE-Agency-Blog-Article-SOP-v1.1.md` |
+| Case study | `ROI-LIVE-Agency-Case-Study-Page-SOP-v1.md` |
+| Collection page | `ROI-LIVE-Agency-Collection-Page-SOP-v1.md` |
+
+If a page type has no SOP yet (about page, location/geo page, product page), fall back to Core Standards and flag the gap.
+
+### Inheritance order
+
+When rules conflict, later items override earlier items:
+
+1. Agency Core Standards
+2. Page-type SOP (if applicable)
+3. Client brand context (`clients/{client}/brand_context/`)
+4. Client-specific overrides (`clients/{client}/standards/`, rare)
+5. Current session instructions
+
+Client-specific overrides are rare. When encountered, flag them explicitly.
+
+### Client parameter sheet
+
+Every active client should have `client-parameter-sheet.md` in their client folder, filled from the template at `/agency/sops/ROI-LIVE-Client-Parameter-Sheet-Template-v*.md`. If a client lacks one, flag it and offer to build one before proceeding with execution work.
+
+### AI Writing Artifact Bans (Stop Slop)
+
+The universal writing bans defined in §8 of Core Standards apply to every piece of written output. The `tool-humanizer` skill enforces these automatically as the final step on any publishable content.

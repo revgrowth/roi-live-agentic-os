@@ -21,29 +21,64 @@ Good copy reads like a smart person explaining something they care about. No one
 Persuasive copy saved to `projects/mkt-copywriting/{campaign-name}/`, scored on 7 dimensions, with multiple variants for testing. Headline variants (5-10), body variants (2-3 for long-form), and A/B test suggestions included.
 
 ## Context Needs
-
 | File | Load level | How it shapes this skill |
 |------|-----------|--------------------------|
+| `agency/sops/ROI-LIVE-Agency-Core-Standards-v1.1.md` | full | Baseline framework — SEO philosophy, Entity SEO, E-E-A-T, Information Gain, AEO/GEO patterns, AI writing bans. Required for all client work. |
+| `agency/sops/{page-type-SOP}.md` | full | Page-type-specific execution rules (see mapping below). Inherits from Core Standards; overrides where specified. |
 | `brand_context/voice-profile.md` | full | Match tone, vocabulary, rhythm in all copy |
 | `brand_context/positioning.md` | angle only | The chosen angle determines lead, proof hierarchy, CTA framing |
 | `brand_context/icp.md` | full | Know who you're writing to: awareness level, pain points, objections |
 | `brand_context/samples.md` | yes | Reference for voice consistency |
+| `client-parameter-sheet.md` (in client folder) | full if exists | Client-specific parameters per Core Standards §2 |
 | `context/learnings.md` | `## mkt-copywriting` section | Apply previous feedback before starting |
 
-Load if they exist. Proceed without them if not — this skill works standalone.
+**Agency layer loading rules:**
+- For client work: Core Standards is REQUIRED. Page-type SOP is required if the task matches a supported page type.
+- For non-page work (ad copy, social posts, email subject lines): Core Standards loads. No page-type SOP needed.
+- If agency files are missing: flag loudly, do not proceed silently with generic copy.
+
+**Page-type SOP mapping:**
+| Task | Load this SOP |
+|---|---|
+| Homepage | `agency/sops/ROI-LIVE-Agency-Homepage-SOP-v1.md` |
+| Service page | `agency/sops/ROI-LIVE-Agency-Service-Page-SOP-v1.1.md` |
+| Blog article | `agency/sops/ROI-LIVE-Agency-Blog-Article-SOP-v1.1.md` |
+| Case study | `agency/sops/ROI-LIVE-Agency-Case-Study-Page-SOP-v1.md` |
+| Collection page | `agency/sops/ROI-LIVE-Agency-Collection-Page-SOP-v1.md` |
+
+If the task is a page type without a SOP yet (about, location/geo, product): load Core Standards only and flag the gap in output.
+
+Agency files load for EVERY client engagement. `brand_context/` and `client-parameter-sheet.md` load if they exist. Generic copy (no brand context) only applies when writing for a non-client context (e.g., testing the skill).
 
 ---
 
 ## Step 1: Load Context
 
-Check `brand_context/` and load per the table above. Show a brief status:
+**1a. Load agency layer (required for client work):**
+- Core Standards: `agency/sops/ROI-LIVE-Agency-Core-Standards-v1.1.md`
+- Matching page-type SOP from the mapping table above
 
+Show status:
+- "Agency Core Standards v1.1 loaded. Applying SEO, AEO, Entity, and Information Gain frameworks."
+- "Page-type SOP loaded: [filename]. Overrides noted for: [any rules that differ from Core]."
+- "No matching page-type SOP for this task. Flagging gap — using Core Standards only."
+
+**1b. Load client layer:**
+- `brand_context/voice-profile.md`, `positioning.md`, `icp.md`, `samples.md`
+- `client-parameter-sheet.md` (in current client folder)
+
+Show status:
 - Voice loaded: "[tone summary]. All copy will match."
 - Positioning loaded: "Building around '[angle]' frame."
 - ICP loaded: "Writing for [audience]. Awareness level: [level]."
-- Nothing found: "No brand context yet. I'll write solid copy — we can build your brand profile anytime to make it on-brand."
+- Parameter sheet: "[key params from §2 of sheet — primary entities, service areas, USPs]"
+- Nothing found: "No brand context yet. Flagging — on-brand client work requires this. Run `/start-here` for this client first, or proceed knowing copy will be generic."
 
+**1c. Load learnings:**
 Read `context/learnings.md` → `## mkt-copywriting` section. Apply any previous corrections.
+
+**1d. Resolve conflicts:**
+If agency standards conflict with client brand context, flag the conflict and ask which takes precedence. Default: client-specific overrides win when explicit (per `clients/{client}/standards/`); agency standards win when client context is silent.
 
 ## Step 2: Establish Format
 
