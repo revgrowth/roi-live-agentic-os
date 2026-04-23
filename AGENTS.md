@@ -277,6 +277,11 @@ Load only the `brand_context/` and `/agency/` files listed for each skill.
 | `mkt-brand-voice` | **writes** | summary | — | — | **writes** | **writes** (via firecrawl branding) | `## mkt-brand-voice` |
 | `mkt-positioning` | — | **writes** | full | — | — | — | `## mkt-positioning` |
 | `mkt-icp` | — | summary | **writes** | — | — | — | `## mkt-icp` |
+| `mkt-copywriting` | full | angle only | full | core + page-SOP | yes | — | `## mkt-copywriting` |
+| `mkt-content-repurposing` | full | — | — | core + page-SOP | yes | — | `## mkt-content-repurposing` |
+| `mkt-ugc-scripts` | full | angle only | language section | core-only | tone refs | — | `## mkt-ugc-scripts` |
+| `str-trending-research` | — | — | language section | — | — | — | `## str-trending-research` |
+| `tool-humanizer` | full | — | — | core-only (§8) | tone refs | — | `## tool-humanizer` |
 | `meta-wrap-up` | — | — | — | — | — | — | `## meta-wrap-up` |
 | `meta-goal-breakdown` | — | summary | summary | core-only | — | — | `## meta-goal-breakdown` |
 | `str-ai-seo` | tone only | summary | full | core + page-SOP | — | — | `## str-ai-seo` |
@@ -286,6 +291,7 @@ Load only the `brand_context/` and `/agency/` files listed for each skill.
 | `ops-cron` | — | — | — | — | — | — | `## ops-cron` |
 | `ops-new-feature` | — | — | — | — | — | — | `## ops-new-feature` |
 | `ops-release` | — | — | — | — | — | — | `## ops-release` |
+
 
 **Matrix key:** `writes` = creates file | `full` = entire file | `summary` = 1-2 sentences | `tone only` = tone + vocabulary | `language section` = words-they-use section | `core-only` = Core Standards only | `core + page-SOP` = Core Standards + matching page-type SOP from `/agency/sops/` | `## skill-name` = read only that section from `context/learnings.md`
 
