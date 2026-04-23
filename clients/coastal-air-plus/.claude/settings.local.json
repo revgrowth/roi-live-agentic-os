@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:coastalcarolinahvac.com)",
+      "WebFetch(domain:coastalairplus.com)",
+      "Bash(awk 'NR==2')",
+      "WebFetch(domain:www.facebook.com)",
+      "WebSearch",
+      "WebFetch(domain:www.bbb.org)",
+      "WebFetch(domain:www.yelp.com)",
+      "WebFetch(domain:www.homeadvisor.com)",
+      "WebFetch(domain:www.angi.com)",
+      "WebFetch(domain:www.guildquality.com)",
+      "WebFetch(domain:www.manta.com)",
+      "WebFetch(domain:ezlocal.com)",
+      "WebFetch(domain:www.airconditioningprofessionals.com)",
+      "WebFetch(domain:coastal-carolina-comfort.wheree.com)",
+      "WebFetch(domain:www.nearbypros.org)",
+      "WebFetch(domain:www.golocal247.com)",
+      "Bash(python .tmp/firecrawl_branding.py)",
+      "Bash(python -c ' *)"
+    ]
+  }
+}

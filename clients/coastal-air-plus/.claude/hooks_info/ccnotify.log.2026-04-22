@@ -1,0 +1,88 @@
+2026-04-22 21:35:27 - INFO - Recorded prompt for session b3a1c210-99b6-42f5-a569-4ac2d739f98c
+2026-04-22 21:36:42 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-22 21:36:42 - INFO - Task completed for session b3a1c210-99b6-42f5-a569-4ac2d739f98c, job#1, duration: 1m14s
+2026-04-22 21:37:07 - INFO - Recorded prompt for session b3a1c210-99b6-42f5-a569-4ac2d739f98c
+2026-04-22 21:37:45 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-22 21:37:45 - INFO - Task completed for session b3a1c210-99b6-42f5-a569-4ac2d739f98c, job#2, duration: 38s
+2026-04-22 21:38:46 - INFO - [NOTIFICATION] session=b3a1c210-99b6-42f5-a569-4ac2d739f98c, message='Claude is waiting for your input'
+2026-04-22 21:38:46 - INFO - Duplicate waiting notification suppressed for session b3a1c210-99b6-42f5-a569-4ac2d739f98c
+2026-04-22 22:02:49 - INFO - Recorded prompt for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:04:02 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-22 22:04:02 - INFO - Task completed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3, job#1, duration: 1m12s
+2026-04-22 22:04:42 - INFO - Recorded prompt for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:04:54 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-22 22:04:54 - INFO - Task completed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3, job#2, duration: 12s
+2026-04-22 22:07:14 - INFO - Recorded prompt for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:07:22 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-22 22:07:22 - INFO - Task completed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3, job#3, duration: 8s
+2026-04-22 22:08:23 - INFO - [NOTIFICATION] session=9f9d7acf-083f-4e76-afbe-c86197c0b6c3, message='Claude is waiting for your input'
+2026-04-22 22:08:23 - INFO - Duplicate waiting notification suppressed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:10:18 - INFO - Recorded prompt for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:10:34 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-22 22:10:34 - INFO - Task completed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3, job#4, duration: 16s
+2026-04-22 22:11:35 - INFO - [NOTIFICATION] session=9f9d7acf-083f-4e76-afbe-c86197c0b6c3, message='Claude is waiting for your input'
+2026-04-22 22:11:35 - INFO - Duplicate waiting notification suppressed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:11:51 - INFO - Recorded prompt for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:12:03 - WARNING - Windows notification used unknown fallback for agentic-os - Task complete: unknown toast error
+2026-04-22 22:12:03 - INFO - Notification sent: agentic-os - Task complete via unknown
+2026-04-22 22:12:03 - INFO - Task completed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3, job#5, duration: 12s
+2026-04-22 22:13:04 - INFO - [NOTIFICATION] session=9f9d7acf-083f-4e76-afbe-c86197c0b6c3, message='Claude is waiting for your input'
+2026-04-22 22:13:04 - INFO - Duplicate waiting notification suppressed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:21:59 - INFO - Recorded prompt for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:33:54 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-22 22:33:54 - INFO - Task completed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3, job#6, duration: 11m55s
+2026-04-22 22:34:55 - INFO - [NOTIFICATION] session=9f9d7acf-083f-4e76-afbe-c86197c0b6c3, message='Claude is waiting for your input'
+2026-04-22 22:34:55 - INFO - Duplicate waiting notification suppressed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:36:58 - INFO - Recorded prompt for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:37:09 - INFO - [NOTIFICATION] session=9f9d7acf-083f-4e76-afbe-c86197c0b6c3, message='Claude needs your permission to use Bash'
+2026-04-22 22:37:10 - INFO - Notification sent: Agentic OS - Permission required via toast
+2026-04-22 22:37:10 - INFO - Notification processed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3: Permission required (warning)
+2026-04-22 22:37:56 - INFO - Skipping complete notification for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3 because the task already asked for attention (permission)
+2026-04-22 22:38:56 - INFO - [NOTIFICATION] session=9f9d7acf-083f-4e76-afbe-c86197c0b6c3, message='Claude is waiting for your input'
+2026-04-22 22:38:56 - INFO - Duplicate waiting notification suppressed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:49:43 - INFO - Recorded prompt for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 22:49:53 - WARNING - Windows notification used unknown fallback for agentic-os - Task complete: unknown toast error
+2026-04-22 22:49:53 - INFO - Notification sent: agentic-os - Task complete via unknown
+2026-04-22 22:49:53 - INFO - Task completed for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3, job#8, duration: 9s
+2026-04-22 22:50:07 - INFO - Recorded prompt for session 9f9d7acf-083f-4e76-afbe-c86197c0b6c3
+2026-04-22 23:00:05 - INFO - Recorded prompt for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:00:44 - INFO - [NOTIFICATION] session=d18bc69d-c14a-46c1-a135-c16552b24017, message='Claude needs your permission to use Bash'
+2026-04-22 23:00:45 - INFO - Notification sent: Agentic OS - Permission required via toast
+2026-04-22 23:00:45 - INFO - Notification processed for session d18bc69d-c14a-46c1-a135-c16552b24017: Permission required (warning)
+2026-04-22 23:01:19 - INFO - Skipping complete notification for session d18bc69d-c14a-46c1-a135-c16552b24017 because the task already asked for attention (permission)
+2026-04-22 23:02:20 - INFO - [NOTIFICATION] session=d18bc69d-c14a-46c1-a135-c16552b24017, message='Claude is waiting for your input'
+2026-04-22 23:02:20 - INFO - Duplicate waiting notification suppressed for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:03:13 - INFO - Recorded prompt for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:03:21 - WARNING - Windows notification used unknown fallback for coastal-air-plus - Task complete: unknown toast error
+2026-04-22 23:03:21 - INFO - Notification sent: coastal-air-plus - Task complete via unknown
+2026-04-22 23:03:21 - INFO - Task completed for session d18bc69d-c14a-46c1-a135-c16552b24017, job#2, duration: 7s
+2026-04-22 23:04:22 - INFO - [NOTIFICATION] session=d18bc69d-c14a-46c1-a135-c16552b24017, message='Claude is waiting for your input'
+2026-04-22 23:04:22 - INFO - Duplicate waiting notification suppressed for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:06:30 - INFO - Recorded prompt for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:06:39 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-22 23:06:39 - INFO - Task completed for session d18bc69d-c14a-46c1-a135-c16552b24017, job#3, duration: 9s
+2026-04-22 23:07:40 - INFO - [NOTIFICATION] session=d18bc69d-c14a-46c1-a135-c16552b24017, message='Claude is waiting for your input'
+2026-04-22 23:07:40 - INFO - Duplicate waiting notification suppressed for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:11:21 - INFO - Recorded prompt for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:11:43 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-22 23:11:43 - INFO - Task completed for session d18bc69d-c14a-46c1-a135-c16552b24017, job#4, duration: 21s
+2026-04-22 23:11:53 - INFO - Recorded prompt for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:12:02 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-22 23:12:02 - INFO - Task completed for session d18bc69d-c14a-46c1-a135-c16552b24017, job#5, duration: 9s
+2026-04-22 23:13:03 - INFO - [NOTIFICATION] session=d18bc69d-c14a-46c1-a135-c16552b24017, message='Claude is waiting for your input'
+2026-04-22 23:13:03 - INFO - Duplicate waiting notification suppressed for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:13:41 - INFO - Recorded prompt for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:13:57 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-22 23:13:57 - INFO - Task completed for session d18bc69d-c14a-46c1-a135-c16552b24017, job#6, duration: 15s
+2026-04-22 23:14:58 - INFO - [NOTIFICATION] session=d18bc69d-c14a-46c1-a135-c16552b24017, message='Claude is waiting for your input'
+2026-04-22 23:14:58 - INFO - Duplicate waiting notification suppressed for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:15:29 - INFO - Recorded prompt for session d18bc69d-c14a-46c1-a135-c16552b24017
+2026-04-22 23:16:00 - INFO - [NOTIFICATION] session=d18bc69d-c14a-46c1-a135-c16552b24017, message='Claude needs your permission to use Fetch'
+2026-04-22 23:16:01 - INFO - Notification sent: Agentic OS - Permission required via toast
+2026-04-22 23:16:01 - INFO - Notification processed for session d18bc69d-c14a-46c1-a135-c16552b24017: Permission required (warning)
+2026-04-22 23:16:16 - INFO - [NOTIFICATION] session=d18bc69d-c14a-46c1-a135-c16552b24017, message='Claude needs your permission to use Fetch'
+2026-04-22 23:16:16 - INFO - Notification sent: Agentic OS - Permission required via toast
+2026-04-22 23:16:16 - INFO - Notification processed for session d18bc69d-c14a-46c1-a135-c16552b24017: Permission required (warning)
+2026-04-22 23:21:05 - INFO - Skipping complete notification for session d18bc69d-c14a-46c1-a135-c16552b24017 because the task already asked for attention (permission)
+2026-04-22 23:22:05 - INFO - [NOTIFICATION] session=d18bc69d-c14a-46c1-a135-c16552b24017, message='Claude is waiting for your input'
+2026-04-22 23:22:05 - INFO - Duplicate waiting notification suppressed for session d18bc69d-c14a-46c1-a135-c16552b24017
