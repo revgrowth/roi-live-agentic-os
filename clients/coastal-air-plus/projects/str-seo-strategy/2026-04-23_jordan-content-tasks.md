@@ -5,6 +5,8 @@ deliverable: Jordan content task briefs
 assigned: Jordan
 status: ready — start today
 created: 2026-04-23
+updated: 2026-04-24
+revision_note: "Task 1 retargeted to new pillar URL /charleston-sc/ac-repair/ after 301 redirects from -617782 and -617782bc were set live. Added Redirect + Internal Linking Audit section and Pillar Support layer."
 scope: coastalcarolinahvac.com only. Do not reference Coastal Air Plus, parent entity, or brand transition anywhere in content. Brand identity is Coastal Carolina Comfort throughout.
 ---
 
@@ -41,19 +43,27 @@ For each task below:
 
 ---
 
-# TASK 1 — Rewrite `/charleston-ac-repair-617782/` *(highest priority)*
+# TASK 1 — Build pillar at `/charleston-sc/ac-repair/` *(highest priority)*
 
-**Why this is #1:** This page has the biggest combined traffic opportunity on the site. It ranks for 4 keywords totaling ~1,760 monthly searches that collectively dropped 10–30 positions since March. It is a vendor-CMS template — exactly what Information Gain targets. Rewriting it with novel Charleston-specific content is the single highest-leverage content move we can make this week.
+**Why this is #1:** Single highest-leverage content move on the site. Both vendor-CMS legacy URLs (`-617782` and `-617782bc`) — which collectively ranked for 4 keywords totaling ~1,760 monthly searches before dropping 10–30 positions in the March Information Gain update — have now been 301 redirected into one clean, keyword-hierarchical pillar URL. The redirects consolidate link equity and past ranking signals into a single destination, but that equity only pays off if the new page earns its place on its own merits. Our job: publish a novel, Charleston-specific AC repair pillar that passes the Information Gain test from day one.
 
-**URL:** `https://coastalcarolinahvac.com/charleston-ac-repair-617782/`
+**Canonical URL:** `https://coastalcarolinahvac.com/charleston-sc/ac-repair/`
+
+**Redirects already live (as of 2026-04-24):**
+- `https://coastalcarolinahvac.com/charleston-ac-repair-617782/` → `/charleston-sc/ac-repair/` (301)
+- `https://coastalcarolinahvac.com/charleston-ac-repair-617782bc/` → `/charleston-sc/ac-repair/` (301)
+
+Both legacy URLs will drop out of the index as Google recrawls; the new URL inherits equity. **Do NOT reference the legacy URLs anywhere in content, internal links, schema, or sitemap.** See the Redirect + Internal Linking Audit section below for Jordan's checklist.
 
 **Keywords this page must target:**
-| Keyword | Vol/mo | Current | Target |
+| Keyword | Vol/mo | Current (pre-redirect) | Target 90d |
 |---|---:|---:|---:|
 | ac repair charleston sc | 590 | 32 | 8 |
 | ac repair charleston | 260 | 30 | 8 |
-| air conditioner repair charleston sc | 590 | 45 | 10 (after `-bc` 301) |
-| air conditioning repair charleston | 320 | 48 | 10 (after `-bc` 301) |
+| air conditioner repair charleston sc | 590 | 45 | 10 |
+| air conditioning repair charleston | 320 | 48 | 10 |
+
+*"Current" reflects the legacy URLs' positions before the 301s went live. Expect a 1–3 week transition window where rankings shuffle as Google processes the redirects and reassigns signals to the new URL. Monitor with GSC's URL inspection tool; don't read early volatility as a failure signal.*
 
 **Meta:**
 - Title (55–60 chars): `AC Repair in Charleston, SC | Coastal Carolina Comfort`
@@ -159,6 +169,24 @@ For each task below:
 
 ---
 
+# TASK 1a — Redirect + Internal Linking Audit *(blocker for Task 1 go-live; ~1–2 hours)*
+
+The 301s from `-617782` and `-617782bc` are live, but the site almost certainly still has internal links, navigation items, schema references, sitemap entries, and GBP/directory listings pointing to the legacy URLs. Those legacy links waste crawl budget, create redirect-chain overhead, and dilute the pillar's internal link equity. Jordan should produce a punch list for dev/Mike before Task 1 publishes.
+
+**Audit scope (deliverable: a spreadsheet or checklist):**
+
+1. **Sitewide internal link scan** — crawl coastalcarolinahvac.com (Screaming Frog free-tier is fine up to 500 URLs, or ahrefs/Sitebulb if available). Export every internal link whose target URL contains `charleston-ac-repair-617782` or `617782bc`. For each, note the source page, anchor text, and recommended replacement anchor (default: "AC repair in Charleston" pointing to `/charleston-sc/ac-repair/`).
+2. **Navigation menu** — check the main nav, footer nav, and any service mega-menu. Any menu item pointing to a legacy URL is the highest-priority fix (every page on the site inherits it).
+3. **XML sitemap** — confirm `/charleston-sc/ac-repair/` is present and the legacy URLs are removed. `[DEV: regenerate sitemap + submit via GSC]`
+4. **Schema markup** — check the homepage, Summerville hub, and any service pages for `WebPage.url`, `BreadcrumbList`, or `Service.url` references that still point to legacy URLs.
+5. **GBP primary URL** — confirm the Google Business Profile website field points to either the homepage or the new pillar, not a legacy URL. `[Blocked on Mike's GBP access grant — flag for intake]`
+6. **Directory/citation listings** — Yelp, BBB, Trane dealer locator, NATE, Angi, Facebook page. Any listing linking to a legacy URL should be updated to the new pillar or the homepage. `[Blocked on Mike's citation access + the Yelp "Lipton St" typo fix already in the Week 1 list]`
+7. **GSC action** — once the pillar is live, request indexing on `/charleston-sc/ac-repair/` via URL Inspection. Do NOT submit a URL removal for the legacy URLs — let the 301s do their work naturally so equity transfers cleanly.
+
+**Deliverable format:** single-page checklist or Google Sheet titled `[CCC] Redirect Cleanup Audit — 2026-04-24`. Flag items Jordan can't verify without access (schema, GBP, citations) as `[BLOCKED on intake]` so Mike can batch them.
+
+---
+
 # TASK 2 — AEO upgrade on `/summerville-sc/` *(high priority — runs in parallel with Task 1)*
 
 **Why this is #2:** Summerville is our primary geo with zero tracked keywords ranking. The page already exists with good bones (Derrick's owner story, Lipman St anchor, named neighborhoods). It's faster to upgrade than to build from scratch. Once optimized and tracked, it's the fastest net-new visibility win in the 90-day plan.
@@ -216,7 +244,12 @@ For each task below:
 
 5. **New section near the bottom — trust row** (same as Task 1 but adapted): license, BBB, Trane, NATE, family-owned, Lipman St HQ.
 
-6. **Dev notes** (add as comments in the doc):
+6. **Contextual cross-link to the Charleston pillar.**
+   Add one natural, in-body sentence that links up to `/charleston-sc/ac-repair/` with contextual anchor text (not a footer dump). This elevates the new pillar from its closest sibling hub and establishes the hub-sibling relationship Google needs to see. Example placement — drop it into the neighborhoods section or the FAQ:
+   > *"Our service area extends east into Charleston proper — if you're in Mount Pleasant, West Ashley, or on the peninsula, see [AC repair in Charleston](/charleston-sc/ac-repair/) for neighborhood-specific coverage."*
+   Anchor text variations to rotate if the page gets multiple links over time: "AC repair in Charleston," "Charleston AC repair coverage," "our Charleston AC repair page." Avoid exact-match stuffing (don't use "ac repair charleston sc" as anchor — it reads spammy and Google flags it).
+
+7. **Dev notes** (add as comments in the doc):
    - `[DEV: embed the Summerville GBP map on this page — pending Mike's GBP access confirmation]`
    - `[DEV: add LocalBusiness schema with areaServed = Dorchester + Berkeley counties, geo coords for 110 Lipman St, priceRange, openingHours]`
 
@@ -308,17 +341,55 @@ For each task below:
 
 ---
 
+# PILLAR SUPPORT — elevating `/charleston-sc/ac-repair/` through the content cluster
+
+Task 1 builds the pillar. Tasks 2 and 3 already support it by design. But the 301s alone won't rebuild the topical authority — Google reads a pillar's strength partly through the quality and relevance of the pages linking up to it. The list below tracks every content surface that should point toward the pillar with context-rich anchor text, and every page that should get optimizations specifically to elevate it.
+
+**Already linking to the pillar (confirmed via this doc):**
+- Task 2 (`/summerville-sc/`) — adds one contextual cross-link per the Task 2 brief
+- Task 3 (salt-air blog) — internal link with anchor "AC repair across Charleston"
+
+**Additional pages to add/update links on (punch list for dev once pages exist):**
+
+| Page | Action | Anchor text recommendation |
+|---|---|---|
+| `/` (homepage) | Add a Charleston service card or trust-row link if one doesn't exist | "AC repair in Charleston" |
+| `/services/ac-repair/` (if a top-level service page exists) | Add "serving Charleston →" link pointing to the pillar | "AC repair across Charleston" |
+| `/charleston-sc/` (city hub — Task 4 deliverable) | Feature the AC repair spoke prominently in hub structure | "Charleston AC repair" |
+| `/charleston-sc/heating-repair/` (Task 5 deliverable) | Sibling cross-link in related services section | "See also: AC repair in Charleston" |
+| `/charleston-sc/duct-cleaning-maintenance/` (Task 7 deliverable) | Sibling cross-link | "AC repair in Charleston" |
+| `/heat-pump-services/` | Add Charleston-specific sub-section with link to pillar | "Charleston AC + heat pump repair" |
+| `/services/hvac-replacement/` (Task 10 deliverable) | Link from "considering repair instead?" section | "AC repair in Charleston" |
+| Blog archive / category pages | If Charleston-tagged blog posts exist, add a sidebar module linking to the pillar | "Need AC repair now?" |
+
+**Pages that should get their own optimization pass to strengthen the pillar's topical cluster** *(queue after Tasks 1–3 ship)*:
+
+1. **`/heat-pump-services/`** — heat pumps are mentioned in the pillar and the salt-air blog. Currently unclear if it has Charleston-specific content; a light AEO pass with named neighborhoods and the salt-air failure pattern would turn it into a legitimate topical neighbor. Adds a second strong signal to the pillar.
+2. **`/charleston-sc/duct-cleaning-maintenance/`** — already ranks flat at #26 (noted in Task 7). A small AEO boost plus a reciprocal link with the pillar turns this into mutual support rather than two isolated pages.
+3. **Future neighborhood pages** (Mount Pleasant, West Ashley, James Island, Daniel Island — currently blocked on Mike's job-data export) — each neighborhood page MUST link up to the pillar as its primary "schedule AC repair" CTA. Treat this as a hard requirement in the neighborhood-page brief when those tasks unblock.
+4. **Future symptom pages** (frozen coil, failed capacitor, refrigerant leak, compressor failure, AC blowing warm air, AC not turning on — the 6 symptoms teased in Task 1's H2) — each symptom spoke's primary CTA should be the pillar. Use anchor text variety: "schedule AC repair in Charleston," "get a Charleston technician out today," "book Charleston AC repair."
+
+**What NOT to do:**
+- Don't sitewide-footer-link the pillar with exact-match anchor. That's a 2015 SEO move and Google discounts it.
+- Don't link every blog post to the pillar out of context. Only link where topically relevant (HVAC-in-Charleston content). Forced links pollute the signal.
+- Don't let the pillar become a link-dump itself — outbound internal links from the pillar to spokes are already listed in Task 1 and are sufficient. Every additional link added there dilutes equity passed to each spoke.
+
+**Measurement:**
+Once Task 1 + Task 1a are live, log a baseline in the strategy doc: pillar URL's indexed date (GSC URL Inspection), initial position for the 4 target keywords, internal link count pointing in (Screaming Frog). Re-measure at day 14 and day 30. Pillar position movement + internal link count growth are the two leading indicators that the cluster strategy is working.
+
+---
+
 # NEXT UP (queue for tomorrow / this week)
 
 Drop these into Jordan's pipeline after Tasks 1–3 are in review:
 
-- **Task 4:** Rewrite `/hvac-company-charleston-sc-617778/` as Charleston city hub — biggest recovery need after AC repair (dropped 21→46 on "charleston hvac repair," 590/mo)
-- **Task 5:** Rewrite `/heating-repair-charleston-sc-617779/` — heating shoulder season is coming, low-risk window to rewrite; consolidate `-617779bc` duplicate via 301
+- **Task 4:** Rewrite `/hvac-company-charleston-sc-617778/` as Charleston city hub — biggest recovery need after AC repair (dropped 21→46 on "charleston hvac repair," 590/mo). **Open question for Jason:** should this follow the same redirect pattern as Task 1 — 301 the `-617778` URL to a new clean URL like `/charleston-sc/` and build the city hub there? Recommended yes, for consistency; confirm before Jordan starts.
+- **Task 5:** Rewrite `/heating-repair-charleston-sc-617779/` — heating shoulder season is coming, low-risk window to rewrite; consolidate `-617779bc` duplicate via 301. **Same open question:** redirect to `/charleston-sc/heating-repair/` and build clean? Recommended yes.
 - **Task 6:** `/summerville-sc/ac-repair/` — new spoke under the Summerville hub once Task 2 is live
-- **Task 7:** AEO upgrade on `/charleston-sc/duct-cleaning-maintenance/` — already ranks flat at #26, small content boost should push it
+- **Task 7:** AEO upgrade on `/charleston-sc/duct-cleaning-maintenance/` — already ranks flat at #26, small content boost should push it; add reciprocal link with Task 1 pillar
 - **Task 8:** `/summerville-sc/heat-pump-repair/` — Summerville heat pump spoke
 - **Task 9:** Blog article — "The Summerville Sneeze: Pollen, Humidity, and Your HVAC in April"
-- **Task 10:** `/services/hvac-replacement/` AEO rewrite with decision-tree content (big AI Overview opportunity)
+- **Task 10:** `/services/hvac-replacement/` AEO rewrite with decision-tree content (big AI Overview opportunity); add "considering repair instead?" link to Task 1 pillar
 
 ---
 
