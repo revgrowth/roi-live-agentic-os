@@ -41,3 +41,7 @@ cron/logs/
 cron/status/
 __pycache__/
 *.pyc
+context/memory/*.md
+clients/*/context/memory/*.md
+__pycache__/
+*.pyc
