@@ -23,7 +23,7 @@ export function spawnUiProcess(
   args: readonly string[],
   options: SpawnOptions = {},
 ): ChildProcess {
-  return spawn(command, [...args], withQuietWindowsOptions(options));
+  return spawn(command, [...args], { ...withQuietWindowsOptions(options), shell: isWindows });
 }
 
 export function spawnManagedTaskProcess(
@@ -35,7 +35,7 @@ export function spawnManagedTaskProcess(
 
   if (isWindows) {
     const { detached: _ignored, ...rest } = quietOptions;
-    return spawn(command, [...args], rest);
+    return spawn(command, [...args], { ...rest, shell: true });
   }
 
   return spawn(command, [...args], {
