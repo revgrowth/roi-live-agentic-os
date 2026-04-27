@@ -1,0 +1,15 @@
+2026-04-23 14:58:12 - INFO - Recorded prompt for session ddadbdd9-6e26-4bb1-be17-a1576a1a5d66
+2026-04-23 14:59:08 - INFO - [NOTIFICATION] session=ddadbdd9-6e26-4bb1-be17-a1576a1a5d66, message='Claude needs your permission to use Bash'
+2026-04-23 14:59:09 - INFO - Notification sent: Agentic OS - Permission required via toast
+2026-04-23 14:59:09 - INFO - Notification processed for session ddadbdd9-6e26-4bb1-be17-a1576a1a5d66: Permission required (warning)
+2026-04-23 15:00:16 - INFO - [NOTIFICATION] session=ddadbdd9-6e26-4bb1-be17-a1576a1a5d66, message='Claude needs your permission to use Bash'
+2026-04-23 15:00:17 - INFO - Notification sent: Agentic OS - Permission required via toast
+2026-04-23 15:00:17 - INFO - Notification processed for session ddadbdd9-6e26-4bb1-be17-a1576a1a5d66: Permission required (warning)
+2026-04-23 15:01:38 - INFO - Skipping complete notification for session ddadbdd9-6e26-4bb1-be17-a1576a1a5d66 because the task already asked for attention (permission)
+2026-04-23 15:02:38 - INFO - [NOTIFICATION] session=ddadbdd9-6e26-4bb1-be17-a1576a1a5d66, message='Claude is waiting for your input'
+2026-04-23 15:02:38 - INFO - Duplicate waiting notification suppressed for session ddadbdd9-6e26-4bb1-be17-a1576a1a5d66
+2026-04-23 20:40:48 - INFO - Recorded prompt for session e964affb-41b9-44fe-b286-17f0400e9270
+2026-04-23 20:41:32 - INFO - Notification sent: Agentic OS - Task complete via toast
+2026-04-23 20:41:32 - INFO - Task completed for session e964affb-41b9-44fe-b286-17f0400e9270, job#1, duration: 43s
+2026-04-23 20:42:33 - INFO - [NOTIFICATION] session=e964affb-41b9-44fe-b286-17f0400e9270, message='Claude is waiting for your input'
+2026-04-23 20:42:33 - INFO - Duplicate waiting notification suppressed for session e964affb-41b9-44fe-b286-17f0400e9270
