@@ -91,18 +91,18 @@ All canonical voice and production documentation lives in `docs/` at repo root. 
 ### Agency SOP stack (governs all client-facing work)
 | File | Purpose |
 |---|---|
-| `docs/ROI-LIVE-Agency-Core-Standards-v1_1.md` | Base layer — SEO/AEO/entity/E-E-A-T framework, universal AI-writing bans. Every page-type SOP inherits from it. |
-| `docs/ROI-LIVE-Agency-Homepage-SOP-v1 (1).md` | Homepage production rules |
-| `docs/ROI-LIVE-Agency-Service-Page-SOP-v1_1.md` | Service page rules |
-| `docs/ROI-LIVE-Agency-Blog-Article-SOP-v1_1.md` | Blog article rules |
-| `docs/ROI-LIVE-Agency-Case-Study-Page-SOP-v1 (1).md` | Case study page rules |
-| `docs/ROI-LIVE-Agency-Collection-Page-SOP-v1 (1).md` | Collection / category page rules (e-commerce) |
-| `docs/ROI-LIVE-Client-Parameter-Sheet-Template-v1__1_.md` | Intake template — voice profile section is the canonical client voice spec |
+| `agency/sops/ROI-LIVE-Agency-Core-Standards-v1.1.md` | Base layer — SEO/AEO/entity/E-E-A-T framework, universal AI-writing bans. Every page-type SOP inherits from it. |
+| `agency/sops/ROI-LIVE-Agency-Homepage-SOP-v1.md` | Homepage production rules |
+| `agency/sops/ROI-LIVE-Agency-Service-Page-SOP-v1.1.md` | Service page rules |
+| `agency/sops/ROI-LIVE-Agency-Blog-Article-SOP-v1.1.md` | Blog article rules |
+| `agency/sops/ROI-LIVE-Agency-Case-Study-Page-SOP-v1.md` | Case study page rules |
+| `agency/sops/ROI-LIVE-Agency-Collection-Page-SOP-v1.md` | Collection / category page rules (e-commerce) |
+| `agency/sops/ROI-LIVE-Client-Parameter-Sheet-Template-v1.md` | Intake template — voice profile section is the canonical client voice spec |
 
 ### ROI.LIVE's own content stack
 | File | Purpose |
 |---|---|
-| `docs/ROI-LIVE-Signal-Article-SOP-v2 (4).md` | Signal article production — Phase 5.2 is the canonical long-form voice profile for Jason Spencer |
+| `agency/sops/ROI-LIVE-Agency-Signal-Article-SOP-v2.md` | Signal article production — Phase 5.2 is the canonical long-form voice profile for Jason Spencer |
 
 ### Brand source of truth (deployed voice in the wild)
 | File | Purpose |

@@ -50,3 +50,4 @@ __pycache__/
 **/.claude/hooks_info/ccnotify.db
 **/.claude/hooks_info/ccnotify.log
 **/.claude/settings.local.json
+
