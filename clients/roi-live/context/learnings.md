@@ -35,6 +35,44 @@
 
 - 2026-04-22: For any ROI.LIVE-branded AEO/AI-SEO work, use Signal SOP Phase 7 + Core Standards Phase 7 as the ruleset, not generic AEO best practices. Casey Keith entity rules (ROI.LIVE bolded 25+ times per pillar, Jason Spencer named 12-18×, zero bare "we," banned-phrase scan) are non-negotiable.
 
+### 2026-04-26 — Phase 0 must check for existing article before any production work
+
+**Source:** Delta Audit spoke article task
+
+**What happened:** Brief asked for "first supporting spoke" on a methodology that already had a published 407-line article using identical branding (The Delta Audit), HowTo schema, and named scoring criteria. Claude Code's Phase 0 reconnaissance caught the duplicate before any writing started.
+
+**Lesson:** Every Signal article task starts with three greps:
+1. `grep -rn "[methodology name]" /path/to/website-repo`
+2. `grep -rn "[primary keyword candidate]" /path/to/website-repo`
+3. Read the Signal hub HTML and confirm cluster article count vs brief assumption
+
+**SOP candidate:** Add explicit "Phase -1: Existing-content audit" step to Signal Article SOP v2 before Phase 0 keyword research. Block all production work until existing-content sweep passes.
+
+### 2026-04-26 — Keyword research must validate brief assumptions before article work
+
+**Source:** Delta Audit spoke article — Phase 1 keyword research
+
+**What happened:** Brief proposed 4 candidate primary keywords ("information gain audit", "content audit for information gain", "how to measure information gain", "content originality audit"). All 4 returned null volume in DataForSEO (both Google Ads and Clickstream sources). Adjacent keyword research surfaced "seo content audit" (390/mo, KD 14) as the strongest fit, plus "delta audit" (20/mo, KD 0) for branded entity play. Without keyword validation, article would have optimized for a zero-volume target.
+
+**Lesson:** DataForSEO check on ALL brief-proposed candidates is mandatory before any title/H1/H2 decisions. Long-tail brief assumptions often have no measurable volume. Adjacent keyword expansion (broader head terms, semantic variants, branded variants) is part of Phase 1, not optional.
+
+**SOP candidate:** Update Signal Article SOP Phase 4.1 (keyword research) to require:
+1. DataForSEO check on every brief-proposed candidate
+2. If all candidates return null/sub-threshold, expand to adjacent keywords using head terms and semantic variants before defaulting to brief's original candidates
+3. Hybrid keyword strategy (process keyword + branded entity) as default for ROI.LIVE methodology articles where a named methodology exists
+
+**Cost note:** 4 keyword research API calls cost $0.17. Negligible. No reason to skip this step ever.
+
+### 2026-04-26 — Banned-phrase scan must run after every patch pass, not just final QA
+
+**Source:** Delta Audit spoke article — Improvement 2
+
+**What happened:** Cross-industry callout block introduction included "what makes" phrasing — banned per SOP §8. Caught during in-patch banned-phrase scan, not at final QA. If only end-of-pass QA had run, this would have shipped or required a second patch round.
+
+**Lesson:** Banned-phrase scan is part of every patch operation, not just final QA. Each new content block gets a scan immediately after writing, not at the end of the batch.
+
+**SOP candidate:** Update SOP Phase 11 checklist to require: "After each patch operation that adds or modifies prose, run banned-phrase scan on the modified content before moving to the next operation."
+
 ## tool-humanizer
 
 - 2026-04-22: Mandatory gate for ROI.LIVE publishable output. Every skill producing text for publication under the ROI.LIVE brand runs output through tool-humanizer before saving. Use `deep` mode (voice-profile loaded). Skip only for research briefs, ICP docs, positioning docs, and internal-only artifacts.
