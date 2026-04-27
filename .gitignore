@@ -45,3 +45,8 @@ context/memory/*.md
 clients/*/context/memory/*.md
 __pycache__/
 *.pyc
+
+# Runtime files that mutate every session
+**/.claude/hooks_info/ccnotify.db
+**/.claude/hooks_info/ccnotify.log
+**/.claude/settings.local.json
