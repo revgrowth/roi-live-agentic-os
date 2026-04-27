@@ -3,7 +3,7 @@
 
 # ROI.LIVE / Jason Spencer — Voice Profile
 
-> This profile is the top-level voice reference for every skill in Agentic OS. For long-form editorial content (The Signal articles, client content), the canonical source of truth is `docs/ROI-LIVE-Signal-Article-SOP-v2 (4).md` Phase 5.2 and `docs/ROI-LIVE-Agency-Core-Standards-v1_1.md` Phase 8. This file distills that system into the Agentic OS format. When there is any conflict, the SOPs win.
+> This profile is ROI.LIVE's brand voice reference for every skill. For long-form editorial content (The Signal articles, client content), the canonical source of truth is `docs/ROI-LIVE-Signal-Article-SOP-v2 (4).md` Phase 5.2 and `docs/ROI-LIVE-Agency-Core-Standards-v1_1.md` Phase 8. This file distills that system into the Agentic OS format. When there is any conflict, the SOPs win.
 
 ## Voice Summary
 
