@@ -1,6 +1,6 @@
 # French Broad Chocolates — Voice Profile
 
-> A multi-stakeholder voice profile. Two distinct founder voices share a brand-level core. New stakeholders (confections, pastry, retail teams) will layer in over time. Treat this as a living document; cite source quotes when adding to it.
+> A multi-stakeholder voice profile. Three load-bearing voices (Jael · Dan · Confections team) share a brand-level core. Other team voices (pastry, hospitality, tour guides, chocolate-making) will layer in as interviews land. Treat this as a living document; cite source quotes when adding to it.
 
 ---
 
@@ -277,7 +277,138 @@ Example pattern: claim → "but" → counter-context → "however" → tighter c
 
 ---
 
-## Section 4 — Voice Routing: Who Leads Which Audience
+## Section 4 — Team Voices
+
+The brand voice is anchored by Jael and Dan, but it isn't just two voices. Multiple teams contribute to public-facing FBC content — and as interview audio lands, each team gets its own §4.x sibling here, structured the same way as §2 and §3 (five identifying patterns · vocabulary tells · sentence rhythm · what they avoid).
+
+Pre-allocated placeholders below mark which teams are still pending. Don't move team voices into §1 (shared brand voice) until at least one full interview is captured — §1 is reserved for patterns provably common across two or more stakeholders.
+
+### 4.0 Why team voices matter
+
+Three reasons:
+
+1. **Authority depth.** A page on bonbon-making sounds different — and ranks differently — when it's voiced by the Head Chocolatier than when it's a Jael-voice marketing summary. Search engines and AI assistants increasingly reward content with named, role-specific expertise.
+2. **Brand integrity.** When customers visit the Lounge, take a tour, or write a wholesale email, they're talking to the team, not the founders. The published voice should match the in-person experience.
+3. **Vertical-integration credibility.** "We do all of it, and we do it deeply" is undermined if the website only sounds like two people. The cluster strategy explicitly names team voices as information-gain assets (see `projects/onboarding/cluster-expansion-opportunities.md`).
+
+### 4.1 Confections team — Rihanna Bourbon + Edgar
+
+Captured in `inputs/2026-04-27_confex-team-transcripts.md`. Two voices, one shared register. Rihanna Bourbon is the Confections Supervisor (transcript renders title as *"Perfection supervisor"* — almost certainly transcription artifact; flagged H08 in open-gaps). Edgar is Head Chocolatier (last name pending — also H08). Edgar publicly calls Rihanna *"the keeper of excellence"* — a phrase worth repeating.
+
+#### Five identifying patterns
+
+**(a) Process-as-choreography.** Edgar coined this. The bonbon production line is described as a series of small movements — empty-mold scraping rehearsals for new staff, the angle of the chocolate scraper, the way you hold the mold. Use this frame whenever describing how the work happens.
+
+> "What we've had to do is establish almost a choreography for new people. We give them an empty mold. Before they even touch the chocolate, we just have them scrape empty molds so that they can at least get used to the movements and sort of have something to memorize and fall back on."
+> — Edgar
+
+**(b) Relay-of-care quality model.** Both voices land here. Quality control isn't a station at the end of the line — every team member checks the previous step's work before moving forward.
+
+> "Each person has to meet that standard of excellence at their steps so that they're passing on good product that will lead to a perfect bonbon in the end."
+> — Rihanna
+
+> "If somebody on the packaging team, they can't see how thick that cap is. They're just looking at the outside of the bonbon."
+> — Rihanna, on why the relay matters
+
+**(c) Technical with self-deprecating qualifier.** Both speakers go technical fast — Brix, water activity, viscosity, hairline fractures, Maillard reaction — and then catch themselves and offer to translate.
+
+> "I mean, that was very a lot of technical explanation for what we do. And this, you know, being our consumer website, feel free to add anything if it makes it…"
+> — Rihanna
+
+> "Can I say a nerdy thing?"
+> — Edgar (asking permission before going into yield math)
+
+This is signature. The team owns the science but doesn't lecture. When confections-voice copy reaches a technical density, it should pause and offer the consumer a translation — not strip the technical out.
+
+**(d) Sensory flavor-as-memory.** Edgar's strongest emotional register. Flavors are designed to evoke specific places, times, memories. Nostalgia is a stated craft target.
+
+> "I want them to really feel it in their bones."
+> "Nostalgia is one of my favorite feelings to evoke in chocolate."
+> — Edgar
+
+The Mother's Day lemon bar bonbon is the canonical example: Edgar's team browned the butter for crust flavor, added cinnamon for graham-cracker association, and a customer reported back that *"it just immediately took me back."*
+
+**(e) Craft-as-team-sport.** Both speakers undermine any single-author narrative. Even when describing their personal contributions, they push credit outward.
+
+> "It shows how much more of a team game this is and how we all contribute our experience and our creativity."
+> — Jael, in the same transcript, framing the team correctly
+
+> "We're all kind of doing quality control at every step of the way. Not just one person, but the whole team has to be able to have eyes on everything."
+> — Rihanna
+
+#### Rihanna's vocabulary tells
+
+*Imperative · standard of excellence · keeper of excellence (Edgar's phrase for her, which she accepts) · making sure that · paying attention to · 98 out of 100 isn't enough · Brix · water activity · viscosity · moisture monitoring · choreography (echoing Edgar) · perfect.* Rihanna talks in process steps and tolerances; she names the spec before she names the result.
+
+#### Edgar's vocabulary tells
+
+*Playground · choreography · main character energy · in conversation with · hit someone on the heart · feel it in their bones · balance, but not subtle · deep umami bomb · nostalgia · noisette / brown butter as hazelnut · take you on a little ride.* Edgar moves between technical and emotional registers in the same paragraph. He uses theatrical/artistic frames more than process-control frames.
+
+#### Sentence rhythm
+
+Rihanna stacks process steps with technical specs, often building a four-or-five-step micro-sequence inside one paragraph. Her cadence is sequential: *"We start off with… and then we… and then…"* Edgar's rhythm is more lateral — he'll start technical, swing to a sensory anchor, return to a small constraint or trade-off, then close on the human moment.
+
+In writing, preserve both: technical sequences from Rihanna should land as numbered or beat-by-beat process; Edgar's voice should keep the swing — don't flatten his asides into bullet points.
+
+#### What they avoid
+
+- **Luxury / premium / decadent / indulgent** — they don't reach for these words. When they describe what they make, they reach for *art · craft · sculpture · piece · ride · journey · experience.*
+- **Lecturing.** Even when the answer is technical, both voices offer a translation or a self-deprecating qualifier ("nerdy thing," "feel free to add anything if it makes it").
+- **Purity-as-superiority.** They contrast their work to mass-produced bonbons (Godiva, See's, Lindt) — but the contrast is always specific (*"vegetable oils, flours, stabilizers, emulsifiers, preservatives"*), never moralizing.
+- **Single-author claims.** Even when describing personal favorites or signature creations, they push credit to the team or to history.
+
+#### Canonical confections-team paragraphs (use as voice calibration)
+
+The full process narrative ("How a bonbon is made, start to finish") and the wildflower honey caramel origin story (Jael, 2007) live in `samples.md` §B.7 and §B.8 — both sourced from the confex transcript.
+
+### 4.2 Pastry team — PENDING
+
+Pastry and confections are distinct teams (per the New Note forwarding email from Jael, 2026-04-26). The pastry team's interview audio is tracked in open-gaps as **H03** and is also a dependency for **Cluster 08 (Hot Chocolate, 74,000/mo)** since FBC's canonical hot chocolate recipe should come voiced by pastry.
+
+When the pastry interview lands, this section will fill with:
+
+- Five identifying patterns (likely overlap with confections on craft-orientation; expect divergence on tempo, batch-size language, and the relationship between pastry and the café/lounge customer flow).
+- Vocabulary tells per speaker.
+- Sentence rhythm — pastry tends to talk in seasonal and daily-production cadences distinct from confections' batch-fillings cadence.
+- What they avoid.
+- Canonical paragraphs — minimum the canonical hot chocolate recipe narrative.
+
+### 4.3 Hospitality / Lounge team — PENDING
+
+Tracked as **H04** in open-gaps. The Lounge has been operating for ~17 years (current Pack Square location for 12 of those). Hospitality voice is the third register customers experience after Jael (story) and Dan (process); when this interview lands, it should populate the front-of-house language used in the Lounge, the menu narrative, and any service-design copy.
+
+When captured, expect:
+
+- Service-as-belonging register (Jael's note — *"a place to go to belong"* — is hospitality voice in the founder's language; the Lounge team will have their own version).
+- Customer-reaction stories — the kind of thing only people who watch guests come in week after week have.
+- Menu-craft language — how the team talks about pairings, flights, the brownie-as-evening-experience.
+- The "this feels like home" theme as the team interprets it now (not as the founders coined it in Costa Rica).
+
+### 4.4 Tour guides — PENDING
+
+Tracked as **H05** in open-gaps. Foundation for **Phase 2 Cluster 11 (Factory Tour, 4,300/mo)**. The tour script itself is also part of this dependency — voiced and refined into article content.
+
+When captured, expect:
+
+- Educator-as-friend register — distinct from both founders. The tour audience is multi-generational; tour-guide voice has to bridge a 7-year-old asking about cocoa beans and a chocolate-buyer asking about percentage.
+- Most-asked questions — these become the FAQ schema for the factory pages.
+- The visual-anchor moments tour guides reach for repeatedly (the smell-as-you-enter, the moment of seeing the production line).
+- Memorable-customer-moment stories — the kind of detail that makes Cluster 11 not feel like a corporate tour-pitch.
+
+### 4.5 Chocolate-making (production) team — PENDING
+
+Tracked as **H02** in open-gaps. Distinct from confections. This team does the bean-side: roasting, winnowing, refining, conching, tempering. The chocolate that the confections team turns into bonbons.
+
+When captured, expect:
+
+- Production-floor register — likely closer to Dan than to Jael, but with day-shift specificity Dan doesn't speak in (Dan describes the system; the team voices the work).
+- The tempo of running 500kg dark batches, the rhythm of the night conche, the small-tolerance vocabulary that distinguishes a production craftsperson from a recipe writer.
+- The "we feel the chocolate" intuitive-knowledge frame — predicting temper from how a sample looks and feels.
+- Multi-voice depth that turns Cluster 01 (Bean-to-Bar) from a Dan-only authority page into a team-authority cluster.
+
+---
+
+## Section 5 — Voice Routing: Who Leads Which Audience
 
 Both founders share the brand voice; their signatures pull in different directions. Use the table to decide whose voice should carry a piece of content (or whose voice should lead while the other supports).
 
@@ -296,12 +427,15 @@ Both founders share the brand voice; their signatures pull in different directio
 | Café / lounge experience copy | **Jael** | Service-as-belonging is her register. | — |
 | Product description (bonbons, bars, treats) | **Jael** | Sensory + flavor lead. | Dan supports on the sourcing line. |
 | Process / how-it's-made content | **Dan** | He owns the workflow. | Jael narrates the why. |
+| **Bonbon / confection production** content (Cluster 09) | **Confections team (Edgar + Rihanna)** | They own the work. Edgar leads on flavor/craft; Rihanna leads on process/standards. | Jael frames the consumer "why." |
+| **Bonbon flavor development** stories | **Edgar** | Sensory-flavor-as-memory is his register; he holds the development narrative. | Rihanna on standards. Jael frames the brand context. |
+| **Standards / quality / training** language | **Rihanna** | "Keeper of excellence." She runs the morning meetings and owns the training language. | — |
 
-**Default routing rule:** If you can't decide, ask which question the piece is answering. *Why does this exist?* → Jael. *How does this work?* → Dan. *Why does it taste like this?* → Both, in that order: Jael opens, Dan deepens.
+**Default routing rule:** If you can't decide, ask which question the piece is answering. *Why does this exist?* → Jael. *How does this work?* → Dan. *Why does it taste like this?* → Both, in that order: Jael opens, Dan deepens. *How does this specific bonbon come to be?* → Confections team leads, Jael closes.
 
 ---
 
-## Section 5 — Universal Rules
+## Section 6 — Universal Rules
 
 ### 5.1 Banned phrases and constructions
 
@@ -312,7 +446,7 @@ These are non-negotiable. They contradict the founders' direct quotes.
 | **"FBC"** in any external copy | Internal shorthand only. | Jael, opening of the competitive transcript: "Let's first make sure that we never call French broad chocolates FBC on our website. That is an internal language thing, and I don't want it to show up in any marketing copy ever." |
 | **"Decadent" / "sinful" / "indulgent"** as primary descriptors | Treats chocolate as transgression. Contradicts the food-not-luxury stance. | Jael: "We need chocolate no less than we need grain." |
 | **"Guilt-free"** | "There's nothing to feel guilty about." | Brand Voice Guide v1, validated by Jael on *The Southern Fork*. |
-| **"Luxury"** as the headline frame | The founders explicitly resist this. | Jael: "I'm not here to feed people a luxury, but to offer something that brings pleasure." |
+| **"Luxury"** — banned as a bare descriptor or marketing headline frame ("luxury chocolate," "luxury experience"). **Permitted** when founders/team use it in qualified phrases that subordinate the word to a specific moment, product, or sensory frame. | The founders explicitly resist the bare/headline use; Jael uses it once in a qualified phrase. | **Banned use:** *"Experience the luxury of French Broad Chocolates."* **Permitted use** (Jael, confex transcript closing line): *"A bonbon is about quality, not quantity… it's a beautiful, small luxury in a moment that transports you."* The qualifier ("small," "in a moment that transports you") subordinates the word — that's the threshold. |
 | **"Premium"** as a standalone claim | Unsubstantiated. Show, don't tell. | Brand Voice Guide v1. |
 | **"Artisanal"** as a vague descriptor | Use the specific craft instead. | Brand Voice Guide v1. |
 | **"Farm to table"** | Overused. Use "connection to source" or "bean to bar." | Brand Voice Guide v1. |
@@ -359,7 +493,7 @@ When writing from scratch, the piece should hit at least one of these:
 
 ---
 
-## Section 6 — Sample Paragraphs
+## Section 7 — Sample Paragraphs
 
 Each sample is voice-tested. Where the source is a real founder utterance, it's marked. Where it is constructed, it's marked as "sample" and built using the patterns above.
 
@@ -410,7 +544,7 @@ Each sample is voice-tested. Where the source is a real founder utterance, it's 
 
 ---
 
-## Section 7 — Voice Tests
+## Section 8 — Voice Tests
 
 Apply these before publishing.
 
@@ -423,14 +557,14 @@ Apply these before publishing.
 
 ---
 
-## Section 8 — What This Profile Doesn't Yet Cover
+## Section 9 — What This Profile Doesn't Yet Cover
 
-These are open gaps to address in future revisions:
+> Gap inventory consolidated at [`projects/onboarding/2026-04-27_fbc-open-gaps.md`](../projects/onboarding/2026-04-27_fbc-open-gaps.md). All voice-profile-related gaps live there now and are not duplicated here.
 
-- **The confections team's voice.** Pending interview. Pastry team is separate.
-- **Retail/cafe team voice** — front-of-house hospitality language used in the Lounge and Factory.
-- **Wholesale buyer-facing voice** — the sales conversation, not just the marketing copy.
-- **Updated sourcing lineup** — Uganda is on the live site but not covered in any 2026 input.
-- **Brand voice in long-form education** (tour scripts, tasting class scripts) — referenced but not transcribed.
+The §4 Team Voices placeholders (§4.2 Pastry · §4.3 Hospitality · §4.4 Tour Guides · §4.5 Chocolate-making) each name the open-gaps ID that gates them. As interviews land, fill those §4.x sections per the §4.1 Confections-team template and cross off the corresponding gap entry.
+
+Other voice-related items not in open-gaps but worth tracking for v2:
+
 - **Dan's written voice** is less represented than his spoken voice. The "Dan on Being a Dad" blog post is the only non-transcribed source.
-- **Voice for newer audiences** — corporate gifting, wholesale-to-foodservice, restaurant pairing programs — these are growing channels but aren't yet in the source corpus.
+- **Voice for newer audiences** — corporate gifting, wholesale-to-foodservice, restaurant pairing programs — growing channels but not yet in the source corpus.
+- **Long-form on-site educational scripts** (tour scripts, tasting class scripts) — referenced but not transcribed; will arrive with H05.

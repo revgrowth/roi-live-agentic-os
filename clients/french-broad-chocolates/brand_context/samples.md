@@ -88,6 +88,61 @@ These are the high-value lines extracted from the inputs. Every piece of long-fo
 > "We started out this journey in chocolate assuming that what we were doing was really unique. We've come to find that most everything has been done before — and that's beautiful."
 > — Dan, sourcing Q&A. Verbatim.
 
+### A.17 The choreography line (Edgar — Confections team)
+
+> "What we've had to do is establish almost a choreography for new people."
+> — Edgar, Head Chocolatier. Confex transcript. Verbatim. The signature confections-team metaphor for production-line training.
+
+### A.18 The bonbon-as-art line (Edgar)
+
+> "Bonbons — just little individual pieces of art."
+> — Edgar. Confex transcript. Verbatim. Validates and extends Jael's earlier "edible jewels / small sculptures" frame.
+
+### A.19 The feel-it-in-their-bones line (Edgar)
+
+> "I want them to really feel it in their bones."
+> — Edgar, on what he's developing flavors toward. Confex transcript. Verbatim. Edgar's emotional-target line.
+
+### A.20 The nostalgia line (Edgar)
+
+> "Nostalgia is one of my favorite feelings to evoke in chocolate."
+> — Edgar. Confex transcript. Verbatim. Use when describing flavor development for seasonal or memory-led collections.
+
+### A.21 The house-dark descriptor (Edgar)
+
+> "Balanced, but not subtle."
+> — Edgar, on FBC's house dark chocolate. Confex transcript. Verbatim. The canonical descriptor for FBC's flagship base chocolate.
+
+### A.22 The chocolate-is-the-star refrain (Edgar)
+
+> "The chocolate is the star."
+> — Edgar. Confex transcript. Said multiple times in this exact form. Use when the piece is centering the chocolate (vs. a filling or a flavor partner).
+
+### A.23 The standard-of-excellence line (Rihanna)
+
+> "Each person has to meet that standard of excellence at their steps so that they're passing on good product that will lead to a perfect bonbon in the end."
+> — Rihanna Bourbon, Confections Supervisor. Confex transcript. Verbatim. The relay-of-care quality model.
+
+### A.24 The 98-out-of-100 line (Rihanna)
+
+> "It can't be 98 out of a 100, or else two people don't get the bonbon that we intended to make."
+> — Rihanna. Confex transcript. Verbatim. The standards line that maps directly to the gift-purchaser ICP (every box has the same recipient promise).
+
+### A.25 The first-bite directive (Edgar / shared)
+
+> "First, we eat with our eyes."
+> — Edgar, on why garnish matters. Confex transcript. Verbatim.
+
+### A.26 The science-lab line (Rihanna)
+
+> "The kitchen is very much like a science lab. Carefully handcrafted science lab."
+> — Rihanna. Confex transcript. Verbatim. Use when describing the production environment in a way that resists the "industrial = soulless / craft = lo-fi" false binary.
+
+### A.27 The Jael small-luxury line (NEW founder quote, from confex transcript)
+
+> "A bonbon is about quality, not quantity. A bonbon isn't about filling your belly with candy. It's a beautiful, small luxury in a moment that transports you. It's a little piece of art that you get to eat."
+> — Jael, closing the confex competitive-intelligence section. Verbatim. **This is the canonical emotional answer to the price-objection question — pair with A.4 (the pragmatic "honest answer, you can" line) for full coverage.** Note: this is the qualified-use exception for the "luxury" banned-phrase rule (see voice-profile.md §6).
+
 ---
 
 ## Section B — Long-Form Verbatim Samples
@@ -143,6 +198,34 @@ These are sustained passages that demonstrate how the founders actually sound at
 > "We had this incredible response on our website. We sold every last piece of inventory we had. When we ran out of inventory, people bought gift cards, and they bought subscriptions. We had this team of people who normally have all these different jobs — there was no work for a barista or a pastry chef or a front-of-house worker. So everybody, one at a time, when we'd call in and say we have work, would say: I'm willing to help out in whatever way the business needs. Pastry chefs were working in packaging. Baristas were working in shipping. Our whole company learned to live a day in someone else's shoes."
 
 **Why it's gold:** This is the canonical Helene story. The polysyndeton ("and she rose, and rose, and rose") is signature Jael. The numbers are exact. The story closes on community, not loss. Use this as the anchor for any anniversary, resilience, or community content.
+
+---
+
+### B.7 Confections team — How a bonbon is made, start to finish (verbatim, lightly tightened, Edgar + Rihanna)
+
+> Edgar: "We start off with clean molds. Imperative for allergen control. And then we take those molds, we garnish them — hand tempering the cocoa butter, and using various techniques. Hand painting. Spraying with a spray gun. And using different unique tools that we kind of made up. I've taken paintbrushes and smashed them back the opposite way they're supposed to be, and that creates, like, a flower motif or what we call starburst."
+>
+> Rihanna: "We garnish them, and then we flood them using kind of like a conveyor belt technique where one person is in charge of filling each mold with chocolate and then handing them off to the next person, then dump that out to get the shell thickness that we're looking for. Then the third person scrapes the molds and monitors the machines, making sure that they're in a good temper, and the holes are full and making sure that there's no blooming happening with the shells."
+>
+> Rihanna: "Once they are flooded, we bring them to room temp, and then we wait for the filling to be ready. So somebody — while they're being flooded, somebody's in the kitchen creating the filling that we're working on, whether that be a ganache, a caramel, or a combination of the two."
+>
+> Edgar: "What makes it harder than people think — the very simple motions that you have to make in everything that we do. A new person sees us doing it and they're like, looks easy. And then they go to do it and chocolate will kind of spill everywhere, and then they have a little bit of a panic. So what we've had to do is establish almost a choreography for new people. Before they even touch the chocolate, we just have them scrape empty molds so that they can at least get used to the movements and sort of have something to memorize and fall back on."
+>
+> Rihanna: "We're all kind of doing quality control at every step of the way. Not just one person, but the whole team has to be able to have eyes on everything. Because if something goes through the entire process — maybe the mold had a water spot on it at the very start — that can just mess up through the whole way down the line. Each person has to meet that standard of excellence at their steps so that they're passing on good product that will lead to a perfect bonbon in the end."
+>
+> — Edgar, Head Chocolatier + Rihanna Bourbon, Confections Supervisor. Confex transcript, FBC confex 1.m4a.
+
+**Why it's gold:** the canonical "how a bonbon is made" narrative, in two voices, with the choreography metaphor and the relay-of-care model both present in the team's own words. Use as the foundation for Cluster 09 supporting article *"How Bonbons Are Made: From Ganache to Glaze"*. Don't paraphrase Edgar's "starburst" — that's named-technique gold (a specific FBC tool naming).
+
+### B.8 Jael — The wildflower honey caramel origin (verbatim, NEW founder story from confex transcript)
+
+> "The wildflower honey caramel was originally created in my home kitchen in the early days of French Broad Chocolates in 2007. It was an attempt to make a caramel without corn syrup. Knowing that honey is a sugar that has invert sugar properties — like corn syrup, to prevent crystallization — I tried using honey in place of corn syrup. Honey boils at a different temperature than corn syrup, and the flavor — it starts to develop a smoky flavor when you get it to temperature.
+>
+> "So in making the recipe, it smelled kind of a little smoky, a little bitter, and I thought it was a total fail. I dumped it out on a piece of parchment and moved on with my next project, and then came back to it later and ate a piece. The smoke was actually a really interesting flavor — like, with the floral notes of the honey, the bitterness from the smoke actually cut the sweetness. So where most caramel is cloying, this was super well balanced. And I just kept going back and slicing off pieces and eating it. And that was, I would say, our first signature bonbon."
+>
+> — Jael, confex transcript. Verbatim, lightly tightened.
+
+**Why it's gold:** a previously-uncaptured founder origin story for the bonbon line — the corollary to the truffle-rolling moment for the bar/confection line. The "total fail → first signature" arc is signature Jael (the universe-conspires register from voice-profile §2.1d, applied to a single recipe). Use as the narrative spine for Cluster 09 pillar (*"What is a Bonbon?"*) and as the on-product-page story for the Wildflower Honey Caramel SKU.
 
 ---
 
@@ -221,6 +304,22 @@ These are voice-tested constructions for paragraph-length needs that the founder
 > Happy to talk about: the craft chocolate movement at twenty years; cacao economics and the recent commodity-price tripling; the experiential factory model; resilience in independent food businesses; the pleasure-vs-purity argument inside craft.
 
 *Patterns: §1.2 dense specificity; §1.7 four-beat in compressed form; §1.5 anti-pretension; §1.6 Asheville-anchored; closing "happy to talk about" list signals Jael's Dan-supports-here B2B style.*
+
+### C.8 "What is a Bonbon?" — pillar page lead (constructed, confections-team-led, Jael frames the close)
+
+*For Cluster 09 pillar at `/learn/bonbons/what-is-a-bonbon/` · target keyword "what is a bonbon" (8,100/mo, KD 0).*
+
+> A bonbon is a small chocolate sculpture with a soft filling and a snappy chocolate shell. That's the technical answer. The longer answer is that a bonbon is a playground.
+>
+> Our Head Chocolatier Edgar calls the production line a choreography. Twenty thousand bonbons leave our Asheville kitchen every week, made by a seven-person team using empty-mold rehearsals, hand-tempered cocoa butter, paintbrushes flicked backwards into a starburst, and the kind of small movements that take a year to make look effortless. Every step has eyes on it from the next person down the line — what our Confections Supervisor Rihanna calls *"the standard of excellence at every step."*
+>
+> Inside the shell, the filling is a ganache, a caramel, or both — handmade in batches of around five thousand, monitored for sugar concentration and water activity so the bonbon stays delicious for three months without a single preservative. We make our own dark chocolate from cacao we source ourselves, which means the shell isn't just a wrapper. It's the backbone of the flavor. *Balanced, but not subtle*, as Edgar says.
+>
+> What's the difference between a bonbon and a truffle? A truffle is a specific kind of bonbon — soft ganache, hand-rolled, dusted in cocoa powder, named after the mushroom it resembles. A bonbon is the broader category. *In America, we tend to call all of it "truffles." We're agnostic about what you call them. We care about what's inside.*
+>
+> The first bonbon we ever made was a wildflower honey caramel, in Jael's home kitchen in 2007. She was trying to make a caramel without corn syrup. The honey smoked when she got it to temperature; she thought it was a total fail and dumped it on a piece of parchment. She came back later, ate a piece, and that became our first signature bonbon. Most caramel is cloying. The smoke cut the sweetness. We've been making bonbons that way since — in the gap between *what was supposed to happen* and *what actually tasted good.*
+
+*Patterns: leads with a technical-answer-then-truer-answer move (Edgar's "playground" frame). Names speakers + roles (information gain). Quantified scale (20,000/wk, 7 people, 5,000-fillings-batch, 3 months, no preservatives). Edgar's chocolate-is-the-star refrain implicit. Bonbon-vs-truffle nuance preserved (live brand-internal-debate, not settled). Closes with the wildflower honey caramel origin (B.8) — Jael's voice carries the close. Hits the "what is a bonbon" head-term + the "bonbon vs truffle" supporting-spoke intent in a single page.*
 
 ---
 

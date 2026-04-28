@@ -37,6 +37,16 @@ Not chocolate. They're buying:
 - A reason to think about Asheville without leaving home.
 - A taste they cannot replicate at the grocery store.
 
+### The two-bite tasting protocol — a customer-education hook
+
+The confections team has an explicit eating directive (Rihanna, confex transcript): *"You're meant to be eating these at room temperature in a couple bites, and that really allows the chocolate to melt and kind of unfold the different nuances of flavor."* Edgar adds — *"It takes you on a little ride… you're left somewhere different than when you started."*
+
+This is the customer-education handoff embedded in product. Use it in:
+- Subscription unboxing emails ("here's how to taste them")
+- Box-insert cards
+- Product-page tasting notes
+- Any consumer-facing content that wants to slow the customer down for the first bite
+
 ### Buying behavior
 
 - High repeat rate after the first box.
@@ -48,7 +58,7 @@ Not chocolate. They're buying:
 
 > **"A dozen hand-crafted bonbons. Every month. Made in Asheville, sourced from named producers, designed for the five minutes after dinner that belong to you."**
 
-(Lifted in spirit from the live subscription page; aligned with Jael's voice — see voice-profile.md §6.2.)
+(Lifted in spirit from the live subscription page; aligned with Jael's voice — see voice-profile.md §7.)
 
 ### Objections + how to handle
 
@@ -69,11 +79,22 @@ Not chocolate. They're buying:
 
 ## Segment 2 — Gift Purchaser
 
-**Status:** Confirmed — gifting is an explicit primary audience in the existing brand voice guide and is a top-tier section in the live shop nav (Mother's Day, Gift Sets, Bonbon Subscriptions).
+**Status:** Confirmed — gifting is an explicit primary audience in the existing brand voice guide and is a top-tier section in the live shop nav (Mother's Day, Gift Sets, Bonbon Subscriptions). **The celebratory-or-comforting framing is now sourced directly to the makers** — see below.
 
 ### Snapshot
 
 > The buyer who is buying *for* somebody else and needs the gift to do work the buyer can't do alone — say "I see you," "thank you," "I'm sorry," "happy birthday," "good luck."
+
+### The makers know who buys these — and why
+
+In the confex transcript, Edgar names the gift use-case as the team's working assumption — and crucially, names BOTH the celebratory and the comforting half:
+
+> *"What we make is typically most purchased as a gift for someone, maybe as a celebratory gift… or maybe it's because something unfortunate has happened to that person. It's, like, meant as a comforting thing that I've purchased for you. It is a — between two people."*
+> — Edgar, Head Chocolatier
+
+This is the **direct source for the four-sub-persona split below.** Special-occasion + Host both live in the celebratory half; Sympathy lives in the comforting half; Corporate straddles. The team already knows this — it can be quoted directly in gift-collection copy.
+
+The 98-out-of-100 rule (Rihanna, confex) is the gift-segment's strongest hidden proof point: every box has the same recipient promise. *"It can't be 98 out of a 100, or else two people don't get the bonbon that we intended to make."* Use this when the gift purchaser is comparing FBC to mass-produced gift boxes — the consistency across the box is real-time-quality-controlled, not engineered post-production.
 
 ### Sub-personas (don't merge)
 
@@ -352,8 +373,11 @@ If a piece of audience-specific copy could read as joyless, it's wrong, regardle
 
 ## Open questions (for next research session)
 
-- Customer review corpus — Google, TripAdvisor, e-commerce platform reviews — has not been ingested. This would sharpen the language each segment actually uses.
+> Gap inventory consolidated at [`projects/onboarding/2026-04-27_fbc-open-gaps.md`](../projects/onboarding/2026-04-27_fbc-open-gaps.md). All ICP-blocking gaps live there now and are not duplicated here.
+
+ICP-specific items not in open-gaps but worth tracking for v2:
+
+- Customer review corpus — Google, TripAdvisor, e-commerce platform reviews — has not been ingested. This would sharpen the language each segment actually uses (covered partially under M06 in open-gaps).
 - Subscription churn rate, repeat-purchase rate, and AOV by segment — needed to confirm where the marketing budget should sit.
-- Wholesale account list and named restaurant/hotel partners — needed to anchor B2B segments (3 + 6) with real proof.
-- Tour-guest survey or post-visit attribution — needed to size Segment 5's downstream contribution to Segments 1 and 2 (the visit → subscriber pipeline).
-- Demographic confirmation against e-commerce data — most demographic claims here are inferred from founder transcripts and inferred from the brand's positioning rather than from analytics.
+- Tour-guest survey or post-visit attribution — needed to size Segment 5's downstream contribution to Segments 1 and 2.
+- Demographic confirmation against e-commerce data — most demographic claims here are inferred rather than analytics-confirmed.

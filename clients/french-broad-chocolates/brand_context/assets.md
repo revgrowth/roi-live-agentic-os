@@ -14,6 +14,8 @@ All located in `inputs/`:
 | `Audio Transcripts.md` | Jael (primary), Stephanie Burt (host) | Three sources: (1) The Southern Fork podcast interview with Jael; (2) FBC origin story Q&A — Jael; (3) FBC competitive position Q&A — Jael; (4) FBC origin story 3 — Hurricane Helene + 5-year vision — Jael; (5) FBC origin story 2 — Hurricane Helene narrative — Jael. | 2026 |
 | `FBC origin story part 1.md` | Jael | Long-form spoken origin story (Minnesota → Costa Rica → Asheville → bean-to-bar) plus a polished ChatGPT summary version of the same content. | 2026 |
 | `New Note.md` | Dan | Long-form spoken interview covering sourcing, direct trade, ethical sourcing, terroir, conching, batch size, ingredient transparency, cost-per-ounce, and bean-to-bar facts. Forwarded by Jael with the note that the confections + pastry teams are still pending interview. | 2026-04-26 |
+| `2026-04-27_confex-team-transcripts.md` | Rihanna Bourbon (Confections Supervisor) + Edgar (Head Chocolatier) + Jael (interviewer + contributor) | Two-section interview with the confections management team. (1) FBC confex 1.m4a — brand voice / art of confection (bonbon-making process, flavor development, signature collection, bonbon-vs-truffle terminology, caramel craft, personal favorites). (2) FBC confex 2.m4a — competitive intelligence (ingredient contrasts vs commercial brands, premium ingredients, production volume, shelf-life, bonbon pricing). Jael contributes a previously-uncaptured founder story — the wildflower honey caramel origin (2007). | 2026-04-27 |
+| `FBC_Website_Proposal__1_.docx` | ROI.LIVE | The 2026 marketing strategy proposal — 7 topical clusters, content roadmap, "what we need from you," AI Brand Agent strategy, MER projections, 36 launch pages. | 2026-02 |
 
 ---
 
@@ -43,10 +45,14 @@ All located in `inputs/`:
 
 | Person | Role | Voice characteristics in source |
 |---|---|---|
-| **Jael Rattigan / Skeffington** (uses both surnames publicly — Skeffington in podcast intro, Rattigan in blog byline) | Co-founder / CEO | Story-driven, sensory, warm, refrain-builder. Public-facing on craft + origin + brand narrative. |
+| **Jael Rattigan / Skeffington** (uses both surnames publicly — Skeffington in podcast intro, Rattigan in blog byline; surname canonicality tracked in open-gaps H07) | Co-founder / CEO | Story-driven, sensory, warm, refrain-builder. Public-facing on craft + origin + brand narrative. |
 | **Dan Rattigan** | Co-founder | Process-deep, anti-reductionist, technical with humanism. Public-facing on sourcing, direct trade, manufacturing. |
-| **Confections team** | Product makers | Not yet interviewed. Pastry team is separate from confections. |
-| **Pastry team** | Product makers | Not yet interviewed. Listed alongside confections in inputs but treated as a distinct team. |
+| **Rihanna Bourbon** (spelling + "Confections Supervisor" title pending H08 confirmation; transcript renders title as "Perfection supervisor" — almost certainly transcription artifact) | Confections Supervisor — *"the keeper of excellence"* (Edgar's phrase) | Process-precise, standards-driven, technical with self-deprecating qualifier. Owns morning meetings, training, and the relay-of-care quality model. Public-facing on bonbon production. |
+| **Edgar** (last name pending H08) | Head Chocolatier | Storyteller-technical hybrid, sensory-flavor-as-memory register. Coined "choreography" (training) and "balanced, but not subtle" (FBC house dark). Public-facing on flavor development, signature collection, bonbon craft. |
+| **Pastry team** | Product makers | Not yet interviewed (H03 pending). Distinct team from confections per Jael's New Note forwarding email. Pastry holds the canonical hot chocolate recipe — dependency for Phase 1 Cluster 08 (Hot Chocolate, 74,000/mo). |
+| **Lounge / hospitality team** | Front-of-house | Not yet interviewed (H04 pending). |
+| **Tour guides** | Educators | Not yet interviewed (H05 pending). Tour script also pending — dependency for Phase 2 Cluster 11 (Factory Tour). |
+| **Chocolate-making (production) team** | Bean-side production | Not yet interviewed (H02 pending). Distinct from confections — they do roasting, winnowing, refining, conching, tempering. |
 
 ---
 
@@ -62,7 +68,18 @@ Cacao supply chain — for transparency content and storytelling:
 - **Cacao Zorzal / Dr. Charles Kirchner** (Dominican Republic) — operates a private rainforest reserve protecting migratory thrush. Songbird namesake.
 - **Rizek** (Dominican Republic) — one of the largest private family-owned cacao producers; conduit for cocoa butter + powder to the US East Coast.
 
-**Live website lists current origin countries as Nicaragua, Dominican Republic, and Uganda.** The Brand Voice Guide v1 says Costa Rica, Guatemala, Nicaragua, and Peru. **Discrepancy flag** — origin lineup has clearly shifted post-2024 (Daniel South, Helene, cacao price spike). Uganda is new and not yet covered in any input transcript.
+**Live website lists current origin countries as Nicaragua, Dominican Republic, and Uganda.** The Brand Voice Guide v1 says Costa Rica, Guatemala, Nicaragua, and Peru. **Discrepancy flag** — origin lineup has clearly shifted post-2024 (Daniel South, Helene, cacao price spike). Uganda is new and not yet covered in any input transcript. *Tracked in open-gaps as CRIT 01.*
+
+### Local + regional partners (from confex transcript)
+
+Named ingredient suppliers from the confections team's own words. These become content gold for Cluster 09 (Bonbons) supporting articles and product-page sourcing notes.
+
+- **Step Family Farms** — local Asheville-area raspberries. *"We buy when they're in season and freeze puree and freeze so that we can use our local berries all year round and not just when they're in season."* (Edgar) Used in the Raspberry bonbon, one of FBC's earliest signature pieces.
+- **Freddy's Guys** (Oregon) — hazelnuts. Edgar's longtime preferred source — *"I've used their hazelnuts for years here. And back when I lived in Oregon, those hazelnuts…"* Used in the Hazelnut Praline bonbon and in the milk-chocolate caramelized hazelnut treats.
+- **Spice Walla** — spices. Named partner, values-aligned.
+- **Burlap and Barrel** — spices. Named partner, values-aligned.
+- **Oak & Grist Distillery** (Asheville) — whiskey. Used in the Asheville Collection caramel bonbon.
+- **"Palm Creek" honey** (verify spelling — possibly Pell Creek; tracked as M07 in open-gaps) — local Asheville-area honey. Used in the Wildflower Honey Caramel — FBC's first signature bonbon, originated in Jael's home kitchen in 2007.
 
 ---
 
@@ -109,6 +126,30 @@ Industrial reference points (contrast set): Cadbury, Lindt, Godiva, Hershey, Nes
 
 ---
 
+## FBC Media Asset Library (Google Drive)
+
+**Canonical URL:** https://drive.google.com/drive/folders/0B9JSVVbtclUVU0c3cXFPMGxRejQ?resourcekey=0-kHUqPTMi04XKsR6T2HRrjw&usp=sharing
+
+**What's in it (per FBC, 2026-04-27 share):** photography, video, logos, and brand assets. Specific category coverage and inventory not yet audited — see follow-up question below.
+
+**Access notes:**
+
+- Shared via link. Anyone with the link can view.
+- Hosted on Google Drive — link is the source of truth. Do not duplicate the library into the repo.
+- If the link resource key changes or access is rotated by FBC, this entry needs updating.
+
+**Usage rules:**
+
+- All deliverables (web pages, decks, collateral, social posts) reference assets from this library directly. Do not download-and-store inside the repo.
+- When citing or embedding a specific asset, note the **Drive filename** in the deliverable's source metadata so future maintainers can find the original.
+- If a deliverable needs an asset category the library does not cover, raise it as a new gap entry in `projects/onboarding/2026-04-27_fbc-open-gaps.md` rather than sourcing externally.
+
+**Follow-up question (not yet resolved):** the library URL resolves the *access* question but does not yet confirm full *category coverage* across deliverable needs. Specifically: drinking-chocolate full-SKU photography (Cluster 08), bonbon production-line behind-the-glass photography (Cluster 09), sourcing-trip archive photography (Cluster 10), and gift-SKU lifestyle photography (Phase 2 Cluster 12) all need verification against the library inventory. Tracked in open-gaps as the M01 follow-up.
+
+**Last verified:** 2026-04-27.
+
+---
+
 ## Design Reference (for future HTML deliverables)
 
 **Approved aesthetic — confirmed by client 2026-04-27 for use in HTML deliverables produced for French Broad Chocolates:**
@@ -130,10 +171,4 @@ Apply this aesthetic — palette, type pairing, editorial rhythm, photography-le
 
 ## Open Gaps (to fill in future sessions)
 
-- Confections team voice + perspective.
-- Pastry team voice + perspective.
-- Wholesale partner-facing copy and current B2B sales materials.
-- Customer review corpus (Google Business Profile, e-commerce reviews) — not yet ingested.
-- Press/media coverage — not yet ingested.
-- Current sourcing lineup (Uganda specifically — origin not covered in any 2026 input transcript).
-- Current product line photography + packaging (assets folder is empty).
+> Gap inventory consolidated at [`projects/onboarding/2026-04-27_fbc-open-gaps.md`](../projects/onboarding/2026-04-27_fbc-open-gaps.md). All FBC-input gaps live there now and are not duplicated here.

@@ -28,7 +28,7 @@ The three pillars carry the load:
 | Pillar | What we promise | What we point to as proof |
 |---|---|---|
 | **Sourced with integrity** | Cacao bought directly (or near-directly) from named producers, paid above commodity prices, with relationships measured in years and decades. | Cacao Bisiesto, Matagalpa, Nicaragua — 14-year relationship. Daniel South, Costa Rica — 19 years until his passing in 2024. Cacao Zorzal in the Dominican Republic — a private rainforest reserve protecting migratory thrushes. Long-form sourcing transparency from Dan publicly available. |
-| **Crafted with intention** | A 12-step bean-to-bar workflow built on human discernment, not engineered for homogeneity. We start with whole beans (no shortcuts on roasted nibs), use compostable packaging, and refuse PGPR/synthetic vanilla/petroleum wraps. | Daily roast supervision; in-house QA testing; 12-hour conching; ~500kg dark batches; sunflower (not soy) lecithin in confections; no lecithin in bars. |
+| **Crafted with intention** | A 12-step bean-to-bar workflow built on human discernment, not engineered for homogeneity. We start with whole beans (no shortcuts on roasted nibs), use compostable packaging, and refuse PGPR/synthetic vanilla/petroleum wraps. The confections team makes ~20,000 bonbons every week by hand, with a 3-month shelf life and zero preservatives. | Daily roast supervision · in-house QA testing · 12-hour conching · ~500kg dark batches · sunflower (not soy) lecithin in confections · no lecithin in bars · 7-person confections team producing ~20,000 hand-crafted bonbons/week (Rihanna Bourbon, Confections Supervisor; Edgar, Head Chocolatier; confex transcript) · 3-month shelf life controlled by water-activity / moisture monitoring rather than preservatives · zero artificial caramel colorants, vegetable oil fillings, flour-based thickeners, or synthetic flavors in confections (explicit competitive contrast Rihanna draws against Godiva / See's). |
 | **Served with gratitude** | Experiential retail spaces designed to be walked through and shared. Daily tours. Active investment in Asheville. | Chocolate Factory at 821 Riverside (built 2018, ~3 ft above the floodplain — a fact that carried Helene). Chocolate Lounge at Pack Square. Tours offered three times a day. Founders on local nonprofit boards. |
 
 This three-pillar structure should be the spine of all brand-level positioning content, including the leadership HTML document.
@@ -81,6 +81,8 @@ Each item below is an actual differentiator — a thing that is either factually
 **The claim:** under one roof, French Broad Chocolates does cacao sourcing, chocolate manufacturing, bonbons + confections, baked pastry, brownies, drinking chocolates, ice cream, retail café, e-commerce, wholesale (both finished-goods and B2B-cacao), tours, and education.
 
 **Why it's defensible:** the founders have stress-tested this. Most bean-to-bar makers are lean and product-line-narrow. Most chocolate cafés don't make chocolate. Most chocolate manufacturers don't run cafés. French Broad Chocolates does all of it after almost twenty years and weathered Hurricane Helene because of the diversification.
+
+**The sharpest version of this claim — bean-to-bar to bonbon:** Edgar, Head Chocolatier, in the confex transcript: *"There's not a lot of bean to bar to bonbon places in the world."* The vertical integration goes further than most competitors realize. FBC makes its own dark chocolate — Edgar calls it *"balanced, but not subtle"* — and that house dark becomes the structural backbone of the bonbons (the shell + many of the fillings). Most chocolatiers buy chocolate as an ingredient. FBC makes it. **This is the highest-defensibility version of the "we do all of it" claim.** When the audience is technical or skeptical, lead here.
 
 ### 4.2 The experiential factory
 
@@ -260,6 +262,16 @@ Source-traceable claims short enough to drop into a headline or a sell sheet wit
 - *Multiple Good Food Awards.*
 - *Class of 2010 in U.S. craft chocolate, alongside Dandelion, Dick Taylor, Fruition, and Ritual.*
 - *Production floor sits three feet above the river. In 2024, it saved the company.*
+- *~20,000 hand-crafted bonbons per week, made by a 7-person confections team.* (Source: Rihanna, confex transcript.)
+- *3-month shelf life with zero preservatives — controlled by water-activity monitoring, not by additives.* (Source: Rihanna, confex transcript.)
+- *Bean-to-bar to bonbon — "there's not a lot of bean-to-bar-to-bonbon places in the world."* (Source: Edgar, confex transcript. Use as the sharpest competitive line for technical audiences.)
+- *No artificial caramel colorants, vegetable-oil fillings, flour-based thickeners, or synthetic flavors. Spices from named partners (Spice Walla, Burlap and Barrel). Whiskey from Oak & Grist, Asheville.*
+
+### Bonbon vs. truffle — terminology note for marketing copy
+
+Edgar (Head Chocolatier) gives the technical answer in the confex transcript: a truffle is a hand-rolled, cocoa-dusted soft ganache in a thin chocolate shell — *"a truffle is a bonbon, but a bonbon isn't necessarily a truffle."* But he also acknowledges: *"in America, we kind of more generally refer to that category, that bonbon category, as truffles. So we've had a lot of conversation about this and what not only what is most technically true… it's also what best communicates to the customer. It's an active and live conversation."*
+
+**Implication for copy:** treat this as a documented brand-internal-debate, not a settled position. Cluster 09's *"Bonbon vs Truffle vs Praline"* article should preserve the nuance — explain the technical distinction, then acknowledge the pragmatic American convention. Don't assert a single right answer.
 
 ---
 
