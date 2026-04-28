@@ -1,0 +1,3005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>French Broad Chocolates — Brand Foundation 2026</title>
+<meta name="description" content="Leadership-grade brand foundation for French Broad Chocolates. Voice, audience, positioning, topical authority, dependencies, and the operating manual for everyone who helps FBC show up as one cohesive voice.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400;1,9..144,500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://frenchbroadchocolates.com/#organization",
+      "name": "French Broad Chocolates",
+      "url": "https://frenchbroadchocolates.com",
+      "founder": [
+        {"@type": "Person", "name": "Jael Skeffington", "jobTitle": "Co-founder & CEO"},
+        {"@type": "Person", "name": "Dan Rattigan", "jobTitle": "Co-founder"}
+      ],
+      "foundingDate": "2006",
+      "foundingLocation": {"@type": "Place", "name": "Asheville, North Carolina, USA"},
+      "address": {"@type": "PostalAddress", "streetAddress": "821 Riverside Drive", "addressLocality": "Asheville", "addressRegion": "NC", "postalCode": "28801", "addressCountry": "US"},
+      "description": "Bean-to-bar chocolate company in Asheville, NC. Founded 2006. Sources cacao directly from named producers; vertically integrates sourcing, manufacturing, confections, pastry, retail, tours, and education."
+    },
+    {
+      "@type": "Article",
+      "headline": "French Broad Chocolates — Brand Foundation 2026",
+      "datePublished": "2026-04-27",
+      "dateModified": "2026-04-27",
+      "author": {"@type": "Organization", "name": "ROI.LIVE"},
+      "publisher": {"@type": "Organization", "name": "ROI.LIVE"},
+      "about": {"@id": "https://frenchbroadchocolates.com/#organization"}
+    }
+  ]
+}
+</script>
+
+<style>
+:root {
+  --fbc-blue: #AFDCE2;
+  --fbc-blue-deep: #8EC8D0;
+  --fbc-teal: #2E7880;
+  --fbc-teal-light: #5AADB3;
+  --fbc-gold: #B8820C;
+  --fbc-gold-light: #D4A544;
+  --fbc-chocolate: #1E0B04;
+  --fbc-chocolate-soft: #3D2415;
+  --fbc-cream: #F7F1EA;
+  --fbc-cream-warm: #EFE5D6;
+  --fbc-white: #FFFFFF;
+  --fbc-rust: #9A4A1E;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --radius-sm: 4px;
+  --radius-md: 12px;
+  --radius-lg: 24px;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --sidebar-w: 280px;
+  --maxw: 1320px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-body);
+  color: var(--fbc-chocolate);
+  background: var(--fbc-cream);
+  line-height: 1.55;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  font-feature-settings: 'kern','liga','clig','calt';
+}
+
+/* Paper-grain texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--fbc-chocolate);
+}
+em { font-style: italic; }
+strong { font-weight: 600; }
+a { color: inherit; text-decoration: none; transition: color .3s var(--ease); }
+hr { border: 0; height: 1px; background: rgba(30,11,4,0.12); margin: 3rem 0; }
+
+/* Layout shell */
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
+  position: relative;
+  z-index: 2;
+}
+
+.container {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 40px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background: var(--fbc-chocolate);
+  color: var(--fbc-cream);
+  padding: 36px 28px 28px;
+  overflow-y: auto;
+  border-right: 1px solid rgba(247,241,234,0.06);
+  position: sticky;
+}
+.sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800' opacity='0.13'%3E%3Cpath d='M0 100 Q100 80 200 100 T400 100' stroke='%232E7880' fill='none' stroke-width='0.7'/%3E%3Cpath d='M0 220 Q100 200 200 220 T400 220' stroke='%232E7880' fill='none' stroke-width='0.7'/%3E%3Cpath d='M0 340 Q100 320 200 340 T400 340' stroke='%232E7880' fill='none' stroke-width='0.7'/%3E%3Cpath d='M0 460 Q100 440 200 460 T400 460' stroke='%232E7880' fill='none' stroke-width='0.7'/%3E%3Cpath d='M0 580 Q100 560 200 580 T400 580' stroke='%232E7880' fill='none' stroke-width='0.7'/%3E%3Cpath d='M0 700 Q100 680 200 700 T400 700' stroke='%232E7880' fill='none' stroke-width='0.7'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.9;
+}
+.sidebar > * { position: relative; z-index: 2; }
+
+.brand-mark {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 26px;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--fbc-cream);
+  margin-bottom: 8px;
+}
+.brand-mark .first {
+  font-style: italic;
+  color: var(--fbc-rust);
+  font-weight: 400;
+}
+.brand-mark .amp {
+  font-style: italic;
+  color: var(--fbc-gold-light);
+  font-weight: 300;
+  margin: 0 4px;
+}
+.sidebar-eyebrow {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fbc-teal-light);
+  display: block;
+  margin-bottom: 32px;
+}
+
+.nav-list { list-style: none; }
+.nav-list li { margin: 0; }
+.nav-list a {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 11px 14px 11px 16px;
+  border-left: 2px solid transparent;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--fbc-cream);
+  transition: all .3s var(--ease);
+}
+.nav-list a:hover {
+  color: var(--fbc-rust);
+  border-left-color: var(--fbc-gold-light);
+}
+.nav-list a.active {
+  color: var(--fbc-cream);
+  border-left-color: var(--fbc-rust);
+  font-weight: 600;
+}
+.nav-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 15px;
+  color: var(--fbc-gold-light);
+  min-width: 20px;
+  flex-shrink: 0;
+  font-variant-numeric: oldstyle-nums;
+}
+.nav-list a.active .nav-num { color: var(--fbc-gold); }
+
+.sidebar-footer {
+  margin-top: 40px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(247,241,234,0.1);
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: rgba(247,241,234,0.55);
+}
+.sidebar-footer .stamp {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--fbc-gold-light);
+  font-size: 14px;
+}
+.sidebar-footer code {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: rgba(247,241,234,0.7);
+  letter-spacing: 0.05em;
+}
+.sidebar-footer .by {
+  margin-top: 10px;
+  font-size: 11px;
+  color: rgba(247,241,234,0.5);
+}
+.sidebar-footer .by em {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--fbc-gold-light);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* ===== UNIVERSAL SECTION HEADER ===== */
+.section-header {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 64px;
+}
+.section-header.left { text-align: left; max-width: none; margin-left: 0; }
+.section-eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fbc-teal);
+  margin-bottom: 18px;
+  display: inline-block;
+}
+.section-eyebrow.gold-light { color: var(--fbc-gold-light); }
+.section-title, h2.section-title {
+  font-size: clamp(36px, 4.6vw, 60px);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+.section-title em, h2 em, h1 em { font-style: italic; color: var(--fbc-rust); font-weight: 400; }
+.section-sub {
+  margin-top: 20px;
+  font-size: 17px;
+  color: var(--fbc-chocolate-soft);
+  line-height: 1.65;
+  max-width: 60ch;
+}
+.section-header.left .section-sub { margin-left: 0; }
+.section-header:not(.left) .section-sub { margin-left: auto; margin-right: auto; }
+
+/* ===== HERO ===== */
+.hero {
+  background: linear-gradient(180deg, var(--fbc-blue) 0%, #C7E5EA 50%, var(--fbc-cream) 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 70px 0 60px;
+}
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 56px;
+  align-items: center;
+  min-height: 580px;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fbc-teal);
+  margin-bottom: 28px;
+}
+.hero-eyebrow::before {
+  content: '';
+  width: 36px;
+  height: 1.5px;
+  background: var(--fbc-teal);
+}
+
+.hero h1 {
+  font-size: clamp(44px, 5.5vw, 78px);
+  font-weight: 300;
+  line-height: 0.98;
+  margin-bottom: 26px;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 144;
+}
+.hero h1 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--fbc-rust);
+}
+
+.hero-attrib {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--fbc-chocolate);
+  margin-bottom: 28px;
+}
+.hero-attrib span {
+  display: block;
+  margin-top: 4px;
+  font-style: normal;
+  font-family: var(--font-body);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--fbc-chocolate-soft);
+  font-weight: 500;
+}
+
+.hero-sub {
+  font-size: 17.5px;
+  line-height: 1.65;
+  color: var(--fbc-chocolate-soft);
+  max-width: 480px;
+  margin-bottom: 36px;
+}
+
+.hero-stanza {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-top: 1px solid rgba(30,11,4,0.18);
+  border-bottom: 1px solid rgba(30,11,4,0.18);
+  margin-bottom: 30px;
+  max-width: 560px;
+}
+.hero-stanza > div {
+  padding: 14px 14px 14px 0;
+  border-right: 1px solid rgba(30,11,4,0.12);
+}
+.hero-stanza > div:last-child { border-right: 0; }
+.hero-stanza .num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--fbc-teal);
+  display: block;
+  margin-bottom: 2px;
+}
+.hero-stanza .verb {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--fbc-chocolate);
+  letter-spacing: -0.01em;
+}
+
+.hero-trust {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  color: var(--fbc-chocolate-soft);
+}
+.hero-trust div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+.hero-trust svg {
+  width: 14px;
+  height: 14px;
+  color: var(--fbc-teal);
+  flex-shrink: 0;
+}
+
+/* Hero visual right column */
+.hero-visual {
+  position: relative;
+  height: 580px;
+}
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px -30px rgba(30,11,4,0.5);
+}
+.hero-float-card {
+  position: absolute;
+  background: var(--fbc-cream);
+  border-radius: 6px;
+  padding: 18px 22px;
+  box-shadow: 0 24px 50px -20px rgba(30,11,4,0.4);
+  z-index: 3;
+  border: 1px solid rgba(30,11,4,0.06);
+}
+.hero-float-card.tl { top: 28px; left: -32px; max-width: 260px; }
+.hero-float-card.br { bottom: 36px; right: -22px; max-width: 250px; }
+.hero-float-card .badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fbc-teal);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hero-float-card .badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--fbc-teal);
+}
+.hero-float-card .big-stat {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--fbc-chocolate);
+  letter-spacing: -0.01em;
+}
+.hero-float-card .big-stat em { color: var(--fbc-rust); }
+.hero-float-card .stat-sub {
+  font-size: 12px;
+  color: var(--fbc-chocolate-soft);
+  margin-top: 5px;
+  line-height: 1.4;
+}
+.hero-float-card .peer-list {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: var(--fbc-chocolate);
+}
+
+/* ===== ART-DIRECTED PHOTO PLACEHOLDER ===== */
+.art-photo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--fbc-cream-warm) 0%, #E5D8C0 100%);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  box-shadow: inset 0 0 0 1px rgba(46,120,128,0.18);
+}
+.art-photo::before, .art-photo::after {
+  content: '';
+  position: absolute;
+  background: var(--fbc-teal);
+  opacity: 0.16;
+}
+.art-photo::before {
+  left: 33%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+.art-photo::after {
+  top: 33%;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+.art-photo .grid-line-2 {
+  position: absolute;
+  background: var(--fbc-teal);
+  opacity: 0.16;
+}
+.art-photo .grid-line-2.v {
+  left: 66%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+.art-photo .grid-line-2.h {
+  top: 66%;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+.art-photo .ph-tag {
+  font-family: var(--font-body);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--fbc-teal);
+  position: relative;
+  z-index: 2;
+}
+.art-photo .ph-shot {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1.35;
+  color: var(--fbc-chocolate);
+  margin-top: 8px;
+  max-width: 76%;
+  letter-spacing: -0.01em;
+  position: relative;
+  z-index: 2;
+}
+.art-photo .ph-mood {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--fbc-chocolate-soft);
+  position: relative;
+  z-index: 2;
+  max-width: 84%;
+}
+.art-photo .ph-mood strong {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fbc-teal);
+  margin-bottom: 6px;
+}
+.art-photo.dark {
+  background: linear-gradient(135deg, var(--fbc-chocolate-soft) 0%, var(--fbc-chocolate) 100%);
+  box-shadow: inset 0 0 0 1px rgba(212,165,68,0.2);
+}
+.art-photo.dark .ph-tag { color: var(--fbc-gold-light); }
+.art-photo.dark .ph-shot { color: var(--fbc-cream); }
+.art-photo.dark .ph-mood { color: rgba(247,241,234,0.65); }
+.art-photo.dark .ph-mood strong { color: var(--fbc-gold-light); }
+.art-photo.dark::before, .art-photo.dark::after,
+.art-photo.dark .grid-line-2 { background: var(--fbc-gold-light); opacity: 0.18; }
+
+/* ===== PRESS STRIP ===== */
+.press {
+  background: var(--fbc-cream);
+  padding: 38px 0;
+  border-bottom: 1px solid rgba(30,11,4,0.08);
+}
+.press-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 38px;
+  flex-wrap: wrap;
+}
+.press-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fbc-chocolate-soft);
+  padding-right: 22px;
+  border-right: 1px solid rgba(30,11,4,0.2);
+}
+.press-logo {
+  font-family: var(--font-display);
+  color: var(--fbc-chocolate-soft);
+  opacity: 0.78;
+  font-size: 17px;
+  font-weight: 400;
+  white-space: nowrap;
+  transition: opacity .3s var(--ease);
+}
+.press-logo:hover { opacity: 1; }
+.press-logo.serif { font-family: var(--font-display); font-weight: 500; }
+.press-logo.sans { font-family: var(--font-body); font-weight: 700; font-size: 14px; letter-spacing: 0.05em; text-transform: uppercase; }
+.press-logo.italic { font-style: italic; }
+
+/* ===== UNIVERSAL SECTION SHELL (cream default) ===== */
+section.fbc-section { padding: 110px 0; background: var(--fbc-cream); position: relative; overflow: hidden; }
+section.dark { background: var(--fbc-chocolate); color: var(--fbc-cream); }
+section.dark::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(184,130,12,0.13) 0%, transparent 60%);
+  pointer-events: none;
+}
+section.blue { background: var(--fbc-blue); position: relative; overflow: hidden; }
+section.blue::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800' opacity='0.18'%3E%3Cpath d='M0 200 Q200 160 400 200 T800 200' stroke='%23fff' fill='none' stroke-width='1'/%3E%3Cpath d='M0 400 Q200 360 400 400 T800 400' stroke='%23fff' fill='none' stroke-width='1'/%3E%3Cpath d='M0 600 Q200 560 400 600 T800 600' stroke='%23fff' fill='none' stroke-width='1'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+section.dark > .container, section.blue > .container { position: relative; z-index: 2; }
+section.dark .section-eyebrow { color: var(--fbc-gold-light); }
+section.dark h2, section.dark h3, section.dark h4 { color: var(--fbc-cream); }
+section.dark h2 em { color: var(--fbc-gold-light); }
+section.dark .section-sub { color: rgba(247,241,234,0.78); }
+
+/* ===== TASTING-LIST PATTERN (used everywhere) ===== */
+.tasting-list { list-style: none; margin: 24px 0; }
+.tasting-list > li {
+  display: grid;
+  grid-template-columns: 1.1fr 1.2fr;
+  gap: 24px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(30,11,4,0.12);
+  align-items: baseline;
+}
+.tasting-list > li:first-child { border-top: 1px solid rgba(30,11,4,0.12); }
+.tasting-list .tast-name {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--fbc-chocolate);
+}
+.tasting-list .tast-name em { font-style: italic; color: var(--fbc-rust); font-weight: 400; }
+.tasting-list .tast-notes {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--fbc-chocolate-soft);
+}
+.tasting-list .tast-notes strong { color: var(--fbc-chocolate); font-weight: 600; }
+section.dark .tasting-list > li,
+section.dark .tasting-list > li:first-child { border-color: rgba(247,241,234,0.15); }
+section.dark .tasting-list .tast-name { color: var(--fbc-cream); }
+section.dark .tasting-list .tast-name em { color: var(--fbc-gold-light); }
+section.dark .tasting-list .tast-notes { color: rgba(247,241,234,0.7); }
+
+/* ===== THIS-MONTH (asymmetric content + photo) ===== */
+.month-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1fr;
+  gap: 72px;
+  align-items: center;
+  position: relative;
+}
+.month-grid.reverse { grid-template-columns: 1fr 0.9fr; }
+.month-grid > .month-photo-side { position: relative; }
+.month-grid > .month-photo-side .month-photo {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 40px 80px -30px rgba(0,0,0,0.6);
+}
+.month-sticker {
+  position: absolute;
+  top: -28px;
+  right: -28px;
+  width: 132px;
+  height: 132px;
+  background: var(--fbc-gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--fbc-chocolate);
+  font-family: var(--font-display);
+  transform: rotate(-10deg);
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.4);
+  padding: 16px;
+  z-index: 4;
+}
+.month-sticker .lab {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+.month-sticker .big {
+  display: block;
+  font-size: 26px;
+  font-weight: 400;
+  font-family: var(--font-display);
+  font-style: italic;
+  letter-spacing: -0.01em;
+  margin: 4px 0 2px;
+}
+.month-sticker.blue { background: var(--fbc-blue-deep); }
+.month-sticker.rust { background: var(--fbc-rust); color: var(--fbc-cream); }
+.month-sticker.rust .big { color: var(--fbc-cream); }
+
+/* ===== PILLARS PATTERN ===== */
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 36px;
+  margin-top: 64px;
+}
+.pillars.four { grid-template-columns: repeat(4, 1fr); gap: 28px; }
+.pillar {
+  background: var(--fbc-white);
+  border-radius: var(--radius-md);
+  border-top: 3px solid var(--fbc-teal);
+  overflow: hidden;
+  padding: 0 0 32px;
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+.pillar:hover { transform: translateY(-4px); box-shadow: 0 30px 60px -25px rgba(30,11,4,0.15); }
+.pillar:nth-child(2) { border-top-color: var(--fbc-gold); }
+.pillar:nth-child(3) { border-top-color: var(--fbc-rust); }
+.pillar:nth-child(4) { border-top-color: var(--fbc-blue-deep); }
+.pillar-img {
+  width: 100%;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  margin-bottom: 22px;
+  position: relative;
+}
+.pillar-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 52px;
+  font-weight: 300;
+  color: var(--fbc-teal);
+  line-height: 1;
+  margin-bottom: 14px;
+  opacity: 0.85;
+  padding: 0 28px;
+  font-variation-settings: "opsz" 144;
+}
+.pillar:nth-child(2) .pillar-num { color: var(--fbc-gold); }
+.pillar:nth-child(3) .pillar-num { color: var(--fbc-rust); }
+.pillar:nth-child(4) .pillar-num { color: var(--fbc-blue-deep); }
+.pillar h3 {
+  font-size: 22px;
+  font-weight: 400;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+  padding: 0 28px;
+}
+.pillar h3 em { font-style: italic; color: var(--fbc-rust); }
+.pillar p {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--fbc-chocolate-soft);
+  padding: 0 28px;
+}
+.pillar p + p { margin-top: 12px; }
+.pillar .pillar-quote {
+  margin-top: 18px;
+  padding: 0 28px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--fbc-chocolate-soft);
+  border-left: 2px solid var(--fbc-teal);
+  padding-left: 18px;
+  margin-left: 28px;
+  margin-right: 28px;
+}
+.pillar:nth-child(2) .pillar-quote { border-left-color: var(--fbc-gold); }
+.pillar:nth-child(3) .pillar-quote { border-left-color: var(--fbc-rust); }
+.pillar:nth-child(4) .pillar-quote { border-left-color: var(--fbc-blue-deep); }
+.pillar-quote .a { display: block; font-style: normal; font-family: var(--font-body); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; margin-top: 10px; color: var(--fbc-teal); font-weight: 600; }
+
+/* ===== PLAN-CARD GRID PATTERN (ICP, clusters) ===== */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+}
+.card-grid.two { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+.card-grid.four { grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.card-grid.six { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+.fbc-card {
+  background: var(--fbc-white);
+  border-radius: var(--radius-md);
+  padding: 28px 28px 32px;
+  position: relative;
+  border: 1.5px solid transparent;
+  transition: all .35s var(--ease);
+  overflow: hidden;
+  cursor: default;
+}
+.fbc-card:hover { transform: translateY(-4px); box-shadow: 0 30px 60px -25px rgba(30,11,4,0.18); }
+.fbc-card.featured { border-color: var(--fbc-teal); background: linear-gradient(180deg, var(--fbc-cream-warm) 0%, var(--fbc-white) 35%); }
+.fbc-card.rust-accent { border-top: 3px solid var(--fbc-rust); border-radius: 8px 8px var(--radius-md) var(--radius-md); }
+.fbc-card.gold-accent { border-top: 3px solid var(--fbc-gold); border-radius: 8px 8px var(--radius-md) var(--radius-md); }
+.fbc-card.teal-accent { border-top: 3px solid var(--fbc-teal); border-radius: 8px 8px var(--radius-md) var(--radius-md); }
+.fbc-card.blue-accent { border-top: 3px solid var(--fbc-blue-deep); border-radius: 8px 8px var(--radius-md) var(--radius-md); }
+
+.fbc-card .seg-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--fbc-teal);
+  margin-bottom: 6px;
+}
+.fbc-card.gold-accent .seg-num { color: var(--fbc-gold); }
+.fbc-card.rust-accent .seg-num { color: var(--fbc-rust); }
+.fbc-card.blue-accent .seg-num { color: var(--fbc-blue-deep); }
+
+.fbc-card h3 {
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.fbc-card h3 em { font-style: italic; color: var(--fbc-rust); }
+.fbc-card .seg-status {
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fbc-chocolate-soft);
+  font-weight: 600;
+  margin-bottom: 14px;
+  display: block;
+}
+.fbc-card .seg-detail {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--fbc-chocolate-soft);
+  margin-bottom: 16px;
+}
+.fbc-card dl { font-size: 13px; }
+.fbc-card dt {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fbc-teal);
+  margin-top: 14px;
+}
+.fbc-card.gold-accent dt { color: var(--fbc-gold); }
+.fbc-card.rust-accent dt { color: var(--fbc-rust); }
+.fbc-card dd {
+  margin: 4px 0 0;
+  color: var(--fbc-chocolate-soft);
+  line-height: 1.55;
+  font-size: 13.5px;
+}
+.fbc-card dd em { font-family: var(--font-display); font-style: italic; font-weight: 400; color: var(--fbc-chocolate); }
+
+/* ===== REVIEW-STYLE CARD (constructed samples, anti-examples, quotables) ===== */
+.review-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.review-grid.two { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+.review-card {
+  background: var(--fbc-white);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  position: relative;
+  transition: all .35s var(--ease);
+  border: 1px solid rgba(30,11,4,0.05);
+}
+.review-card:hover { transform: translateY(-3px); box-shadow: 0 24px 50px -20px rgba(30,11,4,0.16); }
+.review-card.anti { background: rgba(154,74,30,0.07); border: 1px solid rgba(154,74,30,0.2); }
+.review-card.dark { background: var(--fbc-chocolate-soft); color: var(--fbc-cream); }
+.review-card .review-tag {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fbc-teal);
+  margin-bottom: 12px;
+  display: block;
+}
+.review-card.anti .review-tag { color: var(--fbc-rust); }
+.review-card.dark .review-tag { color: var(--fbc-gold-light); }
+.review-card h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.3;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.review-card.dark h4 { color: var(--fbc-cream); }
+.review-card .review-body {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--fbc-chocolate);
+  margin-bottom: 18px;
+}
+.review-card.anti .review-body { color: var(--fbc-chocolate-soft); }
+.review-card.dark .review-body { color: var(--fbc-cream); }
+.review-card .review-body em { color: var(--fbc-rust); }
+.review-card .review-body strong { color: var(--fbc-chocolate); font-weight: 600; }
+.review-card.dark .review-body strong { color: var(--fbc-gold-light); }
+.review-card .review-meta {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--fbc-chocolate-soft);
+  padding-top: 16px;
+  border-top: 1px solid rgba(30,11,4,0.08);
+}
+.review-card.dark .review-meta { color: rgba(247,241,234,0.7); border-top-color: rgba(247,241,234,0.12); }
+.review-card .review-meta strong {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fbc-teal);
+  margin-bottom: 4px;
+}
+.review-card.dark .review-meta strong { color: var(--fbc-gold-light); }
+.review-card .quote-mark {
+  position: absolute;
+  top: 16px;
+  right: 22px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 56px;
+  font-weight: 300;
+  color: var(--fbc-cream-warm);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+.review-card.dark .quote-mark { color: rgba(247,241,234,0.08); }
+.review-card.anti .quote-mark { color: rgba(154,74,30,0.18); }
+
+/* ===== HOW-STEPS PATTERN (timeline) ===== */
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-top: 80px;
+  position: relative;
+}
+.how-steps::before {
+  content: '';
+  position: absolute;
+  top: 30px;
+  left: 12.5%;
+  right: 12.5%;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, currentColor 0 6px, transparent 6px 14px);
+  opacity: 0.35;
+}
+.step {
+  text-align: center;
+  background: var(--fbc-cream);
+  padding: 44px 24px 32px;
+  border-radius: var(--radius-md);
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(30,11,4,0.06);
+}
+section.blue .step { background: var(--fbc-cream); }
+section.dark .step { background: var(--fbc-chocolate-soft); color: var(--fbc-cream); border-color: rgba(247,241,234,0.08); }
+.step-num {
+  width: 56px;
+  height: 56px;
+  background: var(--fbc-chocolate);
+  color: var(--fbc-cream);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  font-style: italic;
+  margin: -72px auto 20px;
+  border: 6px solid var(--fbc-cream);
+}
+section.blue .step-num { border-color: var(--fbc-blue); }
+section.dark .step-num { background: var(--fbc-gold); color: var(--fbc-chocolate); border-color: var(--fbc-chocolate); }
+.step h3 {
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.step p {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--fbc-chocolate-soft);
+}
+section.dark .step p { color: rgba(247,241,234,0.75); }
+
+/* ===== FAQ ACCORDION ===== */
+.faq-list { margin-top: 56px; }
+.faq-item { border-bottom: 1px solid rgba(30,11,4,0.16); }
+section.dark .faq-item, section.blue .faq-item { border-bottom-color: rgba(30,11,4,0.18); }
+.faq-q {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  letter-spacing: -0.01em;
+  transition: color .3s var(--ease);
+}
+.faq-q em { font-style: italic; color: var(--fbc-rust); }
+.faq-q:hover { color: var(--fbc-rust); }
+section.dark .faq-q:hover { color: var(--fbc-gold-light); }
+.faq-q .icon { width: 26px; height: 26px; flex-shrink: 0; position: relative; }
+.faq-q .icon::before, .faq-q .icon::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+  transition: transform .35s var(--ease);
+}
+.faq-q .icon::before { top: 50%; left: 0; right: 0; height: 1.5px; transform: translateY(-50%); }
+.faq-q .icon::after { top: 0; bottom: 0; left: 50%; width: 1.5px; transform: translateX(-50%); }
+.faq-item.open .faq-q .icon::after { transform: translateX(-50%) rotate(90deg); opacity: 0; }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height .4s var(--ease); }
+.faq-item.open .faq-a { max-height: 2400px; }
+.faq-a-inner {
+  padding: 0 0 28px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.faq-a-inner p { margin-bottom: 12px; color: var(--fbc-chocolate-soft); }
+section.dark .faq-a-inner p { color: rgba(247,241,234,0.78); }
+.faq-a-inner em { font-style: italic; color: var(--fbc-rust); font-family: var(--font-display); }
+section.dark .faq-a-inner em { color: var(--fbc-gold-light); }
+
+/* ===== PILL CHIPS ===== */
+.pill-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: var(--fbc-cream-warm);
+  color: var(--fbc-chocolate);
+  border: 1px solid rgba(30,11,4,0.12);
+}
+section.dark .pill { background: rgba(247,241,234,0.1); color: var(--fbc-cream); border-color: rgba(247,241,234,0.18); }
+section.blue .pill { background: var(--fbc-cream); border-color: rgba(30,11,4,0.12); }
+.pill em { font-family: var(--font-display); font-style: italic; color: var(--fbc-rust); font-weight: 400; }
+section.dark .pill em { color: var(--fbc-gold-light); }
+.pill.gold { background: var(--fbc-gold); color: var(--fbc-chocolate); border-color: var(--fbc-gold); }
+
+/* ===== PULL QUOTE ===== */
+.pull-quote {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(26px, 3vw, 38px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  padding: 0 0 0 36px;
+  border-left: 3px solid var(--fbc-rust);
+  max-width: 70ch;
+  margin: 36px 0;
+  color: var(--fbc-chocolate);
+}
+section.dark .pull-quote { color: var(--fbc-cream); border-left-color: var(--fbc-gold-light); }
+.pull-quote em { font-style: italic; color: var(--fbc-rust); font-weight: 400; }
+section.dark .pull-quote em { color: var(--fbc-gold-light); }
+.pull-quote .a {
+  display: block;
+  font-style: normal;
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 18px;
+  color: var(--fbc-teal);
+}
+section.dark .pull-quote .a { color: var(--fbc-gold-light); }
+
+/* ===== INLINE QUOTABLE STRIP ===== */
+.q-strip {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 17.5px;
+  line-height: 1.5;
+  padding: 18px 0 18px 22px;
+  border-left: 2px solid rgba(30,11,4,0.18);
+  color: var(--fbc-chocolate);
+  margin-bottom: 0;
+}
+.q-strip + .q-strip { margin-top: 16px; }
+.q-strip em { color: var(--fbc-rust); }
+.q-strip .a {
+  display: block;
+  font-style: normal;
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-top: 10px;
+  color: var(--fbc-teal);
+}
+section.dark .q-strip { color: var(--fbc-cream); border-left-color: rgba(247,241,234,0.25); }
+section.dark .q-strip em { color: var(--fbc-gold-light); }
+section.dark .q-strip .a { color: var(--fbc-gold-light); }
+
+/* ===== URGENCY/CALLOUT BLOCK ===== */
+.urgency {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(184,130,12,0.16);
+  border: 1px solid var(--fbc-gold);
+  padding: 13px 22px;
+  border-radius: 4px;
+  margin-top: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--fbc-chocolate);
+}
+section.dark .urgency { color: var(--fbc-cream); }
+.urgency .pulse {
+  width: 9px;
+  height: 9px;
+  background: var(--fbc-gold-light);
+  border-radius: 50%;
+  animation: pulse 2.2s infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(212,165,68,0.7); }
+  50% { opacity: 0.6; box-shadow: 0 0 0 9px rgba(212,165,68,0); }
+}
+
+/* ===== BUTTON ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 17px 32px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all .3s var(--ease);
+  background: var(--fbc-chocolate);
+  color: var(--fbc-cream);
+  border-color: var(--fbc-chocolate);
+}
+.btn:hover { background: var(--fbc-teal); border-color: var(--fbc-teal); transform: translateY(-2px); box-shadow: 0 14px 30px -12px rgba(46,120,128,0.5); }
+.btn.gold { background: var(--fbc-gold); border-color: var(--fbc-gold); color: var(--fbc-chocolate); }
+.btn.gold:hover { background: var(--fbc-gold-light); border-color: var(--fbc-gold-light); }
+.btn.ghost { background: transparent; color: var(--fbc-chocolate); border-color: var(--fbc-chocolate); }
+.btn.ghost:hover { background: var(--fbc-chocolate); color: var(--fbc-cream); }
+.btn svg { width: 14px; height: 14px; }
+
+/* ===== INTRO ASYMMETRIC GRID (Why-style) ===== */
+.intro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 60px;
+  align-items: end;
+  margin-bottom: 56px;
+}
+.intro-grid h2 {
+  font-size: clamp(36px, 4.6vw, 60px);
+  font-weight: 300;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+.intro-grid h2 em { font-style: italic; color: var(--fbc-rust); }
+.intro-grid p {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--fbc-chocolate-soft);
+}
+section.dark .intro-grid p { color: rgba(247,241,234,0.78); }
+
+/* ===== VOLUME MATH PANEL ===== */
+.volume-math {
+  background: var(--fbc-chocolate);
+  color: var(--fbc-cream);
+  padding: 48px 48px;
+  border-radius: var(--radius-lg);
+  margin: 56px 0;
+  position: relative;
+  overflow: hidden;
+}
+.volume-math::before {
+  content: '';
+  position: absolute;
+  top: -150px;
+  right: -150px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(184,130,12,0.18) 0%, transparent 60%);
+  pointer-events: none;
+}
+.volume-math > * { position: relative; z-index: 2; }
+.volume-math .vh {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fbc-gold-light);
+  margin-bottom: 28px;
+}
+.vm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(247,241,234,0.12);
+  gap: 24px;
+}
+.vm-row:last-of-type { border-bottom: 0; }
+.vm-row .vlabel { font-size: 14px; color: rgba(247,241,234,0.85); }
+.vm-row .vnum { font-family: var(--font-display); font-size: 22px; font-weight: 400; color: var(--fbc-gold-light); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.vm-delta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 24px;
+  margin-top: 6px;
+  border-top: 2px solid var(--fbc-gold);
+  gap: 24px;
+}
+.vm-delta .vlab { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fbc-cream); }
+.vm-delta .vlift { font-family: var(--font-display); font-style: italic; font-size: 44px; font-weight: 300; color: var(--fbc-gold-light); line-height: 1; letter-spacing: -0.02em; }
+.volume-math .vfoot { margin-top: 16px; font-size: 12.5px; line-height: 1.6; color: rgba(247,241,234,0.65); }
+
+/* ===== GIFT-STRIP STYLE (audience use cases) ===== */
+.gift-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 56px;
+  align-items: center;
+  margin: 64px 0;
+}
+.gift-grid.reverse { grid-template-columns: 1fr 1.05fr; }
+.gift-grid.reverse > .gift-photo-side { grid-column: 1; grid-row: 1; }
+.gift-grid.reverse > .gift-text-side { grid-column: 2; grid-row: 1; }
+.gift-photo-side { position: relative; aspect-ratio: 1.1; }
+.gift-photo-side .gift-photo {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px -20px rgba(30,11,4,0.35);
+}
+.gift-card-overlay {
+  position: absolute;
+  bottom: -28px;
+  left: -28px;
+  background: var(--fbc-cream);
+  padding: 22px 26px;
+  border-radius: 6px;
+  max-width: 280px;
+  box-shadow: 0 20px 40px -10px rgba(30,11,4,0.3);
+  border: 1px solid rgba(30,11,4,0.06);
+  z-index: 3;
+}
+.gift-card-overlay .top {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--fbc-rust);
+  font-size: 13px;
+  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+}
+.gift-card-overlay h4 {
+  font-size: 17px;
+  font-weight: 400;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+.gift-card-overlay p {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--fbc-chocolate-soft);
+}
+.gift-ribbon {
+  position: absolute;
+  top: -16px;
+  right: 12%;
+  background: var(--fbc-gold);
+  color: var(--fbc-chocolate);
+  padding: 9px 18px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transform: rotate(6deg);
+  box-shadow: 0 10px 20px -5px rgba(184,130,12,0.5);
+  z-index: 3;
+}
+
+.gift-text-side h2 {
+  font-size: clamp(32px, 4vw, 50px);
+  font-weight: 300;
+  line-height: 1.06;
+  margin-bottom: 18px;
+  letter-spacing: -0.02em;
+}
+.gift-text-side h2 em { font-style: italic; color: var(--fbc-rust); }
+.gift-text-side > p {
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--fbc-chocolate-soft);
+  margin-bottom: 24px;
+  max-width: 480px;
+}
+.gift-feats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 24px;
+  margin-bottom: 24px;
+  max-width: 540px;
+}
+.gift-feat {
+  display: flex;
+  gap: 10px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--fbc-chocolate-soft);
+}
+.gift-feat::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  background: var(--fbc-teal);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") no-repeat center / contain;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.gift-feat strong { color: var(--fbc-chocolate); font-weight: 600; display: block; margin-bottom: 2px; }
+
+/* ===== FINAL CTA ===== */
+.final-cta {
+  background: var(--fbc-chocolate);
+  color: var(--fbc-cream);
+  padding: 110px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.final-cta::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 900px; height: 900px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(175,220,226,0.08) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.final-cta .inner { position: relative; z-index: 2; max-width: 820px; margin: 0 auto; padding: 0 40px; }
+.final-cta h2 {
+  color: var(--fbc-cream);
+  font-size: clamp(42px, 5.5vw, 70px);
+  font-weight: 300;
+  margin-bottom: 22px;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+}
+.final-cta h2 em { font-style: italic; color: var(--fbc-gold-light); }
+.final-cta p {
+  font-size: 17.5px;
+  color: rgba(247,241,234,0.78);
+  margin-bottom: 38px;
+  line-height: 1.65;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.final-cta .trust-line {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: rgba(247,241,234,0.55);
+  letter-spacing: 0.04em;
+}
+.final-cta .trust-line div::before { content: '·'; color: var(--fbc-gold-light); margin-right: 8px; font-size: 16px; }
+.final-cta .trust-line div:first-child::before { content: ''; margin: 0; }
+
+/* ===== FOOTER MINI ===== */
+.footer-mini {
+  background: var(--fbc-gold);
+  padding: 22px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--fbc-chocolate);
+  text-transform: uppercase;
+}
+.footer-mini em { font-family: var(--font-display); font-style: italic; text-transform: none; letter-spacing: -0.01em; font-weight: 400; font-size: 14px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1300px) {
+  .hero-inner { gap: 40px; }
+  .hero-float-card.tl { left: -10px; }
+  .hero-float-card.br { right: -10px; }
+}
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; padding: 28px 24px; }
+  .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+  .hero-visual { height: 460px; }
+  .hero-float-card.tl { left: 12px; }
+  .hero-float-card.br { right: 12px; }
+  .month-grid, .month-grid.reverse { grid-template-columns: 1fr; gap: 48px; }
+  .pillars, .pillars.four { grid-template-columns: repeat(2, 1fr); }
+  .card-grid, .card-grid.four, .card-grid.six { grid-template-columns: repeat(2, 1fr); }
+  .review-grid { grid-template-columns: 1fr; }
+  .gift-grid, .gift-grid.reverse { grid-template-columns: 1fr; gap: 48px; }
+  .gift-grid.reverse > .gift-photo-side, .gift-grid.reverse > .gift-text-side { grid-column: auto; grid-row: auto; }
+  .how-steps { grid-template-columns: repeat(2, 1fr); }
+  .how-steps::before { display: none; }
+  .intro-grid { grid-template-columns: 1fr; gap: 24px; }
+  .tasting-list > li { grid-template-columns: 1fr; gap: 6px; }
+}
+@media (max-width: 700px) {
+  .container { padding: 0 22px; }
+  .hero { padding: 48px 0 40px; }
+  .hero h1 { font-size: 42px; }
+  .pillars, .pillars.four, .card-grid, .card-grid.four, .card-grid.six { grid-template-columns: 1fr; }
+  .how-steps { grid-template-columns: 1fr; }
+  section.fbc-section, section.dark, section.blue, .final-cta { padding: 72px 0; }
+  .gift-feats { grid-template-columns: 1fr; }
+  .month-sticker { width: 96px; height: 96px; top: -16px; right: -16px; }
+  .month-sticker .big { font-size: 20px; }
+  .press-inner { gap: 22px; }
+  .press-label { display: none; }
+  .volume-math { padding: 32px 24px; }
+}
+
+/* ============================================
+   QA PASS · 2026-04-27 · five surgical bug fixes
+   ============================================ */
+
+/* Bug 1 · Pillar/card h3 invisible on white inside dark sections.
+   The section.dark h3 rule was forcing cream onto white pillar cards. Re-anchor heading color
+   to chocolate when the heading sits inside a card with a light background. */
+section.dark .pillar h3,
+section.dark .pillar p,
+section.dark .pillar .pillar-num,
+section.dark .pillar .pillar-quote,
+section.dark .pillar .pillar-quote .a,
+section.dark .fbc-card:not(.dark) h3 { color: var(--fbc-chocolate); }
+section.dark .pillar h3 em { color: var(--fbc-rust); }
+section.dark .pillar p { color: var(--fbc-chocolate-soft); }
+section.dark .pillar .pillar-quote { color: var(--fbc-chocolate-soft); }
+section.dark .pillar .pillar-quote .a { color: var(--fbc-teal); }
+/* Pillar 2/3/4 keep their colored numbers + quote borders inside dark sections */
+section.dark .pillar:nth-child(2) .pillar-num { color: var(--fbc-gold); }
+section.dark .pillar:nth-child(3) .pillar-num { color: var(--fbc-rust); }
+section.dark .pillar:nth-child(4) .pillar-num { color: var(--fbc-blue-deep); }
+section.dark .pillar:nth-child(2) .pillar-quote .a { color: var(--fbc-gold); }
+section.dark .pillar:nth-child(3) .pillar-quote .a { color: var(--fbc-rust); }
+section.dark .pillar:nth-child(4) .pillar-quote .a { color: var(--fbc-blue-deep); }
+
+/* Bug 2 · Floating cards clipped or floating in empty space.
+   Make every photo-positioning parent overflow-visible so cards extending past the photo
+   edge are visible. Tighten offsets so cards overlap the photo by ~12-16% from inside,
+   not stick way out past it. */
+.hero { overflow: visible; }
+.hero-visual { overflow: visible; }
+.hero-float-card.tl { top: 32px; left: -16px; max-width: 250px; }
+.hero-float-card.br { bottom: 40px; right: -16px; max-width: 240px; }
+@media (max-width: 1300px) {
+  .hero-float-card.tl { left: 8px; }
+  .hero-float-card.br { right: 8px; }
+}
+
+/* Section 1 month-sticker — already inside .month-photo-side which is position:relative.
+   Pull sticker slightly inward so it overlaps the photo's top-right corner. */
+.month-photo-side { overflow: visible; }
+.month-sticker { top: -20px; right: -20px; }
+@media (max-width: 1300px) {
+  .month-sticker { top: -10px; right: -10px; }
+}
+
+/* Section 7 gift-card overlays — same overflow + tighten */
+.gift-photo-side { overflow: visible; width: 100%; }
+.gift-card-overlay { bottom: -20px; left: -16px; max-width: 260px; }
+.gift-ribbon { right: 14%; }
+@media (max-width: 1300px) {
+  .gift-card-overlay { bottom: -12px; left: -8px; max-width: 240px; }
+}
+
+/* Bug 3 · Section 7 columns bleeding into photo space.
+   Constrain the photo-side width, ensure inner photo is contained, give the grid a clearer
+   gap, and make sure neither column can overflow into the other. */
+.gift-grid { gap: 80px; align-items: start; }
+.gift-grid > .gift-text-side,
+.gift-grid > .gift-photo-side { min-width: 0; }
+.gift-photo-side .gift-photo { overflow: hidden; }
+.gift-photo-side .gift-photo .art-photo { overflow: hidden; }
+@media (max-width: 1300px) {
+  .gift-grid { gap: 60px; }
+}
+
+/* Bug 4 · Voice routing / tasting-list column alignment broken.
+   Force explicit left-align, allow grid items to shrink (min-width:0 prevents grid blowout
+   from long unbreakable strings), and ensure the right column doesn't inherit any stray
+   text-align from elsewhere. */
+.tasting-list > li { min-width: 0; }
+.tasting-list .tast-name,
+.tasting-list .tast-notes { min-width: 0; text-align: left; word-break: normal; overflow-wrap: break-word; }
+.tasting-list .tast-notes { hyphens: none; }
+
+/* Bug 5 · Photo placeholder caption text cut off in tight aspect ratios.
+   The art-photo uses flex-column space-between which makes the bottom mood block overflow
+   when the container is short. Solutions:
+   - Hero / Section 1 / Section 7 photos (taller aspect): caption fits as designed, leave alone.
+   - Pillar 16:10 photos (short aspect): shrink and condense the mood block.
+   - Anywhere the mood would still overflow: clip elegantly with text fade rather than hard cut. */
+.art-photo { min-height: 0; }
+.pillar-img .art-photo { padding: 16px; }
+.pillar-img .art-photo .ph-tag { font-size: 8.5px; letter-spacing: 0.22em; }
+.pillar-img .art-photo .ph-shot { font-size: 14px; line-height: 1.3; max-width: 90%; margin-top: 4px; }
+.pillar-img .art-photo .ph-mood { font-size: 10px; line-height: 1.4; max-width: 96%; }
+.pillar-img .art-photo .ph-mood strong { font-size: 8.5px; margin-bottom: 4px; }
+
+/* Inside the pillar 16:10 placeholders ONLY, the bottom edge fade prevents the mood block
+   from looking visually guillotined when content height exceeds container.
+   Other photo placeholders (hero, month, gift) have enough vertical room and keep their
+   grid-line ::after intact. */
+.pillar-img .art-photo > div { position: relative; z-index: 2; }
+.pillar-img .art-photo .ph-mood {
+  position: relative;
+  z-index: 2;
+}
+/* Soft fade overlay applied only to pillar placeholders, on a wrapper element rather than
+   ::after so we don't disturb the existing grid-line ::after. We use a box-shadow inset
+   technique instead — visually similar, no pseudo-element conflict. */
+.pillar-img .art-photo {
+  box-shadow: inset 0 0 0 1px rgba(46,120,128,0.18), inset 0 -32px 24px -20px rgba(239,229,214,0.85);
+}
+.pillar-img .art-photo.dark {
+  box-shadow: inset 0 0 0 1px rgba(212,165,68,0.2), inset 0 -32px 24px -20px rgba(30,11,4,0.65);
+}
+
+/* ============================================
+   QA PASS 2 · 2026-04-27 · final three bug fixes
+   ============================================ */
+
+/* Bug 1 · Hero float cards still extending too far past photo edge.
+   Previous fix used right: -16px (still 16px outside photo). Move to positive offsets so
+   cards sit fully INSIDE the photo bounds. */
+.hero-float-card.tl { top: 32px; left: 24px; right: auto; }
+.hero-float-card.br { bottom: 40px; right: 24px; left: auto; }
+@media (max-width: 1300px) {
+  .hero-float-card.tl { left: 16px; }
+  .hero-float-card.br { right: 16px; }
+}
+
+/* Section 1 month-sticker — same treatment, sit fully on photo's top-right corner */
+.month-sticker { top: 16px; right: 16px; }
+@media (max-width: 1300px) {
+  .month-sticker { top: 8px; right: 8px; }
+}
+
+/* Bug 2 · Section 7 caption cards constrained within photo bounds.
+   Cards were extending past photo's right edge into right-column gutter. Constrain card
+   width to fit within photo, position fully INSIDE bottom-left area. */
+.gift-card-overlay {
+  bottom: 24px;
+  left: 24px;
+  right: auto;
+  max-width: calc(100% - 96px);
+}
+.gift-ribbon { right: 24px; top: 24px; transform: rotate(0); }
+
+/* Bug · Photo placeholder captions bleeding through behind floating cards.
+   In photos that have floating sibling elements (hero · month · gift), the placeholder
+   long-form ph-shot and ph-mood text sits underneath the cards, creating visual bleed.
+   Hide the long-form caption blocks in these photos — the floating cards are the visual
+   content. Keep the corner ph-tag visible for art-direction context.
+   Pillar photos (no floating siblings) keep all caption blocks. */
+.hero-photo .art-photo .ph-shot,
+.hero-photo .art-photo .ph-mood,
+.month-photo .art-photo .ph-shot,
+.month-photo .art-photo .ph-mood,
+.gift-photo .art-photo .ph-shot,
+.gift-photo .art-photo .ph-mood { display: none; }
+
+/* The remaining ph-tag sits in the top-left corner of those placeholders — confirms
+   "this is a photo position" for art-direction without competing with the floating cards. */
+
+/* Bug 3 · Voice routing strong text invisible on chocolate ground.
+   The rule `.tasting-list .tast-notes strong { color: var(--fbc-chocolate) }` outranks
+   the section.dark color override, so bold names like "Jael" and "Dan" render in
+   chocolate-on-chocolate = invisible — creating the appearance of "huge gaps."
+   Override strong color for tasting-lists inside dark sections. Same fix for cream
+   strong-on-cream where it might bite. */
+section.dark .tasting-list .tast-notes strong { color: var(--fbc-cream); }
+section.dark .tasting-list .tast-name strong { color: var(--fbc-cream); }
+
+/* ===== PRINT ===== */
+@media print {
+  body::before, .sidebar, .sidebar::before { display: none !important; }
+  .layout { grid-template-columns: 1fr; }
+  body { background: #fff; color: #000; font-size: 11pt; line-height: 1.45; }
+  .hero { padding: 1.5rem 0; background: #fff !important; }
+  .hero h1, .hero h1 em { color: #000 !important; }
+  section.fbc-section, section.dark, section.blue, .final-cta {
+    page-break-inside: auto;
+    padding: 1.5rem 0;
+    background: #fff !important;
+    color: #000 !important;
+    border-bottom: 1px solid #ccc;
+  }
+  h1, h2, h3, h4, h5 { page-break-after: avoid; color: #000 !important; }
+  h2 em, h1 em, .pull-quote em, em { color: #5a2818 !important; }
+  .fbc-card, .pillar, .review-card, .step, .volume-math, .gift-card-overlay {
+    background: #f7f1ea !important;
+    color: #000 !important;
+    border: 1px solid #ccc;
+    box-shadow: none !important;
+  }
+  .art-photo { display: none; }
+  .footer-mini { background: #fff; color: #666; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<aside class="sidebar" aria-label="Document navigation">
+  <div class="brand-mark"><span class="first">French Broad</span><span class="amp">&</span>Chocolates</div>
+  <span class="sidebar-eyebrow">Brand Foundation 2026</span>
+  <nav>
+    <ul class="nav-list" id="docNav">
+      <li><a href="#hero"><span class="nav-num">00</span><span>Overview</span></a></li>
+      <li><a href="#section-1"><span class="nav-num">01</span><span>Brand Foundation</span></a></li>
+      <li><a href="#section-2"><span class="nav-num">02</span><span>Sample Library</span></a></li>
+      <li><a href="#section-3"><span class="nav-num">03</span><span>Who We Talk To</span></a></li>
+      <li><a href="#section-4"><span class="nav-num">04</span><span>Positioning</span></a></li>
+      <li><a href="#section-5"><span class="nav-num">05</span><span>Topical Authority</span></a></li>
+      <li><a href="#section-6"><span class="nav-num">06</span><span>What We Need From FBC</span></a></li>
+      <li><a href="#section-7"><span class="nav-num">07</span><span>How To Use This</span></a></li>
+    </ul>
+  </nav>
+  <div class="sidebar-footer">
+    <span class="stamp">Living document</span>
+    Last updated <code>27 APR 2026</code><br>
+    Next review <code>27 JUL 2026</code>
+    <div class="by">Built by <em>ROI.LIVE</em></div>
+  </div>
+</aside>
+
+<main>
+
+<!-- ============= HERO ============= -->
+<section id="hero" class="hero">
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">The brand's deepest belief</div>
+      <h1>One of the principal purposes of food is <em>pleasure.</em></h1>
+      <p class="hero-attrib">— Jael, co-founder of French Broad Chocolates<span>The Southern Fork podcast · 2024</span></p>
+      <p class="hero-sub">A leadership-grade brand foundation — voice reflected back, audiences mapped, positioning sharpened, topical authority engineered. Built from twenty years of founder narrative.</p>
+      <div class="hero-stanza" role="list" aria-label="The four-beat brand stanza">
+        <div role="listitem"><span class="num">i</span><span class="verb">Source.</span></div>
+        <div role="listitem"><span class="num">ii</span><span class="verb">Make.</span></div>
+        <div role="listitem"><span class="num">iii</span><span class="verb">Transform.</span></div>
+        <div role="listitem"><span class="num">iv</span><span class="verb">Invite.</span></div>
+      </div>
+      <div class="hero-trust">
+        <div><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Living document</div>
+        <div><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>27 April 2026</div>
+        <div><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Built by ROI.LIVE</div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-photo">
+        <div class="art-photo">
+          <span class="grid-line-2 v"></span><span class="grid-line-2 h"></span>
+          <div>
+            <span class="ph-tag">Hero photograph · 4:5</span>
+            <div class="ph-shot">Jael at the Riverside factory window — production line just visible behind the glass.</div>
+          </div>
+          <div class="ph-mood">
+            <strong>Mood &amp; light</strong>
+            Editorial portrait. Warm available light, late-afternoon. Mid-laugh or candid conversation. The factory line is in focus behind the glass — readers should know this is a working factory at first glance.
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-float-card tl">
+        <div class="badge">Class of 2010</div>
+        <div class="peer-list">Alongside <em>Dandelion</em>, <em>Dick&nbsp;Taylor</em>, <em>Fruition</em>, and <em>Ritual</em>.</div>
+      </div>
+
+      <div class="hero-float-card br">
+        <div class="badge">Every year since 2006</div>
+        <div class="big-stat">85+ team · ~50 tons / year</div>
+        <div class="stat-sub">Asheville, North Carolina · Three locations</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= PRESS STRIP ============= -->
+<section class="press" aria-label="Press placements">
+  <div class="container press-inner">
+    <div class="press-label">As seen in</div>
+    <div class="press-logo serif">The New York Times</div>
+    <div class="press-logo sans">FORBES</div>
+    <div class="press-logo">Good Morning America</div>
+    <div class="press-logo serif italic">Food &amp; Wine</div>
+    <div class="press-logo serif">The Wall Street Journal</div>
+    <div class="press-logo serif">The Washington Post</div>
+    <div class="press-logo">Southern Living</div>
+    <div class="press-logo">Rachael Ray</div>
+    <div class="press-logo serif italic">Vogue</div>
+    <div class="press-logo">Oprah's Favorite Things</div>
+  </div>
+</section>
+
+<!-- ============= SECTION 1 · BRAND FOUNDATION ============= -->
+<section id="section-1" class="dark fbc-section">
+  <div class="container">
+
+    <!-- INTRO · this-month asymmetric pattern -->
+    <div class="month-grid">
+      <div class="month-left">
+        <div class="section-eyebrow">Section 01 · Brand Foundation</div>
+        <h2>Two voices.<br><em>One chocolate brand.</em></h2>
+        <p style="font-size:17px;line-height:1.7;color:rgba(247,241,234,0.82);max-width:520px;margin-top:14px">French Broad Chocolates does not sound like a chocolate company. It sounds like two people who have spent twenty years arguing affectionately about cacao — one telling stories with their hands covered in chocolate, the other patiently dismantling a marketing simplification. That difference is the brand.</p>
+
+        <ul class="tasting-list" style="margin-top:36px">
+          <li><span class="tast-name">The animating <em>belief</em></span><span class="tast-notes">Chocolate is a food. Pleasure is the point. If a draft contradicts either, it's wrong.</span></li>
+          <li><span class="tast-name">Specificity over <em>abstraction</em></span><span class="tast-notes">Always names, places, numbers. <strong>Cacao Bisiesto, Matagalpa.</strong> 39 inches up the door. 12 hours of conching.</span></li>
+          <li><span class="tast-name">People, place, and <em>process</em></span><span class="tast-notes">The founders' three-part lens. Used spontaneously, often. Use it when explaining anything about cacao.</span></li>
+          <li><span class="tast-name">Story-rooted <em>claims</em></span><span class="tast-notes">A claim never floats. Sustainability isn't a value statement; it's a 39-inch waterline and a production floor 3 ft higher.</span></li>
+          <li><span class="tast-name">Anti-<em>pretension</em></span><span class="tast-notes">"I will never turn up my nose at a milk chocolate bar, or a creamy peanut butter cup, or what I will go to my grave believing is the best dessert in the world — a chocolate chip cookie."</span></li>
+          <li><span class="tast-name">Asheville as a <em>character</em></span><span class="tast-notes">Not a backdrop. The terroir of Asheville is influencing the business. Named locals — Counter Culture, Sandy Mush, Mountain BizWorks.</span></li>
+          <li><span class="tast-name">We do all of it, and we do it <em>deeply</em></span><span class="tast-notes">The most-repeated competitive line. A four-beat rhythm: source / make / transform / invite.</span></li>
+          <li><span class="tast-name">The published three-pillar <em>promise</em></span><span class="tast-notes"><strong>Sourced with integrity. Crafted with intention. Served with gratitude.</strong> The cleanest unifying triplet — already in production.</span></li>
+        </ul>
+      </div>
+
+      <div class="month-photo-side">
+        <div class="month-photo">
+          <div class="art-photo dark">
+            <span class="grid-line-2 v"></span><span class="grid-line-2 h"></span>
+            <div>
+              <span class="ph-tag">Section 01 · 1:1</span>
+              <div class="ph-shot">Two pairs of hands at the lounge counter — a bonbon being handed across to a customer.</div>
+            </div>
+            <div class="ph-mood">
+              <strong>Mood &amp; composition</strong>
+              The brand voice is in this exchange. Hands in focus, faces blurred. Cream-paper packaging visible. Warm tungsten light. Subject crops at the wrist on both sides — implies this happens hundreds of times a day.
+            </div>
+          </div>
+        </div>
+        <div class="month-sticker rust">
+          <div class="lab">Eight<br>load-bearing<br><span class="big">patterns</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- VOICE SIGNATURES · 4-pillar grid -->
+  <div class="container" style="margin-top:96px">
+    <div class="section-header left">
+      <div class="section-eyebrow gold-light">Voice Signatures</div>
+      <h2 class="section-title" style="color:var(--fbc-cream)">Three voices,<br><em>one brand spine.</em></h2>
+      <p class="section-sub" style="color:rgba(247,241,234,0.75)">Each signature has its own patterns and vocabulary tells. As team interviews land, more pillars fill the row — pastry, hospitality, tour guides, chocolate-making teams each get their own card.</p>
+    </div>
+
+    <div class="pillars four">
+      <div class="pillar">
+        <div class="pillar-img">
+          <div class="art-photo">
+            <div><span class="ph-tag">Shared · 16:10</span><div class="ph-shot">A bar of chocolate, broken in half on cream paper.</div></div>
+            <div class="ph-mood"><strong>Tone</strong>Quiet, rooted, warm.</div>
+          </div>
+        </div>
+        <div class="pillar-num">i</div>
+        <h3>The shared <em>brand voice</em></h3>
+        <p>The patterns that show up across both founders and the published work. Specificity over abstraction. Story-rooted claims. Anti-pretension. The three-pillar promise.</p>
+        <div class="pillar-quote">"We do all of it, and we do it deeply."<span class="a">— The competitive line</span></div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-img">
+          <div class="art-photo">
+            <div><span class="ph-tag">Jael · 16:10</span><div class="ph-shot">Jael at the lounge, laughing — caught in the middle of a story.</div></div>
+            <div class="ph-mood"><strong>Tone</strong>Warm, refrain-built, scenic.</div>
+          </div>
+        </div>
+        <div class="pillar-num">ii</div>
+        <h3>Jael's <em>signature</em></h3>
+        <p>Story-driven, sensory, refrain-builder. The brand's primary public-facing voice. Origin narrative, gifting register, hospitality, press profile.</p>
+        <div class="pillar-quote">"Chocolate is the thing that will make me happy."<span class="a">— FBC origin Q&amp;A</span></div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-img">
+          <div class="art-photo">
+            <div><span class="ph-tag">Dan · 16:10</span><div class="ph-shot">Dan on a sourcing trip — handling cacao pods at a producer farm.</div></div>
+            <div class="ph-mood"><strong>Tone</strong>Process-deep, anti-reductionist, technical with humanism.</div>
+          </div>
+        </div>
+        <div class="pillar-num">iii</div>
+        <h3>Dan's <em>signature</em></h3>
+        <p>Sourcing, manufacturing, ethics, the unglamorous truth of supply chains. The voice that says "I've been growing allergic to reductionist messages."</p>
+        <div class="pillar-quote">"Direct trade is a very convenient marketing term, but it is probably impossibly reductionist."<span class="a">— Sourcing Q&amp;A</span></div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-img">
+          <div class="art-photo">
+            <div><span class="ph-tag">Confections · 16:10</span><div class="ph-shot">Rihanna and Edgar at the production line, mid-task.</div></div>
+            <div class="ph-mood"><strong>Tone</strong>Process-as-choreography, relay-of-care.</div>
+          </div>
+        </div>
+        <div class="pillar-num">iv</div>
+        <h3>The Confections <em>team</em></h3>
+        <p>Rihanna Bourbon, Confections Supervisor. Edgar, Head Chocolatier. Captured 2026-04-27. They lead on bonbon production, flavor development, and standards/training language.</p>
+        <div class="pillar-quote">"What we've had to do is establish almost a choreography for new people."<span class="a">— Edgar, Head Chocolatier</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOICE ROUTING · tasting-list -->
+  <div class="container" style="margin-top:96px">
+    <div class="intro-grid">
+      <h2>Voice routing.<br><em>Who leads what.</em></h2>
+      <p>When you can't decide who should carry a piece, ask which question it answers. <em>Why does this exist?</em> → Jael. <em>How does this work?</em> → Dan. <em>Why does it taste like this?</em> → Both, in that order: Jael opens, Dan deepens. <em>How does this specific bonbon come to be?</em> → Confections team leads, Jael closes.</p>
+    </div>
+
+    <ul class="tasting-list">
+      <li><span class="tast-name">Founder origin storytelling</span><span class="tast-notes"><strong>Jael</strong> · story-driven, scene-rich · Dan supports with a process detail</span></li>
+      <li><span class="tast-name">Mother's Day, gift, consumer emotional</span><span class="tast-notes"><strong>Jael</strong> · warmth, "Hi friends" register, self-disclosure</span></li>
+      <li><span class="tast-name">Sustainability, sourcing, direct trade</span><span class="tast-notes"><strong>Dan</strong> · lived knowledge, anti-reductionist · Jael frames the why</span></li>
+      <li><span class="tast-name">B2B wholesale, pastry chefs, chocolatiers</span><span class="tast-notes"><strong>Dan</strong> · technical buyers want technical answers · Jael frames values fit</span></li>
+      <li><span class="tast-name">Retail wholesale (shopkeepers)</span><span class="tast-notes"><strong>Jael</strong> on relationship · <strong>Dan</strong> on specs</span></li>
+      <li><span class="tast-name">Restaurant + hotel partner</span><span class="tast-notes"><strong>Jael</strong> · hospitality-to-hospitality is relational · Dan supports on supply</span></li>
+      <li><span class="tast-name">Press &amp; media — profile</span><span class="tast-notes"><strong>Jael</strong> · Dan supports</span></li>
+      <li><span class="tast-name">Press &amp; media — industry/economics</span><span class="tast-notes"><strong>Dan</strong> · Jael supports</span></li>
+      <li><span class="tast-name">Crisis · Helene · community moments</span><span class="tast-notes"><strong>Jael</strong> · holds the gratitude register · Dan names practical lessons</span></li>
+      <li><span class="tast-name">Industry peers (other makers)</span><span class="tast-notes"><strong>Dan</strong> · peer-to-peer, no marketing</span></li>
+      <li><span class="tast-name">Café &amp; Lounge experience copy</span><span class="tast-notes"><strong>Jael</strong> · service-as-belonging is her register</span></li>
+      <li><span class="tast-name">Bonbon production content (Cluster 09)</span><span class="tast-notes"><strong>Confections team</strong> · Edgar on flavor/craft, Rihanna on process/standards · Jael frames the consumer "why"</span></li>
+      <li><span class="tast-name">Bonbon flavor development stories</span><span class="tast-notes"><strong>Edgar</strong> · sensory-flavor-as-memory is his register</span></li>
+      <li><span class="tast-name">Standards · quality · training language</span><span class="tast-notes"><strong>Rihanna</strong> · the keeper of excellence</span></li>
+    </ul>
+  </div>
+
+  <!-- UNIVERSAL RULES · 2-col -->
+  <div class="container" style="margin-top:96px">
+    <div class="section-header left">
+      <div class="section-eyebrow gold-light">Universal Rules</div>
+      <h2 class="section-title" style="color:var(--fbc-cream)">Banned phrases.<br><em>Must-include patterns.</em></h2>
+      <p class="section-sub" style="color:rgba(247,241,234,0.75)">Each rule is sourced to a founder quote. These aren't preferences — they're rules the founders have personally enforced.</p>
+    </div>
+
+    <div class="card-grid two">
+      <div class="fbc-card dark" style="background:rgba(154,74,30,0.12);border:1px solid rgba(154,74,30,0.3);color:var(--fbc-cream)">
+        <span class="seg-num" style="color:var(--fbc-rust)">Banned</span>
+        <h3 style="color:var(--fbc-cream)">Phrases we don't use.</h3>
+        <ul class="tasting-list" style="margin-top:24px">
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)"><em style="color:var(--fbc-rust)">FBC</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">In any external copy. Internal shorthand only. Jael, on record.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)"><em style="color:var(--fbc-rust)">Decadent · sinful · indulgent</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">As primary descriptors. Treats chocolate as transgression.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)"><em style="color:var(--fbc-rust)">Guilt-free</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">"There's nothing to feel guilty about."</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)"><em style="color:var(--fbc-rust)">Luxury</em> as bare descriptor / headline frame</span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">Banned in "luxury chocolate," "luxury experience." <strong>Permitted</strong> when subordinated to a moment, e.g., Jael: "a beautiful, small luxury in a moment that transports you."</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)"><em style="color:var(--fbc-rust)">Premium · artisanal</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">As standalone claims. Show the work instead.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)"><em style="color:var(--fbc-rust)">Direct trade</em> without nuance</span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">Dan: "impossibly reductionist." Use carefully and qualify.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)"><em style="color:var(--fbc-rust)">Synergy · leverage · disrupt</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">Off-register. Not a food brand.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)">Generalizations like <em style="color:var(--fbc-rust)">our farmers</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">Without naming. Name them.</span></li>
+        </ul>
+      </div>
+
+      <div class="fbc-card dark" style="background:rgba(46,120,128,0.14);border:1px solid rgba(46,120,128,0.35);color:var(--fbc-cream)">
+        <span class="seg-num" style="color:var(--fbc-teal-light)">Must include · at least one per piece</span>
+        <h3 style="color:var(--fbc-cream)">Patterns to keep.</h3>
+        <ul class="tasting-list" style="margin-top:24px">
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)">A <em style="color:var(--fbc-gold-light)">named person, place, supplier</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">"Cacao Bisiesto in Matagalpa." "Counter Culture, two blocks over." "Step Family Farms raspberries."</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)">A <em style="color:var(--fbc-gold-light)">scene or moment</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">Not an abstract claim. Truffles up to elbows. 39 inches at the door.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)">A <em style="color:var(--fbc-gold-light)">sensory verb</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">Rooted in eating, not marketing. Melts. Blooms. Lingers. Snaps. Releases. Opens.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)">A <em style="color:var(--fbc-gold-light)">community gesture</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">When the piece is consumer-facing.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)">A <em style="color:var(--fbc-gold-light)">qualification</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">When the piece is sourcing or sustainability. Keeps it from sounding like greenwash.</span></li>
+        </ul>
+
+        <span class="seg-num" style="color:var(--fbc-teal-light);margin-top:24px;display:block">Structural patterns</span>
+        <ul class="tasting-list" style="margin-top:14px">
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)">The <em style="color:var(--fbc-gold-light)">four-beat brand stanza</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">Source · make · transform · invite. Spine of the brand promise.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)">Hard fact → <em style="color:var(--fbc-gold-light)">soft reframe</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">Jael move. Lead with the hard reality, end on the human reframe.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)">Tidy frame → <em style="color:var(--fbc-gold-light)">"actually it's more complex"</em> → quiet definitive</span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">Dan move. Lead conventional, dismantle, restate.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream)">Three-pillar <em style="color:var(--fbc-gold-light)">mapping</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.65)">Brand-level copy maps to <em>Sourced · Crafted · Served.</em></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============= SECTION 2 · SAMPLE LIBRARY ============= -->
+<section id="section-2" class="fbc-section">
+  <div class="container">
+
+    <div class="intro-grid">
+      <div>
+        <div class="section-eyebrow">Section 02 · Sample Library</div>
+        <h2>What French Broad Chocolates<br><em>actually sounds like.</em></h2>
+      </div>
+      <p>A matchstick library. The question to ask of any new draft is not <em>"is this in our brand voice?"</em> but <em>"could this paragraph live next to one of these samples without feeling foreign?"</em></p>
+    </div>
+
+    <!-- CORE QUOTABLES · 27 lines as tasting list -->
+    <div style="margin-top:24px">
+      <div class="section-header left" style="margin-bottom:36px">
+        <div class="section-eyebrow">Twenty-seven core quotables · sourced</div>
+        <h3 class="section-title" style="font-size:clamp(28px,3.5vw,42px)">High-value verbatim lines.<br><em>Every long-form should consider one.</em></h3>
+      </div>
+
+      <div class="card-grid two" style="gap:48px">
+        <div>
+          <div class="q-strip">"Chocolate is the thing that will make me <em>happy.</em>"<span class="a">— Jael · the origin moment</span></div>
+          <div class="q-strip">"Chocolate is a food just like grain is a food. One of the principal purposes of food is <em>pleasure.</em>"<span class="a">— Jael · The Southern Fork</span></div>
+          <div class="q-strip">"Most chocolate companies pick a lane. We do <em>all of it</em>, and we do it deeply."<span class="a">— Jael · the competitive line</span></div>
+          <div class="q-strip">"Honest answer, you can. We're not trying to win on price. What we're offering is <em>fundamentally different</em>."<span class="a">— Jael · the price-comparison line</span></div>
+          <div class="q-strip">"The terroir of <em>Asheville</em> is influencing our business."<span class="a">— Jael · the Asheville line</span></div>
+          <div class="q-strip">"The French Broad River is a metaphor of life and of business. The only real <em>constant</em> in life is change."<span class="a">— Jael · the river metaphor</span></div>
+          <div class="q-strip">"Asheville gave us <em>everything</em>. Being an active part of its growth and resilience is core to who we are."<span class="a">— Jael · the community line</span></div>
+          <div class="q-strip">"You can't quit. The world needs your <em>chocolate.</em>"<span class="a">— A friend of Jael's, 2007 · folkloric to the brand</span></div>
+          <div class="q-strip">"I will never turn up my nose at a milk chocolate bar, or a creamy peanut butter cup, or what I will go to my grave believing is <em>the best dessert in the world</em> — a chocolate chip cookie."<span class="a">— Jael · the connoisseur-pushback line</span></div>
+          <div class="q-strip">"I want food to bring me <em>closer</em> to who I am."<span class="a">— Jael · the reframe</span></div>
+          <div class="q-strip">"I've been growing <em>allergic</em> to reductionist messages, because I don't find them to be very intellectually honest."<span class="a">— Dan · the anti-reductionism line</span></div>
+          <div class="q-strip">"Direct trade is a very convenient marketing term, but it is probably <em>impossibly reductionist.</em>"<span class="a">— Dan · the direct-trade qualifier</span></div>
+          <div class="q-strip">"I don't know that I have ever visited a cacao farm that wasn't <em>proud</em> of the cacao they produced."<span class="a">— Dan · the farmer-pride line</span></div>
+          <div class="q-strip">"He was sixty-three when he died, suddenly. We knew him for over twenty years… he did a great job, and I will <em>always miss him.</em>"<span class="a">— Dan · on Daniel South</span></div>
+        </div>
+        <div>
+          <div class="q-strip">"We are <em>not separate</em> from commodity. We are all connected. The geopolitics of the cacao industry, the strategic decisions of big candy and big chocolate makers — all those dynamics, they all affect us."<span class="a">— Dan · the leveling line</span></div>
+          <div class="q-strip">"We started out this journey assuming what we were doing was unique. We've come to find that <em>most everything has been done before</em> — and that's beautiful."<span class="a">— Dan · the humility line</span></div>
+          <div class="q-strip">"What we've had to do is establish almost a <em>choreography</em> for new people."<span class="a">— Edgar, Head Chocolatier · the choreography line</span></div>
+          <div class="q-strip">"Bonbons — just little individual <em>pieces of art.</em>"<span class="a">— Edgar · the bonbon-as-art line</span></div>
+          <div class="q-strip">"I want them to really <em>feel it in their bones.</em>"<span class="a">— Edgar · the feel-it-in-their-bones line</span></div>
+          <div class="q-strip">"<em>Nostalgia</em> is one of my favorite feelings to evoke in chocolate."<span class="a">— Edgar · the nostalgia line</span></div>
+          <div class="q-strip">"<em>Balanced</em>, but not subtle."<span class="a">— Edgar · on FBC house dark</span></div>
+          <div class="q-strip">"The chocolate is the <em>star.</em>"<span class="a">— Edgar · the refrain</span></div>
+          <div class="q-strip">"Each person has to meet that <em>standard of excellence</em> at their steps so that they're passing on good product that will lead to a perfect bonbon in the end."<span class="a">— Rihanna Bourbon · the standard-of-excellence line</span></div>
+          <div class="q-strip">"It can't be <em>98 out of a 100</em>, or else two people don't get the bonbon that we intended to make."<span class="a">— Rihanna · the 98-out-of-100 line</span></div>
+          <div class="q-strip">"<em>First, we eat with our eyes.</em>"<span class="a">— Edgar · the first-bite directive</span></div>
+          <div class="q-strip">"The kitchen is very much like a science lab. <em>Carefully handcrafted</em> science lab."<span class="a">— Rihanna · the science-lab line</span></div>
+          <div class="q-strip">"A bonbon is about quality, not quantity… It's a beautiful, <em>small luxury in a moment that transports you.</em> It's a little piece of art that you get to eat."<span class="a">— Jael · the small-luxury line (NEW from confex transcript)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LONG-FORM PASSAGES · review-card pattern, dark variant for canonical -->
+  <div class="container" style="margin-top:96px">
+    <div class="section-header left">
+      <div class="section-eyebrow">Long-form passages · eight</div>
+      <h3 class="section-title" style="font-size:clamp(28px,3.5vw,42px)">Sustained verbatim — voice calibration<br>before any long-form draft.</h3>
+    </div>
+
+    <div class="card-grid two">
+      <div class="review-card dark">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Origin · canonical · Jael</span>
+        <h4>The truffle scene at full length</h4>
+        <p class="review-body">"So one day, I'm making truffles by hand — little ganache balls that you roll by hand and then dip in chocolate by hand and then roll in cocoa powder. They were messy, and I had chocolate up to my elbows, and complete joy… I stopped and looked at the palms of my hands. And I looked up at Dan, and I said out loud: <em>chocolate is the thing that will make me happy.</em><br><br>Chocolate found me."</p>
+        <div class="review-meta"><strong>The founder myth · 130 words</strong>Scene-first. Sensory verbs. Polysyndeton. A single italic line that lands the whole thing.</div>
+      </div>
+
+      <div class="review-card dark">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Press · on-record · Jael</span>
+        <h4>The luxury answer on Southern Fork</h4>
+        <p class="review-body">"I might respectfully disagree. We need chocolate no less than we need grain. Chocolate is a food just like grain is a food… What food brings to us is joy, is connection, is an offering. That, to me, is what we're here to do — not to feed people a luxury, but to <em>offer something that brings pleasure</em>, something that can be an emotional exchange between humans. That, to me, is vital."</p>
+        <div class="review-meta"><strong>Gentle pushback into joy-connection-offering refrain</strong>Redirects "luxury" into "vital." Use as the canonical luxury-objection answer.</div>
+      </div>
+
+      <div class="review-card dark">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Brand narrative · canonical · Jael</span>
+        <h4>Asheville as cultural co-founder</h4>
+        <p class="review-body">"Even though the cacao isn't grown here in Asheville, we believe the <em>terroir of Asheville</em> is influencing our business. This is a place that is creative, that is collaborative. Our business model, like many in this town, is not built on fear or threatened by other businesses… It's a cultural terroir."</p>
+        <div class="review-meta"><strong>The canonical "why Asheville" paragraph</strong>Use when content needs to make Asheville the reason FBC exists — not just where it lives.</div>
+      </div>
+
+      <div class="review-card dark">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Sustainability · canonical · Dan</span>
+        <h4>Dan on direct-trade complexity</h4>
+        <p class="review-body">"Direct trade is a very convenient marketing term, but it is probably <em>impossibly reductionist</em> — because cacao necessarily passes through many hands… Direct trade with French Broad Chocolates means we try to know the nuance of those stories. There's a lot to it. So I've been using the term direct trade a lot less lately. I've been growing allergic to reductionist messages, because I don't find them to be very intellectually honest."</p>
+        <div class="review-meta"><strong>Standard frame → "but" → counter-context → quiet definitive</strong>The model for any sourcing or sustainability long-form.</div>
+      </div>
+
+      <div class="review-card dark">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Sustainability · long-form · Dan</span>
+        <h4>What ethical sourcing actually means</h4>
+        <p class="review-body">"We try to play the <em>long game</em> with our partners. That's ethical. Staying in close communication, paying our bills on time. That's ethical. Giving candid feedback when we're having an issue with their beans or their shipment — offering candid feedback is an important part of ethical practice. And then helping them out whenever we can. Spreading the love. Sharing sources with others — this is a way in which we can raise all ships with a higher tide."</p>
+        <div class="review-meta"><strong>Measured. Specific. Refuses to sound like a marketing claim.</strong>Foundation paragraph for any sustainability content.</div>
+      </div>
+
+      <div class="review-card dark">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Resilience · canonical · Jael</span>
+        <h4>The Helene story</h4>
+        <p class="review-body">"Hurricane Helene's flood happened on September 27, 2024… She rose, and rose, and rose, and breached her banks, and crossed the street, and climbed the hill, and climbed the steps to our front door… The water reached <em>thirty-nine inches</em> up our front door. Production sat 3 ft higher and stayed dry — the only reason we're still here. We sold every last piece of inventory we had. People bought gift cards. They bought subscriptions. Pastry chefs were working in packaging. Baristas in shipping. Our whole company learned to live a day in someone else's shoes."</p>
+        <div class="review-meta"><strong>Polysyndeton · exact numbers · closes on community, not loss</strong>Anchor for any anniversary, resilience, or community content.</div>
+      </div>
+
+      <div class="review-card dark">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Confections · canonical · two voices</span>
+        <h4>How a bonbon is made, start to finish</h4>
+        <p class="review-body"><strong>Edgar:</strong> "We start off with clean molds. Imperative for allergen control. We garnish them — hand tempering the cocoa butter, hand painting, spraying with a spray gun. I've taken paintbrushes and smashed them back the opposite way they're supposed to be — that creates what we call <em>starburst</em>."<br><br><strong>Rihanna:</strong> "We're all kind of doing quality control at every step of the way. Each person has to meet that <em>standard of excellence</em> at their steps so that they're passing on good product that will lead to a perfect bonbon in the end."</p>
+        <div class="review-meta"><strong>Choreography metaphor + relay-of-care quality model</strong>Foundation for Cluster 09 supporting article "How Bonbons Are Made."</div>
+      </div>
+
+      <div class="review-card dark">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Bonbon origin · NEW founder story · Jael</span>
+        <h4>The wildflower honey caramel · 2007</h4>
+        <p class="review-body">"The wildflower honey caramel was originally created in my home kitchen in the early days of French Broad Chocolates in 2007. I tried using honey in place of corn syrup… The honey smelled kind of a little smoky, a little bitter, and <em>I thought it was a total fail.</em> I dumped it out on a piece of parchment and moved on… Came back to it later and ate a piece. The smoke actually cut the sweetness. So where most caramel is cloying, this was super well balanced. That was, I would say, our first signature bonbon."</p>
+        <div class="review-meta"><strong>Previously-uncaptured founder story · "total fail → first signature"</strong>Use as the narrative spine for Cluster 09 pillar and the on-product-page story.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSTRUCTED CANONICAL SAMPLES · 8 use cases -->
+  <div class="container" style="margin-top:96px">
+    <div class="section-header left">
+      <div class="section-eyebrow">Constructed canonical samples · eight use cases</div>
+      <h3 class="section-title" style="font-size:clamp(28px,3.5vw,42px)">Voice-tested constructions for what<br>the founder transcripts don't directly cover.</h3>
+    </div>
+
+    <div class="card-grid two">
+      <div class="review-card">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">DTC · constructed · Jael-led</span>
+        <h4>Bonbon subscription — landing-page hero</h4>
+        <p class="review-body">A dozen hand-crafted bonbons. <em>Every month</em>, twelve new flavors. We choose them. You taste them.<br><br>Twelve months in, you'll have eaten 144 bonbons by people who have spent twenty years figuring out how to make the chocolate sing — sourced from named farms, transformed in our Asheville factory, shipped the week they're made.<br><br>Pause anytime. Skip a month. Cancel in two clicks.</p>
+        <div class="review-meta"><strong>Patterns</strong>Four-beat rhythm · specificity · reframe at close.</div>
+      </div>
+
+      <div class="review-card">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Product · constructed · unified</span>
+        <h4>Single-origin bar product page lead</h4>
+        <p class="review-body"><em>Nicaragua 70%</em> — From Cacao Bisiesto in Matagalpa, where we've been buying for fourteen years. Notes of fudge, brown butter, and a slow finish that smells like a forest after rain. Two ingredients. No lecithin. Wrapped in compostable foil.</p>
+        <div class="review-meta"><strong>Patterns</strong>Specificity (named producer, region, year-count) · sensory verbs avoiding "decadent" · ingredients as anti-greenwash signal.</div>
+      </div>
+
+      <div class="review-card">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">B2B · constructed · Jael-led with Dan support</span>
+        <h4>Wholesale sell-sheet opener</h4>
+        <p class="review-body"><em>French Broad Chocolates is a 20-year bean-to-bar maker</em> from Asheville, North Carolina. We source cacao directly from named producers, make about 50 tons of chocolate a year, and turn it into bars, bonbons, brownies, drinking chocolates, and pastry — sold across two retail locations, our website, and a wholesale program with shopkeepers and chefs across the country.<br><br>What you're carrying when you carry French Broad Chocolates: a brand your customers will ask follow-up questions about, with answers ready.</p>
+        <div class="review-meta"><strong>Patterns</strong>Dense specificity · four-beat in compressed form · objection-led second paragraph.</div>
+      </div>
+
+      <div class="review-card">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Visit · constructed · unified</span>
+        <h4>Tour booking page — voice</h4>
+        <p class="review-body">Forty-five minutes inside the building. The smell of cacao roasting hits you before the door closes. We'll walk you through the twelve steps that take a fermented bean from a farm in the Dominican Republic to the bar you'll taste at the end. We'll explain conching <em>without making you feel like you're back in chemistry class.</em> Tours run three times a day, daily. They fill up.</p>
+        <div class="review-meta"><strong>Patterns</strong>Anti-pretension · specificity · ends on community-friendly directive.</div>
+      </div>
+
+      <div class="review-card">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Sustainability · constructed · Dan-led</span>
+        <h4>Sustainability page lead</h4>
+        <p class="review-body"><em>Sustainability is a word that has been doing a lot of marketing work lately</em>, and we are skeptical of it.<br><br>What we can tell you in plain terms is this. We pay above-commodity prices for cacao, every year, since the beginning. We buy from named producers we know — fourteen years and counting at Cacao Bisiesto in Matagalpa, Nicaragua; longer at Cacao Zorzal in the Dominican Republic, where the farm is also a private rainforest reserve protecting migratory thrushes.<br><br>We are also still figuring it out.</p>
+        <div class="review-meta"><strong>Patterns</strong>Anti-reductionism (skeptical of the word itself) · specific names + dates · tender humanism · honest qualification at close.</div>
+      </div>
+
+      <div class="review-card">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Email · constructed · Jael-led</span>
+        <h4>Email — gift purchaser, post-purchase</h4>
+        <p class="review-body"><strong>Subject:</strong> Your gift is on its way<br><br>Hi —<br><br>Your box of bonbons just left our Asheville factory. Inside, twelve small things made by hand, by people who have been doing this for almost twenty years.<br><br>If the recipient reads the back of the box: tell them yes, the chocolate really did come from named farms. Tell them yes, the bonbons really were hand-painted with cocoa butter the morning before they shipped.<br><br>Big love, Jael<br><em>Co-founder / CEO / Mom / Human</em></p>
+        <div class="review-meta"><strong>Patterns</strong>Jael signature throughout — "Hi —" opening · slash-stack signoff (verbatim from existing journal post).</div>
+      </div>
+
+      <div class="review-card">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Press · constructed · unified · Jael leads</span>
+        <h4>Press &amp; journalist pitch lead</h4>
+        <p class="review-body"><em>French Broad Chocolates is a vertically-integrated bean-to-bar chocolate company in Asheville, North Carolina</em>, founded in 2006. About 85 team members. Three locations. Approximately 50 tons of chocolate a year. Class of 2010 in U.S. craft chocolate, alongside Dandelion, Dick Taylor, Fruition, and Ritual.<br><br>We are pleasure-forward in a category that has gotten austere. We do all of it — sourcing, manufacturing, confections, pastry, retail, education — and we do it deeply.</p>
+        <div class="review-meta"><strong>Patterns</strong>Dense specificity · four-beat compressed · anti-pretension · Asheville-anchored.</div>
+      </div>
+
+      <div class="review-card">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Cluster 09 pillar · constructed · confections-led</span>
+        <h4>"What is a Bonbon?" — pillar page lead</h4>
+        <p class="review-body">A bonbon is a small chocolate sculpture with a soft filling and a snappy chocolate shell. That's the technical answer. The longer answer is that a bonbon is a <em>playground</em>.<br><br>Our Head Chocolatier Edgar calls the production line a choreography. Twenty thousand bonbons leave our Asheville kitchen every week, made by a seven-person team using empty-mold rehearsals, hand-tempered cocoa butter, paintbrushes flicked backwards into a starburst.<br><br>Inside the shell — handmade in batches of around five thousand, monitored for sugar concentration and water activity. Three months without a single preservative.</p>
+        <div class="review-meta"><strong>Patterns</strong>Targets "what is a bonbon" head term (8,100/mo, KD 0). Names speakers + roles for information gain.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANTI-EXAMPLES · 5 -->
+  <div class="container" style="margin-top:96px">
+    <div class="section-header left">
+      <div class="section-eyebrow" style="color:var(--fbc-rust)">Anti-examples · five</div>
+      <h3 class="section-title" style="font-size:clamp(28px,3.5vw,42px)">What <em>NOT</em> to publish.<br>Failure modes the voice profile bans.</h3>
+    </div>
+
+    <div class="card-grid">
+      <div class="review-card anti">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Failure mode · 01</span>
+        <h4>Generic craft-chocolate copy</h4>
+        <p class="review-body">"French Broad Chocolates crafts <em>premium artisan chocolate</em> from ethically sourced cacao. Indulge in our decadent collection of luxury bonbons, hand-crafted by passionate chocolatiers."</p>
+        <div class="review-meta"><strong>Why it fails</strong>Three banned words in 25 words. The substitution test fails — could be any chocolate brand.</div>
+      </div>
+
+      <div class="review-card anti">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Failure mode · 02</span>
+        <h4>Purity-first lecture</h4>
+        <p class="review-body">"<em>True chocolate connoisseurs</em> understand that the bean's terroir, the post-harvest fermentation profile, and the conching parameters together create a complex flavor architecture."</p>
+        <div class="review-meta"><strong>Why it fails</strong>Gatekeeping language. Treats explanation as a prerequisite for enjoyment. Jael actively rejects this stance.</div>
+      </div>
+
+      <div class="review-card anti">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Failure mode · 03</span>
+        <h4>Corporate jargon</h4>
+        <p class="review-body">"<em>Leveraging</em> our 20 years of craft chocolate expertise, we deliver innovative bean-to-bar solutions that disrupt the artisanal confection space."</p>
+        <div class="review-meta"><strong>Why it fails</strong>Banned word inventory. Reads like an investor deck for a company that doesn't make food.</div>
+      </div>
+
+      <div class="review-card anti">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Failure mode · 04</span>
+        <h4>False direct-trade simplicity</h4>
+        <p class="review-body">"Through our direct trade relationships, we ensure every farmer receives a fair price for their hard work, <em>eliminating the middlemen</em> who exploit cacao communities."</p>
+        <div class="review-meta"><strong>Why it fails</strong>Dan would refuse this paragraph. "Eliminating the middlemen" is exactly the reductionism he's growing allergic to.</div>
+      </div>
+
+      <div class="review-card anti">
+        <span class="quote-mark">"</span>
+        <span class="review-tag">Failure mode · 05</span>
+        <h4>Hard-sell Mother's Day</h4>
+        <p class="review-body">"Show Mom how much you care this Mother's Day with our luxurious gift box of <em>decadent</em> bonbons. She deserves the best — give her the indulgence she's earned."</p>
+        <div class="review-meta"><strong>Why it fails</strong>Three banned words. "Earned" implies guilt-free framing. None of Jael's actual register present.</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============= SECTION 3 · AUDIENCE ============= -->
+<section id="section-3" class="blue fbc-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 03 · Audience</div>
+      <h2 class="section-title">Six segments.<br><em>Three lines of business.</em></h2>
+      <p class="section-sub">French Broad Chocolates runs three distinct lines that touch different buyers. Each segment has its own purchase context, lead message, and voice routing. Where a segment is partially inferred rather than directly named in founder transcripts, it's flagged.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="fbc-card teal-accent">
+        <span class="seg-num">Segment 01</span>
+        <h3>DTC chocolate <em>buyer</em></h3>
+        <span class="seg-status">Confirmed · subscription &amp; e-commerce</span>
+        <p class="seg-detail">The repeat e-commerce buyer who orders for themselves. Often started as a tourist who visited the Lounge or Factory; now lives elsewhere and re-orders chocolate as a small ritual.</p>
+        <dl>
+          <dt>What they actually buy</dt>
+          <dd>A reliable five-minute ceremony. Permission to slow down. A reason to think about Asheville without leaving home.</dd>
+          <dt>Lead message</dt>
+          <dd><em>"A dozen hand-crafted bonbons. Every month. Made in Asheville, sourced from named producers, designed for the five minutes after dinner that belong to you."</em></dd>
+          <dt>Voice routing</dt>
+          <dd><em>Jael leads.</em> "Hi friends" register. Self-disclosure. Loop-back-to-product close.</dd>
+          <dt>Proof</dt>
+          <dd>The 12-step process page · named origins · Mother's Day blog post as canonical voice sample.</dd>
+        </dl>
+      </div>
+
+      <div class="fbc-card gold-accent">
+        <span class="seg-num">Segment 02</span>
+        <h3>Gift <em>purchaser</em></h3>
+        <span class="seg-status">Confirmed · 4 sub-personas</span>
+        <p class="seg-detail">The buyer purchasing <em>for</em> someone else, who needs the gift to do work the buyer can't do alone — say "I see you," "thank you," "I'm sorry," "good luck."</p>
+        <dl>
+          <dt>Sub-personas</dt>
+          <dd>Special-occasion · host · corporate · sympathy. Each gets its own landing page register.</dd>
+          <dt>Sourced framing — Edgar, confex transcript</dt>
+          <dd><em>"What we make is typically most purchased as a gift for someone, maybe as a celebratory gift… or maybe it's because something unfortunate has happened to that person. It's, like, meant as a comforting thing — between two people."</em></dd>
+          <dt>Lead message</dt>
+          <dd><em>"A gift that comes with a story. From an Asheville factory you can almost smell."</em></dd>
+          <dt>Voice routing</dt>
+          <dd><em>Jael leads.</em> Warmth. Gentle product handoff at close.</dd>
+        </dl>
+      </div>
+
+      <div class="fbc-card rust-accent">
+        <span class="seg-num">Segment 03</span>
+        <h3>B2B retail <em>wholesale buyer</em></h3>
+        <span class="seg-status">Confirmed · top-priority growth channel</span>
+        <p class="seg-detail">The buyer at a like-minded shop — specialty grocery, cheese counter, gift shop, regional food retailer, museum store, hotel gift shop — who curates inventory by story.</p>
+        <dl>
+          <dt>What they actually buy</dt>
+          <dd>A brand their customers will ask follow-up questions about, with answers ready. A maker they can trust to ship consistently.</dd>
+          <dt>Lead message</dt>
+          <dd><em>"A 20-year bean-to-bar maker from Asheville with named producers, a story your staff can tell in two sentences, and chocolate that will move."</em></dd>
+          <dt>Voice routing</dt>
+          <dd><em>Dan</em> on technical/sourcing. <em>Jael</em> on values fit and "why we'd be good shelf-mates."</dd>
+          <dt>Proof</dt>
+          <dd>20 years · ~50 tons/yr · diverse SKU base · compostable packaging · B Corp · named anchor accounts.</dd>
+        </dl>
+      </div>
+
+      <div class="fbc-card rust-accent">
+        <span class="seg-num">Segment 04</span>
+        <h3>B2B cacao + bulk <em>chocolate buyer</em></h3>
+        <span class="seg-status">Confirmed · Jael named explicitly</span>
+        <p class="seg-detail">The buyer who isn't selling French Broad Chocolates' branded product — they're using FBC chocolate as an ingredient in their own.</p>
+        <dl>
+          <dt>Sub-personas</dt>
+          <dd>Pastry chefs · independent chocolatiers · coffee roasters &amp; distillers using single-origin chocolate · peer chocolate makers co-importing containers.</dd>
+          <dt>What they actually buy</dt>
+          <dd>Bulk format with predictable specs. A vendor who answers technical questions in technical terms. Origin transparency they can pass along.</dd>
+          <dt>Lead message</dt>
+          <dd><em>"Chocolate from a maker who knows what you're doing with it — because we do it too."</em></dd>
+          <dt>Voice routing</dt>
+          <dd><em>Dan leads</em>, almost exclusively. This is his audience.</dd>
+        </dl>
+      </div>
+
+      <div class="fbc-card blue-accent">
+        <span class="seg-num">Segment 05</span>
+        <h3>Café · Lounge · Factory <em>walk-in</em></h3>
+        <span class="seg-status">Confirmed · the original channel</span>
+        <p class="seg-detail">The person in Asheville for a weekend or a Saturday afternoon who wants the experience, not just the chocolate.</p>
+        <dl>
+          <dt>Sub-personas</dt>
+          <dd>Asheville visitor · local regular · tour guest · date / occasion party.</dd>
+          <dt>What they actually buy</dt>
+          <dd>Experience, not transaction. The chocolate is the souvenir of the experience.</dd>
+          <dt>Lead message</dt>
+          <dd><em>"Sit down. Stay an hour. We'll make you something you've never tasted, in a building you can watch chocolate being made inside."</em></dd>
+          <dt>Voice routing</dt>
+          <dd>Hospitality voice — warm, present, no upsell pressure. <em>Jael's register dominates.</em></dd>
+        </dl>
+      </div>
+
+      <div class="fbc-card blue-accent">
+        <span class="seg-num">Segment 06</span>
+        <h3>Restaurant + hotel <em>partner</em></h3>
+        <span class="seg-status">Partially inferred · gap flag</span>
+        <p class="seg-detail">The chef, F&amp;B director, or hotel concierge who needs a local-Asheville chocolate program for the dessert menu, in-room amenity, conference welcome gift, or wholesale-to-room program.</p>
+        <dl>
+          <dt>Sub-personas</dt>
+          <dd>Chef-owner · F&amp;B director · wedding venue / event planner · concierge / GM.</dd>
+          <dt>What they actually buy</dt>
+          <dd>A local-source story that shows up on the menu, on the bedside table, in the welcome bag. A reliable supplier with hospitality-cadence fulfillment.</dd>
+          <dt>Lead message</dt>
+          <dd><em>"Asheville's chocolate maker, on your dessert menu. From a 20-year hospitality partner who lives down the road."</em></dd>
+          <dt>Proof / GAP</dt>
+          <dd>Local hospitality references list to be assembled. The Lounge experience as hospitality reference. <strong>Needs FBC confirmation as priority.</strong></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- CROSS-SEGMENT PATTERNS · 4-pillar -->
+  <div class="container" style="margin-top:96px">
+    <div class="section-header">
+      <div class="section-eyebrow">Cross-segment patterns</div>
+      <h3 class="section-title" style="font-size:clamp(28px,3.5vw,42px)">Four through-lines<br><em>across all six audiences.</em></h3>
+    </div>
+
+    <div class="pillars four">
+      <div class="pillar">
+        <div class="pillar-num">i</div>
+        <h3>Story-led <em>purchase</em></h3>
+        <p>Across all six segments, customers are buying <em>with</em> a story, not despite it. Even Segment 4 (the most utilitarian) chooses FBC over commodity bulk because of who and what is behind the bag.</p>
+        <p style="margin-top:10px;font-size:13px;color:var(--fbc-chocolate-soft)"><strong>Implication:</strong> every audience-specific page should foreground a name, a place, or a moment in the first 50 words.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">ii</div>
+        <h3>Asheville is an <em>asset</em></h3>
+        <p>For three segments (DTC, Gift, Walk-in) Asheville is part of the value. For two (Retail B2B, Foodservice) it's a credible-source signal. For one (B2B Cacao) it's incidental.</p>
+        <p style="margin-top:10px;font-size:13px;color:var(--fbc-chocolate-soft)"><strong>Implication:</strong> lean into the geography for the first three. Don't fight it for the latter two.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">iii</div>
+        <h3>Relationship-led <em>economics</em></h3>
+        <p>Subscription rather than one-off. Long-term wholesale rather than transactional. Co-import rather than spot-buy. The brand is built for high-LTV / low-CAC dynamics.</p>
+        <p style="margin-top:10px;font-size:13px;color:var(--fbc-chocolate-soft)"><strong>Implication:</strong> marketing should match — invest in audience depth over reach.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">iv</div>
+        <h3>Pleasure as the <em>through-line</em></h3>
+        <p>The single emotional through-line across every segment is pleasure-as-vital, not pleasure-as-transgression. From the Tuesday-night ritual to the wholesale buyer choosing "people-pleasing" over "connoisseur-only."</p>
+        <p style="margin-top:10px;font-size:13px;color:var(--fbc-chocolate-soft)"><strong>Implication:</strong> if a piece of audience-specific copy could read as joyless, it's wrong, regardless of segment.</p>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============= SECTION 4 · POSITIONING ============= -->
+<section id="section-4" class="dark fbc-section">
+  <div class="container">
+    <div class="intro-grid">
+      <div>
+        <div class="section-eyebrow gold-light">Section 04 · Positioning</div>
+        <h2 style="font-size:clamp(48px,6vw,84px);font-weight:300;line-height:0.98;color:var(--fbc-cream)">We do all of it,<br>and we do it <em>deeply.</em></h2>
+      </div>
+      <p style="color:rgba(247,241,234,0.78)">The strategic claim, anchored where it lives. Every claim below is source-traceable to founder quotes or verifiable facts. If a claim drifts toward generic craft-chocolate marketing, it goes.</p>
+    </div>
+
+    <div class="pull-quote" style="margin-top:48px;font-size:clamp(22px,2.4vw,30px)">
+      French Broad Chocolates is the bean-to-bar chocolate company that does <em>all of it</em> — sourcing, manufacturing, confections, pastry, retail, and education — and does each one deeply, from a 20-year home in Asheville that we treat as a cultural co-founder.
+      <span class="a">Synthesis · Jael, FBC competitive Q&amp;A · plus the Asheville and 20-year claims</span>
+    </div>
+  </div>
+
+  <!-- THREE-PILLAR PROMISE -->
+  <div class="container" style="margin-top:80px">
+    <div class="section-header left">
+      <div class="section-eyebrow gold-light">The three-pillar promise · already in production</div>
+      <h3 class="section-title" style="color:var(--fbc-cream);font-size:clamp(30px,3.5vw,46px)">Sourced with integrity.<br>Crafted with intention.<br><em>Served with gratitude.</em></h3>
+      <p class="section-sub" style="color:rgba(247,241,234,0.78)">The cleanest unifying triplet. Already on the live About page. New brand-level copy maps to one — or transparently bridges two — of the three.</p>
+    </div>
+
+    <div class="pillars">
+      <div class="pillar" style="background:var(--fbc-chocolate-soft);color:var(--fbc-cream);border-top-color:var(--fbc-teal-light)">
+        <div class="pillar-img"><div class="art-photo dark"><div><span class="ph-tag">Pillar 01 · 16:10</span><div class="ph-shot">Dan in conversation with a producer at a named cacao farm.</div></div><div class="ph-mood"><strong>Tone</strong>Documentary, working-hands.</div></div></div>
+        <div class="pillar-num" style="color:var(--fbc-teal-light)">i</div>
+        <h3 style="color:var(--fbc-cream)">Sourced with <em style="color:var(--fbc-gold-light)">integrity.</em></h3>
+        <p style="color:rgba(247,241,234,0.75)">Cacao bought directly (or near-directly) from named producers, paid above commodity prices, with relationships measured in years and decades.</p>
+        <div class="pillar-quote" style="border-left-color:var(--fbc-teal-light);color:rgba(247,241,234,0.85);font-size:13px">Cacao Bisiesto, Matagalpa — 14 years. Daniel South, Costa Rica — 19 years until 2024. Cacao Zorzal — a private rainforest reserve in the Dominican Republic.<span class="a" style="color:var(--fbc-teal-light)">Proof set</span></div>
+      </div>
+
+      <div class="pillar" style="background:var(--fbc-chocolate-soft);color:var(--fbc-cream);border-top-color:var(--fbc-gold)">
+        <div class="pillar-img"><div class="art-photo dark"><div><span class="ph-tag">Pillar 02 · 16:10</span><div class="ph-shot">A chocolatier hand-tempering cocoa butter at the Riverside line.</div></div><div class="ph-mood"><strong>Tone</strong>Concentration, small movements.</div></div></div>
+        <div class="pillar-num" style="color:var(--fbc-gold)">ii</div>
+        <h3 style="color:var(--fbc-cream)">Crafted with <em style="color:var(--fbc-gold-light)">intention.</em></h3>
+        <p style="color:rgba(247,241,234,0.75)">A 12-step bean-to-bar workflow built on human discernment, not engineered for homogeneity. The confections team makes ~20,000 bonbons every week by hand, with a 3-month shelf life and zero preservatives.</p>
+        <div class="pillar-quote" style="border-left-color:var(--fbc-gold);color:rgba(247,241,234,0.85);font-size:13px">12-hour conching · ~500kg dark batches · 7-person confections team · zero artificial caramel colorants, vegetable-oil fillings, or flour-based thickeners.<span class="a" style="color:var(--fbc-gold)">Proof set</span></div>
+      </div>
+
+      <div class="pillar" style="background:var(--fbc-chocolate-soft);color:var(--fbc-cream);border-top-color:var(--fbc-rust)">
+        <div class="pillar-img"><div class="art-photo dark"><div><span class="ph-tag">Pillar 03 · 16:10</span><div class="ph-shot">Tour guests behind the glass — production line just visible.</div></div><div class="ph-mood"><strong>Tone</strong>Hospitality, designed-to-be-walked-through.</div></div></div>
+        <div class="pillar-num" style="color:var(--fbc-rust)">iii</div>
+        <h3 style="color:var(--fbc-cream)">Served with <em style="color:var(--fbc-gold-light)">gratitude.</em></h3>
+        <p style="color:rgba(247,241,234,0.75)">Experiential retail spaces designed to be walked through and shared. Daily tours. Active investment in Asheville.</p>
+        <div class="pillar-quote" style="border-left-color:var(--fbc-rust);color:rgba(247,241,234,0.85);font-size:13px">Chocolate Factory at 821 Riverside (built 2018, 3 ft above the floodplain — the fact that carried Helene). Tours three times a day. Founders on local nonprofit boards.<span class="a" style="color:var(--fbc-rust)">Proof set</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT ONLY FBC CAN CLAIM · 7 distinct claims -->
+  <div class="container" style="margin-top:96px">
+    <div class="section-header left">
+      <div class="section-eyebrow gold-light">What only French Broad Chocolates can claim · seven</div>
+      <h3 class="section-title" style="color:var(--fbc-cream);font-size:clamp(28px,3.5vw,42px)">Each is either factually exclusive,<br><em>or a stance competitors don't credibly hold.</em></h3>
+    </div>
+
+    <ul class="tasting-list">
+      <li><span class="tast-name" style="color:var(--fbc-cream);font-size:21px">Vertical integration — <em>bean-to-bar to bonbon</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.75)">Edgar, confex transcript: <em>"There's not a lot of bean-to-bar to bonbon places in the world."</em> Most chocolatiers buy chocolate as an ingredient. FBC makes it. The sharpest version of the "we do all of it" claim.</span></li>
+      <li><span class="tast-name" style="color:var(--fbc-cream);font-size:21px">The <em>experiential factory</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.75)">821 Riverside Drive (2018) was deliberately designed for guests, not just for production. Glass separating customers from the production floor. Tours three times a day.</span></li>
+      <li><span class="tast-name" style="color:var(--fbc-cream);font-size:21px">Pleasure-forward craft — an <em>explicit ideological position</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.75)">The brand explicitly resists the "darker = better, more austere = better" arc. Peanut butter cups sit beside single-origin Uganda 70%. Competitors who sell only single-origin dark cannot make this claim.</span></li>
+      <li><span class="tast-name" style="color:var(--fbc-cream);font-size:21px">Sourcing relationships measured in <em>decades, not seasons</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.75)">14 years direct buying with Cacao Bisiesto. 19 years with Daniel South in Costa Rica until his passing in 2024. Co-import partnerships with peer makers. Time-in-market is the evidence.</span></li>
+      <li><span class="tast-name" style="color:var(--fbc-cream);font-size:21px">A 20-year, <em>weathered</em> history</span><span class="tast-notes" style="color:rgba(247,241,234,0.75)">Dropping out of school. COVID. Cacao tripling ($3K → $12K/ton). Hurricane Helene. Water reached 39 inches up the door. 8 inches inside. Production floor 3 ft higher stayed dry. Verifiable, recent, emotionally true.</span></li>
+      <li><span class="tast-name" style="color:var(--fbc-cream);font-size:21px">Asheville as <em>cultural co-founder</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.75)">Counter Culture coffee. Sandy Mush strawberries. Annie Louise's pumpkins. Mother's Day collection with six women-founded local food businesses. Cannot be claimed by a competitor in another city.</span></li>
+      <li><span class="tast-name" style="color:var(--fbc-cream);font-size:21px">The river is the brand metaphor — and it is <em>now meaningful</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.75)">Other brands name themselves after places. FBC uses its river as a working metaphor for evolution and resilience. Made concrete in 2024 when the river the company is named after rose and flooded its building.</span></li>
+    </ul>
+  </div>
+
+  <!-- ASKINOSIE CORRECTION CALLOUT -->
+  <div class="container" style="margin-top:64px">
+    <div class="urgency" style="background:rgba(46,120,128,0.18);border-color:var(--fbc-teal-light);color:var(--fbc-cream);max-width:none;display:block;padding:24px 28px">
+      <span style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--fbc-teal-light);display:block;margin-bottom:10px">Competitive audit · revised framing</span>
+      <p style="font-size:15.5px;line-height:1.65;margin-bottom:8px;color:var(--fbc-cream)">The proposal asserts none of Dandelion, Theo, or Askinosie has built keyword-architected topical clusters. <strong>The strategic claim holds.</strong> But the Askinosie line should be tightened: <em style="font-family:var(--font-display);color:var(--fbc-gold-light)">"Askinosie has the most education of the three competitors — a multi-page Learn hub with ~12-15 dedicated pieces, including 4 origin pages, a Direct Trade philosophy page, a transparency report, and a Chocolate University community program. But it is narrative-driven content, not search-engineered."</em></p>
+      <p style="font-size:14px;line-height:1.6;color:rgba(247,241,234,0.75);margin:0">Every competitor has <em style="font-family:var(--font-display);color:var(--fbc-gold-light)">content</em>; none have <em style="font-family:var(--font-display);color:var(--fbc-gold-light)">clusters</em>. The window is real.</p>
+    </div>
+  </div>
+
+  <!-- QUICK-GRAB CLAIMS -->
+  <div class="container" style="margin-top:64px">
+    <div class="section-header left">
+      <div class="section-eyebrow gold-light">Quick-grab claims · for headlines, decks, sell sheets</div>
+      <h3 class="section-title" style="color:var(--fbc-cream);font-size:clamp(28px,3.5vw,42px)">Source-traceable lines.<br><em>Drop-in ready.</em></h3>
+    </div>
+    <div class="pill-row" style="margin-top:24px">
+      <span class="pill">Bean-to-bar in <em>Asheville</em> since 2006</span>
+      <span class="pill">~50 tons of <em>chocolate</em> a year</span>
+      <span class="pill">85+ team members</span>
+      <span class="pill">Three locations</span>
+      <span class="pill">Tours daily — 45 min</span>
+      <span class="pill">Cacao from <em>named producers</em> · NIC · DR · UGA</span>
+      <span class="pill">14-year direct partnership in Matagalpa</span>
+      <span class="pill">Above-commodity prices · every year</span>
+      <span class="pill">Compostable packaging</span>
+      <span class="pill">Multiple Good Food Awards</span>
+      <span class="pill">Class of 2010 — alongside <em>Dandelion · Dick Taylor · Fruition · Ritual</em></span>
+      <span class="pill">Production floor sits <em>3 ft above the river</em></span>
+      <span class="pill">~20,000 hand-crafted <em>bonbons / week</em></span>
+      <span class="pill">3-month shelf life · zero preservatives</span>
+      <span class="pill">Bean-to-bar to <em>bonbon</em></span>
+      <span class="pill">Zero artificial caramel colorants, vegetable-oil fillings, flour-based thickeners</span>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============= SECTION 5 · TOPICAL AUTHORITY ============= -->
+<section id="section-5" class="fbc-section">
+  <div class="container">
+    <div class="intro-grid">
+      <div>
+        <div class="section-eyebrow">Section 05 · Topical Authority</div>
+        <h2>Twelve clusters.<br><em>Engineered for AEO + SEO.</em></h2>
+      </div>
+      <p>Seven from the proposal (with pivot notes). Three Phase 1 expansion clusters integrated into the 2026 roadmap. Two Phase 2 clusters pending photography. Total addressable head-term volume rises from ~22,000/mo to ~110,000+/mo at the same production cadence.</p>
+    </div>
+
+    <!-- HUB-VS-PILLAR PATTERN -->
+    <div class="card-grid two" style="margin-top:48px">
+      <div class="fbc-card teal-accent">
+        <span class="seg-num">Architectural pattern</span>
+        <h3>Hub-vs-pillar <em>split</em></h3>
+        <p class="seg-detail">Two clusters separate the navigation hub from the content pillar that drives traffic. Documented pattern, not exception.</p>
+        <p style="font-size:14px;line-height:1.6;color:var(--fbc-chocolate-soft)"><strong>Hub</strong> (e.g., <code>/learn/pairings/</code>) — thin nav page. Site architecture + internal-linking equity. Doesn't target a high-volume keyword.<br><br><strong>Pillar</strong> (e.g., <code>/learn/pairings/chocolate-and-wine-pairings/</code>) — the content asset that captures organic traffic. Targets the head term.</p>
+      </div>
+      <div class="fbc-card gold-accent">
+        <span class="seg-num">Where it applies</span>
+        <h3>Two clusters <em>use this pattern</em></h3>
+        <p class="seg-detail">Asheville Local SEO + Pairings. Reserved for clusters where the natural hub keyword is thin but the cluster has clear high-volume spoke intent.</p>
+        <p style="font-size:14px;line-height:1.6;color:var(--fbc-chocolate-soft)"><strong>Asheville</strong> — Hub: <code>/asheville/</code> · Pillar: <code>/asheville/chocolate-guide/</code> targeting "asheville chocolate" (2,900/mo).<br><br><strong>Pairings</strong> — Hub: <code>/learn/pairings/</code> · Pillar: <code>/learn/pairings/chocolate-and-wine-pairings/</code> targeting "chocolate and wine" (8,100/mo).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12 CLUSTERS · 4-col card grid -->
+  <div class="container" style="margin-top:96px">
+    <div class="section-header left">
+      <div class="section-eyebrow">The twelve clusters · 7 proposal · 3 Phase 1 · 2 Phase 2</div>
+      <h3 class="section-title" style="font-size:clamp(28px,3.5vw,42px)">All twelve.<br>With pivots, expansions,<br><em>and information-gain assets.</em></h3>
+    </div>
+
+    <div class="card-grid four" style="margin-top:32px">
+      <div class="fbc-card teal-accent">
+        <span class="seg-num">Cluster 01 · LOCK</span>
+        <h3>Bean-to-Bar <em>Process</em></h3>
+        <span class="seg-status">5,400/mo · KD 0</span>
+        <p class="seg-detail">Pillar: <code>/learn/bean-to-bar/what-is-bean-to-bar/</code> · "bean to bar chocolate." Best-fit pillar in the entire set.</p>
+        <dl><dt>Info-gain</dt><dd>Dan's process narrative (already in <code>inputs/New Note.md</code>). Chocolate-makers team interview pending.</dd></dl>
+      </div>
+
+      <div class="fbc-card gold-accent">
+        <span class="seg-num">Cluster 02 · DECISION PENDING</span>
+        <h3>Chocolate <em>Guides</em></h3>
+        <span class="seg-status">Original target weak</span>
+        <p class="seg-detail">"What is dark chocolate" (1,300/mo, KD 25) is the proposal's anchor. Better alternates: "best chocolate brands" (1,600, KD 2) · "dark vs milk chocolate" (1,900, KD 4) · or hub-vs-pillar split.</p>
+        <dl><dt>Recommendation</dt><dd>Hub-vs-pillar split with "dark chocolate vs milk chocolate" as content pillar. Awaiting FBC sign-off.</dd></dl>
+      </div>
+
+      <div class="fbc-card rust-accent">
+        <span class="seg-num">Cluster 03 · PIVOT</span>
+        <h3>Chocolate <em>Pairings</em></h3>
+        <span class="seg-status">8,100/mo · KD 2</span>
+        <p class="seg-detail">"Chocolate pairings" (110/mo) is too thin. Hub becomes nav page; "Chocolate &amp; Wine Pairings" (8,100) becomes the content pillar. Coffee, cheese, beer pairings as spokes.</p>
+        <dl><dt>Info-gain</dt><dd>Asheville winery partnerships, named &amp; photographed. Tasting-flight imagery from the Lounge.</dd></dl>
+      </div>
+
+      <div class="fbc-card teal-accent">
+        <span class="seg-num">Cluster 04 · LOCK + co-target</span>
+        <h3>Sustainability <em>&amp; Sourcing</em></h3>
+        <span class="seg-status">12,100/mo · KD 21</span>
+        <p class="seg-detail">"Ethical chocolate" pillar co-targets "fair trade chocolate" (9,900, KD 0). "Direct Trade Cacao" (70/mo) demoted from standalone article to sub-section.</p>
+        <dl><dt>Info-gain</dt><dd>Dan's transcript. Sourcing trip photography. Heavy-metals candor section.</dd></dl>
+      </div>
+
+      <div class="fbc-card teal-accent">
+        <span class="seg-num">Cluster 05 · LOCK</span>
+        <h3>Recipes</h3>
+        <span class="seg-status">5,400/mo · KD 0</span>
+        <p class="seg-detail">Pillar: <code>/learn/recipes/chocolate-recipes/</code>. The proposal's "Hot Chocolate Recipes" supporting article is now its own micro-pillar (Cluster 08).</p>
+        <dl><dt>Info-gain</dt><dd>Pastry team interview audio (pending H03). Recipe schema. Recipe video where feasible.</dd></dl>
+      </div>
+
+      <div class="fbc-card teal-accent">
+        <span class="seg-num">Cluster 06 · LOCK · hub-pillar</span>
+        <h3>Asheville <em>Local SEO</em></h3>
+        <span class="seg-status">2,900/mo + 9,900/mo spoke</span>
+        <p class="seg-detail">Hub: <code>/asheville/</code> · Pillar: <code>/asheville/chocolate-guide/</code>. "Things to Do in Asheville" (9,900) publishes first as Q2 funnel-top.</p>
+        <dl><dt>Info-gain</dt><dd>Asheville landscape photography. Mother's Day collaboration story. Editorial copy from Jael.</dd></dl>
+      </div>
+
+      <div class="fbc-card gold-accent">
+        <span class="seg-num">Cluster 07 · seasonal</span>
+        <h3>Blog <em>&amp; Seasonal</em></h3>
+        <span class="seg-status">Q2-Q4 ongoing</span>
+        <p class="seg-detail">Holiday Gift Guide + Corporate Gift Guide (Q4). Time-sensitive content linking into evergreen cluster architecture.</p>
+        <dl><dt>Note</dt><dd>Phase 2 Cluster 12 (Gifts evergreen pillar) will lift these year-round.</dd></dl>
+      </div>
+
+      <div class="fbc-card rust-accent">
+        <span class="seg-num">Cluster 08 · Phase 1 · CRITICAL</span>
+        <h3>Hot Chocolate <em>&amp; Drinking Chocolate</em></h3>
+        <span class="seg-status">74,000/mo · KD 26</span>
+        <p class="seg-detail">The single largest unmet keyword. Pillar: <code>/learn/hot-chocolate/</code>. Spokes: Hot Chocolate Recipes · Drinking vs Hot · Mexican Hot · Vegan/Dairy-Free · Best.</p>
+        <dl><dt>Info-gain</dt><dd>FBC's <strong>canonical hot chocolate recipe</strong> (pastry team). Drinking chocolate SKU photography. Video of preparation at the Lounge.</dd></dl>
+      </div>
+
+      <div class="fbc-card rust-accent">
+        <span class="seg-num">Cluster 09 · Phase 1 · HIGH</span>
+        <h3>Bonbons <em>&amp; Confections</em></h3>
+        <span class="seg-status">~18,000/mo combined · KD 0</span>
+        <p class="seg-detail">"What is a bonbon" 8,100 + "chocolate bonbons" 9,900. NONE of Dandelion, Theo, Askinosie has a "what is a bonbon" page. Wide-open lane.</p>
+        <dl><dt>Info-gain</dt><dd><strong>Confections team interview RESOLVED</strong>. Bonbon-rolling origin scene as foundation. Photography pending.</dd></dl>
+      </div>
+
+      <div class="fbc-card rust-accent">
+        <span class="seg-num">Cluster 10 · Phase 1 · HIGH-AUTHORITY</span>
+        <h3>Cacao Origins <em>&amp; Farming</em></h3>
+        <span class="seg-status">3,500–5,500/mo · KD 0–10</span>
+        <p class="seg-detail">Dan's transcript IS the source content. 14-yr Cacao Bisiesto, 19-yr Daniel South, Cacao Zorzal, Cooperativa Norandino, Cooperativa Pangoa — unduplicatable.</p>
+        <dl><dt>Info-gain</dt><dd>Dan's transcript already gathered. <strong>Origin lineup verification (CRIT 01).</strong> Sourcing trip photos.</dd></dl>
+      </div>
+
+      <div class="fbc-card blue-accent">
+        <span class="seg-num">Cluster 11 · Phase 2 · pending photography</span>
+        <h3>Chocolate <em>Factory Tour</em></h3>
+        <span class="seg-status">4,300/mo combined · KD 2</span>
+        <p class="seg-detail">FBC offers 3 tours daily, 365 days/year. Architecture-as-asset story is canonical. Conversion engine for tour bookings.</p>
+        <dl><dt>Gating</dt><dd>Professional video + photography session at the Riverside factory. Tour guide team interview (H05 pending).</dd></dl>
+      </div>
+
+      <div class="fbc-card blue-accent">
+        <span class="seg-num">Cluster 12 · Phase 2 · pending photography</span>
+        <h3>Chocolate <em>Gifts</em> evergreen pillar</h3>
+        <span class="seg-status">12,000+/mo · KD 0 organic</span>
+        <p class="seg-detail">Lifts the proposal's Q4 seasonal pages year-round. Mother's Day · Gift Sets · Bonbon Subscriptions are top-tier nav already.</p>
+        <dl><dt>Gating</dt><dd>Full SKU gift photography on consistent backgrounds + lifestyle shots.</dd></dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOLUME MATH PANEL -->
+  <div class="container" style="margin-top:80px">
+    <div class="volume-math">
+      <div class="vh">Volume math · proposal vs. proposal-plus-strategy</div>
+      <div class="vm-row"><span class="vlabel">Proposal as-written · 7 clusters · existing pillar targets</span><span class="vnum">~22,000</span></div>
+      <div class="vm-row"><span class="vlabel">+ Recommended pillar pivots (Pairings → wine, Sustainability co-target, Recipes prio)</span><span class="vnum">+~16,000</span></div>
+      <div class="vm-row"><span class="vlabel">+ Phase 1 · Cluster 08 (Hot Chocolate)</span><span class="vnum">+~74,000</span></div>
+      <div class="vm-row"><span class="vlabel">+ Phase 1 · Cluster 09 (Bonbons)</span><span class="vnum">+~18,000</span></div>
+      <div class="vm-row"><span class="vlabel">+ Phase 1 · Cluster 10 (Cacao Origins)</span><span class="vnum">+~4,500</span></div>
+      <div class="vm-delta"><span class="vlab">Proposal + Phase 1 + pivots</span><span class="vlift">~110,000+/mo</span></div>
+      <p class="vfoot">A 5x lift in addressable head-term volume at the same production cadence. Most of the lift comes from one move — routing the Recipes cluster to capture "hot chocolate recipe" (74,000/mo). Phase 2 clusters bring this higher in 2027. Volume figures are head-term only; long-tail and supporting-article volume compound on top.</p>
+    </div>
+  </div>
+
+  <!-- QUARTERLY TIMELINE · how-steps -->
+  <div class="container" style="margin-top:96px">
+    <div class="section-header">
+      <div class="section-eyebrow">Quarterly execution · 2026</div>
+      <h3 class="section-title" style="font-size:clamp(28px,3.5vw,42px)">Eight pages a month.<br><em>Phase 1 expansions integrated.</em></h3>
+    </div>
+
+    <div class="how-steps">
+      <div class="step">
+        <div class="step-num">i</div>
+        <h3>Q1 2026 · <em>Launch</em></h3>
+        <p>Bean-to-Bar pillar (C01) · Asheville Chocolate Guide pillar (C06). Plus the 36 launch pages already scoped. ~5 launch pieces.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">ii</div>
+        <h3>Q2 · <em>Local + High-Volume Strike</em></h3>
+        <p><strong>April first publish — Hot Chocolate Recipe (C08 · 74K/mo).</strong> Plus: Things to Do in Asheville (9.9K) · Best Desserts · Dark vs Milk · What is a Bonbon (C09 · 8.1K) · Wine Pairings pillar (C03 · 8.1K). 10 pages.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">iii</div>
+        <h3>Q3 · <em>Authority Depth</em></h3>
+        <p>Ethical Chocolate Guide pillar (C04 · 12.1K + fair trade co-target) · Cacao Origins pillar (C10) · Recipes pillar (C05) · How Bonbons Are Made (C09) · Cacao Origins spokes · Coffee Pairings · Bonbon Decoration. 10 pages.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">iv</div>
+        <h3>Q4 · <em>Seasonal + Refresh</em></h3>
+        <p>Holiday Gift Guide · Corporate Gift Guide · How to Store Chocolate · Cheese Pairings · Reading Chocolate Labels · Cacao Zorzal DR. REFRESH 3 pillars (Asheville, Bean-to-Bar, Chocolate Guides). 5 new + 3 refresh.</p>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:var(--fbc-chocolate-soft);max-width:700px;margin:40px auto 0;text-align:center;font-style:italic;font-family:var(--font-display)">Phase 2 clusters (11 — Factory Tour, 12 — Gifts evergreen) launch in 2027 — or late 2026 if photography capacity ships earlier than projected.</p>
+  </div>
+</section>
+
+<!-- ============= SECTION 6 · WHAT WE NEED FROM FBC ============= -->
+<section id="section-6" class="blue fbc-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 06 · Inputs &amp; Dependencies</div>
+      <h2 class="section-title">What we need<br><em>from French Broad Chocolates.</em></h2>
+      <p class="section-sub">A living checklist. Every item is tied to the work it unblocks. Critical items block production until resolved. High and Medium are staged with target dates and documented defaults. Inventory consolidated at <code style="background:rgba(30,11,4,0.08);padding:2px 6px;border-radius:3px;font-size:13px">projects/onboarding/2026-04-27_fbc-open-gaps.md</code>.</p>
+    </div>
+
+    <!-- CRITICAL · accordion -->
+    <div style="margin-top:32px">
+      <h3 class="section-title" style="font-size:clamp(24px,2.6vw,32px);font-weight:300;margin-bottom:8px;color:var(--fbc-chocolate)"><em style="color:var(--fbc-rust)">Critical</em> · 3 items · block work until resolved</h3>
+      <div class="faq-list">
+        <div class="faq-item open">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-rust);margin-right:14px">CRIT 01</strong>Confirm current cacao <em>origin lineup.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p>Brand voice guide v1 says <em>Costa Rica, Guatemala, Nicaragua, Peru</em>. Live website says <em>Nicaragua, Dominican Republic, Uganda</em>. Dan's transcript confirms Costa Rica supply ended (Daniel South passed in 2024). Uganda is not covered in any 2026 founder transcript.</p>
+            <p><strong>Unblocks:</strong> Sustainability cluster · Cacao Origins cluster (10) · every product page · the elevator pitch. <strong>Default if unanswered by 2026-05-15:</strong> use the live-site lineup; avoid year-counts where the producer isn't currently active.</p>
+          </div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-rust);margin-right:14px">CRIT 02</strong>Lock the <em>team headcount.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p>Brand voice guide + Southern Fork say <em>"85+"</em>. Older origin transcript says <em>"over 60"</em>. The number appears in elevator pitches, press kit, wholesale sell sheet. Confex transcript confirms the confections team is 7 (5 FT + 1 PT + 1 treats-only) but does not lock the total.</p>
+            <p><strong>Default if unanswered by 2026-05-15:</strong> use "85+ team members" per the voice guide and Southern Fork audio.</p>
+          </div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-rust);margin-right:14px">CRIT 03</strong>Confirm current <em>B Corp status.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p>A 2017 journal post announces FBC becoming a B Corp. No 2026 transcript mentions it. Certifications expire — verification needed before claiming on the wholesale sell sheet.</p>
+            <p><strong>Default if unanswered by 2026-05-15:</strong> omit the B Corp claim from new copy; flag the journal post for review.</p>
+          </div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HIGH · accordion -->
+    <div style="margin-top:64px">
+      <h3 class="section-title" style="font-size:clamp(24px,2.6vw,32px);font-weight:300;margin-bottom:8px;color:var(--fbc-chocolate)"><em style="color:var(--fbc-gold)">High</em> · 8 items · resolve within 30 days</h3>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-gold);margin-right:14px">H 01</strong>Founders / ownership audio recordings — <em>clean second pass.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Tightened second pass from Jael and Dan covering origin · Costa Rica → Asheville · Helene · vision · what makes FBC different. Phone recording fine · 30-60 min. Default: existing transcripts as AI Brand Agent v1 corpus.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-gold);margin-right:14px">H 02</strong>Chocolate makers / production team <em>audio.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>2-4 voices from the chocolate-making team — bean-to-bar process, sourcing, roasting, conching, tempering. Multi-voice depth distinguishes Cluster 01 from a single-voice authority page.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q open" onclick="toggleFaq(this)" style="color:var(--fbc-teal)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-gold);margin-right:14px">H 03</strong>Pastry team <em>audio</em> — including FBC's canonical hot chocolate recipe. <em style="color:var(--fbc-teal-light);font-size:14px;font-family:var(--font-body);font-style:normal;letter-spacing:0.18em;text-transform:uppercase;font-weight:700;margin-left:10px">Confex partial-resolved 2026-04-27</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p><em>Confections team RESOLVED 2026-04-27.</em> Rihanna Bourbon (Confections Supervisor) and Edgar (Head Chocolatier) interviewed. Transcript at <code>inputs/2026-04-27_confex-team-transcripts.md</code>. Voice signature now in §4.1.</p>
+            <p><em>Pastry team STILL OPEN.</em> Pastry and confections are distinct teams. Pastry holds <strong>FBC's canonical hot chocolate recipe</strong> — load-bearing for Cluster 08 (74,000/mo).</p>
+          </div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-gold);margin-right:14px">H 04</strong>Lounge / hospitality team <em>audio.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>2-3 voices · Lounge experience · favorite menu items · customer reactions. Required for hospitality voice on the Visit hub and Lounge location page.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-gold);margin-right:14px">H 05</strong>Tour guides audio — and the <em>tour script.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Foundation for Phase 2 Cluster 11 (Factory Tour, 4,300/mo). Audio capture should happen in H1 window so Phase 2 stages to launch as soon as photography ships.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-gold);margin-right:14px">H 06</strong>Cacao sourcing leads <em>beyond Dan.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Other team members involved in sourcing logistics, QA testing, or relationship management. Multi-voice depth on Clusters 04 and 10. Optional but high-value.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-gold);margin-right:14px">H 07</strong>Voice + naming <em>clarifications.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p><strong>Year-count precision.</strong> Cite exact counts (14yr Bisiesto, 19yr Daniel South) or rounded ("more than a decade") in customer-facing copy?</p>
+            <p><strong>Jael's external surname.</strong> Skeffington (Southern Fork) or Rattigan (blog byline)?</p>
+            <p><strong>Voice routing default.</strong> Approve as documented in §1: Jael leads on origin/consumer/hospitality/press · Dan leads on sourcing/manufacturing/B2B-technical · Confections team leads on bonbon-making content.</p>
+          </div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-gold);margin-right:14px">H 08</strong>Confex team member <em>identifying details.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Confirmed spelling for "Rihanna Bourbon" + Edgar's last name + confirmed titles. Transcript renders Rihanna's title as <em>"Perfection supervisor"</em> — almost certainly transcription artifact for "Confections Supervisor." Default by 2026-05-15: use first names only in client-facing deliverables; verify before external publication.</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEDIUM · accordion -->
+    <div style="margin-top:64px">
+      <h3 class="section-title" style="font-size:clamp(24px,2.6vw,32px);font-weight:300;margin-bottom:8px;color:var(--fbc-chocolate)"><em style="color:var(--fbc-teal)">Medium</em> · 7 items · resolve as content production begins</h3>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q open" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-teal);margin-right:14px">M 01</strong>Existing media assets — <em>access resolved 2026-04-27.</em> Category coverage still open.</span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p><em>Resolved (access).</em> FBC shared Google Drive media library at <code>drive.google.com/drive/folders/0B9JSVVbtclUVU0c3cXFPMGxRejQ</code>. Captured in <code>brand_context/assets.md</code>.</p>
+            <p><em>Still open (category coverage).</em> Drinking-chocolate full-SKU photography (C08), bonbon production-line photography (C09), sourcing-trip archive (C10), gift-SKU lifestyle photography (Phase 2 C12). 30-min audit to map library against deliverable categories.</p>
+          </div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-teal);margin-right:14px">M 02</strong>Phase 1 cluster-specific <em>photography.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Drinking chocolate full SKU coverage (C08) · bonbon production line + decoration (C09) · sourcing trip photography — Jael in Peru, Dan planting cacao in Costa Rica (C10).</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-teal);margin-right:14px">M 03</strong>Phase 2 photography <em>production.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Professional video + photography session at the Riverside factory (C11) · full SKU gift photography (C12). A single 2-day production covers both. Determines whether Phase 2 launches late 2026 or 2027.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-teal);margin-right:14px">M 04</strong>Complete <em>product catalog.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Descriptions, ingredients, allergens, pricing for every SKU. Required for Shopify build + every product page rewrite.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-teal);margin-right:14px">M 05</strong>Tour, class, tasting <em>schedules.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Current hours of operation for both locations. Booking flow links. Cancellation/policy text from existing tour booking page.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-teal);margin-right:14px">M 06</strong>Existing testimonials &amp; <em>reviews.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Pulls from Google Business Profile, TripAdvisor for tours, e-commerce platform reviews, press quotes. Plus wholesale account list and any restaurant/hotel partner names you'd like cited.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)"><span><strong style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;color:var(--fbc-teal);margin-right:14px">M 07</strong>Local supplier <em>verifications.</em></span><span class="icon"></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Verify spelling for "Palm Creek" honey (possibly Pell Creek). Plus current relationship status for Step Family Farms · Freddy's Guys · Spice Walla · Burlap and Barrel · Oak &amp; Grist Distillery.</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESOLVED CALLOUT · this-month dark panel -->
+    <div style="margin-top:80px">
+      <div class="volume-math" style="background:var(--fbc-chocolate);padding:48px">
+        <div class="vh" style="color:var(--fbc-gold-light)">Resolved · 2026-04-27 · seven items closed by the confex transcript</div>
+        <ul class="tasting-list" style="margin-top:24px">
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream);font-size:18px"><em style="color:var(--fbc-gold-light)">Confections team voice</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.7)">Rihanna Bourbon + Edgar interviewed. Voice signature now in §4.1; samples in §2.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream);font-size:18px"><em style="color:var(--fbc-gold-light)">Bonbon vs truffle terminology</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.7)">Edgar's full discussion preserved as a brand-internal-debate, not a settled position.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream);font-size:18px"><em style="color:var(--fbc-gold-light)">Shelf-life claim for wholesale</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.7)">3 months without preservatives, controlled by water-activity / moisture monitoring (Rihanna).</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream);font-size:18px"><em style="color:var(--fbc-gold-light)">Confections production volume</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.7)">~20,000 bonbons/week from a 7-person team.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream);font-size:18px"><em style="color:var(--fbc-gold-light)">Cluster 09 source content</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.7)">Full process narrative, signature collection backstory, named suppliers, customer use-case framing all captured.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream);font-size:18px"><em style="color:var(--fbc-gold-light)">Wildflower honey caramel origin</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.7)">NEW founder mythology asset. Jael, home kitchen, 2007. The corollary to the truffle-rolling moment.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream);font-size:18px"><em style="color:var(--fbc-gold-light)">Two-bite eating protocol</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.7)">"At room temperature in a couple bites." Canonical customer-education directive.</span></li>
+          <li style="border-color:rgba(247,241,234,0.12)"><span class="tast-name" style="color:var(--fbc-cream);font-size:18px"><em style="color:var(--fbc-gold-light)">Media library access (M01 access half)</em></span><span class="tast-notes" style="color:rgba(247,241,234,0.7)">FBC Drive shared. Category-coverage audit still pending.</span></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============= SECTION 7 · HOW TO USE THIS DOCUMENT ============= -->
+<section id="section-7" class="fbc-section">
+  <div class="container">
+    <div class="intro-grid">
+      <div>
+        <div class="section-eyebrow">Section 07 · How to use</div>
+        <h2>Three audiences,<br><em>three uses.</em></h2>
+      </div>
+      <p>This document is consumed by three different teams, in three different ways. Each one starts from a different place. Each one returns to it differently.</p>
+    </div>
+  </div>
+
+  <!-- USE CASE 01 · gift-strip-style -->
+  <div class="container" style="margin-top:48px">
+    <div class="gift-grid">
+      <div class="gift-text-side">
+        <div class="section-eyebrow">Use case 01</div>
+        <h2>For the FBC team writing<br><em>internal content.</em></h2>
+        <p>Email copy, social posts, in-store signage, replies to wholesale inquiries, anything written in-house.</p>
+        <div style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--fbc-teal);margin:24px 0 12px">Read first</div>
+        <ul style="list-style:none;padding:0;font-size:14.5px;line-height:1.8;color:var(--fbc-chocolate-soft)">
+          <li>→ <strong>Section 1</strong> · the eight shared patterns + universal rules</li>
+          <li>→ <strong>Section 2</strong> · keep the sample library open as you write</li>
+        </ul>
+        <div style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--fbc-teal);margin:24px 0 12px">Voice tests before publishing</div>
+        <ol style="font-size:14.5px;line-height:1.7;padding-left:1.2rem;color:var(--fbc-chocolate-soft)">
+          <li>The <em style="font-family:var(--font-display);color:var(--fbc-rust)">substitution test</em> — could "[any other artisan chocolate brand]" replace FBC and the piece still read as accurate? If yes, add specificity.</li>
+          <li>The <em style="font-family:var(--font-display);color:var(--fbc-rust)">Jael read</em> — would Jael read this and say "yes, that's how we sound"?</li>
+          <li>The <em style="font-family:var(--font-display);color:var(--fbc-rust)">Dan read</em> — is there a sentence Dan would want to add a "but actually" to? Do it for him before publishing.</li>
+          <li>The <em style="font-family:var(--font-display);color:var(--fbc-rust)">lecture test</em> — does this make a customer feel they need to study before they're allowed to enjoy? If yes, cut and lead with pleasure.</li>
+        </ol>
+      </div>
+      <div class="gift-photo-side">
+        <div class="gift-photo">
+          <div class="art-photo">
+            <span class="grid-line-2 v"></span><span class="grid-line-2 h"></span>
+            <div><span class="ph-tag">Use case 01 · 1:1</span><div class="ph-shot">A hand at a desk in the Lounge, laptop open, reference card next to a coffee.</div></div>
+            <div class="ph-mood"><strong>Tone</strong>Working environment. The brand foundation as a tool, not a decoration. Visible reference card with FBC's eight shared patterns.</div>
+          </div>
+        </div>
+        <div class="gift-card-overlay">
+          <div class="top">For the team</div>
+          <h4>"Voice rules + sample library, every time."</h4>
+          <p>Run <code>tool-humanizer</code> in deep mode against the brand voice profile before publishing.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USE CASE 02 · gift-strip reversed -->
+  <div class="container" style="margin-top:96px">
+    <div class="gift-grid reverse">
+      <div class="gift-photo-side">
+        <div class="gift-photo">
+          <div class="art-photo">
+            <span class="grid-line-2 v"></span><span class="grid-line-2 h"></span>
+            <div><span class="ph-tag">Use case 02 · 1:1</span><div class="ph-shot">A ROI.LIVE writer's screen with two windows — brand_context files on one, draft article on the other.</div></div>
+            <div class="ph-mood"><strong>Tone</strong>The companion files in active use — voice-profile.md, positioning.md, samples.md visible on screen.</div>
+          </div>
+        </div>
+        <div class="gift-card-overlay">
+          <div class="top">For ROI.LIVE</div>
+          <h4>"Read in order, every time."</h4>
+          <p>Section 1 → 3 → 4 → 5 → 6 → 2. Then humanizer pass. Then publish.</p>
+        </div>
+      </div>
+      <div class="gift-text-side">
+        <div class="section-eyebrow">Use case 02</div>
+        <h2>For the ROI.LIVE team writing<br><em>FBC client work.</em></h2>
+        <p>Topical-cluster articles, landing pages, ad copy, email sequences, social campaigns, the new website itself.</p>
+        <div style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--fbc-teal);margin:24px 0 12px">Read in this order</div>
+        <ol style="font-size:14.5px;line-height:1.7;padding-left:1.2rem;color:var(--fbc-chocolate-soft)">
+          <li><strong>Section 1</strong> — voice (every time, before drafting)</li>
+          <li><strong>Section 3</strong> — find the audience. Lock the segment, lead message, voice routing.</li>
+          <li><strong>Section 4</strong> — confirm which positioning pillar the piece lives under.</li>
+          <li><strong>Section 5</strong> — confirm which cluster, which spoke, what the head term is.</li>
+          <li><strong>Section 6</strong> — check what FBC inputs are blocking. Use documented defaults if anything is missing.</li>
+          <li><strong>Section 2</strong> — keep the sample library open as you draft.</li>
+          <li>Run <code>tool-humanizer</code> in <em>deep</em> mode before publishing.</li>
+        </ol>
+        <div style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--fbc-teal);margin:24px 0 12px">Companion files</div>
+        <p style="font-size:13.5px;line-height:1.7;color:var(--fbc-chocolate-soft)"><code>brand_context/voice-profile.md</code> · <code>positioning.md</code> · <code>icp.md</code> · <code>samples.md</code> · <code>assets.md</code> · plus the three onboarding research files.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- USE CASE 03 · gift-strip -->
+  <div class="container" style="margin-top:96px">
+    <div class="gift-grid">
+      <div class="gift-text-side">
+        <div class="section-eyebrow">Use case 03</div>
+        <h2>For <em>AI tools.</em></h2>
+        <p>Claude, ChatGPT, the FBC AI Brand Agent, or any other model used to draft copy.</p>
+        <div style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--fbc-teal);margin:24px 0 12px">System prompt construction</div>
+        <p style="font-size:14.5px;line-height:1.7;color:var(--fbc-chocolate-soft)">Load <code>brand_context/voice-profile.md</code> + <code>positioning.md</code> + <code>samples.md</code> as system prompt context. Add <code>icp.md</code> when audience-specific. Add the relevant cluster row from §5 when SEO-targeted.</p>
+        <div style="font-family:var(--font-body);font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--fbc-teal);margin:24px 0 12px">Required output checks</div>
+        <ul style="list-style:none;padding:0;font-size:14.5px;line-height:1.8;color:var(--fbc-chocolate-soft)">
+          <li>→ <em style="font-family:var(--font-display);color:var(--fbc-rust)">Named</em> person, place, or supplier in the first 50 words</li>
+          <li>→ No <em style="font-family:var(--font-display);color:var(--fbc-rust)">banned phrases</em> (Section 1)</li>
+          <li>→ A <em style="font-family:var(--font-display);color:var(--fbc-rust)">scene or moment</em> grounding the claim — not abstract</li>
+          <li>→ A <em style="font-family:var(--font-display);color:var(--fbc-rust)">community gesture</em> if consumer-facing</li>
+          <li>→ A <em style="font-family:var(--font-display);color:var(--fbc-rust)">qualification</em> if sourcing or sustainability</li>
+        </ul>
+        <p style="font-size:13px;color:var(--fbc-chocolate-soft);font-style:italic;font-family:var(--font-display);margin-top:18px">If a draft fails any of these, return it for a rewrite — do not ship.</p>
+      </div>
+      <div class="gift-photo-side">
+        <div class="gift-photo">
+          <div class="art-photo">
+            <span class="grid-line-2 v"></span><span class="grid-line-2 h"></span>
+            <div><span class="ph-tag">Use case 03 · 1:1</span><div class="ph-shot">An LLM interface with brand_context files attached as system context.</div></div>
+            <div class="ph-mood"><strong>Tone</strong>The AI Brand Agent in action. brand_context/*.md visible as a context block. A draft being checked against the voice tests.</div>
+          </div>
+        </div>
+        <div class="gift-ribbon">For AI Tools</div>
+        <div class="gift-card-overlay">
+          <div class="top">System prompt</div>
+          <h4>"voice-profile.md + positioning.md + samples.md"</h4>
+          <p>Add icp.md for audience-specific work. Add the cluster row for SEO-targeted content.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERSIONING · faq style -->
+  <div class="container" style="margin-top:96px">
+    <div class="section-header left">
+      <div class="section-eyebrow">Versioning</div>
+      <h3 class="section-title" style="font-size:clamp(28px,3.5vw,42px)">A living document.<br><em>Quarterly review windows.</em></h3>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item open">
+        <button class="faq-q" onclick="toggleFaq(this)"><span>What changes when?</span><span class="icon"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>The <em>brand foundation</em> (Sections 1-4) is stable. Changes only when founders' positioning evolves materially or when team-voice interviews ship.</p>
+          <p>The <em>topical authority strategy</em> (Section 5) reviewed quarterly. Q3 review window: <strong>27 July 2026</strong>. Q4 review window: <strong>27 October 2026</strong>.</p>
+          <p>The <em>"What we need"</em> section (Section 6) reviewed at every milestone. Resolved items dated and crossed off; new questions added.</p>
+        </div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)"><span>Where do new gaps go?</span><span class="icon"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>Single source of truth at <code>projects/onboarding/2026-04-27_fbc-open-gaps.md</code>. Other locations (voice-profile §9, assets.md, icp.md) point here, do not duplicate.</p>
+          <p>Resolution cadence: 3-5 business days at each milestone (per proposal Part 7).</p>
+        </div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)"><span>Document version</span><span class="icon"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p><em>v2.0</em> · Created <strong>27 April 2026</strong> · Built by ROI.LIVE for the French Broad Chocolates team. Cross-references: <code>brand_context/*.md</code>, <code>projects/onboarding/keyword-research-results.md</code>, <code>competitor-cluster-analysis.md</code>, <code>cluster-expansion-opportunities.md</code>, <code>2026-04-27_fbc-open-gaps.md</code>.</p>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============= FINAL CTA ============= -->
+<section class="final-cta">
+  <div class="inner">
+    <div class="section-eyebrow gold-light" style="margin-bottom:18px">The closing handshake</div>
+    <h2>One cohesive voice.<br>Every moment <em>we make.</em></h2>
+    <p>This document lives. We refresh it as the brand grows — quarterly reviews, named gaps tracked, every team voice captured as it's interviewed.</p>
+    <a href="#section-6" class="btn gold">
+      See what we still need from you
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </a>
+    <div class="trust-line">
+      <div>Living document</div>
+      <div>Last updated 27 April 2026</div>
+      <div>Built by <em style="font-family:var(--font-display);font-style:italic;color:var(--fbc-gold-light)">ROI.LIVE</em></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= FOOTER MINI ============= -->
+<div class="footer-mini">
+  &copy; 2026, French Broad Chocolates &nbsp;·&nbsp; <em>Hand-crafted in Asheville since 2006</em>
+</div>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var sections = document.querySelectorAll('main > section[id]');
+  var links = document.querySelectorAll('#docNav a');
+  var byId = {};
+  links.forEach(function(a){ byId[a.getAttribute('href').slice(1)] = a; });
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!byId[e.target.id]) return;
+      if(e.isIntersecting){
+        links.forEach(function(a){a.classList.remove('active');});
+        byId[e.target.id].classList.add('active');
+      }
+    });
+  }, {rootMargin: '-30% 0px -55% 0px', threshold: 0});
+  sections.forEach(function(s){io.observe(s);});
+
+  window.toggleFaq = function(btn){
+    var item = btn.closest('.faq-item');
+    if(item) item.classList.toggle('open');
+  };
+})();
+</script>
+
+</body>
+</html>
