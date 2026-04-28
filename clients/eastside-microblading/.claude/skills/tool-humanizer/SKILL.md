@@ -23,16 +23,15 @@ Strip AI-generated patterns from text. Make it sound like a person wrote it.
 Input text returned with AI patterns removed, scored before and after on a 0-10 human-ness scale. Change log shows exactly what was fixed. Output either replaces the original or is saved alongside it.
 
 ## Context Needs
-
 | File | Load level | How it shapes this skill |
 |------|-----------|--------------------------|
+| `agency/sops/ROI-LIVE-Agency-Core-Standards-v1.1.md` | §8 only | Authoritative list of banned AI writing patterns. Apply to ALL text, agency or client. Overrides any generic detection rule that conflicts. |
 | `brand_context/voice-profile.md` | full | Replacements use the brand's actual vocabulary, rhythm, and connectors instead of generic "human" phrasing |
 | `brand_context/samples.md` | tone refs | Reference for what on-brand sounds like |
 | `context/learnings.md` | `## tool-humanizer` section | Patterns the user cares about most, false positives to skip |
 
-Load if they exist. Works standalone with generic replacements.
-
----
+Core Standards §8 loads for ALL invocations — it is the canonical ban list and is not optional. `brand_context/` files load per mode. Generic replacements are a fallback only when no brand_context exists.
+----
 
 ## Instructions
 
