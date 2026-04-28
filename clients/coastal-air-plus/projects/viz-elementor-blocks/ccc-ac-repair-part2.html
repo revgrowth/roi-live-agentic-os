@@ -1,0 +1,672 @@
+<!-- Coastal Carolina Comfort - AC Repair Summerville - Part 2 -->
+<style>
+.ccc-ac-repair { font-family: "Rubik", Arial, sans-serif; color: #1F1A1A; line-height: 1.7; font-size: 17px; }
+.ccc-ac-repair *, .ccc-ac-repair *::before, .ccc-ac-repair *::after { box-sizing: border-box; }
+.ccc-ac-repair h1, .ccc-ac-repair h2, .ccc-ac-repair h3, .ccc-ac-repair h4 { font-family: "Teko", "Oswald", Arial, sans-serif; color: #092A49; margin: 0; line-height: 1.15; }
+.ccc-ac-repair p { margin: 0 0 16px; font-size: 17px; line-height: 1.7; color: #1F1A1A; }
+.ccc-ac-repair a { color: #F68029; }
+.ccc-ac-repair img { max-width: 100%; height: auto; display: block; }
+.ccc-ac-repair button:focus, .ccc-ac-repair a:focus { outline: 2px solid #00BFA5; outline-offset: 2px; }
+
+/* ---------- Elementor Override Reset (nuclear) ---------- */
+.ccc-ac-repair button,
+.ccc-ac-repair button:hover,
+.ccc-ac-repair button:focus,
+.ccc-ac-repair input[type="button"],
+.ccc-ac-repair input[type="submit"] {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+.ccc-ac-repair .ccc-section-label {
+  font-family: "Rubik", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #00BFA5;
+  text-align: center;
+  margin-bottom: 16px;
+  display: block;
+}
+.ccc-ac-repair .ccc-centered-head { text-align: center; max-width: 900px; margin: 0 auto 48px; }
+.ccc-ac-repair .ccc-centered-head h2 {
+  font-family: "Teko", sans-serif;
+  font-size: 44px;
+  color: #092A49;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  line-height: 1.1;
+}
+.ccc-ac-repair .ccc-centered-head p {
+  font-size: 17px;
+  color: #1F1A1A;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ---------- Section 11: FAQ Accordion ---------- */
+.ccc-ac-repair .ccc-faq { background: #F9F9F9; padding: 80px 20px; }
+.ccc-ac-repair .ccc-accordion { max-width: 800px; margin: 0 auto; }
+.ccc-ac-repair .ccc-acc-item { margin-bottom: 0; }
+
+.ccc-ac-repair .ccc-accordion-btn {
+  width: 100%;
+  text-align: left;
+  background: #ffffff !important;
+  padding: 18px 20px 18px 24px;
+  border: 1px solid #EAEAEA;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Teko', sans-serif;
+  font-size: 20px;
+  color: #00BFA5 !important;
+  line-height: 1.3;
+  transition: border-left 0.2s ease, background 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ccc-ac-repair .ccc-accordion-btn:hover {
+  background: #FAFFFE !important;
+  border-left: 4px solid #00BFA5;
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-btn[aria-expanded="true"] {
+  background: #FAFFFE !important;
+  border-left: 4px solid #00BFA5;
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-btn span.ccc-acc-question {
+  color: #00BFA5 !important;
+  font-family: 'Teko', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.ccc-ac-repair .ccc-accordion-btn:hover span.ccc-acc-question,
+.ccc-ac-repair .ccc-accordion-btn[aria-expanded="true"] span.ccc-acc-question {
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-toggle {
+  color: #333333 !important;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-left: 16px;
+  transition: transform 0.2s ease;
+}
+
+.ccc-ac-repair .ccc-accordion-btn[aria-expanded="true"] .ccc-accordion-toggle {
+  transform: rotate(45deg);
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding: 0 24px;
+  font-family: 'Rubik', sans-serif;
+  font-size: 16px;
+  color: #333333 !important;
+  line-height: 1.7;
+  background: #ffffff;
+  border: 1px solid #EAEAEA;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  margin-top: -6px;
+  margin-bottom: 6px;
+}
+
+.ccc-ac-repair .ccc-accordion-panel.is-open {
+  padding: 0 24px 20px 24px;
+}
+
+.ccc-ac-repair .ccc-accordion-panel p {
+  color: #333333 !important;
+  margin: 12px 0 0 0;
+}
+
+.ccc-ac-repair .ccc-accordion-panel a {
+  color: #F68029 !important;
+  text-decoration: underline;
+}
+
+/* ---------- Section 12: Service Areas ---------- */
+.ccc-ac-repair .ccc-areas {
+  background-image: linear-gradient(135deg, rgba(9,42,73,0.88) 0%, rgba(9,42,73,0.82) 100%), url('https://coastalcarolinahvac.com/wp-content/uploads/2026/04/summerville-sc.png');
+  background-size: cover;
+  background-position: center;
+  padding: 80px 20px;
+  color: #FFFFFF;
+}
+.ccc-ac-repair .ccc-areas .ccc-section-label { color: #00BFA5; }
+.ccc-ac-repair .ccc-areas h3 {
+  font-family: "Teko", sans-serif;
+  font-size: 38px;
+  color: #FFFFFF;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  line-height: 1.1;
+}
+.ccc-ac-repair .ccc-areas-intro {
+  text-align: center;
+  color: #FFFFFF;
+  opacity: 0.9;
+  font-size: 17px;
+  max-width: 720px;
+  margin: 0 auto 48px;
+}
+.ccc-ac-repair .ccc-areas-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.ccc-ac-repair .ccc-area-card {
+  background: rgba(255,255,255,0.1);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 28px;
+}
+.ccc-ac-repair .ccc-area-card h4 {
+  font-family: "Teko", sans-serif;
+  font-size: 22px;
+  color: #00BFA5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+.ccc-ac-repair .ccc-area-card ul { list-style: none; padding: 0; margin: 0; }
+.ccc-ac-repair .ccc-area-card li {
+  font-family: "Rubik", sans-serif;
+  font-size: 15px;
+  line-height: 2;
+  color: #FFFFFF;
+}
+.ccc-ac-repair .ccc-areas-links {
+  text-align: center;
+  margin-top: 36px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+}
+.ccc-ac-repair .ccc-areas-links a { color: #00BFA5; text-decoration: underline; }
+
+/* ---------- Section 13: Blog Grid ---------- */
+.ccc-ac-repair .ccc-blog { background: #FFFFFF; padding: 80px 20px; }
+.ccc-ac-repair .ccc-blog .ccc-centered-head { margin-bottom: 48px; }
+.ccc-ac-repair .ccc-blog-subtext {
+  text-align: center;
+  font-size: 17px;
+  color: #555555;
+  max-width: 760px;
+  margin: 0 auto 48px;
+}
+.ccc-ac-repair .ccc-blog-grid {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.ccc-ac-repair .ccc-blog-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.ccc-ac-repair .ccc-blog-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.13);
+}
+.ccc-ac-repair .ccc-blog-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+.ccc-ac-repair .ccc-blog-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.ccc-ac-repair .ccc-blog-pill {
+  font-family: "Rubik", sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #E7F5FF;
+  color: #00BFA5;
+  border-radius: 20px;
+  padding: 3px 10px;
+  display: inline-block;
+  margin-bottom: 10px;
+  align-self: flex-start;
+  font-weight: 600;
+}
+.ccc-ac-repair .ccc-blog-card h3 {
+  font-family: "Teko", sans-serif;
+  font-size: 22px;
+  color: #092A49;
+  line-height: 1.25;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.ccc-ac-repair .ccc-blog-excerpt {
+  font-family: "Rubik", sans-serif;
+  font-size: 14px;
+  color: #666666;
+  line-height: 1.6;
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  margin: 0 0 12px;
+}
+.ccc-ac-repair .ccc-blog-readmore {
+  font-family: "Teko", sans-serif;
+  font-size: 17px;
+  color: #F68029;
+  text-decoration: none;
+  margin-top: auto;
+  padding-top: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ---------- Section 14: Final CTA ---------- */
+.ccc-ac-repair .ccc-final-cta {
+  background: #F68029;
+  padding: 64px 20px;
+  text-align: center;
+  color: #FFFFFF;
+}
+.ccc-ac-repair .ccc-final-cta h2 {
+  font-family: "Teko", sans-serif;
+  font-size: 46px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  margin-bottom: 14px;
+  line-height: 1.1;
+}
+.ccc-ac-repair .ccc-final-cta-sub {
+  font-size: 18px;
+  color: #FFFFFF;
+  opacity: 0.92;
+  margin: 0 auto 32px;
+  max-width: 760px;
+}
+.ccc-ac-repair .ccc-final-cta-phone {
+  display: inline-block;
+  background: #FFFFFF;
+  color: #092A49;
+  font-family: "Teko", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  padding: 18px 48px;
+  border-radius: 4px;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+.ccc-ac-repair .ccc-final-cta-phone:hover { transform: translateY(-2px); color: #092A49; }
+.ccc-ac-repair .ccc-final-cta-fine {
+  font-size: 14px;
+  color: #FFFFFF;
+  opacity: 0.85;
+  margin: 20px auto 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  /* Tablet: 2-col blog grid + 2-col service area grid */
+  .ccc-ac-repair .ccc-blog-grid { grid-template-columns: repeat(2, 1fr); }
+  .ccc-ac-repair .ccc-areas-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 767px) {
+  .ccc-ac-repair { font-size: 16px; }
+  .ccc-ac-repair p { font-size: 16px; }
+
+  /* ---- Section padding ---- */
+  .ccc-ac-repair .ccc-faq,
+  .ccc-ac-repair .ccc-areas,
+  .ccc-ac-repair .ccc-blog,
+  .ccc-ac-repair .ccc-final-cta { padding: 56px 18px; }
+
+  /* ---- FAQ Accordion ---- */
+  .ccc-ac-repair .ccc-accordion-btn {
+    font-size: 17px;
+    padding: 16px;
+  }
+  .ccc-ac-repair .ccc-accordion-btn span.ccc-acc-question { font-size: 17px; }
+  .ccc-ac-repair .ccc-accordion-toggle { flex-shrink: 0; margin-left: 12px; }
+  .ccc-ac-repair .ccc-accordion-panel { padding: 0 16px; }
+  .ccc-ac-repair .ccc-accordion-panel.is-open { padding: 0 16px 16px 16px; }
+
+  /* ---- Service Areas ---- */
+  .ccc-ac-repair .ccc-areas-grid { grid-template-columns: 1fr; gap: 20px; }
+  .ccc-ac-repair .ccc-area-card { padding: 22px; }
+  .ccc-ac-repair .ccc-areas h3 { font-size: 30px; }
+
+  /* ---- Blog grid ---- */
+  .ccc-ac-repair .ccc-blog-grid { grid-template-columns: 1fr; gap: 24px; }
+  .ccc-ac-repair .ccc-blog-card img { height: 200px; }
+
+  /* ---- Final CTA ---- */
+  .ccc-ac-repair .ccc-final-cta h2 { font-size: 28px; }
+  .ccc-ac-repair .ccc-final-cta-phone {
+    display: block;
+    width: 90%;
+    max-width: 340px;
+    margin: 0 auto;
+    font-size: 22px;
+    padding: 16px 24px;
+    text-align: center;
+  }
+
+  /* ---- Headings ---- */
+  .ccc-ac-repair .ccc-centered-head h2 { font-size: 34px; }
+}
+
+/* ---- Global mobile safety ---- */
+@media (max-width: 767px) {
+  .ccc-ac-repair * { max-width: 100%; }
+  .ccc-ac-repair img { height: auto !important; }
+  .ccc-ac-repair h1,
+  .ccc-ac-repair h2,
+  .ccc-ac-repair h3 { word-break: break-word; }
+}
+</style>
+
+<div class="ccc-ac-repair">
+
+  <!-- ============ SECTION 11: FAQ ============ -->
+  <section class="ccc-faq">
+    <span class="ccc-section-label">COMMON QUESTIONS</span>
+    <div class="ccc-centered-head">
+      <h2>Common Summerville AC Repair Questions</h2>
+    </div>
+    <div class="ccc-accordion" data-acc="faq">
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-1" id="acc-faq-btn-1">
+          <span class="ccc-acc-question">How much does AC repair cost in Summerville?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-1" role="region" aria-labelledby="acc-faq-btn-1">
+          <p>Most AC repairs in Summerville cost between $150 and $650. Capacitor replacement runs $150–$300. Refrigerant recharge — including leak detection — runs $250–$600 depending on refrigerant type. R-410A costs have risen since the January 2025 EPA production ban. Compressor repair can reach $1,200–$2,500. We provide upfront flat-rate pricing after diagnosis, before any work begins.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-2" id="acc-faq-btn-2">
+          <span class="ccc-acc-question">Do you offer same-day or emergency AC repair in Summerville?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-2" role="region" aria-labelledby="acc-faq-btn-2">
+          <p>Yes. We offer same-day AC repair for Summerville homeowners, with most calls answered within 2 hours from our Lipman St. headquarters. For after-hours emergencies during extreme heat, we provide <a href="https://coastalcarolinahvac.com/emergency-ac-repair-lowcountry/" style="color:#F68029;text-decoration:underline;">emergency AC repair across the Lowcountry</a>.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-3" id="acc-faq-btn-3">
+          <span class="ccc-acc-question">Why is my AC running but not cooling my house?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-3" role="region" aria-labelledby="acc-faq-btn-3">
+          <p>The most common causes are low refrigerant from a leak, a dirty or frozen evaporator coil, a failing compressor, or ductwork leaks losing cooled air into your attic. In Summerville's humidity, a clogged air filter alone can freeze the evaporator coil within hours. Check your filter first. If it's clean and the problem persists, call for a diagnostic.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-4" id="acc-faq-btn-4">
+          <span class="ccc-acc-question">How long does AC repair take in Summerville?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-4" role="region" aria-labelledby="acc-faq-btn-4">
+          <p>Most repairs are completed in a single visit — typically 1 to 3 hours depending on the issue. Capacitor replacement, contactor repair, and thermostat replacement are usually under an hour. Refrigerant leak repairs take longer because we locate the leak, repair it, and recharge the system before confirming the fix. We carry common parts for all major brands on every truck to avoid return visits.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-5" id="acc-faq-btn-5">
+          <span class="ccc-acc-question">How often should I have my AC serviced in the Lowcountry?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-5" role="region" aria-labelledby="acc-faq-btn-5">
+          <p>Twice per year — once in early spring before cooling season and once in fall. Summerville's cooling season runs April through October, which is longer than the national average. High humidity accelerates coil fouling, drain line clogging, and capacitor wear. Regular maintenance catches these before they become emergency repairs. Read more about <a href="https://coastalcarolinahvac.com/ac-maintenance-prevents-repairs/" style="color:#F68029;text-decoration:underline;">why regular AC maintenance prevents costly repairs</a>.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-6" id="acc-faq-btn-6">
+          <span class="ccc-acc-question">What AC brands do you repair in Summerville?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-6" role="region" aria-labelledby="acc-faq-btn-6">
+          <p>We service all major residential brands — Trane, Carrier, Lennox, Rheem, Goodman, Daikin, York, and Amana. As a Daikin partner, we stock Daikin parts on every truck. We also repair ductless mini-split systems from Mitsubishi, Fujitsu, and LG, which are common in older Summerville homes and additions without existing ductwork.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-7" id="acc-faq-btn-7">
+          <span class="ccc-acc-question">My AC system uses R-410A. Is it still worth repairing?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-7" role="region" aria-labelledby="acc-faq-btn-7">
+          <p>It depends on the repair and the system's age. Minor fixes — capacitor, contactor, thermostat — are still cost-effective on R-410A systems. Refrigerant leak repairs cost more now due to the 2025 EPA ban, so the math shifts on older systems. Compressor replacement on an R-410A system over 12 years old rarely makes financial sense. We'll give you the specific numbers during the diagnostic.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-8" id="acc-faq-btn-8">
+          <span class="ccc-acc-question">What causes short cycling — my AC keeps turning on and off?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-8" role="region" aria-labelledby="acc-faq-btn-8">
+          <p>Short cycling is usually caused by an oversized system, a failing capacitor, low refrigerant triggering safety shutoffs, or a thermostat malfunction. In newer Summerville communities like Nexton and Cane Bay, builder-grade systems are often oversized for the actual load, which causes short cycles and inadequate dehumidification even when the temperature reads correctly. Read our full guide on <a href="https://coastalcarolinahvac.com/ac-short-cycling/" style="color:#F68029;text-decoration:underline;">AC short cycling causes and fixes</a>.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-9" id="acc-faq-btn-9">
+          <span class="ccc-acc-question">Does Summerville's humidity affect my AC differently than drier climates?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-9" role="region" aria-labelledby="acc-faq-btn-9">
+          <p>Yes. Summerville's humidity forces your AC to remove significantly more moisture per cycle than systems in drier regions. This increases condensate production — making drain clogs more frequent — puts additional load on the compressor, and creates conditions for mold growth on the evaporator coil. Salt air from the coast also accelerates copper refrigerant line corrosion faster than inland markets. Read more on <a href="https://coastalcarolinahvac.com/lowcountry-climate-ac-system/" style="color:#F68029;text-decoration:underline;">what the Lowcountry climate does to your AC system</a>.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-10" id="acc-faq-btn-10">
+          <span class="ccc-acc-question">Is it worth repairing a 15-year-old AC system in Summerville?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-10" role="region" aria-labelledby="acc-faq-btn-10">
+          <p>For minor repairs, yes. For major component failures — compressor, evaporator coil, or refrigerant leak on an R-410A system — replacement usually makes more financial sense, especially given that a new system will run significantly more efficiently through Summerville's 6-month cooling season. We'll give you the honest comparison during the diagnostic. See our full guide on <a href="https://coastalcarolinahvac.com/ac-repair-vs-replacement/" style="color:#F68029;text-decoration:underline;">whether to repair or replace your AC</a>.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ SECTION 12: SERVICE AREAS ============ -->
+  <section class="ccc-areas">
+    <span class="ccc-section-label">WHERE WE SERVE</span>
+    <h3>Dispatching to the Lowcountry From Lipman St.</h3>
+    <p class="ccc-areas-intro">From our headquarters in Summerville, SC, Coastal Carolina Comfort focuses on speed. Because we deploy trucks directly from Lipman St., we avoid the traffic delays that other companies driving up from Charleston face. Whether you're dealing with a failed compressor in Nexton or a refrigerant leak in The Ponds, our local team is minutes away.</p>
+    <div class="ccc-areas-grid">
+      <div class="ccc-area-card">
+        <h4>NEXTON &amp; CANE BAY</h4>
+        <ul>
+          <li>Nexton (Midtown)</li>
+          <li>Brighton Park</li>
+          <li>Cane Bay Plantation</li>
+          <li>Lindera Preserve</li>
+          <li>Del Webb Nexton</li>
+          <li>Carnes Crossroads</li>
+        </ul>
+      </div>
+      <div class="ccc-area-card">
+        <h4>WEST SUMMERVILLE</h4>
+        <ul>
+          <li>The Ponds</li>
+          <li>Knightsville</li>
+          <li>Legend Oaks</li>
+          <li>Summers Corner</li>
+          <li>Pine Forest</li>
+          <li>Wescott Plantation</li>
+        </ul>
+      </div>
+      <div class="ccc-area-card">
+        <h4>CENTRAL &amp; HISTORIC</h4>
+        <ul>
+          <li>Historic Downtown</li>
+          <li>Ashborough East</li>
+          <li>Sangaree</li>
+          <li>Oakbrook</li>
+          <li>Corey Gardens</li>
+          <li>Central Summerville</li>
+        </ul>
+      </div>
+    </div>
+    <p class="ccc-areas-links">For neighborhood-specific AC repair information: <a href="/ac-repair-summerville-historic-district/" style="color:#00BFA5;text-decoration:underline;">AC repair in Summerville's Historic District</a> &nbsp;|&nbsp; <a href="/ac-repair-nexton-cane-bay/" style="color:#00BFA5;text-decoration:underline;">AC repair in Nexton &amp; Cane Bay</a> &nbsp;|&nbsp; <a href="/ac-repair-knightsville-central-summerville/" style="color:#00BFA5;text-decoration:underline;">AC repair in Knightsville &amp; Central Summerville</a> &nbsp;|&nbsp; <a href="/ac-repair-cane-bay-plantation/" style="color:#00BFA5;text-decoration:underline;">AC repair in Cane Bay Plantation</a></p>
+  </section>
+
+  <!-- ============ SECTION 13: BLOG GRID ============ -->
+  <section class="ccc-blog">
+    <span class="ccc-section-label">HVAC KNOWLEDGE BASE</span>
+    <div class="ccc-centered-head">
+      <h2>Keep Learning About AC Repair in the Lowcountry</h2>
+    </div>
+    <p class="ccc-blog-subtext">These guides cover everything Summerville homeowners need to know about AC repair, maintenance, and making smart decisions about your cooling system.</p>
+    <div class="ccc-blog-grid">
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-wont-turn-on/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-wont-turn-on-300x164.png.webp" alt="AC troubleshooting guide">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Troubleshooting</span>
+          <h3>My AC Won't Turn On: Troubleshooting Before You Call a Technician</h3>
+          <p class="ccc-blog-excerpt">About 30% of 'AC won't start' calls we respond to across South Carolina are resolved by basic homeowner checks. Here's what to look at before calling a technician.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-frozen-evaporator-coil/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-frozen-evaporator-coil-300x164.png.webp" alt="Frozen AC evaporator coil">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Repair Guide</span>
+          <h3>AC Frozen Evaporator Coil: Why Your Air Conditioner Ices Up in Humid SC Weather</h3>
+          <p class="ccc-blog-excerpt">In South Carolina's high-humidity environment, frozen coils are both more common and more damaging than in drier climates. Here's what causes them and what to do.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-leaking-water-inside/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-leaking-water-inside-house-300x164.png.webp" alt="AC leaking water inside house">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Water Damage</span>
+          <h3>Why Is My AC Leaking Water Inside My House?</h3>
+          <p class="ccc-blog-excerpt">Your AC can produce 5–20 gallons of water per day in South Carolina's summer humidity. When the drainage system fails, that water ends up inside your home.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-short-cycling/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-short-cycling-300x164.png.webp" alt="AC short cycling causes">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Troubleshooting</span>
+          <h3>AC Keeps Turning On and Off: Short Cycling Causes and Fixes in South Carolina</h3>
+          <p class="ccc-blog-excerpt">Short cycling damages your compressor, spikes energy bills, and fails to properly dehumidify your home. Here are the 7 most common causes and how we fix them.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-making-noise/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-making-noise-300x164.png.webp" alt="AC unit making strange noises">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Diagnostics</span>
+          <h3>AC Unit Making Strange Noises: What Each Sound Means and When to Call for Repair</h3>
+          <p class="ccc-blog-excerpt">Grinding, buzzing, clicking, banging, hissing—each AC noise points to a specific problem. This sound-by-sound diagnostic guide tells you exactly what you're dealing with.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-running-not-cooling/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-running-but-not-cooling-300x164.png.webp" alt="AC running but not cooling">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Repair Guide</span>
+          <h3>Why Is My AC Running But Not Cooling the House?</h3>
+          <p class="ccc-blog-excerpt">When your AC runs all day but your home never reaches the set temperature, the system is failing to produce or deliver adequate cooling. Here are the 7 most common reasons.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ============ SECTION 14: FINAL CTA ============ -->
+  <section class="ccc-final-cta">
+    <h2>AC Not Cooling? Call Now for Same-Day Service.</h2>
+    <p class="ccc-final-cta-sub">Serving Summerville, Nexton, Cane Bay, Historic District, and all of Dorchester County.</p>
+    <a class="ccc-final-cta-phone" href="tel:8437088735">📞 (843) 708-8735</a>
+    <p class="ccc-final-cta-fine">110 Lipman St, Summerville, SC 29483 · Licensed &amp; Insured · NATE-Certified · Daikin Partner</p>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  var roots = document.querySelectorAll('.ccc-ac-repair [data-acc]');
+  roots.forEach(function(root){
+    var btns = root.querySelectorAll('.ccc-accordion-btn');
+    btns.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var expanded = btn.getAttribute('aria-expanded') === 'true';
+        btns.forEach(function(b){
+          b.setAttribute('aria-expanded', 'false');
+          var pid = b.getAttribute('aria-controls');
+          var p = document.getElementById(pid);
+          if (p) { p.classList.remove('is-open'); p.style.maxHeight = null; }
+        });
+        if (!expanded) {
+          btn.setAttribute('aria-expanded', 'true');
+          var panelId = btn.getAttribute('aria-controls');
+          var panel = document.getElementById(panelId);
+          if (panel) {
+            panel.classList.add('is-open');
+            panel.style.maxHeight = panel.scrollHeight + 'px';
+          }
+        }
+      });
+    });
+  });
+})();
+</script>

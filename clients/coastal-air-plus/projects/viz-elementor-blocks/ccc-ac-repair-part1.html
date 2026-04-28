@@ -1,0 +1,1188 @@
+<!-- Coastal Carolina Comfort - AC Repair Summerville - Part 1 -->
+<style>
+.ccc-ac-repair { font-family: "Rubik", Arial, sans-serif; color: #1F1A1A; line-height: 1.7; font-size: 17px; }
+.ccc-ac-repair *, .ccc-ac-repair *::before, .ccc-ac-repair *::after { box-sizing: border-box; }
+.ccc-ac-repair h1, .ccc-ac-repair h2, .ccc-ac-repair h3, .ccc-ac-repair h4 { font-family: "Teko", "Oswald", Arial, sans-serif; color: #092A49; margin: 0; line-height: 1.15; }
+.ccc-ac-repair p { margin: 0 0 16px; font-size: 17px; line-height: 1.7; color: #1F1A1A; }
+.ccc-ac-repair a { color: #F68029; }
+.ccc-ac-repair img { max-width: 100%; height: auto; display: block; }
+.ccc-ac-repair button:focus, .ccc-ac-repair a:focus { outline: 2px solid #00BFA5; outline-offset: 2px; }
+
+/* ---------- Elementor Override Reset (nuclear) ---------- */
+.ccc-ac-repair button,
+.ccc-ac-repair button:hover,
+.ccc-ac-repair button:focus,
+.ccc-ac-repair input[type="button"],
+.ccc-ac-repair input[type="submit"] {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+/* ---------- Section 1: Hero ---------- */
+.ccc-ac-repair .ccc-hero {
+  position: relative;
+  min-height: 600px;
+  padding: 80px 20px;
+  background-image: linear-gradient(135deg, rgba(9,42,73,0.82) 0%, rgba(13,92,99,0.75) 100%), url('https://coastalcarolinahvac.com/wp-content/uploads/2026/04/coastal-hvac-tech-van.png');
+  background-size: cover;
+  background-position: center;
+  color: #FFFFFF;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ccc-ac-repair .ccc-hero-inner { max-width: 920px; width: 100%; margin: 0 auto; }
+.ccc-ac-repair .ccc-hero h1 {
+  font-family: "Teko", sans-serif;
+  font-size: 72px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+}
+.ccc-ac-repair .ccc-hero h2 {
+  font-family: "Rubik", sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.55;
+  color: #FFFFFF;
+  text-transform: none;
+  max-width: 760px;
+  margin: 0 auto 36px;
+  opacity: 0.95;
+}
+.ccc-ac-repair .ccc-hero-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.ccc-ac-repair .ccc-btn-primary {
+  display: inline-block;
+  background: #F68029;
+  color: #FFFFFF;
+  font-family: "Teko", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 16px 32px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: 2px solid #F68029;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+.ccc-ac-repair .ccc-btn-primary:hover { background: #d96a18; border-color: #d96a18; color: #FFFFFF; }
+.ccc-ac-repair .ccc-btn-outline {
+  display: inline-block;
+  background: transparent;
+  color: #FFFFFF;
+  font-family: "Teko", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 16px 32px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: 2px solid #FFFFFF;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+.ccc-ac-repair .ccc-btn-outline:hover { background: #FFFFFF; color: #092A49; }
+.ccc-ac-repair .ccc-trust-row {
+  margin: 40px auto 0;
+  background: rgba(0,0,0,0.45);
+  border-radius: 50px;
+  padding: 12px 24px;
+  display: inline-flex;
+  gap: 28px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  scrollbar-width: none;
+}
+.ccc-ac-repair .ccc-trust-row::-webkit-scrollbar { display: none; }
+.ccc-ac-repair .ccc-trust-row span {
+  display: inline-flex;
+  align-items: center;
+  font-family: "Teko", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #FFFFFF;
+  white-space: nowrap;
+}
+.ccc-ac-repair .ccc-trust-row span .ccc-icon { color: #00BFA5; margin-right: 4px; }
+
+/* ---------- Section 2: Symptom Cards ---------- */
+.ccc-ac-repair .ccc-symptoms { background: #F9F9F9; padding: 60px 20px; }
+.ccc-ac-repair .ccc-section-label {
+  font-family: "Rubik", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #00BFA5;
+  text-align: center;
+  margin-bottom: 16px;
+  display: block;
+}
+.ccc-ac-repair .ccc-symptoms h2 { display: none; }
+.ccc-ac-repair .ccc-symptom-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.ccc-ac-repair .ccc-symptom-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  padding: 32px 28px;
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.ccc-ac-repair .ccc-symptom-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+}
+.ccc-ac-repair .ccc-symptom-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #E7F5FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+.ccc-ac-repair .ccc-symptom-icon svg { width: 30px; height: 30px; stroke: #00BFA5; fill: none; stroke-width: 2; }
+.ccc-ac-repair .ccc-symptom-card h3 { font-family: "Teko", sans-serif; font-size: 24px; color: #092A49; margin-bottom: 12px; text-transform: uppercase; }
+.ccc-ac-repair .ccc-symptom-card p { font-size: 15px; color: #555555; line-height: 1.6; margin: 0; }
+
+/* ---------- Section 3: About ---------- */
+.ccc-ac-repair .ccc-about { background: #FFFFFF; padding: 80px 20px; }
+.ccc-ac-repair .ccc-two-col {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+.ccc-ac-repair .ccc-about img { border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
+.ccc-ac-repair .ccc-about-label {
+  font-family: "Rubik", sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #00BFA5;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: block;
+}
+.ccc-ac-repair .ccc-about h2 {
+  font-family: "Teko", sans-serif;
+  font-size: 44px;
+  color: #092A49;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  line-height: 1.1;
+}
+.ccc-ac-repair .ccc-about p { font-size: 17px; color: #1F1A1A; margin-bottom: 18px; }
+.ccc-ac-repair .ccc-about .ccc-btn-primary { margin-top: 12px; }
+
+/* ---------- Section 4: Common Problems ---------- */
+.ccc-ac-repair .ccc-problems { background: #E7F5FF; padding: 80px 20px; }
+.ccc-ac-repair .ccc-centered-head { text-align: center; max-width: 900px; margin: 0 auto 48px; }
+.ccc-ac-repair .ccc-centered-head h2 {
+  font-family: "Teko", sans-serif;
+  font-size: 44px;
+  color: #092A49;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  line-height: 1.1;
+}
+.ccc-ac-repair .ccc-centered-head p {
+  font-size: 17px;
+  color: #1F1A1A;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.ccc-ac-repair .ccc-problem-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+.ccc-ac-repair .ccc-problem-card {
+  background: #FFFFFF;
+  border-left: 4px solid #00BFA5;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+}
+.ccc-ac-repair .ccc-problem-card h3 {
+  font-family: "Teko", sans-serif;
+  font-size: 26px;
+  color: #092A49;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.ccc-ac-repair .ccc-problem-card p { font-size: 16px; line-height: 1.65; margin: 0; color: #1F1A1A; }
+
+/* ---------- Section 5: Process ---------- */
+.ccc-ac-repair .ccc-process { background: #FFFFFF; padding: 80px 20px; margin-bottom: 16px; }
+.ccc-ac-repair .ccc-process-grid {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  position: relative;
+}
+.ccc-ac-repair .ccc-process-grid::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  left: 12.5%;
+  right: 12.5%;
+  border-top: 2px dashed #00BFA5;
+  z-index: 0;
+}
+.ccc-ac-repair .ccc-process-step { text-align: center; position: relative; z-index: 1; }
+.ccc-ac-repair .ccc-process-num {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #092A49;
+  color: #FFFFFF;
+  font-family: "Teko", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+.ccc-ac-repair .ccc-process-step h3 {
+  font-family: "Teko", sans-serif;
+  font-size: 22px;
+  color: #092A49;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+.ccc-ac-repair .ccc-process-step p { font-size: 15px; color: #555555; margin: 0; line-height: 1.6; }
+.ccc-ac-repair .ccc-process-img {
+  display: block;
+  max-width: 600px;
+  width: 100%;
+  margin: 64px auto 0;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+/* ---------- Section 6: Systems We Repair ---------- */
+.ccc-ac-repair .ccc-systems { background: #F9F9F9; padding: 80px 20px; }
+.ccc-ac-repair .ccc-systems-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+.ccc-ac-repair .ccc-systems-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 28px 28px 28px 36px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  position: relative;
+  overflow: hidden;
+}
+.ccc-ac-repair .ccc-systems-card::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: #00BFA5;
+  border-radius: 12px 0 0 12px;
+}
+.ccc-ac-repair .ccc-systems-card h3 {
+  font-family: "Teko", sans-serif;
+  font-size: 24px;
+  color: #092A49;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.ccc-ac-repair .ccc-systems-card p { font-size: 16px; color: #1F1A1A; margin: 0; line-height: 1.65; }
+
+/* ---------- Section 7: Signs (Accordion) ---------- */
+.ccc-ac-repair .ccc-signs { background: #FFFFFF; padding: 80px 20px; }
+.ccc-ac-repair .ccc-accordion { max-width: 800px; margin: 0 auto; }
+.ccc-ac-repair .ccc-acc-item { margin-bottom: 0; }
+
+.ccc-ac-repair .ccc-accordion-btn {
+  width: 100%;
+  text-align: left;
+  background: #ffffff !important;
+  padding: 18px 20px 18px 24px;
+  border: 1px solid #EAEAEA;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Teko', sans-serif;
+  font-size: 20px;
+  color: #00BFA5 !important;
+  line-height: 1.3;
+  transition: border-left 0.2s ease, background 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ccc-ac-repair .ccc-accordion-btn:hover {
+  background: #FAFFFE !important;
+  border-left: 4px solid #00BFA5;
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-btn[aria-expanded="true"] {
+  background: #FAFFFE !important;
+  border-left: 4px solid #00BFA5;
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-btn span.ccc-acc-question {
+  color: #00BFA5 !important;
+  font-family: 'Teko', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.ccc-ac-repair .ccc-accordion-btn:hover span.ccc-acc-question,
+.ccc-ac-repair .ccc-accordion-btn[aria-expanded="true"] span.ccc-acc-question {
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-toggle {
+  color: #333333 !important;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-left: 16px;
+  transition: transform 0.2s ease;
+}
+
+.ccc-ac-repair .ccc-accordion-btn[aria-expanded="true"] .ccc-accordion-toggle {
+  transform: rotate(45deg);
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding: 0 24px;
+  font-family: 'Rubik', sans-serif;
+  font-size: 16px;
+  color: #333333 !important;
+  line-height: 1.7;
+  background: #ffffff;
+  border: 1px solid #EAEAEA;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  margin-top: -6px;
+  margin-bottom: 6px;
+}
+
+.ccc-ac-repair .ccc-accordion-panel.is-open {
+  padding: 0 24px 20px 24px;
+}
+
+.ccc-ac-repair .ccc-accordion-panel p {
+  color: #333333 !important;
+  margin: 12px 0 0 0;
+}
+
+.ccc-ac-repair .ccc-accordion-panel a {
+  color: #F68029 !important;
+  text-decoration: underline;
+}
+.ccc-ac-repair .ccc-signs-note {
+  max-width: 800px;
+  margin: 24px auto 0;
+  font-size: 16px;
+  text-align: center;
+  color: #1F1A1A;
+}
+
+/* ---------- Section 8: Why Choose Us ---------- */
+.ccc-ac-repair .ccc-why {
+  background: linear-gradient(150deg, #092A49 0%, #0D3D6B 100%);
+  padding: 80px 20px;
+  color: #FFFFFF;
+}
+.ccc-ac-repair .ccc-why-grid {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+.ccc-ac-repair .ccc-why .ccc-section-label,
+.ccc-ac-repair .ccc-why-label {
+  text-align: left;
+  color: #00BFA5;
+  font-family: "Rubik", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: block;
+}
+.ccc-ac-repair .ccc-why h2 {
+  font-family: "Teko", sans-serif;
+  font-size: 42px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  line-height: 1.1;
+}
+.ccc-ac-repair .ccc-why-intro {
+  color: #FFFFFF;
+  opacity: 0.9;
+  font-size: 17px;
+  line-height: 1.7;
+  margin-bottom: 36px;
+}
+.ccc-ac-repair .ccc-why-list { list-style: none; padding: 0; margin: 0; }
+.ccc-ac-repair .ccc-why-item { display: flex; gap: 16px; margin-bottom: 24px; align-items: flex-start; }
+.ccc-ac-repair .ccc-why-check {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #00BFA5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ccc-ac-repair .ccc-why-check svg { width: 20px; height: 20px; }
+.ccc-ac-repair .ccc-why-text h3 {
+  font-family: "Teko", sans-serif;
+  font-size: 22px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+.ccc-ac-repair .ccc-why-text p {
+  color: #FFFFFF;
+  opacity: 0.85;
+  font-size: 15px;
+  line-height: 1.65;
+  margin: 0;
+}
+.ccc-ac-repair .ccc-why-img { width: 100%; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.ccc-ac-repair .ccc-why-trustindex { margin: 48px auto 0; max-width: 1100px; }
+.ccc-ac-repair .ccc-why-link-note {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 15px;
+  color: #FFFFFF;
+  opacity: 0.9;
+}
+.ccc-ac-repair .ccc-why-link-note a { color: #00BFA5; text-decoration: underline; }
+
+/* ---------- Section 9: Repair vs Replace ---------- */
+.ccc-ac-repair .ccc-vs { background: #FFFFFF; padding: 80px 20px; }
+.ccc-ac-repair .ccc-vs-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.ccc-ac-repair .ccc-vs-card {
+  border-radius: 12px;
+  padding: 32px;
+  border: 2px solid;
+}
+.ccc-ac-repair .ccc-vs-card.ccc-repair { background: #F0FFF8; border-color: #00BFA5; }
+.ccc-ac-repair .ccc-vs-card.ccc-replace { background: #FFF5F5; border-color: #E53E3E; }
+.ccc-ac-repair .ccc-vs-card h3 {
+  font-family: "Teko", sans-serif;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.ccc-ac-repair .ccc-vs-card.ccc-repair h3 { color: #00875A; }
+.ccc-ac-repair .ccc-vs-card.ccc-replace h3 { color: #C53030; }
+.ccc-ac-repair .ccc-vs-pip {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: "Rubik", sans-serif;
+}
+.ccc-ac-repair .ccc-vs-card.ccc-repair .ccc-vs-pip { background: #00875A; }
+.ccc-ac-repair .ccc-vs-card.ccc-replace .ccc-vs-pip { background: #C53030; }
+.ccc-ac-repair .ccc-vs-card ul { list-style: none; padding: 0; margin: 0; }
+.ccc-ac-repair .ccc-vs-card li {
+  font-family: "Rubik", sans-serif;
+  font-size: 16px;
+  line-height: 2;
+  color: #1F1A1A;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.ccc-ac-repair .ccc-vs-card.ccc-repair li::before {
+  content: "✓";
+  color: #00BFA5;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.ccc-ac-repair .ccc-vs-card.ccc-replace li::before {
+  content: "✕";
+  color: #E53E3E;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.ccc-ac-repair .ccc-vs-note {
+  text-align: center;
+  max-width: 680px;
+  margin: 36px auto 0;
+  font-size: 16px;
+  color: #1F1A1A;
+}
+
+/* ---------- Section 10: Contact form lead ---------- */
+.ccc-ac-repair .ccc-contact-lead {
+  background: linear-gradient(135deg, #092A49 0%, #0D5C63 100%);
+  padding: 72px 20px;
+  text-align: center;
+  color: #FFFFFF;
+}
+.ccc-ac-repair .ccc-contact-lead h2 {
+  font-family: "Teko", sans-serif;
+  font-size: 44px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  line-height: 1.1;
+}
+.ccc-ac-repair .ccc-contact-lead p {
+  font-size: 18px;
+  color: #FFFFFF;
+  opacity: 0.9;
+  margin: 0 auto 32px;
+  max-width: 720px;
+}
+.ccc-ac-repair .ccc-contact-phone {
+  display: inline-block;
+  background: #FFFFFF;
+  color: #092A49;
+  font-family: "Teko", sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  padding: 16px 40px;
+  border-radius: 4px;
+  text-decoration: none;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+.ccc-ac-repair .ccc-contact-phone:hover { transform: translateY(-2px); color: #092A49; }
+
+/* ---------- Quick Answer Block ---------- */
+.ccc-ac-repair .ccc-quick-answer {
+  background: #F0FFFE;
+  border-left: 4px solid #00BFA5;
+  border-radius: 8px;
+  padding: 24px 28px;
+  max-width: 780px;
+  margin: 0 auto 40px;
+}
+.ccc-ac-repair .ccc-qa-heading {
+  font-family: 'Teko', sans-serif;
+  font-size: 20px;
+  color: #092A49;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+}
+.ccc-ac-repair .ccc-qa-body {
+  font-family: 'Rubik', sans-serif;
+  font-size: 16px;
+  color: #333333;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ---------- Fault Label Pill (for problem cards) ---------- */
+.ccc-ac-repair .ccc-fault-label {
+  display: inline-block;
+  font-family: 'Rubik', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #00BFA5;
+  background: #E7F5FF;
+  border-radius: 20px;
+  padding: 3px 10px;
+  margin-bottom: 10px;
+}
+
+/* ---------- Full-width context card under 2x2 problem grid ---------- */
+.ccc-ac-repair .ccc-problem-context-card {
+  background: #F0FFFE;
+  border-left: 4px solid #00BFA5;
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-top: 24px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  /* Tablet: 2-col for previously 4-col process grid */
+  .ccc-ac-repair .ccc-process-grid { grid-template-columns: repeat(2, 1fr); row-gap: 48px; }
+  .ccc-ac-repair .ccc-process-grid::before { display: none; }
+  /* Hero scales down */
+  .ccc-ac-repair .ccc-hero h1 { font-size: 56px; }
+  /* Keep 2-col explicitly at tablet for problems / systems grids */
+  .ccc-ac-repair .ccc-problem-grid { grid-template-columns: repeat(2, 1fr); }
+  .ccc-ac-repair .ccc-systems-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 767px) {
+  .ccc-ac-repair { font-size: 16px; }
+  .ccc-ac-repair p { font-size: 16px; }
+
+  /* ---- Hero ---- */
+  .ccc-ac-repair .ccc-hero { min-height: 420px; padding: 60px 18px; }
+  .ccc-ac-repair .ccc-hero h1 { font-size: 38px; }
+  .ccc-ac-repair .ccc-hero h2 { font-size: 17px; line-height: 1.5; }
+  .ccc-ac-repair .ccc-hero-cta { flex-direction: column; gap: 12px; align-items: center; }
+  .ccc-ac-repair .ccc-hero-cta a {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    font-size: 20px;
+  }
+  .ccc-ac-repair .ccc-trust-row {
+    gap: 20px;
+    padding: 10px 18px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .ccc-ac-repair .ccc-trust-row span { display: inline-flex; align-items: center; flex-shrink: 0; }
+
+  /* ---- Section padding ---- */
+  .ccc-ac-repair .ccc-symptoms,
+  .ccc-ac-repair .ccc-about,
+  .ccc-ac-repair .ccc-problems,
+  .ccc-ac-repair .ccc-process,
+  .ccc-ac-repair .ccc-systems,
+  .ccc-ac-repair .ccc-signs,
+  .ccc-ac-repair .ccc-why,
+  .ccc-ac-repair .ccc-vs { padding: 56px 18px; }
+
+  /* ---- Symptom cards ---- */
+  .ccc-ac-repair .ccc-symptom-grid { grid-template-columns: 1fr; gap: 20px; }
+  .ccc-ac-repair .ccc-symptom-card { padding: 24px 20px; }
+
+  /* ---- About / two-col ---- */
+  .ccc-ac-repair .ccc-two-col { grid-template-columns: 1fr; gap: 28px; padding: 0; }
+  .ccc-ac-repair .ccc-two-col > div { padding-left: 0 !important; padding-right: 0 !important; }
+  .ccc-ac-repair .ccc-about img { border-radius: 8px; margin-bottom: 0; }
+
+  /* ---- Problems grid ---- */
+  .ccc-ac-repair .ccc-problem-grid { grid-template-columns: 1fr; gap: 20px; }
+  .ccc-ac-repair .ccc-problem-card { padding: 24px 20px; }
+
+  /* ---- Process steps ---- */
+  .ccc-ac-repair .ccc-process-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .ccc-ac-repair .ccc-process-grid::before { display: none; }
+  .ccc-ac-repair .ccc-process-step { max-width: 100%; text-align: center; }
+  .ccc-ac-repair .ccc-process-num { margin: 0 auto 12px; }
+  .ccc-ac-repair .ccc-process-img { margin-top: 40px; border-radius: 8px; }
+
+  /* ---- Systems grid ---- */
+  .ccc-ac-repair .ccc-systems-grid { grid-template-columns: 1fr; gap: 20px; }
+  .ccc-ac-repair .ccc-systems-card { padding: 22px 20px 22px 28px; }
+
+  /* ---- Accordion ---- */
+  .ccc-ac-repair .ccc-accordion-btn {
+    font-size: 17px;
+    padding: 16px;
+  }
+  .ccc-ac-repair .ccc-accordion-btn span.ccc-acc-question { font-size: 17px; }
+  .ccc-ac-repair .ccc-accordion-toggle { flex-shrink: 0; margin-left: 12px; }
+  .ccc-ac-repair .ccc-accordion-panel { padding: 0 16px; }
+  .ccc-ac-repair .ccc-accordion-panel.is-open { padding: 0 16px 16px 16px; }
+
+  /* ---- Why Choose Us ---- */
+  .ccc-ac-repair .ccc-why-grid { grid-template-columns: 1fr; gap: 32px; }
+  .ccc-ac-repair .ccc-why-img {
+    margin-top: 32px;
+    border-radius: 8px;
+    max-height: 400px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  /* ---- Repair vs Replace ---- */
+  .ccc-ac-repair .ccc-vs-grid { grid-template-columns: 1fr; gap: 20px; }
+  .ccc-ac-repair .ccc-vs-card { padding: 24px; }
+
+  /* ---- Contact section ---- */
+  .ccc-ac-repair .ccc-contact-lead { padding: 56px 18px; }
+  .ccc-ac-repair .ccc-contact-phone {
+    display: block;
+    width: 90%;
+    max-width: 340px;
+    margin: 0 auto 24px;
+    padding: 14px 24px;
+    font-size: 22px;
+    text-align: center;
+  }
+
+  /* ---- Headings ---- */
+  .ccc-ac-repair .ccc-about h2,
+  .ccc-ac-repair .ccc-centered-head h2,
+  .ccc-ac-repair .ccc-why h2,
+  .ccc-ac-repair .ccc-contact-lead h2 { font-size: 34px; }
+}
+
+/* ---- Global mobile safety ---- */
+@media (max-width: 767px) {
+  .ccc-ac-repair * { max-width: 100%; }
+  .ccc-ac-repair img { height: auto !important; }
+  .ccc-ac-repair h1,
+  .ccc-ac-repair h2,
+  .ccc-ac-repair h3 { word-break: break-word; }
+}
+</style>
+
+<div class="ccc-ac-repair">
+
+  <!-- ============ SECTION 1: HERO ============ -->
+  <section class="ccc-hero">
+    <div class="ccc-hero-inner">
+      <h1>AC Repair in Summerville, SC</h1>
+      <h2>From Nexton to the Historic District, our NATE-certified technicians diagnose and repair AC problems the same day you call. $49 Service Call for Summerville homeowners.</h2>
+      <div class="ccc-hero-cta">
+        <a class="ccc-btn-primary" href="tel:8437088735">📞 (843) 708-8735</a>
+        <a class="ccc-btn-outline" href="#contact-form">BOOK AC DIAGNOSTIC</a>
+      </div>
+      <div class="ccc-trust-row" role="list">
+        <span role="listitem"><span class="ccc-icon">⚡</span> Rapid Response</span>
+        <span role="listitem"><span class="ccc-icon">⭐</span> 5-Star Rated</span>
+        <span role="listitem"><span class="ccc-icon">📍</span> 20+ Years Local</span>
+        <span role="listitem"><span class="ccc-icon">🛡️</span> Licensed &amp; Insured</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUICK ANSWER BLOCK (post-hero) ============ -->
+  <div class="ccc-quick-answer" style="margin-top:40px;">
+    <h3 class="ccc-qa-heading">AC Repair in Summerville, SC: Quick Answer</h3>
+    <p class="ccc-qa-body">Most Summerville AC repairs cost between $150 and $650. Capacitor replacement, refrigerant recharge, contactor repair, and thermostat issues fall on the lower end. Compressor repair or evaporator coil work runs $600–$1,500 or more. Coastal Carolina Comfort provides same-day diagnosis with upfront flat-rate pricing before any work begins — diagnostic fee applied toward the repair cost. Most Summerville homeowners see a technician within 2 hours of calling.</p>
+  </div>
+
+  <!-- ============ SECTION 2: SYMPTOM CARDS ============ -->
+  <section class="ccc-symptoms">
+    <span class="ccc-section-label">WHAT'S WRONG WITH YOUR AC?</span>
+    <div class="ccc-symptom-grid">
+
+      <a class="ccc-symptom-card" href="#cold-air">
+        <div class="ccc-symptom-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 14.76V5a2 2 0 0 0-4 0v9.76a4 4 0 1 0 4 0z" stroke-linejoin="round" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <h3>Warm Air?</h3>
+        <p>System running but air is warm? Likely a refrigerant leak, compressor failure, or frozen evaporator coil.</p>
+      </a>
+
+      <a class="ccc-symptom-card" href="#burning-smell">
+        <div class="ccc-symptom-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" stroke-linejoin="round" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <h3>Water Leaks?</h3>
+        <p>Puddles around your indoor unit? A clogged condensate drain or frozen coil can cause water damage fast.</p>
+      </a>
+
+      <a class="ccc-symptom-card" href="#loud-noises">
+        <div class="ccc-symptom-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12h2M7 8v8M11 5v14M15 8v8M19 11v2M21 12h0" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <h3>Strange Noises?</h3>
+        <p>Grinding, buzzing, or clicking from your AC? We diagnose mechanical failures and electrical issues fast.</p>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ============ SECTION 3: ABOUT ============ -->
+  <section class="ccc-about">
+    <div class="ccc-two-col">
+      <div>
+        <img src="https://coastalcarolinahvac.com/wp-content/uploads/2026/04/coastal-hvac-techs-working.png" alt="Coastal Carolina Comfort HVAC technicians servicing a residential AC condenser unit in Summerville, SC">
+      </div>
+      <div>
+        <span class="ccc-about-label">SUMMERVILLE'S LOCAL HVAC TEAM</span>
+        <h2>Keeping Summerville Cool Since Day One</h2>
+        <p>AC repair in Summerville, SC addresses cooling system failures ranging from refrigerant leaks and compressor malfunctions to thermostat issues and clogged condensate drains. Summerville's high humidity and extended cooling season—April through October—put significant stress on residential AC systems, making professional repair a necessity rather than a luxury.</p>
+        <p>Coastal Carolina Comfort provides same-day AC repair service across Summerville, from the Historic District to Nexton and Cane Bay Plantation, with NATE-certified technicians who diagnose the problem before recommending solutions. Most common AC repairs in the Summerville area cost between $150 and $650, with major component replacements ranging higher.</p>
+        <p>Unlike generic companies that drive up from the city, our trucks are dispatched from Lipman St. We carry the specific parts needed for the major brands found in Dorchester County homes, ensuring we can get your system back on in a single visit.</p>
+        <a class="ccc-btn-primary" href="#contact-form">RESTORE MY COOL AIR NOW</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 4: COMMON PROBLEMS ============ -->
+  <section class="ccc-problems" id="cold-air">
+    <span class="ccc-section-label">DORCHESTER COUNTY CLIMATE</span>
+    <div class="ccc-centered-head">
+      <h2>Common AC Problems Summerville Homeowners Face</h2>
+      <p>Summerville sits in one of the most demanding climates for residential cooling systems in the United States. Average summer temperatures regularly exceed 95°F, and the heat index climbs above 100°F for more than 40 days per year — NOAA data for Dorchester County puts peak summer relative humidity between 70–90% from May through September. That combination forces your AC system to work harder, longer, and under more stress than systems in drier climates. Here are the problems we see most often in Dorchester County homes.</p>
+    </div>
+    <div class="ccc-problem-grid">
+      <div class="ccc-problem-card">
+        <span class="ccc-fault-label">Short Cycling · Oversized System</span>
+        <h3>Humidity Overload</h3>
+        <p>Lowcountry humidity makes your AC work double duty—cooling and dehumidifying. When the system can't keep up, you get a home that feels clammy even at 72°F. Oversized AC units are a common culprit in newer Summerville subdivisions like Nexton, where builder-grade systems may short-cycle rather than properly dehumidify.</p>
+      </div>
+      <div class="ccc-problem-card">
+        <span class="ccc-fault-label">Refrigerant Leak · R-410A · R-22</span>
+        <h3>Refrigerant Leaks</h3>
+        <p>Low refrigerant levels are the number-one cause of warm air blowing from your vents. In the Lowcountry, salt air and coastal moisture accelerate corrosion on copper refrigerant lines, making leaks more common here than in inland areas. We test and recharge with R-410A or identify if your older system still runs on phased-out R-22 Freon.</p>
+      </div>
+      <div class="ccc-problem-card">
+        <span class="ccc-fault-label">Compressor Failure · Capacitor</span>
+        <h3>Compressor Failure</h3>
+        <p>The compressor is the heart of your air conditioning system. Extended run times during Summerville's brutal summers put enormous strain on this component. Symptoms include warm air from vents, the outdoor unit humming but not starting, or the system tripping your circuit breaker repeatedly.</p>
+      </div>
+      <div class="ccc-problem-card">
+        <span class="ccc-fault-label">Condensate Drain Clog · Evaporator Coil</span>
+        <h3>Clogged Condensate Drains</h3>
+        <p>High humidity means your AC produces more condensation than systems in drier climates. When the condensate drain line clogs with algae, mold, or debris, water backs up into your home. In Summerville, we see this especially in older homes in the Historic District and Knightsville where drainage systems may not have been updated.</p>
+      </div>
+    </div>
+
+    <!-- Full-width context card: Nexton / Cane Bay new construction -->
+    <div class="ccc-problem-context-card">
+      <span class="ccc-fault-label">Nexton · Cane Bay · New Construction</span>
+      <h3 style="font-family:'Teko',sans-serif;font-size:22px;color:#092A49;margin:8px 0 12px;">First-Wave Repairs in Summerville's Newer Communities</h3>
+      <p style="font-family:'Rubik',sans-serif;font-size:16px;color:#333;line-height:1.7;margin:0;">Homes built in Nexton, Cane Bay Plantation, Summers Corner, and Carnes Crossroads between 2015 and 2024 are now hitting their first major repair windows. Capacitors typically fail at the 7–10 year mark. Refrigerant lines in homes approaching a decade old show early corrosion in Lowcountry conditions. Evaporator coils are due for their first professional cleaning. Builder-grade systems in these subdivisions were often sized for cost efficiency rather than humidity performance — meaning short-cycling and inadequate dehumidification are the most common complaints we see from these neighborhoods. If your home is in one of these communities and your system is 7 years or older, a preventive diagnostic is worth scheduling before the peak of summer.</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 5: PROCESS ============ -->
+  <section class="ccc-process" id="burning-smell">
+    <span class="ccc-section-label">HOW WE WORK</span>
+    <div class="ccc-centered-head">
+      <h2>Our AC Repair Process: Diagnosis Before Repair</h2>
+      <p>Every AC repair from Coastal Carolina Comfort starts with a thorough diagnostic evaluation. We never recommend parts or repairs until we understand exactly what's wrong with your cooling system. Our process is designed to get you an honest answer and a lasting fix—not a quick patch that fails in two weeks.</p>
+    </div>
+    <div class="ccc-process-grid">
+      <div class="ccc-process-step">
+        <div class="ccc-process-num">1</div>
+        <h3>Same-Day Dispatch From Lipman St.</h3>
+        <p>When you call, our team dispatches a technician directly from our headquarters on Lipman St. in Summerville. No waiting for a truck to drive up from Charleston. Most Summerville homeowners see a technician within 2 hours of their call.</p>
+      </div>
+      <div class="ccc-process-step">
+        <div class="ccc-process-num">2</div>
+        <h3>Complete System Diagnostic</h3>
+        <p>Your technician performs a comprehensive diagnostic that includes checking refrigerant levels and pressure, testing electrical connections and capacitors, evaluating airflow through the evaporator and condenser coils, inspecting the thermostat calibration, and checking the condensate drain for blockages.</p>
+      </div>
+      <div class="ccc-process-step">
+        <div class="ccc-process-num">3</div>
+        <h3>Honest Diagnosis &amp; Upfront Pricing</h3>
+        <p>Before any wrench turns, we explain the problem in plain language and give you a written estimate. If the repair cost approaches the threshold where AC replacement makes more financial sense, we'll tell you that too. We provide upfront flat-rate pricing before we start.</p>
+      </div>
+      <div class="ccc-process-step">
+        <div class="ccc-process-num">4</div>
+        <h3>Repair &amp; Verification</h3>
+        <p>We complete the repair using manufacturer-specified parts, then run a full system verification. We check temperature differential across the evaporator coil, verify refrigerant charge, and confirm the system cycles properly before we leave your home. You get a written summary and a warranty on parts and labor.</p>
+      </div>
+    </div>
+    <img class="ccc-process-img" src="https://coastalcarolinahvac.com/wp-content/uploads/2026/04/coastal-hvac-tech-tools.png" alt="Coastal Carolina Comfort technician performing AC diagnostic with manifold gauges in Summerville, SC">
+  </section>
+
+  <!-- ============ SECTION 6: SYSTEMS WE REPAIR ============ -->
+  <section class="ccc-systems" id="loud-noises">
+    <span class="ccc-section-label">ALL SYSTEM TYPES</span>
+    <div class="ccc-centered-head">
+      <h2>AC Systems We Repair in Summerville</h2>
+      <p>Summerville homes use a variety of cooling systems depending on the age and style of the home. From builder-grade central air in Cane Bay Plantation to the heat pump systems common in The Ponds and older window-unit-to-central conversions in the Historic District, our NATE-certified technicians are trained on every system type.</p>
+    </div>
+    <div class="ccc-systems-grid">
+      <div class="ccc-systems-card">
+        <h3>Central Air Conditioners</h3>
+        <p>Split-system central air conditioning is the most common setup in Summerville. We repair all major brands including Trane, Carrier, Lennox, Rheem, Goodman, and Daikin. Our technicians carry common replacement parts for these manufacturers on every truck.</p>
+      </div>
+      <div class="ccc-systems-card">
+        <h3>Heat Pump Systems</h3>
+        <p>Heat pumps provide both heating and cooling and are increasingly popular in Lowcountry homes. Repair considerations differ from standard AC units, especially regarding the reversing valve, defrost cycle, and dual-fuel configurations. We understand the nuances of heat pump repair in a subtropical climate.</p>
+      </div>
+      <div class="ccc-systems-card">
+        <h3>Ductless Mini-Split Systems</h3>
+        <p>Mini-splits are a smart solution for older Summerville homes without existing ductwork, bonus rooms, and garage conversions. We service and repair all major mini-split brands and handle unique issues like condensate pump failures and indoor unit drainage problems.</p>
+      </div>
+      <div class="ccc-systems-card">
+        <h3>Package Units</h3>
+        <p>Some Summerville homes, particularly manufactured and modular homes, use self-contained package units where all components are housed in a single outdoor cabinet. These systems require specific repair expertise because the compressor, evaporator, and air handler are integrated.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 7: SIGNS (Accordion) ============ -->
+  <section class="ccc-signs">
+    <span class="ccc-section-label">EARLY WARNING SIGNS</span>
+    <div class="ccc-centered-head">
+      <h2>Signs Your AC Needs Professional Repair</h2>
+      <p>Not every AC issue is an emergency, but every symptom is a signal. Catching problems early prevents small repairs from becoming major replacements. Here are the warning signs Summerville homeowners should watch for, especially during our demanding cooling season.</p>
+    </div>
+    <div class="ccc-accordion" data-acc="signs">
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-signs-1" id="ccc-signs-btn-1">
+          <span class="ccc-acc-question">Warm or inconsistent air from vents</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-signs-1" role="region" aria-labelledby="ccc-signs-btn-1">
+          <p>If your system runs but the air coming out isn't cold, you may have a refrigerant leak, a failing compressor, or restricted airflow from a dirty evaporator coil.</p>
+        </div>
+      </div>
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-signs-2" id="ccc-signs-btn-2">
+          <span class="ccc-acc-question">Unusual noises</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-signs-2" role="region" aria-labelledby="ccc-signs-btn-2">
+          <p>Grinding often indicates a failing fan motor bearing. Buzzing can signal electrical issues. Clicking at startup may point to a bad capacitor or contactor. None of these resolve on their own.</p>
+        </div>
+      </div>
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-signs-3" id="ccc-signs-btn-3">
+          <span class="ccc-acc-question">Higher-than-normal energy bills</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-signs-3" role="region" aria-labelledby="ccc-signs-btn-3">
+          <p>A sudden spike in your Dominion Energy or Berkeley Electric bill often means your system is working overtime to compensate for a failing component.</p>
+        </div>
+      </div>
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-signs-4" id="ccc-signs-btn-4">
+          <span class="ccc-acc-question">Short cycling</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-signs-4" role="region" aria-labelledby="ccc-signs-btn-4">
+          <p>If your AC turns on and off every few minutes rather than running steady cycles, the system may be oversized, low on refrigerant, or have a malfunctioning thermostat.</p>
+        </div>
+      </div>
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-signs-5" id="ccc-signs-btn-5">
+          <span class="ccc-acc-question">Moisture or ice on the indoor unit</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-signs-5" role="region" aria-labelledby="ccc-signs-btn-5">
+          <p>Ice on your evaporator coil or water pooling around the air handler signals restricted airflow or low refrigerant. In the Lowcountry's humidity, a frozen coil can quickly lead to water damage.</p>
+        </div>
+      </div>
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-signs-6" id="ccc-signs-btn-6">
+          <span class="ccc-acc-question">Musty or burning smells</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-signs-6" role="region" aria-labelledby="ccc-signs-btn-6">
+          <p>A musty smell from your vents can indicate mold growth inside the ductwork or on the evaporator coil—a real concern in humid Summerville. Burning smells suggest electrical issues that need immediate attention.</p>
+        </div>
+      </div>
+    </div>
+    <p class="ccc-signs-note">For a deeper look at each of these symptoms and when they cross the line from 'keep an eye on it' to 'call a pro now,' read our complete guide to <a href="https://coastalcarolinahvac.com/signs-ac-needs-repair/" style="color:#F68029; text-decoration:underline;">signs your AC needs professional repair</a>.</p>
+  </section>
+
+  <!-- ============ SECTION 8: WHY CHOOSE US ============ -->
+  <section class="ccc-why">
+    <div class="ccc-why-grid">
+      <div>
+        <span class="ccc-why-label">WHY COASTAL CAROLINA COMFORT</span>
+        <h2>Why Summerville Trusts Coastal Carolina Comfort</h2>
+        <p class="ccc-why-intro">Summerville has no shortage of HVAC companies advertising on Google. But there's a difference between a company that bids on your zip code and one that actually operates from it. Here's what sets Coastal Carolina Comfort apart.</p>
+        <ul class="ccc-why-list">
+          <li class="ccc-why-item">
+            <span class="ccc-why-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+            <div class="ccc-why-text">
+              <h3>Headquartered on Lipman St. in Summerville</h3>
+              <p>We don't dispatch from North Charleston or Mount Pleasant. Our trucks roll out from Summerville every morning. That means faster response times and technicians who know the neighborhoods—from Brighton Park to Cane Bay Plantation to Legend Oaks.</p>
+            </div>
+          </li>
+          <li class="ccc-why-item">
+            <span class="ccc-why-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+            <div class="ccc-why-text">
+              <h3>NATE-Certified Technicians</h3>
+              <p>NATE (North American Technician Excellence) certification is the HVAC industry's highest standard. Every technician on our team holds current NATE certification, meaning they've passed rigorous testing on installation, service, and repair.</p>
+            </div>
+          </li>
+          <li class="ccc-why-item">
+            <span class="ccc-why-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+            <div class="ccc-why-text">
+              <h3>Upfront, Flat-Rate Pricing</h3>
+              <p>We quote a price before we start. No hourly rates that climb while you wait. No surprise charges when the job takes longer than expected.</p>
+            </div>
+          </li>
+          <li class="ccc-why-item">
+            <span class="ccc-why-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+            <div class="ccc-why-text">
+              <h3>Licensed and Insured in South Carolina</h3>
+              <p>We hold a current SC LLR Mechanical Contractor license and carry full liability and workers' compensation insurance. This protects you and your home.</p>
+            </div>
+          </li>
+          <li class="ccc-why-item">
+            <span class="ccc-why-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+            <div class="ccc-why-text">
+              <h3>5-Star Rated with 100+ Google Reviews</h3>
+              <p>Our reputation is built on every call. Check our Google Business Profile and you'll see why Summerville families call us back year after year.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <img class="ccc-why-img" src="https://coastalcarolinahvac.com/wp-content/uploads/2026/04/coastal-hvac-tech-greeting.png" alt="Coastal Carolina Comfort technician greeting Summerville homeowners at their front door">
+      </div>
+    </div>
+    <div class="ccc-why-trustindex">
+      <script defer async src='https://cdn.trustindex.io/loader.js?74c5fa9611a240161696ff6ddd2'></script>
+    </div>
+    <p class="ccc-why-link-note">Choosing the right contractor matters. See our guide on <a href="https://coastalcarolinahvac.com/choose-ac-repair-company-lowcountry/">how to choose an AC repair company in the Lowcountry</a>.</p>
+  </section>
+
+  <!-- ============ SECTION 9: REPAIR VS REPLACE ============ -->
+  <section class="ccc-vs">
+    <span class="ccc-section-label">THE HONEST ASSESSMENT</span>
+    <div class="ccc-centered-head">
+      <h2>AC Repair vs. AC Replacement: How to Know</h2>
+      <p>Not every AC problem requires a full system replacement. But sometimes repair costs approach or exceed the value of putting money into an aging system. Knowing the difference saves you money and frustration.</p>
+    </div>
+    <div class="ccc-vs-grid">
+      <div class="ccc-vs-card ccc-repair">
+        <h3><span class="ccc-vs-pip" aria-hidden="true">✓</span> CONSIDER REPAIR WHEN</h3>
+        <ul>
+          <li>Your system is under 10 years old</li>
+          <li>The repair costs less than 50% of a new unit</li>
+          <li>The problem is isolated to a single component (capacitor, contactor, thermostat)</li>
+          <li>The system uses current R-410A refrigerant</li>
+        </ul>
+      </div>
+      <div class="ccc-vs-card ccc-replace">
+        <h3><span class="ccc-vs-pip" aria-hidden="true">×</span> CONSIDER REPLACEMENT WHEN</h3>
+        <ul>
+          <li>Your AC is 15+ years old</li>
+          <li>You're facing a major component failure (compressor, evaporator coil) on an aging system</li>
+          <li>The unit still uses R-22 Freon (phased out and increasingly expensive)</li>
+          <li>You've needed multiple repairs in the past two years</li>
+        </ul>
+      </div>
+    </div>
+    <p class="ccc-vs-note">Our technicians will always give you an honest assessment. If repair makes sense, we'll fix it. If replacement makes more financial sense, we'll explain why. For a detailed decision framework, read our guide on <a href="https://coastalcarolinahvac.com/ac-repair-vs-replacement/" style="color:#F68029;text-decoration:underline;">whether to repair or replace your AC system</a>.</p>
+
+    <!-- R-410A Callout -->
+    <div style="background:#FFF8F0;border-left:4px solid #F68029;border-radius:8px;padding:28px 32px;max-width:780px;margin:48px auto 0;">
+      <h3 style="font-family:'Teko',sans-serif;font-size:22px;color:#092A49;margin:0 0 12px;">R-410A Refrigerant: What Summerville Homeowners Need to Know in 2025–2026</h3>
+      <p style="font-family:'Rubik',sans-serif;font-size:16px;color:#333;line-height:1.7;margin:0 0 12px;">The EPA's production and import ban on R-410A refrigerant took effect January 1, 2025. R-410A is present in the majority of Summerville homes with systems installed between 2010 and 2024 — which covers most of Nexton, Cane Bay, and the wave of new construction built during that period.</p>
+      <p style="font-family:'Rubik',sans-serif;font-size:16px;color:#333;line-height:1.7;margin:0 0 12px;">A refrigerant leak repair that cost $350 in 2022 may now run $500–$700 depending on the charge required. The repair-vs-replacement math on an older R-410A system has changed. We'll tell you which refrigerant your system uses during the diagnostic, give you the current recharge cost, and walk you through whether repair or replacement makes more sense given your system's age and condition.</p>
+      <p style="font-family:'Rubik',sans-serif;font-size:16px;color:#333;line-height:1.7;margin:0;">No pressure — just the math.</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 10: CONTACT FORM LEAD ============ -->
+  <section class="ccc-contact-lead" id="contact-form">
+    <h2>Get Same-Day AC Repair in Summerville</h2>
+    <p>Call (843) 708-8735 or fill out the form below. Most calls answered within 2 hours from our Lipman St. headquarters.</p>
+    <a class="ccc-contact-phone" href="tel:8437088735">📞 (843) 708-8735</a>
+    <!-- Forminator form renders via separate Elementor Shortcode widget: [forminator_form id="814"] -->
+  </section>
+
+</div>
+
+<script>
+(function(){
+  var roots = document.querySelectorAll('.ccc-ac-repair [data-acc]');
+  roots.forEach(function(root){
+    var btns = root.querySelectorAll('.ccc-accordion-btn');
+    btns.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var expanded = btn.getAttribute('aria-expanded') === 'true';
+        btns.forEach(function(b){
+          b.setAttribute('aria-expanded', 'false');
+          var pid = b.getAttribute('aria-controls');
+          var p = document.getElementById(pid);
+          if (p) { p.classList.remove('is-open'); p.style.maxHeight = null; }
+        });
+        if (!expanded) {
+          btn.setAttribute('aria-expanded', 'true');
+          var panelId = btn.getAttribute('aria-controls');
+          var panel = document.getElementById(panelId);
+          if (panel) {
+            panel.classList.add('is-open');
+            panel.style.maxHeight = panel.scrollHeight + 'px';
+          }
+        }
+      });
+    });
+  });
+})();
+</script>

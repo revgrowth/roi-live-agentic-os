@@ -1,0 +1,659 @@
+<!-- Coastal Carolina Comfort - AC Repair Charleston - Part 2 -->
+<style>
+.ccc-ac-repair { font-family: "Rubik", Arial, sans-serif; color: #1F1A1A; line-height: 1.7; font-size: 17px; }
+.ccc-ac-repair *, .ccc-ac-repair *::before, .ccc-ac-repair *::after { box-sizing: border-box; }
+.ccc-ac-repair h1, .ccc-ac-repair h2, .ccc-ac-repair h3, .ccc-ac-repair h4 { font-family: "Teko", "Oswald", Arial, sans-serif; color: #092A49; margin: 0; line-height: 1.15; }
+.ccc-ac-repair p { margin: 0 0 16px; font-size: 17px; line-height: 1.7; color: #1F1A1A; }
+.ccc-ac-repair a { color: #F68029; }
+.ccc-ac-repair img { max-width: 100%; height: auto; display: block; }
+.ccc-ac-repair button:focus, .ccc-ac-repair a:focus { outline: 2px solid #00BFA5; outline-offset: 2px; }
+
+/* ---------- Elementor Override Reset (nuclear) ---------- */
+.ccc-ac-repair button,
+.ccc-ac-repair button:hover,
+.ccc-ac-repair button:focus,
+.ccc-ac-repair input[type="button"],
+.ccc-ac-repair input[type="submit"] {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+.ccc-ac-repair .ccc-section-label {
+  font-family: "Rubik", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #00BFA5;
+  text-align: center;
+  margin-bottom: 16px;
+  display: block;
+}
+.ccc-ac-repair .ccc-centered-head { text-align: center; max-width: 900px; margin: 0 auto 48px; }
+.ccc-ac-repair .ccc-centered-head h2 {
+  font-family: "Teko", sans-serif;
+  font-size: 44px;
+  color: #092A49;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  line-height: 1.1;
+}
+.ccc-ac-repair .ccc-centered-head p {
+  font-size: 17px;
+  color: #1F1A1A;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ---------- Section 11: FAQ Accordion ---------- */
+.ccc-ac-repair .ccc-faq { background: #F9F9F9; padding: 80px 20px; }
+.ccc-ac-repair .ccc-accordion { max-width: 800px; margin: 0 auto; }
+.ccc-ac-repair .ccc-acc-item { margin-bottom: 0; }
+
+.ccc-ac-repair .ccc-accordion-btn {
+  width: 100%;
+  text-align: left;
+  background: #ffffff !important;
+  padding: 18px 20px 18px 24px;
+  border: 1px solid #EAEAEA;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Teko', sans-serif;
+  font-size: 20px;
+  color: #00BFA5 !important;
+  line-height: 1.3;
+  transition: border-left 0.2s ease, background 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ccc-ac-repair .ccc-accordion-btn:hover {
+  background: #FAFFFE !important;
+  border-left: 4px solid #00BFA5;
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-btn[aria-expanded="true"] {
+  background: #FAFFFE !important;
+  border-left: 4px solid #00BFA5;
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-btn span.ccc-acc-question {
+  color: #00BFA5 !important;
+  font-family: 'Teko', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.ccc-ac-repair .ccc-accordion-btn:hover span.ccc-acc-question,
+.ccc-ac-repair .ccc-accordion-btn[aria-expanded="true"] span.ccc-acc-question {
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-toggle {
+  color: #333333 !important;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-left: 16px;
+  transition: transform 0.2s ease;
+}
+
+.ccc-ac-repair .ccc-accordion-btn[aria-expanded="true"] .ccc-accordion-toggle {
+  transform: rotate(45deg);
+  color: #00BFA5 !important;
+}
+
+.ccc-ac-repair .ccc-accordion-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding: 0 24px;
+  font-family: 'Rubik', sans-serif;
+  font-size: 16px;
+  color: #333333 !important;
+  line-height: 1.7;
+  background: #ffffff;
+  border: 1px solid #EAEAEA;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  margin-top: -6px;
+  margin-bottom: 6px;
+}
+
+.ccc-ac-repair .ccc-accordion-panel.is-open {
+  padding: 0 24px 20px 24px;
+}
+
+.ccc-ac-repair .ccc-accordion-panel p {
+  color: #333333 !important;
+  margin: 12px 0 0 0;
+}
+
+.ccc-ac-repair .ccc-accordion-panel a {
+  color: #F68029 !important;
+  text-decoration: underline;
+}
+
+/* ---------- Section 12: Service Areas ---------- */
+.ccc-ac-repair .ccc-areas {
+  background-image: linear-gradient(135deg, rgba(9,42,73,0.88) 0%, rgba(9,42,73,0.82) 100%), url('https://coastalcarolinahvac.com/wp-content/uploads/2026/04/summerville-sc.png');
+  background-size: cover;
+  background-position: center;
+  padding: 80px 20px;
+  color: #FFFFFF;
+}
+.ccc-ac-repair .ccc-areas .ccc-section-label { color: #00BFA5; }
+.ccc-ac-repair .ccc-areas h3 {
+  font-family: "Teko", sans-serif;
+  font-size: 38px;
+  color: #FFFFFF;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  line-height: 1.1;
+}
+.ccc-ac-repair .ccc-areas-intro {
+  text-align: center;
+  color: #FFFFFF;
+  opacity: 0.9;
+  font-size: 17px;
+  max-width: 720px;
+  margin: 0 auto 48px;
+}
+
+/* ---------- Charleston 4-column Geographic Entity Grid ---------- */
+.ccc-ac-repair .ccc-areas-grid-chs {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.ccc-ac-repair .ccc-area-card-chs {
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 28px 24px;
+}
+.ccc-ac-repair .ccc-area-card-chs h4 {
+  font-family: 'Teko', sans-serif;
+  font-size: 22px;
+  color: #00BFA5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 14px 0;
+  line-height: 1.15;
+}
+.ccc-ac-repair .ccc-area-card-chs ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.ccc-ac-repair .ccc-area-card-chs li {
+  font-family: 'Rubik', sans-serif;
+  font-size: 15px;
+  line-height: 2;
+  color: #FFFFFF;
+}
+
+/* ---------- Section 13: Blog Grid ---------- */
+.ccc-ac-repair .ccc-blog { background: #FFFFFF; padding: 80px 20px; }
+.ccc-ac-repair .ccc-blog .ccc-centered-head { margin-bottom: 48px; }
+.ccc-ac-repair .ccc-blog-subtext {
+  text-align: center;
+  font-size: 17px;
+  color: #555555;
+  max-width: 760px;
+  margin: 0 auto 48px;
+}
+.ccc-ac-repair .ccc-blog-grid {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.ccc-ac-repair .ccc-blog-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.ccc-ac-repair .ccc-blog-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.13);
+}
+.ccc-ac-repair .ccc-blog-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+.ccc-ac-repair .ccc-blog-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.ccc-ac-repair .ccc-blog-pill {
+  font-family: "Rubik", sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #E7F5FF;
+  color: #00BFA5;
+  border-radius: 20px;
+  padding: 3px 10px;
+  display: inline-block;
+  margin-bottom: 10px;
+  align-self: flex-start;
+  font-weight: 600;
+}
+.ccc-ac-repair .ccc-blog-card h3 {
+  font-family: "Teko", sans-serif;
+  font-size: 22px;
+  color: #092A49;
+  line-height: 1.25;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.ccc-ac-repair .ccc-blog-excerpt {
+  font-family: "Rubik", sans-serif;
+  font-size: 14px;
+  color: #666666;
+  line-height: 1.6;
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  margin: 0 0 12px;
+}
+.ccc-ac-repair .ccc-blog-readmore {
+  font-family: "Teko", sans-serif;
+  font-size: 17px;
+  color: #F68029;
+  text-decoration: none;
+  margin-top: auto;
+  padding-top: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ---------- Section 14: Final CTA ---------- */
+.ccc-ac-repair .ccc-final-cta {
+  background: #F68029;
+  padding: 64px 20px;
+  text-align: center;
+  color: #FFFFFF;
+}
+.ccc-ac-repair .ccc-final-cta h2 {
+  font-family: "Teko", sans-serif;
+  font-size: 46px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  margin-bottom: 14px;
+  line-height: 1.1;
+}
+.ccc-ac-repair .ccc-final-cta-sub {
+  font-size: 18px;
+  color: #FFFFFF;
+  opacity: 0.92;
+  margin: 0 auto 32px;
+  max-width: 760px;
+}
+.ccc-ac-repair .ccc-final-cta-phone {
+  display: inline-block;
+  background: #FFFFFF;
+  color: #092A49;
+  font-family: "Teko", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  padding: 18px 48px;
+  border-radius: 4px;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+.ccc-ac-repair .ccc-final-cta-phone:hover { transform: translateY(-2px); color: #092A49; }
+.ccc-ac-repair .ccc-final-cta-fine {
+  font-size: 14px;
+  color: #FFFFFF;
+  opacity: 0.85;
+  margin: 20px auto 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  /* Tablet: 2-col blog grid + 3-col service area grid */
+  .ccc-ac-repair .ccc-blog-grid { grid-template-columns: repeat(2, 1fr); }
+  .ccc-ac-repair .ccc-areas-grid-chs { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 767px) {
+  .ccc-ac-repair { font-size: 16px; }
+  .ccc-ac-repair p { font-size: 16px; }
+
+  /* ---- Section padding ---- */
+  .ccc-ac-repair .ccc-faq,
+  .ccc-ac-repair .ccc-areas,
+  .ccc-ac-repair .ccc-blog,
+  .ccc-ac-repair .ccc-final-cta { padding: 56px 18px; }
+
+  /* ---- FAQ Accordion ---- */
+  .ccc-ac-repair .ccc-accordion-btn {
+    font-size: 17px;
+    padding: 16px;
+  }
+  .ccc-ac-repair .ccc-accordion-btn span.ccc-acc-question { font-size: 17px; }
+  .ccc-ac-repair .ccc-accordion-toggle { flex-shrink: 0; margin-left: 12px; }
+  .ccc-ac-repair .ccc-accordion-panel { padding: 0 16px; }
+  .ccc-ac-repair .ccc-accordion-panel.is-open { padding: 0 16px 16px 16px; }
+
+  /* ---- Service Areas ---- */
+  .ccc-ac-repair .ccc-areas-grid-chs { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .ccc-ac-repair .ccc-area-card-chs { padding: 22px 18px; }
+  .ccc-ac-repair .ccc-areas h3 { font-size: 30px; }
+
+  /* ---- Blog grid ---- */
+  .ccc-ac-repair .ccc-blog-grid { grid-template-columns: 1fr; gap: 24px; }
+  .ccc-ac-repair .ccc-blog-card img { height: 200px; }
+
+  /* ---- Final CTA ---- */
+  .ccc-ac-repair .ccc-final-cta h2 { font-size: 28px; }
+  .ccc-ac-repair .ccc-final-cta-phone {
+    display: block;
+    width: 90%;
+    max-width: 340px;
+    margin: 0 auto;
+    font-size: 22px;
+    padding: 16px 24px;
+    text-align: center;
+  }
+
+  /* ---- Headings ---- */
+  .ccc-ac-repair .ccc-centered-head h2 { font-size: 34px; }
+}
+
+@media (max-width: 480px) {
+  .ccc-ac-repair .ccc-areas-grid-chs { grid-template-columns: 1fr; }
+}
+
+/* ---- Global mobile safety ---- */
+@media (max-width: 767px) {
+  .ccc-ac-repair * { max-width: 100%; }
+  .ccc-ac-repair img { height: auto !important; }
+  .ccc-ac-repair h1,
+  .ccc-ac-repair h2,
+  .ccc-ac-repair h3 { word-break: break-word; }
+}
+</style>
+
+<div class="ccc-ac-repair">
+
+  <!-- ============ SECTION 11: FAQ ============ -->
+  <section class="ccc-faq">
+    <span class="ccc-section-label">COMMON QUESTIONS</span>
+    <div class="ccc-centered-head">
+      <h2>Common Charleston AC Repair Questions</h2>
+    </div>
+    <div class="ccc-accordion" data-acc="faq-charleston">
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-chs-faq-1" id="ccc-chs-faq-btn-1">
+          <span class="ccc-acc-question">How much does AC repair cost in Charleston, SC?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-chs-faq-1" role="region" aria-labelledby="ccc-chs-faq-btn-1">
+          <p>Most AC repairs in Charleston cost between $150 and $650. Capacitor replacement runs $150–$300. Refrigerant recharge (including leak detection) runs $250–$600 depending on the refrigerant type and charge required — R-410A costs have risen significantly since the January 2025 production ban. Compressor repair or replacement can reach $1,200–$2,500. We provide upfront flat-rate pricing after diagnosis, before any work begins.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-chs-faq-2" id="ccc-chs-faq-btn-2">
+          <span class="ccc-acc-question">Why is my AC running but not cooling my Charleston home?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-chs-faq-2" role="region" aria-labelledby="ccc-chs-faq-btn-2">
+          <p>The most common causes are low refrigerant from a leak, a dirty evaporator or condenser coil, a failing compressor, or ductwork leaks dumping cooled air into your attic. In Charleston's humidity, a clogged air filter alone can freeze the evaporator coil and shut down cooling within hours. Check your filter first. If it's clean and the system still isn't cooling, call for a diagnostic.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-chs-faq-3" id="ccc-chs-faq-btn-3">
+          <span class="ccc-acc-question">Do you repair AC systems in Charleston's historic homes?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-chs-faq-3" role="region" aria-labelledby="ccc-chs-faq-btn-3">
+          <p>Yes. We regularly service homes in the Historic District, Harleston Village, Wagener Terrace, and other pre-1950s neighborhoods where ductwork access, pier-and-beam foundations, and original construction create repair challenges that standard residential HVAC companies aren't prepared for. We ask the right questions before arriving so we come equipped.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-chs-faq-4" id="ccc-chs-faq-btn-4">
+          <span class="ccc-acc-question">My AC system uses R-410A. Is it still worth repairing?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-chs-faq-4" role="region" aria-labelledby="ccc-chs-faq-btn-4">
+          <p>It depends on the repair and the system's age. Minor fixes — capacitor, contactor, thermostat — are still cost-effective on R-410A systems regardless of age. Refrigerant leak repairs are more expensive now due to the 2025 production ban, so the math changes on older systems. Compressor replacement on an R-410A system over 12 years old rarely makes financial sense. We'll give you the specific numbers during the diagnostic.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-chs-faq-5" id="ccc-chs-faq-btn-5">
+          <span class="ccc-acc-question">How quickly can you get to my home in Charleston for AC repair?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-chs-faq-5" role="region" aria-labelledby="ccc-chs-faq-btn-5">
+          <p>Most Charleston-area service calls are answered within 2–4 hours. We dispatch from Summerville and have technicians covering West Ashley, James Island, Mount Pleasant, Daniel Island, North Charleston, and the peninsula. Same-day service is available for calls placed before 2 PM.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="ccc-chs-faq-6" id="ccc-chs-faq-btn-6">
+          <span class="ccc-acc-question">What AC brands do you repair in Charleston?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="ccc-chs-faq-6" role="region" aria-labelledby="ccc-chs-faq-btn-6">
+          <p>We service all major residential brands including Trane, Carrier, Lennox, Rheem, Goodman, Daikin, York, and Amana. As a Daikin partner, we stock Daikin parts on every truck. We also repair ductless mini-split systems from Mitsubishi, Fujitsu, and LG — which are common in Charleston's older homes that lack existing ductwork.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-7" id="acc-faq-btn-7">
+          <span class="ccc-acc-question">How often should I have my AC serviced in Charleston?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-7" role="region" aria-labelledby="acc-faq-btn-7">
+          <p>Twice per year — once in early spring before the cooling season starts and once in fall. Charleston's cooling season runs March through October, which is longer than most of the country. High humidity accelerates coil fouling, condensate drain clogging, and capacitor wear faster than in drier climates. Regular maintenance catches these before they become emergency calls during peak summer heat.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-8" id="acc-faq-btn-8">
+          <span class="ccc-acc-question">Does Charleston's salt air affect my AC differently than inland systems?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-8" role="region" aria-labelledby="acc-faq-btn-8">
+          <p>Yes — significantly. Properties east of the Ashley River, on James Island, and within two miles of the harbor experience accelerated corrosion on copper refrigerant lines from salt air infiltration. This makes refrigerant leaks more common in coastal Charleston than in inland markets like Columbia or Greenville. Outdoor condenser coils also accumulate salt deposits that reduce heat transfer efficiency over time. Systems in these zones benefit from annual coil cleaning and more frequent refrigerant pressure checks than the manufacturer's standard maintenance schedule recommends.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-9" id="acc-faq-btn-9">
+          <span class="ccc-acc-question">What causes short cycling — my AC keeps turning on and off?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-9" role="region" aria-labelledby="acc-faq-btn-9">
+          <p>Short cycling is usually caused by an oversized system, a failing capacitor, low refrigerant triggering safety shutoffs, or a thermostat malfunction. In newer Charleston developments, builder-grade systems are often oversized for the actual cooling load, which causes short cycles and inadequate dehumidification — the home reaches the set temperature but still feels clammy because the system never runs long enough to properly remove moisture. Read our full guide on <a href='https://coastalcarolinahvac.com/ac-short-cycling/' style='color:#F68029;text-decoration:underline;'>AC short cycling causes and fixes</a>.</p>
+        </div>
+      </div>
+
+      <div class="ccc-acc-item">
+        <button class="ccc-accordion-btn" aria-expanded="false" aria-controls="acc-faq-10" id="acc-faq-btn-10">
+          <span class="ccc-acc-question">Is it worth repairing a 15-year-old AC system in Charleston?</span>
+          <span class="ccc-accordion-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="ccc-accordion-panel" id="acc-faq-10" role="region" aria-labelledby="acc-faq-btn-10">
+          <p>For minor repairs — capacitor, contactor, thermostat — yes, even on a 15-year-old system. For major component failures like compressor replacement or evaporator coil leaks, replacement usually makes more financial sense, especially given Charleston's 8-month cooling season that puts significantly more annual hours on equipment than the national average. If the system also uses phased-out R-22 Freon, replacement is almost always the right call. We will give you the honest comparison during the diagnostic. See our guide on <a href='https://coastalcarolinahvac.com/ac-repair-vs-replacement/' style='color:#F68029;text-decoration:underline;'>whether to repair or replace your AC</a>.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ SECTION 12: SERVICE AREAS ============ -->
+  <section class="ccc-areas">
+    <span class="ccc-section-label">WHERE WE SERVE</span>
+    <h3>Serving All of Greater Charleston from Our Lowcountry Base</h3>
+    <p class="ccc-areas-intro">From our headquarters in Summerville, SC, Coastal Carolina Comfort covers all of greater Charleston. Whether you're dealing with a refrigerant leak in West Ashley or a compressor failure on Daniel Island, our team is on the way.</p>
+    <div class="ccc-areas-grid-chs">
+
+      <div class="ccc-area-card-chs">
+        <h4>CHARLESTON PENINSULA</h4>
+        <ul>
+          <li>Historic District</li>
+          <li>Harleston Village</li>
+          <li>Wagener Terrace</li>
+          <li>Radcliffeborough</li>
+          <li>Cannonborough</li>
+          <li>Elliotborough</li>
+        </ul>
+      </div>
+
+      <div class="ccc-area-card-chs">
+        <h4>WEST ASHLEY &amp; JAMES ISLAND</h4>
+        <ul>
+          <li>West Ashley</li>
+          <li>James Island</li>
+          <li>Johns Island</li>
+          <li>Avondale</li>
+          <li>Bees Ferry</li>
+        </ul>
+      </div>
+
+      <div class="ccc-area-card-chs">
+        <h4>EAST COOPER</h4>
+        <ul>
+          <li>Mount Pleasant</li>
+          <li>Daniel Island</li>
+          <li>Sullivan's Island</li>
+          <li>Isle of Palms</li>
+          <li>Wando</li>
+        </ul>
+      </div>
+
+      <div class="ccc-area-card-chs">
+        <h4>NORTH CHARLESTON &amp; GOOSE CREEK</h4>
+        <ul>
+          <li>North Charleston</li>
+          <li>Hanahan</li>
+          <li>Goose Creek</li>
+          <li>Ladson</li>
+          <li>Moncks Corner</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ SECTION 13: BLOG GRID ============ -->
+  <section class="ccc-blog">
+    <span class="ccc-section-label">HVAC KNOWLEDGE BASE</span>
+    <div class="ccc-centered-head">
+      <h2>Keep Learning About AC Repair in the Lowcountry</h2>
+    </div>
+    <p class="ccc-blog-subtext">These guides cover everything Charleston homeowners need to know about AC repair, maintenance, and making smart decisions about your cooling system.</p>
+    <div class="ccc-blog-grid">
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-wont-turn-on/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-wont-turn-on-300x164.png.webp" alt="AC troubleshooting guide">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Troubleshooting</span>
+          <h3>My AC Won't Turn On: Troubleshooting Before You Call a Technician</h3>
+          <p class="ccc-blog-excerpt">About 30% of 'AC won't start' calls we respond to across South Carolina are resolved by basic homeowner checks. Here's what to look at before calling a technician.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-frozen-evaporator-coil/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-frozen-evaporator-coil-300x164.png.webp" alt="Frozen AC evaporator coil">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Repair Guide</span>
+          <h3>AC Frozen Evaporator Coil: Why Your Air Conditioner Ices Up in Humid SC Weather</h3>
+          <p class="ccc-blog-excerpt">In South Carolina's high-humidity environment, frozen coils are both more common and more damaging than in drier climates. Here's what causes them and what to do.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-leaking-water-inside/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-leaking-water-inside-house-300x164.png.webp" alt="AC leaking water inside house">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Water Damage</span>
+          <h3>Why Is My AC Leaking Water Inside My House?</h3>
+          <p class="ccc-blog-excerpt">Your AC can produce 5–20 gallons of water per day in South Carolina's summer humidity. When the drainage system fails, that water ends up inside your home.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-short-cycling/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-short-cycling-300x164.png.webp" alt="AC short cycling causes">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Troubleshooting</span>
+          <h3>AC Keeps Turning On and Off: Short Cycling Causes and Fixes in South Carolina</h3>
+          <p class="ccc-blog-excerpt">Short cycling damages your compressor, spikes energy bills, and fails to properly dehumidify your home. Here are the 7 most common causes and how we fix them.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-making-noise/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-making-noise-300x164.png.webp" alt="AC unit making strange noises">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Diagnostics</span>
+          <h3>AC Unit Making Strange Noises: What Each Sound Means and When to Call for Repair</h3>
+          <p class="ccc-blog-excerpt">Grinding, buzzing, clicking, banging, hissing—each AC noise points to a specific problem. This sound-by-sound diagnostic guide tells you exactly what you're dealing with.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+      <a class="ccc-blog-card" href="https://coastalcarolinahvac.com/ac-running-not-cooling/">
+        <img src="https://coastalcarolinahvac.com/wp-content/smush-webp/2026/03/ac-running-but-not-cooling-300x164.png.webp" alt="AC running but not cooling">
+        <div class="ccc-blog-content">
+          <span class="ccc-blog-pill">Repair Guide</span>
+          <h3>Why Is My AC Running But Not Cooling the House?</h3>
+          <p class="ccc-blog-excerpt">When your AC runs all day but your home never reaches the set temperature, the system is failing to produce or deliver adequate cooling. Here are the 7 most common reasons.</p>
+          <span class="ccc-blog-readmore">Read More →</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ============ SECTION 14: FINAL CTA ============ -->
+  <section class="ccc-final-cta">
+    <h2>AC Not Cooling? Call Now for Same-Day Charleston Service.</h2>
+    <p class="ccc-final-cta-sub">Serving West Ashley, Mount Pleasant, James Island, Historic District, and all of Charleston County.</p>
+    <a class="ccc-final-cta-phone" href="tel:8437088735">📞 (843) 708-8735</a>
+    <p class="ccc-final-cta-fine">110 Lipman St, Summerville, SC 29483 · Licensed &amp; Insured · NATE-Certified · Daikin Partner</p>
+  </section>
+
+</div>
