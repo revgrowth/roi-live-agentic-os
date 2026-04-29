@@ -256,6 +256,7 @@ Every skill and its output folder uses a category prefix.
 | Skill | Triggers on |
 |-------|-------------|
 | `tool-stitch` | "fetch stitch design", "get stitch screens", "stitch project", "pull from stitch", "stitch code", "export stitch" |
+| `tool-dataforseo` | "keyword research", "search volume", "keyword difficulty", "validate keywords", "SERP analysis", "AI Overview citations", "AEO competitor audit", "DataForSEO", "what shows up for", "what's the volume for" |
 
 ### Operations Skills
 
@@ -286,6 +287,7 @@ Load only the `brand_context/` and `/agency/` files listed for each skill.
 | `meta-goal-breakdown` | — | summary | summary | core-only | — | — | `## meta-goal-breakdown` |
 | `str-ai-seo` | tone only | summary | full | core + page-SOP | — | — | `## str-ai-seo` |
 | `tool-stitch` | — | — | — | — | — | — | `## tool-stitch` |
+| `tool-dataforseo` | — | — | — | — | — | — | `## tool-dataforseo` |
 | `viz-stitch-design` | tone only | summary | language section | — | — | — | `## viz-stitch-design` |
 | `viz-interface-design` | tone only | summary | language section | — | — | — | `## viz-interface-design` |
 | `ops-cron` | — | — | — | — | — | — | `## ops-cron` |
@@ -435,6 +437,7 @@ Some skills use external services for enhanced functionality. API keys are store
 | Google Gemini | `GEMINI_API_KEY` | `viz-nano-banana` | Image generation via Gemini 3 Pro Image | No fallback |
 | HeyGen | `HEYGEN_API_KEY` | `viz-ugc-heygen` | AI avatar video generation | No fallback |
 | Google Stitch | gcloud auth | `tool-stitch`, `viz-stitch-design` | UI design generation and export | No fallback |
+| DataForSEO | `DATAFORSEO_LOGIN` + `DATAFORSEO_PASSWORD` | `tool-dataforseo`, `str-ai-seo` | Keyword research (volume, KD, intent), SERP analysis, AI Overview citation detection | No fallback. Skill non-functional without credentials. |
 
 ### Rules for Skills Using External Services
 

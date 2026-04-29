@@ -51,6 +51,12 @@
 
 ## tool-youtube
 
+## tool-dataforseo
+
+- 2026-04-28: First version built during gh-yellow-jacket-oil Phase 1 keyword validation. Three scripts: keyword-overview, serp-advanced, validate-keywords. Per-keyword JSON cache is a hard requirement — earlier client-level helper lost ~$0.10 of paid SERP output to a mid-run filesystem reset because raw responses lived only in memory until end-of-run. New design persists immediately on each call.
+- 2026-04-28: AI Overview citation references appear in two response shapes — sometimes `item.references`, sometimes nested under `item.items[].references`. Summariser handles both. Watch for further variants as DataForSEO updates the AIO endpoint.
+- 2026-04-28: Keyword Overview Live silently omits keywords with no measured volume — they don't return as a row at all. Treat missing keywords as a soft LOW_VOLUME signal, not as a fetch error. Validation table flags them in a dedicated "No Overview Data Returned" section.
+
 ## viz-excalidraw-diagram
 
 ## viz-interface-design
