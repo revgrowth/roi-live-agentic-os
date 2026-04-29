@@ -1,0 +1,2478 @@
+{
+  "version": "0.1.20260420",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "6.1201 sec.",
+  "cost": 0.0035,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "04282126-1032-0139-0000-a299ac343c72",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "5.9872 sec.",
+      "cost": 0.0035,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "serp",
+        "google",
+        "organic",
+        "live",
+        "advanced"
+      ],
+      "data": {
+        "api": "serp",
+        "function": "live",
+        "se": "google",
+        "se_type": "organic",
+        "keyword": "shaped charge",
+        "location_code": 2840,
+        "language_code": "en",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20,
+        "load_async_ai_overview": true
+      },
+      "result": [
+        {
+          "keyword": "shaped charge",
+          "type": "organic",
+          "se_domain": "google.com",
+          "location_code": 2840,
+          "language_code": "en",
+          "check_url": "https://www.google.com/search?q=shaped%20charge&hl=en&gl=US&ie=UTF-8&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc",
+          "datetime": "2026-04-28 18:26:31 +00:00",
+          "spell": null,
+          "refinement_chips": null,
+          "item_types": [
+            "ai_overview",
+            "organic",
+            "product_considerations",
+            "video",
+            "people_also_ask",
+            "images",
+            "short_videos",
+            "related_searches"
+          ],
+          "se_results_count": 259000000,
+          "pages_count": 2,
+          "items_count": 25,
+          "items": [
+            {
+              "type": "ai_overview",
+              "rank_group": 1,
+              "rank_absolute": 1,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "asynchronous_ai_overview": true,
+              "markdown": "A shaped charge is `an explosive device that uses a hollow, metal-lined (often copper) cone to focus explosive energy into a high-velocity, high-temperature jet, creating an extremely powerful cutting or piercing effect` . Based on the [Munroe Effect](https://www.google.com/search?q=Munroe+Effect&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwii5-r0lZGUAxVYkysGHXXxLy8QgK4QegYIAQgAEAQ) , this jet can reach speeds up to 10 km/s, allowing it to penetrate thick armor, steel, or rock by blasting through it, rather than just melting.[[1]](https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20speed%20can%20reach%2010%20km/s%2C%20peaking,The%20jet%20tail%20reaches%20about%202%E2%80%935%20km/s.)[[2]](https://www.reddit.com/r/Warthunder/comments/93nmrn/slow_mo_guys_playing_around_with_shaped_charges/)[[3]](https://apps.dtic.mil/sti/pdfs/ADA469696.pdf)[[4]](https://www.explosives.net/shaped-charges-explosive-technology/)\n\n**Key Aspects of Shaped Charges:** \n\n- **How it Works (The Munroe Effect):** In 1888, Charles E. Munroe discovered that a hollow cavity in an explosive directs the force, creating a concentrated blast. When detonated, the detonation wave collapses the metallic liner, forming a hypervelocity jet that pierces the target.\n- **Components:** A main explosive charge, a hollow cavity (liner, usually copper), and a detonator.\n- **Purpose:** Primarily designed for high-precision, deep-penetration tasks, including anti-tank weapons (HEAT - High-Explosive Anti-Tank), oil well perforation, and industrial cutting.\n- **Types:** \n\t- **Cone/Conical Shaped Charges:** Standard, used to create a deep, narrow hole (e.g., Bazooka, Panzerfaust).\n\t- **Linear Shaped Charges (LSC):** Used for cutting, creating a continuous, deep, and narrow slit through materials.\n\t- **Explosively Formed Projectiles (EFP):** Creates a high-speed slug rather than a long jet, used for longer-range, wide-diameter hole creation.\n- **Limitations:** \n\t- **Standoff Distance:** Requires a precise distance between the charge and the target to form the jet effectively.\n\t- **Armor Defenses:** Explosive Reactive Armor (ERA) can disrupt or destroy the jet, significantly reducing its effectiveness.\n\t- **Efficiency:** The jet tip is fast, but the tail is slower, leading to loss of energy if not optimized.[[1]](https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20speed%20can%20reach%2010%20km/s%2C%20peaking,The%20jet%20tail%20reaches%20about%202%E2%80%935%20km/s.)[[2]](https://www.explosives.net/shaped-charges-explosive-technology/)[[3]](https://apps.dtic.mil/sti/tr/pdf/ADA497450.pdf#:~:text=The%20unlined%20shaped%20charge%20was%20rediscovered%20by,explosive%20in%20contact%20with%20a%20steel%20plate.)[[4]](https://www.reddit.com/r/Warthunder/comments/93nmrn/slow_mo_guys_playing_around_with_shaped_charges/)[[5]](https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/)[[6]](https://ebad.com/products/linear-shaped-charge-lsc/#:~:text=In%20a%20typical%20installation%2C%20the%20length%20of,environments%2C%20while%20providing%20the%20optimum%20standoff%20height.)[[7]](https://www.youtube.com/watch?v=rB3lvv2MYws#:~:text=Shaped%20charges%20are%20fascinating%20engineering%20marvels%20that,concentrated%20jet%20for%20extreme%20precision%20and%20power!)[[8]](https://www.youtube.com/watch?v=OCYAr5jEXHo&t=531)[[9]](https://www.sciencedirect.com/topics/engineering/shaped-charge#:~:text=As%20a%20result%2C%20the%20jet%20from%20both,from%20the%20apex%20with%20the%20highest%20velocity.)\n\n**Common Applications:** \n\n- **Military:** Anti-tank missiles and munitions, such as the Panzerfaust and Bazooka.\n- **Oil and Gas:** Perforating oil wells to enable oil flow, often utilizing tools like [EQUAfrac® Shaped Charges](https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/).\n- **Industrial:** Cutting, demolition, and explosive welding.[[1]](https://www.explosives.net/shaped-charges-explosive-technology/)[[2]](https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/)[[3]](https://dynaenergetics.com/products/Shaped-Charges/Shaped-Charges#:~:text=DPU%20and%20XPU%20Charges.%20DynaEnergetics%20DPU%20and,neighboring%20formation%20in%20multiple%20casing%20strings%20completions.)[[4]](https://ebad.com/products/linear-shaped-charge-lsc/#:~:text=In%20a%20typical%20installation%2C%20the%20length%20of,environments%2C%20while%20providing%20the%20optimum%20standoff%20height.)[[5]](https://patents.google.com/patent/US4860654A/en#:~:text=It%20has%20become%20common%20practice%20in%20the,required%20to%20work%20in%20very%20restrictive%20environments.)",
+              "items": [
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "A shaped charge is an explosive device that uses a hollow, metal-lined (often copper) cone to focus explosive energy into a high-velocity, high-temperature jet, creating an extremely powerful cutting or piercing effect. Based on the Munroe Effect, this jet can reach speeds up to 10 km/s, allowing it to penetrate thick armor, steel, or rock by blasting through it, rather than just melting. Wikipedia +2",
+                  "markdown": "A shaped charge is `an explosive device that uses a hollow, metal-lined (often copper) cone to focus explosive energy into a high-velocity, high-temperature jet, creating an extremely powerful cutting or piercing effect` . Based on the [Munroe Effect](https://www.google.com/search?q=Munroe+Effect&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwii5-r0lZGUAxVYkysGHXXxLy8QgK4QegYIAQgAEAQ) , this jet can reach speeds up to 10 km/s, allowing it to penetrate thick armor, steel, or rock by blasting through it, rather than just melting.[[1]](https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20speed%20can%20reach%2010%20km/s%2C%20peaking,The%20jet%20tail%20reaches%20about%202%E2%80%935%20km/s.)[[2]](https://www.reddit.com/r/Warthunder/comments/93nmrn/slow_mo_guys_playing_around_with_shaped_charges/)[[3]](https://apps.dtic.mil/sti/pdfs/ADA469696.pdf)[[4]](https://www.explosives.net/shaped-charges-explosive-technology/)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Wikipedia",
+                      "domain": "en.wikipedia.org",
+                      "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20speed%20can%20reach%2010%20km/s%2C%20peaking,The%20jet%20tail%20reaches%20about%202%E2%80%935%20km/s.",
+                      "title": "Shaped charge - Wikipedia",
+                      "text": "The speed can reach 10 km/s, peaking some 40 microseconds after detonation; the cone tip is subjected to acceleration of about 25 ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Reddit",
+                      "domain": "www.reddit.com",
+                      "url": "https://www.reddit.com/r/Warthunder/comments/93nmrn/slow_mo_guys_playing_around_with_shaped_charges/",
+                      "title": "Slow Mo Guys playing around with shaped charges. : r/Warthunder",
+                      "text": "A shaped charge with a copper cone and explosives is used. The detonation starts at the back and travels forward, creating an inve..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "apps.dtic.mil",
+                      "domain": "apps.dtic.mil",
+                      "url": "https://apps.dtic.mil/sti/pdfs/ADA469696.pdf",
+                      "title": "Introduction to Shaped Charges - DTIC",
+                      "text": "A shaped charge detonates on impact, liquefying metal, which melts the tanks armor. • The jet is a high temperature plasma (about."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Alford Technologies",
+                      "domain": "www.explosives.net",
+                      "url": "https://www.explosives.net/shaped-charges-explosive-technology/",
+                      "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                      "text": "Early Observations (1888-1910s): Researchers noticed that cavities in explosives could influence the direction of the blast. This ..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Key Aspects of Shaped Charges:",
+                  "text": "How it Works (The Munroe Effect): In 1888, Charles E. Munroe discovered that a hollow cavity in an explosive directs the force, creating a concentrated blast. When detonated, the detonation wave collapses the metallic liner, forming a hypervelocity jet that pierces the target. Components: A main explosive charge, a hollow cavity (liner, usually copper), and a detonator. Purpose: Primarily designed for high-precision, deep-penetration tasks, including anti-tank weapons (HEAT - High-Explosive Anti-Tank), oil well perforation, and industrial cutting. Types: Cone/Conical Shaped Charges: Standard, used to create a deep, narrow hole (e.g., Bazooka, Panzerfaust). Linear Shaped Charges (LSC): Used for cutting, creating a continuous, deep, and narrow slit through materials. Explosively Formed Projectiles (EFP): Creates a high-speed slug rather than a long jet, used for longer-range, wide-diameter hole creation. Limitations: Standoff Distance: Requires a precise distance between the charge and the target to form the jet effectively. Armor Defenses: Explosive Reactive Armor (ERA) can disrupt or destroy the jet, significantly reducing its effectiveness. Efficiency: The jet tip is fast, but the tail is slower, leading to loss of energy if not optimized.",
+                  "markdown": "- **How it Works (The Munroe Effect):** In 1888, Charles E. Munroe discovered that a hollow cavity in an explosive directs the force, creating a concentrated blast. When detonated, the detonation wave collapses the metallic liner, forming a hypervelocity jet that pierces the target.\n- **Components:** A main explosive charge, a hollow cavity (liner, usually copper), and a detonator.\n- **Purpose:** Primarily designed for high-precision, deep-penetration tasks, including anti-tank weapons (HEAT - High-Explosive Anti-Tank), oil well perforation, and industrial cutting.\n- **Types:** \n\t- **Cone/Conical Shaped Charges:** Standard, used to create a deep, narrow hole (e.g., Bazooka, Panzerfaust).\n\t- **Linear Shaped Charges (LSC):** Used for cutting, creating a continuous, deep, and narrow slit through materials.\n\t- **Explosively Formed Projectiles (EFP):** Creates a high-speed slug rather than a long jet, used for longer-range, wide-diameter hole creation.\n- **Limitations:** \n\t- **Standoff Distance:** Requires a precise distance between the charge and the target to form the jet effectively.\n\t- **Armor Defenses:** Explosive Reactive Armor (ERA) can disrupt or destroy the jet, significantly reducing its effectiveness.\n\t- **Efficiency:** The jet tip is fast, but the tail is slower, leading to loss of energy if not optimized.[[1]](https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20speed%20can%20reach%2010%20km/s%2C%20peaking,The%20jet%20tail%20reaches%20about%202%E2%80%935%20km/s.)[[2]](https://www.explosives.net/shaped-charges-explosive-technology/)[[3]](https://apps.dtic.mil/sti/tr/pdf/ADA497450.pdf#:~:text=The%20unlined%20shaped%20charge%20was%20rediscovered%20by,explosive%20in%20contact%20with%20a%20steel%20plate.)[[4]](https://www.reddit.com/r/Warthunder/comments/93nmrn/slow_mo_guys_playing_around_with_shaped_charges/)[[5]](https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/)[[6]](https://ebad.com/products/linear-shaped-charge-lsc/#:~:text=In%20a%20typical%20installation%2C%20the%20length%20of,environments%2C%20while%20providing%20the%20optimum%20standoff%20height.)[[7]](https://www.youtube.com/watch?v=rB3lvv2MYws#:~:text=Shaped%20charges%20are%20fascinating%20engineering%20marvels%20that,concentrated%20jet%20for%20extreme%20precision%20and%20power!)[[8]](https://www.youtube.com/watch?v=OCYAr5jEXHo&t=531)[[9]](https://www.sciencedirect.com/topics/engineering/shaped-charge#:~:text=As%20a%20result%2C%20the%20jet%20from%20both,from%20the%20apex%20with%20the%20highest%20velocity.)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Wikipedia",
+                      "domain": "en.wikipedia.org",
+                      "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20speed%20can%20reach%2010%20km/s%2C%20peaking,The%20jet%20tail%20reaches%20about%202%E2%80%935%20km/s.",
+                      "title": "Shaped charge - Wikipedia",
+                      "text": "The speed can reach 10 km/s, peaking some 40 microseconds after detonation; the cone tip is subjected to acceleration of about 25 ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Alford Technologies",
+                      "domain": "www.explosives.net",
+                      "url": "https://www.explosives.net/shaped-charges-explosive-technology/",
+                      "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                      "text": "Early Observations (1888-1910s): Researchers noticed that cavities in explosives could influence the direction of the blast. This ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "apps.dtic.mil",
+                      "domain": "apps.dtic.mil",
+                      "url": "https://apps.dtic.mil/sti/tr/pdf/ADA497450.pdf#:~:text=The%20unlined%20shaped%20charge%20was%20rediscovered%20by,explosive%20in%20contact%20with%20a%20steel%20plate.",
+                      "title": "A Brief History of Shaped Charges - DTIC",
+                      "text": "The unlined shaped charge was rediscovered by Charles Munroe of the Naval Torpedo Station, Newport, RI in 1888. Munroe popularized..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Reddit",
+                      "domain": "www.reddit.com",
+                      "url": "https://www.reddit.com/r/Warthunder/comments/93nmrn/slow_mo_guys_playing_around_with_shaped_charges/",
+                      "title": "Slow Mo Guys playing around with shaped charges. : r/Warthunder",
+                      "text": "A shaped charge with a copper cone and explosives is used. The detonation starts at the back and travels forward, creating an inve..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Hunting PLC",
+                      "domain": "huntingplc.com",
+                      "url": "https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/",
+                      "title": "Shaped Charge Summary - Hunting PLC",
+                      "text": "Product summary * Perfecta® Shaped Charges. * Perfecta® Rock Charges. * EQUAfrac® Shaped Charges. * EQUAfrac® Limited Shaped Charg..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Ensign-Bickford Aerospace & Defense",
+                      "domain": "ebad.com",
+                      "url": "https://ebad.com/products/linear-shaped-charge-lsc/#:~:text=In%20a%20typical%20installation%2C%20the%20length%20of,environments%2C%20while%20providing%20the%20optimum%20standoff%20height.",
+                      "title": "Linear Shaped Charge Product (LSC) - EBAD",
+                      "text": "In a typical installation, the length of the LSC is formed to match the contour of the cutting surface. LCS's are often assembled ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=rB3lvv2MYws#:~:text=Shaped%20charges%20are%20fascinating%20engineering%20marvels%20that,concentrated%20jet%20for%20extreme%20precision%20and%20power!",
+                      "title": "Shaped Charge: HEAT and EFP",
+                      "text": "Shaped charges are fascinating engineering marvels that focus explosive energy into a concentrated jet for extreme precision and p..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=OCYAr5jEXHo&t=531",
+                      "title": "How Can Glass Punch A Hole Through Steel? The Science ...",
+                      "text": "Modern tanks sometimes utilize explosive reactive armor as a defense against anti-tank missile shape charges. This type of armor i..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "ScienceDirect.com",
+                      "domain": "www.sciencedirect.com",
+                      "url": "https://www.sciencedirect.com/topics/engineering/shaped-charge#:~:text=As%20a%20result%2C%20the%20jet%20from%20both,from%20the%20apex%20with%20the%20highest%20velocity.",
+                      "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                      "text": "As a result, the jet from both inclined surfaces will converge at the axis of the cone. Compared with the jet formation at the ape..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "Cone/Conical Shaped Charges: Standard, used to create a deep, narrow hole (e.g., Bazooka, Panzerfaust). Linear Shaped Charges (LSC): Used for cutting, creating a continuous, deep, and narrow slit through materials. Explosively Formed Projectiles (EFP): Creates a high-speed slug rather than a long jet, used for longer-range, wide-diameter hole creation.",
+                  "markdown": "- **Cone/Conical Shaped Charges:** Standard, used to create a deep, narrow hole (e.g., Bazooka, Panzerfaust).\n- **Linear Shaped Charges (LSC):** Used for cutting, creating a continuous, deep, and narrow slit through materials.\n- **Explosively Formed Projectiles (EFP):** Creates a high-speed slug rather than a long jet, used for longer-range, wide-diameter hole creation.",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "Standoff Distance: Requires a precise distance between the charge and the target to form the jet effectively. Armor Defenses: Explosive Reactive Armor (ERA) can disrupt or destroy the jet, significantly reducing its effectiveness. Efficiency: The jet tip is fast, but the tail is slower, leading to loss of energy if not optimized.",
+                  "markdown": "- **Standoff Distance:** Requires a precise distance between the charge and the target to form the jet effectively.\n- **Armor Defenses:** Explosive Reactive Armor (ERA) can disrupt or destroy the jet, significantly reducing its effectiveness.\n- **Efficiency:** The jet tip is fast, but the tail is slower, leading to loss of energy if not optimized.[[1]](https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20speed%20can%20reach%2010%20km/s%2C%20peaking,The%20jet%20tail%20reaches%20about%202%E2%80%935%20km/s.)[[2]](https://www.explosives.net/shaped-charges-explosive-technology/)[[3]](https://apps.dtic.mil/sti/tr/pdf/ADA497450.pdf#:~:text=The%20unlined%20shaped%20charge%20was%20rediscovered%20by,explosive%20in%20contact%20with%20a%20steel%20plate.)[[4]](https://www.reddit.com/r/Warthunder/comments/93nmrn/slow_mo_guys_playing_around_with_shaped_charges/)[[5]](https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/)[[6]](https://ebad.com/products/linear-shaped-charge-lsc/#:~:text=In%20a%20typical%20installation%2C%20the%20length%20of,environments%2C%20while%20providing%20the%20optimum%20standoff%20height.)[[7]](https://www.youtube.com/watch?v=rB3lvv2MYws#:~:text=Shaped%20charges%20are%20fascinating%20engineering%20marvels%20that,concentrated%20jet%20for%20extreme%20precision%20and%20power!)[[8]](https://www.youtube.com/watch?v=OCYAr5jEXHo&t=531)[[9]](https://www.sciencedirect.com/topics/engineering/shaped-charge#:~:text=As%20a%20result%2C%20the%20jet%20from%20both,from%20the%20apex%20with%20the%20highest%20velocity.)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Wikipedia",
+                      "domain": "en.wikipedia.org",
+                      "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20speed%20can%20reach%2010%20km/s%2C%20peaking,The%20jet%20tail%20reaches%20about%202%E2%80%935%20km/s.",
+                      "title": "Shaped charge - Wikipedia",
+                      "text": "The speed can reach 10 km/s, peaking some 40 microseconds after detonation; the cone tip is subjected to acceleration of about 25 ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Alford Technologies",
+                      "domain": "www.explosives.net",
+                      "url": "https://www.explosives.net/shaped-charges-explosive-technology/",
+                      "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                      "text": "Early Observations (1888-1910s): Researchers noticed that cavities in explosives could influence the direction of the blast. This ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "apps.dtic.mil",
+                      "domain": "apps.dtic.mil",
+                      "url": "https://apps.dtic.mil/sti/tr/pdf/ADA497450.pdf#:~:text=The%20unlined%20shaped%20charge%20was%20rediscovered%20by,explosive%20in%20contact%20with%20a%20steel%20plate.",
+                      "title": "A Brief History of Shaped Charges - DTIC",
+                      "text": "The unlined shaped charge was rediscovered by Charles Munroe of the Naval Torpedo Station, Newport, RI in 1888. Munroe popularized..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Reddit",
+                      "domain": "www.reddit.com",
+                      "url": "https://www.reddit.com/r/Warthunder/comments/93nmrn/slow_mo_guys_playing_around_with_shaped_charges/",
+                      "title": "Slow Mo Guys playing around with shaped charges. : r/Warthunder",
+                      "text": "A shaped charge with a copper cone and explosives is used. The detonation starts at the back and travels forward, creating an inve..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Hunting PLC",
+                      "domain": "huntingplc.com",
+                      "url": "https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/",
+                      "title": "Shaped Charge Summary - Hunting PLC",
+                      "text": "Product summary * Perfecta® Shaped Charges. * Perfecta® Rock Charges. * EQUAfrac® Shaped Charges. * EQUAfrac® Limited Shaped Charg..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Ensign-Bickford Aerospace & Defense",
+                      "domain": "ebad.com",
+                      "url": "https://ebad.com/products/linear-shaped-charge-lsc/#:~:text=In%20a%20typical%20installation%2C%20the%20length%20of,environments%2C%20while%20providing%20the%20optimum%20standoff%20height.",
+                      "title": "Linear Shaped Charge Product (LSC) - EBAD",
+                      "text": "In a typical installation, the length of the LSC is formed to match the contour of the cutting surface. LCS's are often assembled ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=rB3lvv2MYws#:~:text=Shaped%20charges%20are%20fascinating%20engineering%20marvels%20that,concentrated%20jet%20for%20extreme%20precision%20and%20power!",
+                      "title": "Shaped Charge: HEAT and EFP",
+                      "text": "Shaped charges are fascinating engineering marvels that focus explosive energy into a concentrated jet for extreme precision and p..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=OCYAr5jEXHo&t=531",
+                      "title": "How Can Glass Punch A Hole Through Steel? The Science ...",
+                      "text": "Modern tanks sometimes utilize explosive reactive armor as a defense against anti-tank missile shape charges. This type of armor i..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "ScienceDirect.com",
+                      "domain": "www.sciencedirect.com",
+                      "url": "https://www.sciencedirect.com/topics/engineering/shaped-charge#:~:text=As%20a%20result%2C%20the%20jet%20from%20both,from%20the%20apex%20with%20the%20highest%20velocity.",
+                      "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                      "text": "As a result, the jet from both inclined surfaces will converge at the axis of the cone. Compared with the jet formation at the ape..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Common Applications:",
+                  "text": "Military: Anti-tank missiles and munitions, such as the Panzerfaust and Bazooka. Panzerfaust Bazooka Oil and Gas: Perforating oil wells to enable oil flow, often utilizing tools like EQUAfrac® Shaped Charges. Industrial: Cutting, demolition, and explosive welding.",
+                  "markdown": "- **Military:** Anti-tank missiles and munitions, such as the Panzerfaust and Bazooka.\n- **Oil and Gas:** Perforating oil wells to enable oil flow, often utilizing tools like [EQUAfrac® Shaped Charges](https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/).\n- **Industrial:** Cutting, demolition, and explosive welding.[[1]](https://www.explosives.net/shaped-charges-explosive-technology/)[[2]](https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/)[[3]](https://dynaenergetics.com/products/Shaped-Charges/Shaped-Charges#:~:text=DPU%20and%20XPU%20Charges.%20DynaEnergetics%20DPU%20and,neighboring%20formation%20in%20multiple%20casing%20strings%20completions.)[[4]](https://ebad.com/products/linear-shaped-charge-lsc/#:~:text=In%20a%20typical%20installation%2C%20the%20length%20of,environments%2C%20while%20providing%20the%20optimum%20standoff%20height.)[[5]](https://patents.google.com/patent/US4860654A/en#:~:text=It%20has%20become%20common%20practice%20in%20the,required%20to%20work%20in%20very%20restrictive%20environments.)",
+                  "links": [
+                    {
+                      "type": "link_element",
+                      "title": "EQUAfrac® Shaped Charges",
+                      "description": null,
+                      "url": "https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/",
+                      "domain": "huntingplc.com"
+                    }
+                  ],
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Alford Technologies",
+                      "domain": "www.explosives.net",
+                      "url": "https://www.explosives.net/shaped-charges-explosive-technology/",
+                      "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                      "text": "Early Observations (1888-1910s): Researchers noticed that cavities in explosives could influence the direction of the blast. This ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Hunting PLC",
+                      "domain": "huntingplc.com",
+                      "url": "https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/",
+                      "title": "Shaped Charge Summary - Hunting PLC",
+                      "text": "Product summary * Perfecta® Shaped Charges. * Perfecta® Rock Charges. * EQUAfrac® Shaped Charges. * EQUAfrac® Limited Shaped Charg..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "DynaEnergetics",
+                      "domain": "dynaenergetics.com",
+                      "url": "https://dynaenergetics.com/products/Shaped-Charges/Shaped-Charges#:~:text=DPU%20and%20XPU%20Charges.%20DynaEnergetics%20DPU%20and,neighboring%20formation%20in%20multiple%20casing%20strings%20completions.",
+                      "title": "Shaped Charges - DynaEnergetics",
+                      "text": "DPU and XPU Charges. DynaEnergetics DPU and XPU shaped charges are specially designed and engineered to offer access to the most o..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Ensign-Bickford Aerospace & Defense",
+                      "domain": "ebad.com",
+                      "url": "https://ebad.com/products/linear-shaped-charge-lsc/#:~:text=In%20a%20typical%20installation%2C%20the%20length%20of,environments%2C%20while%20providing%20the%20optimum%20standoff%20height.",
+                      "title": "Linear Shaped Charge Product (LSC) - EBAD",
+                      "text": "In a typical installation, the length of the LSC is formed to match the contour of the cutting surface. LCS's are often assembled ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Google Patents",
+                      "domain": "patents.google.com",
+                      "url": "https://patents.google.com/patent/US4860654A/en#:~:text=It%20has%20become%20common%20practice%20in%20the,required%20to%20work%20in%20very%20restrictive%20environments.",
+                      "title": "US4860654A - Implosion shaped charge perforator",
+                      "text": "It has become common practice in the oil and gas industry to perforate the well casing of an oil and gas well to bring such well i..."
+                    }
+                  ]
+                }
+              ],
+              "references": [
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Wikipedia",
+                  "domain": "en.wikipedia.org",
+                  "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20speed%20can%20reach%2010%20km/s%2C%20peaking,The%20jet%20tail%20reaches%20about%202%E2%80%935%20km/s.",
+                  "title": "Shaped charge - Wikipedia",
+                  "text": "The speed can reach 10 km/s, peaking some 40 microseconds after detonation; the cone tip is subjected to acceleration of about 25 ..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Alford Technologies",
+                  "domain": "www.explosives.net",
+                  "url": "https://www.explosives.net/shaped-charges-explosive-technology/",
+                  "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                  "text": "Early Observations (1888-1910s): Researchers noticed that cavities in explosives could influence the direction of the blast. This ..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "apps.dtic.mil",
+                  "domain": "apps.dtic.mil",
+                  "url": "https://apps.dtic.mil/sti/pdfs/ADA469696.pdf",
+                  "title": "Introduction to Shaped Charges - DTIC",
+                  "text": "A shaped charge detonates on impact, liquefying metal, which melts the tanks armor. • The jet is a high temperature plasma (about."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Reddit",
+                  "domain": "www.reddit.com",
+                  "url": "https://www.reddit.com/r/Warthunder/comments/93nmrn/slow_mo_guys_playing_around_with_shaped_charges/",
+                  "title": "Slow Mo Guys playing around with shaped charges. : r/Warthunder",
+                  "text": "A shaped charge with a copper cone and explosives is used. The detonation starts at the back and travels forward, creating an inve..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "ScienceDirect.com",
+                  "domain": "www.sciencedirect.com",
+                  "url": "https://www.sciencedirect.com/topics/engineering/shaped-charge#:~:text=As%20a%20result%2C%20the%20jet%20from%20both,from%20the%20apex%20with%20the%20highest%20velocity.",
+                  "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                  "text": "As a result, the jet from both inclined surfaces will converge at the axis of the cone. Compared with the jet formation at the ape..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "apps.dtic.mil",
+                  "domain": "apps.dtic.mil",
+                  "url": "https://apps.dtic.mil/sti/tr/pdf/ADA497450.pdf#:~:text=The%20unlined%20shaped%20charge%20was%20rediscovered%20by,explosive%20in%20contact%20with%20a%20steel%20plate.",
+                  "title": "A Brief History of Shaped Charges - DTIC",
+                  "text": "The unlined shaped charge was rediscovered by Charles Munroe of the Naval Torpedo Station, Newport, RI in 1888. Munroe popularized..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Hunting PLC",
+                  "domain": "huntingplc.com",
+                  "url": "https://huntingplc.com/products-services/perforating-logging-systems/energetics/shaped-charge-summary/",
+                  "title": "Shaped Charge Summary - Hunting PLC",
+                  "text": "Product summary * Perfecta® Shaped Charges. * Perfecta® Rock Charges. * EQUAfrac® Shaped Charges. * EQUAfrac® Limited Shaped Charg..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Ensign-Bickford Aerospace & Defense",
+                  "domain": "ebad.com",
+                  "url": "https://ebad.com/products/linear-shaped-charge-lsc/#:~:text=In%20a%20typical%20installation%2C%20the%20length%20of,environments%2C%20while%20providing%20the%20optimum%20standoff%20height.",
+                  "title": "Linear Shaped Charge Product (LSC) - EBAD",
+                  "text": "In a typical installation, the length of the LSC is formed to match the contour of the cutting surface. LCS's are often assembled ..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "DynaEnergetics",
+                  "domain": "dynaenergetics.com",
+                  "url": "https://dynaenergetics.com/products/Shaped-Charges/Shaped-Charges#:~:text=DPU%20and%20XPU%20Charges.%20DynaEnergetics%20DPU%20and,neighboring%20formation%20in%20multiple%20casing%20strings%20completions.",
+                  "title": "Shaped Charges - DynaEnergetics",
+                  "text": "DPU and XPU Charges. DynaEnergetics DPU and XPU shaped charges are specially designed and engineered to offer access to the most o..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=OCYAr5jEXHo&t=531",
+                  "title": "How Can Glass Punch A Hole Through Steel? The Science ...",
+                  "text": "Modern tanks sometimes utilize explosive reactive armor as a defense against anti-tank missile shape charges. This type of armor i..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=rB3lvv2MYws#:~:text=Shaped%20charges%20are%20fascinating%20engineering%20marvels%20that,concentrated%20jet%20for%20extreme%20precision%20and%20power!",
+                  "title": "Shaped Charge: HEAT and EFP",
+                  "text": "Shaped charges are fascinating engineering marvels that focus explosive energy into a concentrated jet for extreme precision and p..."
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 1,
+              "rank_absolute": 2,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]",
+              "domain": "en.wikipedia.org",
+              "title": "Shaped charge",
+              "url": "https://en.wikipedia.org/wiki/Shaped_charge",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://en.wikipedia.org › wiki › Shaped_charge",
+              "website_name": "Wikipedia",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "A shaped charge, commonly also hollow charge if shaped with a cavity, is an explosive charge shaped to focus the effect of the explosive's energy. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": "shaped charge from en.wikipedia.org",
+                  "url": "https://en.wikipedia.org/wiki/Shaped_charge",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-a299ac343c72:0"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "an explosive charge shaped to focus the effect of the explosive's energy"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "product_considerations",
+              "rank_group": 1,
+              "rank_absolute": 3,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]",
+              "title": "Things to know",
+              "items": [
+                {
+                  "type": "product_considerations_element",
+                  "title": "What is the purpose of a shaped charge?",
+                  "consideration_category": "Purpose",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_expanded_element",
+                      "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                      "featured_title": null,
+                      "breadcrumb": "https://www.sciencedirect.com › topics › materials-science",
+                      "snippet": "Shaped charges are widely used for both military purposes, and in oil field applications, where the perforations they create through steel casing and drilling damage connect the wellbore to the oil-bearing rock. Simulations of shaped charge detonation, jet formation and target penetration are challenging for any code.",
+                      "domain": "www.google.com",
+                      "url": "https://www.google.com/search?sca_esv=06de5ba07996f893&hl=en&gl=US&q=what+is+the+purpose+of+a+shaped+charge&sa=X&ved=2ahUKEwii5-r0lZGUAxVYkysGHXXxLy8QrooIegQIGxAO",
+                      "timestamp": null,
+                      "related_searches": [
+                        "What is the purpose of a shaped charge?"
+                      ],
+                      "about_this_result": null
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": "What are the limitations of a shaped charge?",
+                  "consideration_category": "Limitations",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Shaped charges are limited by strict standoff distance requirements (too close or far reduces efficiency), high sensitivity to production imperfections causing inaccurate jet formation, and effectiveness limited mainly to specialized, narrow-diameter penetration rather than blast destruction. They are also countered effectively by spaced, composite, or explosive reactive armor.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "ScienceDirect.com",
+                              "domain": "www.sciencedirect.com",
+                              "url": "https://www.sciencedirect.com/science/article/abs/pii/S0734743X0800184X#:~:text=In%20Ref.,resulting%20jets%20have%20been%20determined.",
+                              "title": "The influence of asymmetries in shaped charge performance",
+                              "text": "In Ref. [1], the decrease in penetration depth due to crater wall interactions of jet particles is discussed in detail. In practic..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Wikipedia",
+                              "domain": "en.wikipedia.org",
+                              "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=During%20World%20War%20II%2C%20the,closer%20to%20its%20optimum%20standoff.",
+                              "title": "Shaped charge - Wikipedia",
+                              "text": "During World War II, the precision of the charge's construction and its detonation mode were both inferior to modern warheads. Thi..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Academia Română",
+                              "domain": "acad.ro",
+                              "url": "https://acad.ro/sectii2002/proceedings/doc2020-3/10-Malciu_Pupaza.pdf",
+                              "title": "RESEARCH ON THE MITIGATION OF SHAPED CHARGE EFFECT",
+                              "text": "Shaped charges are the explosive charges provided with a cavity in which a metallic liner is introduced which, as a result of the ..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Key limitations of shaped charges include:",
+                          "text": "Optimal Standoff Requirement: The charge must detonate at a precise distance (typically 2-4 charge diameters) from the target for the jet to form correctly. If the charge hits too close, the jet does not fully form; too far, and the jet disperses. Manufacturing Imperfections: Small defects in the lining, liner thickness, or symmetry of the explosive charge can cause the metal jet to break up, curve, or become unstable, greatly reducing penetration depth. Countermeasures: Modern armor, such as ERA (Explosive Reactive Armor) or composite (Chobham) armor, can disrupt the jet's concentration, significantly reducing effectiveness. Limited Destruction Area: Shaped charges create a deep, narrow hole but do not produce a large blast radius, making them less effective against personnel compared to conventional explosives. Rotation Degradation: If fired from a rifled gun, the high-speed rotation reduces the cohesive force of the jet, dispersing it earlier and reducing penetration. This requires specialized, non-rotating shells.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Wikipedia",
+                              "domain": "en.wikipedia.org",
+                              "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=During%20World%20War%20II%2C%20the,closer%20to%20its%20optimum%20standoff.",
+                              "title": "Shaped charge - Wikipedia",
+                              "text": "During World War II, the precision of the charge's construction and its detonation mode were both inferior to modern warheads. Thi..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "ScienceDirect.com",
+                              "domain": "www.sciencedirect.com",
+                              "url": "https://www.sciencedirect.com/science/article/abs/pii/S0734743X0800184X#:~:text=In%20Ref.,resulting%20jets%20have%20been%20determined.",
+                              "title": "The influence of asymmetries in shaped charge performance",
+                              "text": "In Ref. [1], the decrease in penetration depth due to crater wall interactions of jet particles is discussed in detail. In practic..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Academia Română",
+                              "domain": "acad.ro",
+                              "url": "https://acad.ro/sectii2002/proceedings/doc2020-3/10-Malciu_Pupaza.pdf",
+                              "title": "RESEARCH ON THE MITIGATION OF SHAPED CHARGE EFFECT",
+                              "text": "Shaped charges are the explosive charges provided with a cavity in which a metallic liner is introduced which, as a result of the ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Wiley Online Library",
+                              "domain": "onlinelibrary.wiley.com",
+                              "url": "https://onlinelibrary.wiley.com/doi/10.1155/2021/6660189#:~:text=Shaped%20charges%20are%20widely%20used,a%201.67%25%20deviation%20was%20observed.",
+                              "title": "Formation and Penetration Capability of an Annular‐Shaped Charge",
+                              "text": "Apr 20, 2021 — Shaped charges are widely used in the field of national defense because of their high energy density and strong direct..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Synonyms/Related Terms for Limitations:",
+                          "text": "Constraints, design trade-offs, operational restrictions, vulnerabilities, deficiencies, failure points.",
+                          "images": null,
+                          "references": null
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Usage Examples of Limitations:",
+                          "text": "Armor Skirts: Panzer skirt (Schürzen) armor in WWII or modern tank \"cages\" cause charges to detonate too early, causing the jet to disperse. Spaced Armor: Placing armor plates at intervals breaks up the jet, reducing penetration effectiveness. Spin Stabilized Projectiles: Using a rifled gun reduces the penetration of a standard shaped charge.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Wikipedia",
+                              "domain": "en.wikipedia.org",
+                              "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=During%20World%20War%20II%2C%20the,closer%20to%20its%20optimum%20standoff.",
+                              "title": "Shaped charge - Wikipedia",
+                              "text": "During World War II, the precision of the charge's construction and its detonation mode were both inferior to modern warheads. Thi..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Images Images illustrating the ideal vs. poor liner construction or the need for specific standoff distances would show how a distorted liner (due to manufacturing flaws) leads to a disjointed, inefficient jet.",
+                          "images": null,
+                          "references": null
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "ScienceDirect.com",
+                          "domain": "www.sciencedirect.com",
+                          "url": "https://www.sciencedirect.com/science/article/abs/pii/S0734743X0800184X#:~:text=In%20Ref.,resulting%20jets%20have%20been%20determined.",
+                          "title": "The influence of asymmetries in shaped charge performance",
+                          "text": "In Ref. [1], the decrease in penetration depth due to crater wall interactions of jet particles is discussed in detail. In practic..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Wiley Online Library",
+                          "domain": "onlinelibrary.wiley.com",
+                          "url": "https://onlinelibrary.wiley.com/doi/10.1155/2021/6660189#:~:text=Shaped%20charges%20are%20widely%20used,a%201.67%25%20deviation%20was%20observed.",
+                          "title": "Formation and Penetration Capability of an Annular‐Shaped Charge",
+                          "text": "Apr 20, 2021 — Shaped charges are widely used in the field of national defense because of their high energy density and strong direct..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Wikipedia",
+                          "domain": "en.wikipedia.org",
+                          "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=During%20World%20War%20II%2C%20the,closer%20to%20its%20optimum%20standoff.",
+                          "title": "Shaped charge - Wikipedia",
+                          "text": "During World War II, the precision of the charge's construction and its detonation mode were both inferior to modern warheads. Thi..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Academia Română",
+                          "domain": "acad.ro",
+                          "url": "https://acad.ro/sectii2002/proceedings/doc2020-3/10-Malciu_Pupaza.pdf",
+                          "title": "RESEARCH ON THE MITIGATION OF SHAPED CHARGE EFFECT",
+                          "text": "Shaped charges are the explosive charges provided with a cavity in which a metallic liner is introduced which, as a result of the ..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": "What are the different types of shaped charges?",
+                  "consideration_category": "Types",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Shaped charges are engineered explosives focusing energy into a high-velocity jet to pierce, cut, or deform targets, primarily classified by their liner shape and application. Key types include conical/hemispherical (armor penetration/oil well perforating), linear (precision cutting/demolition), and explosively formed penetrators (EFPs - long-range armor disruption), commonly using liners of copper or steel.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Wikipedia",
+                              "domain": "en.wikipedia.org",
+                              "url": "https://en.wikipedia.org/wiki/Shaped_charge",
+                              "title": "Shaped charge - Wikipedia",
+                              "text": "There are several forms of shaped charge. * Linear shaped charges. * Explosively formed penetrator. * Tandem warhead. * Voitenko ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Sage Journals",
+                              "domain": "journals.sagepub.com",
+                              "url": "https://journals.sagepub.com/doi/10.1177/20414196211017923#:~:text=a%20deeper%20penetration.-,Other%20forms%20of%20shaped%20charges,in%20cutting%20and%20forming%20processes).",
+                              "title": "A practical review study on shaped charge in the last two decades ( ...",
+                              "text": "Jun 6, 2021 — Other forms of shaped charges. Typical shaped charges usually have conical shapes with cone angles of <100°. In this se..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Alford Technologies",
+                              "domain": "www.explosives.net",
+                              "url": "https://www.explosives.net/shaped-charges-explosive-technology/#:~:text=What%20Are%20Shaped%20Charges?,into%20rock%20with%20impressive%20accuracy.",
+                              "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                              "text": "Jan 20, 2025 — What Are Shaped Charges? 1-Ballistic cap, 2-Air-filled cavity, 3-Conical liner, 4-Detonator, 5-Explosive, 6-Piezo-elec..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "National Institutes of Health (.gov)",
+                              "domain": "pubmed.ncbi.nlm.nih.gov",
+                              "url": "https://pubmed.ncbi.nlm.nih.gov/18200915/",
+                              "title": "Shaped charges and explosively formed penetrators: background for clinicians - PubMed",
+                              "text": "Shaped charges (SC) and explosively formed penetrators (EFP) are both types of munitions. SCs have been used in the mining industr..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Key Types and Usage Examples",
+                          "text": "Conical Charges (Cone): The most common type (e.g., HEAT rounds), featuring a cone-shaped liner (copper, steel) that collapses into a high-speed jet to penetrate heavy armor. Linear Shaped Charges (LSC): V-shaped \"explosive ropes\" used for cutting through thick steel, steel cables, or reinforced concrete in demolition and underwater, specialized cutting applications. Explosively Formed Penetrators (EFP / Misznay-Schardin): Uses a shallow, concave, or flat liner (not conical) to form a dense, high-speed slug that can penetrate armor at much greater distances than traditional shaped charges. Hemispherical/Parabolic/Trumpet Liners: Used in specific oil and gas well perforating, offering different hole sizes and penetration depths for stimulating oil production. Tandem Charges : Multiple shaped charges (usually two) in a single missile. The first charge detonates the outer Reactive Armor (ERA), while the second pierces the main armor. Voitenko Compressor : A highly specialized type designed to create extremely high velocities for physics research. Specialty/Oil Field Charges: Includes \"Big Hole\" (for maximum diameter in casing) and \"Deep Penetrating\" charges for optimal well stimulation.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Blogger.com",
+                              "domain": "disaster-wise.blogspot.com",
+                              "url": "http://disaster-wise.blogspot.com/2010/10/shaped-charges-other-two-types.html#:~:text=Following%20up%20on%20my%20September,heads%20out%20at%20hypersonic%20speeds.",
+                              "title": "Shaped Charges: The Other Two Types - Disaster-wise",
+                              "text": "Oct 5, 2010 — Following up on my September post , which was about the conical shaped charge as it appears in the warhead of a Hellfir..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Alford Technologies",
+                              "domain": "www.explosives.net",
+                              "url": "https://www.explosives.net/shaped-charges-explosive-technology/#:~:text=What%20Are%20Shaped%20Charges?,into%20rock%20with%20impressive%20accuracy.",
+                              "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                              "text": "Jan 20, 2025 — What Are Shaped Charges? 1-Ballistic cap, 2-Air-filled cavity, 3-Conical liner, 4-Detonator, 5-Explosive, 6-Piezo-elec..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "National Institutes of Health (.gov)",
+                              "domain": "pubmed.ncbi.nlm.nih.gov",
+                              "url": "https://pubmed.ncbi.nlm.nih.gov/18200915/",
+                              "title": "Shaped charges and explosively formed penetrators: background for clinicians - PubMed",
+                              "text": "Shaped charges (SC) and explosively formed penetrators (EFP) are both types of munitions. SCs have been used in the mining industr..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Sage Journals",
+                              "domain": "journals.sagepub.com",
+                              "url": "https://journals.sagepub.com/doi/10.1177/20414196211017923#:~:text=a%20deeper%20penetration.-,Other%20forms%20of%20shaped%20charges,in%20cutting%20and%20forming%20processes).",
+                              "title": "A practical review study on shaped charge in the last two decades ( ...",
+                              "text": "Jun 6, 2021 — Other forms of shaped charges. Typical shaped charges usually have conical shapes with cone angles of <100°. In this se..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Science Toys",
+                              "domain": "scitoys.com",
+                              "url": "https://scitoys.com/shaped.html#:~:text=Special%20rebar%20cutting%20charges%2C%20using,provides%20an%20improved%20spherical%20implosion.",
+                              "title": "Shaped Charges - Science Toys",
+                              "text": "Special rebar cutting charges, using the same principle, can be clamped onto inch-thick or larger rebar, cutting them apart. These..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Wikipedia",
+                              "domain": "en.wikipedia.org",
+                              "url": "https://en.wikipedia.org/wiki/Shaped_charge",
+                              "title": "Shaped charge - Wikipedia",
+                              "text": "There are several forms of shaped charge. * Linear shaped charges. * Explosively formed penetrator. * Tandem warhead. * Voitenko ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "apps.dtic.mil",
+                              "domain": "apps.dtic.mil",
+                              "url": "https://apps.dtic.mil/sti/tr/pdf/ADA228492.pdf",
+                              "title": "The Shaped Charge Concept. Part 3. Applications of ... - DTIC",
+                              "text": "charges, Oe devices contain a relatively small amount of explosive. (Usually, several shaped charges art fired simultaneously.) Th..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Jet Research Center",
+                              "domain": "www.jetresearch.com",
+                              "url": "https://www.jetresearch.com/en/energetics/shaped-charges#:~:text=Engineered%20for%20your%20rock,high-performance%20shots%20every%20time.",
+                              "title": "Shaped Charges - Jet Research Center",
+                              "text": "Engineered for your rock. JRC designs and manufactures a wide range of shaped charges for oil and gas well perforating. JRC shaped..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Synonyms and Related Terms",
+                          "text": "Shaped Charge: Hollow charge, cavity charge, Monroe effect charge. Linear Shaped Charge: Explosive cutting tape, LSC. EFP: Self-forging fragment, Misznay-Schardin charge, slug.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Wikipedia",
+                              "domain": "en.wikipedia.org",
+                              "url": "https://en.wikipedia.org/wiki/Shaped_charge",
+                              "title": "Shaped charge - Wikipedia",
+                              "text": "There are several forms of shaped charge. * Linear shaped charges. * Explosively formed penetrator. * Tandem warhead. * Voitenko ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Blogger.com",
+                              "domain": "disaster-wise.blogspot.com",
+                              "url": "http://disaster-wise.blogspot.com/2010/10/shaped-charges-other-two-types.html#:~:text=Following%20up%20on%20my%20September,heads%20out%20at%20hypersonic%20speeds.",
+                              "title": "Shaped Charges: The Other Two Types - Disaster-wise",
+                              "text": "Oct 5, 2010 — Following up on my September post , which was about the conical shaped charge as it appears in the warhead of a Hellfir..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Accurate Energetic Systems",
+                              "domain": "www.aesys.biz",
+                              "url": "https://www.aesys.biz/linear-shaped-charge",
+                              "title": "Linear Shaped Charge | AES - Accurate Energetic Systems",
+                              "text": "LINEAR SHAPED CHARGE * LINEAR SHAPED. CHARGE. PRECISION CUTTING. AES is proud to offer the Linear Shaped Charge (LSC), a highly s..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "National Institutes of Health (.gov)",
+                              "domain": "pubmed.ncbi.nlm.nih.gov",
+                              "url": "https://pubmed.ncbi.nlm.nih.gov/18200915/",
+                              "title": "Shaped charges and explosively formed penetrators: background for clinicians - PubMed",
+                              "text": "Shaped charges (SC) and explosively formed penetrators (EFP) are both types of munitions. SCs have been used in the mining industr..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "DOE OSTI (.gov)",
+                              "domain": "www.osti.gov",
+                              "url": "https://www.osti.gov/servlets/purl/1334941#:~:text=Cylindrical%20Shaped%20Charge%20Concept,form%20a%20localized%20intense%20force.",
+                              "title": "Energy Transfer of a Shaped Charge - OSTI",
+                              "text": "Cylindrical Shaped Charge Concept A cylinder of explosive with a hollow cavity on one and a detonator at the other is considered a..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Common Liner Materials",
+                          "text": "Copper: Standard for high performance and high velocity, ductile deformation. Steel/Aluminum: Used for specific industrial cutting and oil well applications. Tungsten: High-density, high-penetration applications.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "ScienceDirect.com",
+                              "domain": "www.sciencedirect.com",
+                              "url": "https://www.sciencedirect.com/topics/engineering/shaped-charge#:~:text=A%20shaped%20charge%20is%20usually,copper%2C%20and%20other%20metallic%20materials.",
+                              "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                              "text": "A shaped charge is usually a conical shape, as shown in Fig. 25.3. The explosive charge is often contained in a plastic tube whose..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "ScienceDirect.com",
+                              "domain": "www.sciencedirect.com",
+                              "url": "https://www.sciencedirect.com/topics/materials-science/shaped-charge",
+                              "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                              "text": null
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "apps.dtic.mil",
+                              "domain": "apps.dtic.mil",
+                              "url": "https://apps.dtic.mil/sti/tr/pdf/ADA228492.pdf",
+                              "title": "The Shaped Charge Concept. Part 3. Applications of ... - DTIC",
+                              "text": "charges, Oe devices contain a relatively small amount of explosive. (Usually, several shaped charges art fired simultaneously.) Th..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Shaped charges are commonly used in military anti-tank munitions, oil well casing perforation, and industrial demolition of concrete or steel structures.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Sage Journals",
+                              "domain": "journals.sagepub.com",
+                              "url": "https://journals.sagepub.com/doi/10.1177/20414196211017923#:~:text=a%20deeper%20penetration.-,Other%20forms%20of%20shaped%20charges,in%20cutting%20and%20forming%20processes).",
+                              "title": "A practical review study on shaped charge in the last two decades ( ...",
+                              "text": "Jun 6, 2021 — Other forms of shaped charges. Typical shaped charges usually have conical shapes with cone angles of <100°. In this se..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Jet Research Center",
+                              "domain": "www.jetresearch.com",
+                              "url": "https://www.jetresearch.com/en/energetics/shaped-charges#:~:text=Engineered%20for%20your%20rock,high-performance%20shots%20every%20time.",
+                              "title": "Shaped Charges - Jet Research Center",
+                              "text": "Engineered for your rock. JRC designs and manufactures a wide range of shaped charges for oil and gas well perforating. JRC shaped..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Alford Technologies",
+                              "domain": "www.explosives.net",
+                              "url": "https://www.explosives.net/shaped-charges-explosive-technology/#:~:text=What%20Are%20Shaped%20Charges?,into%20rock%20with%20impressive%20accuracy.",
+                              "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                              "text": "Jan 20, 2025 — What Are Shaped Charges? 1-Ballistic cap, 2-Air-filled cavity, 3-Conical liner, 4-Detonator, 5-Explosive, 6-Piezo-elec..."
+                            }
+                          ]
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Wikipedia",
+                          "domain": "en.wikipedia.org",
+                          "url": "https://en.wikipedia.org/wiki/Shaped_charge",
+                          "title": "Shaped charge - Wikipedia",
+                          "text": "There are several forms of shaped charge. * Linear shaped charges. * Explosively formed penetrator. * Tandem warhead. * Voitenko ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Blogger.com",
+                          "domain": "disaster-wise.blogspot.com",
+                          "url": "http://disaster-wise.blogspot.com/2010/10/shaped-charges-other-two-types.html#:~:text=Following%20up%20on%20my%20September,heads%20out%20at%20hypersonic%20speeds.",
+                          "title": "Shaped Charges: The Other Two Types - Disaster-wise",
+                          "text": "Oct 5, 2010 — Following up on my September post , which was about the conical shaped charge as it appears in the warhead of a Hellfir..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "ScienceDirect.com",
+                          "domain": "www.sciencedirect.com",
+                          "url": "https://www.sciencedirect.com/topics/engineering/shaped-charge#:~:text=A%20shaped%20charge%20is%20usually,copper%2C%20and%20other%20metallic%20materials.",
+                          "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                          "text": "A shaped charge is usually a conical shape, as shown in Fig. 25.3. The explosive charge is often contained in a plastic tube whose..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "ScienceDirect.com",
+                          "domain": "www.sciencedirect.com",
+                          "url": "https://www.sciencedirect.com/topics/materials-science/shaped-charge",
+                          "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                          "text": null
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Sage Journals",
+                          "domain": "journals.sagepub.com",
+                          "url": "https://journals.sagepub.com/doi/10.1177/20414196211017923#:~:text=a%20deeper%20penetration.-,Other%20forms%20of%20shaped%20charges,in%20cutting%20and%20forming%20processes).",
+                          "title": "A practical review study on shaped charge in the last two decades ( ...",
+                          "text": "Jun 6, 2021 — Other forms of shaped charges. Typical shaped charges usually have conical shapes with cone angles of <100°. In this se..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Jet Research Center",
+                          "domain": "www.jetresearch.com",
+                          "url": "https://www.jetresearch.com/en/energetics/shaped-charges#:~:text=Engineered%20for%20your%20rock,high-performance%20shots%20every%20time.",
+                          "title": "Shaped Charges - Jet Research Center",
+                          "text": "Engineered for your rock. JRC designs and manufactures a wide range of shaped charges for oil and gas well perforating. JRC shaped..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Alford Technologies",
+                          "domain": "www.explosives.net",
+                          "url": "https://www.explosives.net/shaped-charges-explosive-technology/#:~:text=What%20Are%20Shaped%20Charges?,into%20rock%20with%20impressive%20accuracy.",
+                          "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                          "text": "Jan 20, 2025 — What Are Shaped Charges? 1-Ballistic cap, 2-Air-filled cavity, 3-Conical liner, 4-Detonator, 5-Explosive, 6-Piezo-elec..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "apps.dtic.mil",
+                          "domain": "apps.dtic.mil",
+                          "url": "https://apps.dtic.mil/sti/tr/pdf/ADA228492.pdf",
+                          "title": "The Shaped Charge Concept. Part 3. Applications of ... - DTIC",
+                          "text": "charges, Oe devices contain a relatively small amount of explosive. (Usually, several shaped charges art fired simultaneously.) Th..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Science Toys",
+                          "domain": "scitoys.com",
+                          "url": "https://scitoys.com/shaped.html#:~:text=Special%20rebar%20cutting%20charges%2C%20using,provides%20an%20improved%20spherical%20implosion.",
+                          "title": "Shaped Charges - Science Toys",
+                          "text": "Special rebar cutting charges, using the same principle, can be clamped onto inch-thick or larger rebar, cutting them apart. These..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Accurate Energetic Systems",
+                          "domain": "www.aesys.biz",
+                          "url": "https://www.aesys.biz/linear-shaped-charge",
+                          "title": "Linear Shaped Charge | AES - Accurate Energetic Systems",
+                          "text": "LINEAR SHAPED CHARGE * LINEAR SHAPED. CHARGE. PRECISION CUTTING. AES is proud to offer the Linear Shaped Charge (LSC), a highly s..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "National Institutes of Health (.gov)",
+                          "domain": "pubmed.ncbi.nlm.nih.gov",
+                          "url": "https://pubmed.ncbi.nlm.nih.gov/18200915/",
+                          "title": "Shaped charges and explosively formed penetrators: background for clinicians - PubMed",
+                          "text": "Shaped charges (SC) and explosively formed penetrators (EFP) are both types of munitions. SCs have been used in the mining industr..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "DOE OSTI (.gov)",
+                          "domain": "www.osti.gov",
+                          "url": "https://www.osti.gov/servlets/purl/1334941#:~:text=Cylindrical%20Shaped%20Charge%20Concept,form%20a%20localized%20intense%20force.",
+                          "title": "Energy Transfer of a Shaped Charge - OSTI",
+                          "text": "Cylindrical Shaped Charge Concept A cylinder of explosive with a hollow cavity on one and a detonator at the other is considered a..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": "What is the Monroe effect in a shaped charge?",
+                  "consideration_category": "Monroe Effect",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "The Munroe effect is the concentration of explosive energy, specifically through a conical or wedge-shaped cavity, to form a high-velocity jet that penetrates thick materials, such as armor or rock. When detonated, the explosive collapses a metal liner (copper/aluminum) inward, creating a plasma jet that pierces targets.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Wikipedia",
+                              "domain": "en.wikipedia.org",
+                              "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20Munroe%20or%20Neumann%20effect,effect%20and%20thereby%20save%20powder.",
+                              "title": "Shaped charge - Wikipedia",
+                              "text": "The Munroe or Neumann effect is the focusing of blast energy by a hollow or void cut on a surface of an explosive. The earliest me..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Alford Technologies",
+                              "domain": "www.explosives.net",
+                              "url": "https://www.explosives.net/shaped-charges-explosive-technology/",
+                              "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                              "text": "Jan 20, 2025"
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Accurate Energetic Systems",
+                              "domain": "www.aesys.biz",
+                              "url": "https://www.aesys.biz/linear-shaped-charge#:~:text=The%20effectiveness%20of%20the%20AES,the%20path%20of%20the%20jet.",
+                              "title": "Linear Shaped Charge | AES - Accurate Energetic Systems",
+                              "text": "The effectiveness of the AES LSC is derived from the \"Monroe effect,\" a phenomenon where the explosive core and V-shaped metal lin..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Usage Examples and Applications",
+                          "text": "High-Explosive Anti-Tank (HEAT) warheads : Used in missiles and tank rounds to penetrate heavy armor. Linear Shaped Charges (LSC) : Employed to cut steel beams, demolish structures, or cut trenches. Oil Well Perforators : Pokes holes through casing and cement into rock formations to allow oil to flow. Field Expedient Breaching : Using shaped materials like glass bottles filled with explosive to cut through materials.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Wikipedia",
+                              "domain": "en.wikipedia.org",
+                              "url": "https://en.wikipedia.org/wiki/High-explosive_anti-tank#:~:text=This%20article%20needs%20additional%20citations,may%20be%20challenged%20and%20removed.&text=High-explosive%20anti-tank%20(,incendiary%20effect%20on%20the%20armor.&text=Unlike%20standard%20armor-piercing%20rounds,HEAT%20being%20simply%20an%20acronym.",
+                              "title": "High-explosive anti-tank - Wikipedia",
+                              "text": "This article needs additional citations for verification. Please help improve this article by adding citations to reliable sources..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Instagram ·",
+                              "domain": "www.instagram.com",
+                              "url": "https://www.instagram.com/reel/DOHdZBSDpoD/#:~:text=Most%20oil%20filled%20perforators%20or,it'll%20work%20just%20fine.",
+                              "title": "Testing out the Munroe effect with this linear shaped charge ... - Instagram",
+                              "text": "Sep 2, 2025 — Most oil filled perforators or shape charges that we work with, 99% of them, they poke a hole, okay? They use a cone, a..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Accurate Energetic Systems",
+                              "domain": "www.aesys.biz",
+                              "url": "https://www.aesys.biz/linear-shaped-charge#:~:text=The%20effectiveness%20of%20the%20AES,the%20path%20of%20the%20jet.",
+                              "title": "Linear Shaped Charge | AES - Accurate Energetic Systems",
+                              "text": "The effectiveness of the AES LSC is derived from the \"Monroe effect,\" a phenomenon where the explosive core and V-shaped metal lin..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Reddit ·",
+                              "domain": "www.reddit.com",
+                              "url": "https://www.reddit.com/r/WarCollege/comments/1f0u96t/use_and_effectiveness_of_non_copper_shaped_charges/#:~:text=Everyone%20talks%20about%20the%20cone,water%2C%20you%20can%20cut%20them.",
+                              "title": "Use and effectiveness of non- copper shaped charges : r/WarCollege",
+                              "text": "Aug 25, 2024 — Everyone talks about the cone being converted into an EFP(explosively formed projectile) but that's not how the Munroe..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Synonyms and Related Terms",
+                          "text": "Neumann Effect : Commonly used in Europe for the same phenomenon. Von Foerster Effect : Also used in European contexts. Hollow Charge Effect : Descriptive term for the cavity.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Wikipedia",
+                              "domain": "en.wikipedia.org",
+                              "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20Munroe%20or%20Neumann%20effect,effect%20and%20thereby%20save%20powder.",
+                              "title": "Shaped charge - Wikipedia",
+                              "text": "The Munroe or Neumann effect is the focusing of blast energy by a hollow or void cut on a surface of an explosive. The earliest me..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "DTIC",
+                              "domain": "apps.dtic.mil",
+                              "url": "https://apps.dtic.mil/sti/pdfs/ADA226401.pdf",
+                              "title": "THE SHAPED CHARGE CONCEPT, PART I. INTRODUCTION - DTIC",
+                              "text": "This concentrated force, when directed against a metal plate, is capable of creating a deeper cavity than a cylinder of explosive ..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "The effect is named after American chemist Charles E. Munroe, who discovered in the late 19th century that placing a hollow indentation in explosive material dramatically increases its localized destructive force. The jet formed is a result of the liner collapsing under high-pressure detonation, focusing energy on a very small area.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Amazon.com",
+                              "domain": "www.amazon.com",
+                              "url": "https://www.amazon.com/Munroe-Effect-Professional-Explosive-applications/dp/B0BNTT3Z8D#:~:text=What's%20it%20about?,applications%20including%20anti-tank%20warheads.",
+                              "title": "The Munroe Effect: A Professional look at the Science of High ...",
+                              "text": "What's it about? A technical examination of shaped charge explosives, covering their history from 1883 through WWII, Dr. Charles E..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Britannica",
+                              "domain": "www.britannica.com",
+                              "url": "https://www.britannica.com/technology/shaped-charge#:~:text=The%20shaped%20charge%20was%20an,capable%20of%20punching%20through%20armour.",
+                              "title": "Shaped charge | explosive - Britannica",
+                              "text": "The shaped charge was an explosive formed into a hollow cone and lined with heavy metal; upon detonation, the explosive gases and ..."
+                            }
+                          ]
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Wikipedia",
+                          "domain": "en.wikipedia.org",
+                          "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=The%20Munroe%20or%20Neumann%20effect,effect%20and%20thereby%20save%20powder.",
+                          "title": "Shaped charge - Wikipedia",
+                          "text": "The Munroe or Neumann effect is the focusing of blast energy by a hollow or void cut on a surface of an explosive. The earliest me..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "DTIC",
+                          "domain": "apps.dtic.mil",
+                          "url": "https://apps.dtic.mil/sti/pdfs/ADA226401.pdf",
+                          "title": "THE SHAPED CHARGE CONCEPT, PART I. INTRODUCTION - DTIC",
+                          "text": "This concentrated force, when directed against a metal plate, is capable of creating a deeper cavity than a cylinder of explosive ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Reddit ·",
+                          "domain": "www.reddit.com",
+                          "url": "https://www.reddit.com/r/WarCollege/comments/1f0u96t/use_and_effectiveness_of_non_copper_shaped_charges/#:~:text=Everyone%20talks%20about%20the%20cone,water%2C%20you%20can%20cut%20them.",
+                          "title": "Use and effectiveness of non- copper shaped charges : r/WarCollege",
+                          "text": "Aug 25, 2024 — Everyone talks about the cone being converted into an EFP(explosively formed projectile) but that's not how the Munroe..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Instagram ·",
+                          "domain": "www.instagram.com",
+                          "url": "https://www.instagram.com/reel/DOHdZBSDpoD/#:~:text=Most%20oil%20filled%20perforators%20or,it'll%20work%20just%20fine.",
+                          "title": "Testing out the Munroe effect with this linear shaped charge ... - Instagram",
+                          "text": "Sep 2, 2025 — Most oil filled perforators or shape charges that we work with, 99% of them, they poke a hole, okay? They use a cone, a..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Alford Technologies",
+                          "domain": "www.explosives.net",
+                          "url": "https://www.explosives.net/shaped-charges-explosive-technology/",
+                          "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                          "text": "Jan 20, 2025"
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Accurate Energetic Systems",
+                          "domain": "www.aesys.biz",
+                          "url": "https://www.aesys.biz/linear-shaped-charge#:~:text=The%20effectiveness%20of%20the%20AES,the%20path%20of%20the%20jet.",
+                          "title": "Linear Shaped Charge | AES - Accurate Energetic Systems",
+                          "text": "The effectiveness of the AES LSC is derived from the \"Monroe effect,\" a phenomenon where the explosive core and V-shaped metal lin..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Wikipedia",
+                          "domain": "en.wikipedia.org",
+                          "url": "https://en.wikipedia.org/wiki/High-explosive_anti-tank#:~:text=This%20article%20needs%20additional%20citations,may%20be%20challenged%20and%20removed.&text=High-explosive%20anti-tank%20(,incendiary%20effect%20on%20the%20armor.&text=Unlike%20standard%20armor-piercing%20rounds,HEAT%20being%20simply%20an%20acronym.",
+                          "title": "High-explosive anti-tank - Wikipedia",
+                          "text": "This article needs additional citations for verification. Please help improve this article by adding citations to reliable sources..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Amazon.com",
+                          "domain": "www.amazon.com",
+                          "url": "https://www.amazon.com/Munroe-Effect-Professional-Explosive-applications/dp/B0BNTT3Z8D#:~:text=What's%20it%20about?,applications%20including%20anti-tank%20warheads.",
+                          "title": "The Munroe Effect: A Professional look at the Science of High ...",
+                          "text": "What's it about? A technical examination of shaped charge explosives, covering their history from 1883 through WWII, Dr. Charles E..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Britannica",
+                          "domain": "www.britannica.com",
+                          "url": "https://www.britannica.com/technology/shaped-charge#:~:text=The%20shaped%20charge%20was%20an,capable%20of%20punching%20through%20armour.",
+                          "title": "Shaped charge | explosive - Britannica",
+                          "text": "The shaped charge was an explosive formed into a hollow cone and lined with heavy metal; upon detonation, the explosive gases and ..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": "What is the history of the shaped charge?",
+                  "consideration_category": "History",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "The history of the shaped charge, or hollow charge, spans over a century, evolving from 19th-century observations of focused explosive energy into a vital technology for military and industrial applications. Based on the \"Munroe Effect\" discovered in 1888, the technology matured during WWII into high-velocity penetrators (HEAT) to combat armor.",
+                          "images": null,
+                          "references": null
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Key Historical Developments",
+                          "text": "Early Discoveries (1880s–1910s): Researchers like Charles E. Munroe (1888) and Max von Foerster (1883) noted that a cavity within an explosive directs the force, a phenomenon known as the Munroe effect. WWII Developments (1930s–1940s): German engineers (e.g., Thomanek) developed the first effective lined cavity penetrators (c. 1935–1939). These were first used heavily by German troops against Fort Eben-Emael in 1940. Famous weapons included the German Panzerfaust and American Bazooka. Post-War Evolution: Advances in materials science, high-speed imaging, and computer modeling allowed for optimized liner materials (copper) and shapes, leading to advanced tandem and linear charges.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "apps.dtic.mil",
+                              "domain": "apps.dtic.mil",
+                              "url": "https://apps.dtic.mil/sti/citations/ADA497450#:~:text=Abstract:,Mohaupt%2C%20Thomanek%2C%20and%20others.",
+                              "title": "A Brief History of Shaped Charges - DTIC",
+                              "text": "Abstract: This report provides an overview of the history of shaped charge development by consolidating earlier write-ups from sev..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Alford Technologies",
+                              "domain": "www.explosives.net",
+                              "url": "https://www.explosives.net/shaped-charges-explosive-technology/#:~:text=A%20Brief%20History%20of%20Directed,collapse%20inward%20under%20tremendous%20pressure.",
+                              "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                              "text": "Jan 20, 2025 — A Brief History of Directed Explosive Power. The concept of shaped charges emerged in the early 20th century. While ea..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Wikipedia",
+                              "domain": "en.wikipedia.org",
+                              "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=One%20of%20the%20earliest%20uses,like%20the%20modern%20HEAT%20warheads.",
+                              "title": "Shaped charge - Wikipedia",
+                              "text": "One of the earliest uses of shaped charges was by German glider-borne troops against the Belgian Fort Eben-Emael in 1940. These de..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "apps.dtic.mil",
+                              "domain": "apps.dtic.mil",
+                              "url": "https://apps.dtic.mil/sti/tr/pdf/ADA226772.pdf",
+                              "title": "BRL DTC FILE Copy - iBRLOP - DTIC",
+                              "text": "concept and developed the first effective fined cavity shaped charge penetraors. Thomane's early work dates from late 1935 to 1939..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Facebook ·",
+                              "domain": "www.facebook.com",
+                              "url": "https://www.facebook.com/alfordtech/videos/pluton-highly-versatile-shaped-charge/844553531122699/",
+                              "title": "💥 The Evolution and Impact of Shaped Charges 💥 Only one candidate for 'S' in the Alford A to Z... Shaped charges have a rich history and remain one of the most fascinating innovations in explosives. Developed during World War II, they were first used by German engineers who sought to create more effective anti-tank weapons. But the roots of this technology stretch back even further - to the 1880s - when Munroe first observed the phenomenon of focused explosive energy, later dubbed the 'Munroe Effect'. 🎓 How does a shaped charge work? Concentrating explosive energy into a narrow jet allows it to penetrate thick armour or other materials with astonishing precision. This groundbreaking principle reshaped military strategy, particularly in anti-tank warfare. While WWII marked the beginning of its practical use, the technology has since evolved beyond the battlefield. 👷‍♂️ Who uses them? Today, shaped charges are essential not just in defence but also in industries like oil and gas - where they're used in perforation processes for well completion - demolition, and even space. They are essential to Explosive Ordnance Disposal (EOD) operations, where precision and",
+                              "text": "Sep 30, 2024"
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "ResearchGate",
+                              "domain": "www.researchgate.net",
+                              "url": "https://www.researchgate.net/publication/346752319_A_Review_of_Works_on_Shaped_Charges#:~:text=air%20and%20naval.-,High%20explosives,by%20further%20refinements%20in%20the",
+                              "title": "A Review of Works on Shaped Charges - ResearchGate",
+                              "text": "Nov 19, 2025 — High explosives. compositions fillings produce a thin high velocity metal jet which. is used for target damage. Shaped..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Usage Examples",
+                          "text": "Military: High Explosive Anti-Tank (HEAT) rounds, bunker busters, rocket-propelled grenades, and explosive ordnance disposal (EOD) tools. Industrial/Commercial: Oil well completion (perforation) to allow oil to flow, industrial cutting of large metal structures, demolition of concrete structures, and mining. Scientific: Research into hypervelocity and simulated hypervelocity impacts (e.g., creating artificial meteorites).",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Facebook ·",
+                              "domain": "www.facebook.com",
+                              "url": "https://www.facebook.com/alfordtech/videos/pluton-highly-versatile-shaped-charge/844553531122699/",
+                              "title": "💥 The Evolution and Impact of Shaped Charges 💥 Only one candidate for 'S' in the Alford A to Z... Shaped charges have a rich history and remain one of the most fascinating innovations in explosives. Developed during World War II, they were first used by German engineers who sought to create more effective anti-tank weapons. But the roots of this technology stretch back even further - to the 1880s - when Munroe first observed the phenomenon of focused explosive energy, later dubbed the 'Munroe Effect'. 🎓 How does a shaped charge work? Concentrating explosive energy into a narrow jet allows it to penetrate thick armour or other materials with astonishing precision. This groundbreaking principle reshaped military strategy, particularly in anti-tank warfare. While WWII marked the beginning of its practical use, the technology has since evolved beyond the battlefield. 👷‍♂️ Who uses them? Today, shaped charges are essential not just in defence but also in industries like oil and gas - where they're used in perforation processes for well completion - demolition, and even space. They are essential to Explosive Ordnance Disposal (EOD) operations, where precision and",
+                              "text": "Sep 30, 2024"
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "National Institutes of Health (.gov)",
+                              "domain": "pubmed.ncbi.nlm.nih.gov",
+                              "url": "https://pubmed.ncbi.nlm.nih.gov/18200915/",
+                              "title": "Shaped charges and explosively formed penetrators: background for clinicians - PubMed",
+                              "text": "Shaped charges (SC) and explosively formed penetrators (EFP) are both types of munitions. SCs have been used in the mining industr..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "ScienceDirect.com",
+                              "domain": "www.sciencedirect.com",
+                              "url": "https://www.sciencedirect.com/topics/materials-science/shaped-charge#:~:text=Shaped%20charges%20are%20devices%20in,Walters%20&%20Zukas%2C%201989).",
+                              "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                              "text": "Shaped charges are devices in which an explosive load is used to collapse a (usually metal) liner, thereby creating a high velocit..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "ScienceDirect.com",
+                              "domain": "www.sciencedirect.com",
+                              "url": "https://www.sciencedirect.com/topics/engineering/shaped-charge",
+                              "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                              "text": "25.3 Shaped charges and applications * 25.3. 1 Shaped Charges. Shaped charges are used in not only military but also civil engine..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "apps.dtic.mil",
+                              "domain": "apps.dtic.mil",
+                              "url": "https://apps.dtic.mil/sti/tr/pdf/ADA240999.pdf",
+                              "title": "Shock Waves in the Study of Shaped Charges - DTIC",
+                              "text": "The warhead weighed 3,500 kg with an explosive weight of 1,720 kg. The fighter pilot flew the combination to the target, aimed It,"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Synonyms and Related Terms Hollow Charge (most common synonym), Munroe Effect Charger, Lined Cavity Charge, High Explosive Anti-Tank (HEAT) warhead, and Explosively Formed Penetrator (EFP) (a related variant).",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "DTIC",
+                              "domain": "apps.dtic.mil",
+                              "url": "https://apps.dtic.mil/sti/tr/pdf/ADA497450.pdf",
+                              "title": "A Brief History of Shaped Charges - DTIC",
+                              "text": "The unlined shaped charge was rediscovered by Charles Munroe of the Naval Torpedo Station, Newport, RI in 1888. Munroe popularized..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "apps.dtic.mil",
+                              "domain": "apps.dtic.mil",
+                              "url": "https://apps.dtic.mil/sti/tr/pdf/ADA226772.pdf",
+                              "title": "BRL DTC FILE Copy - iBRLOP - DTIC",
+                              "text": "concept and developed the first effective fined cavity shaped charge penetraors. Thomane's early work dates from late 1935 to 1939..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Alford Technologies",
+                              "domain": "www.explosives.net",
+                              "url": "https://www.explosives.net/shaped-charges-explosive-technology/#:~:text=A%20Brief%20History%20of%20Directed,collapse%20inward%20under%20tremendous%20pressure.",
+                              "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                              "text": "Jan 20, 2025 — A Brief History of Directed Explosive Power. The concept of shaped charges emerged in the early 20th century. While ea..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "National Institutes of Health (.gov)",
+                              "domain": "pubmed.ncbi.nlm.nih.gov",
+                              "url": "https://pubmed.ncbi.nlm.nih.gov/18200915/",
+                              "title": "Shaped charges and explosively formed penetrators: background for clinicians - PubMed",
+                              "text": "Shaped charges (SC) and explosively formed penetrators (EFP) are both types of munitions. SCs have been used in the mining industr..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "ScienceDirect.com",
+                              "domain": "www.sciencedirect.com",
+                              "url": "https://www.sciencedirect.com/topics/materials-science/shaped-charge#:~:text=Shaped%20charges%20are%20devices%20in,Walters%20&%20Zukas%2C%201989).",
+                              "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                              "text": "Shaped charges are devices in which an explosive load is used to collapse a (usually metal) liner, thereby creating a high velocit..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "The development of the modern lined shaped charge revolutionized armor warfare and provided a precise tool for industrial penetration and destruction.",
+                          "images": null,
+                          "references": null
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "DTIC",
+                          "domain": "apps.dtic.mil",
+                          "url": "https://apps.dtic.mil/sti/tr/pdf/ADA497450.pdf",
+                          "title": "A Brief History of Shaped Charges - DTIC",
+                          "text": "The unlined shaped charge was rediscovered by Charles Munroe of the Naval Torpedo Station, Newport, RI in 1888. Munroe popularized..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Wikipedia",
+                          "domain": "en.wikipedia.org",
+                          "url": "https://en.wikipedia.org/wiki/Shaped_charge#:~:text=One%20of%20the%20earliest%20uses,like%20the%20modern%20HEAT%20warheads.",
+                          "title": "Shaped charge - Wikipedia",
+                          "text": "One of the earliest uses of shaped charges was by German glider-borne troops against the Belgian Fort Eben-Emael in 1940. These de..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "apps.dtic.mil",
+                          "domain": "apps.dtic.mil",
+                          "url": "https://apps.dtic.mil/sti/citations/ADA497450#:~:text=Abstract:,Mohaupt%2C%20Thomanek%2C%20and%20others.",
+                          "title": "A Brief History of Shaped Charges - DTIC",
+                          "text": "Abstract: This report provides an overview of the history of shaped charge development by consolidating earlier write-ups from sev..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "apps.dtic.mil",
+                          "domain": "apps.dtic.mil",
+                          "url": "https://apps.dtic.mil/sti/tr/pdf/ADA226772.pdf",
+                          "title": "BRL DTC FILE Copy - iBRLOP - DTIC",
+                          "text": "concept and developed the first effective fined cavity shaped charge penetraors. Thomane's early work dates from late 1935 to 1939..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Alford Technologies",
+                          "domain": "www.explosives.net",
+                          "url": "https://www.explosives.net/shaped-charges-explosive-technology/#:~:text=A%20Brief%20History%20of%20Directed,collapse%20inward%20under%20tremendous%20pressure.",
+                          "title": "Shaped Charges: Harnessing Precision in Explosive Technology",
+                          "text": "Jan 20, 2025 — A Brief History of Directed Explosive Power. The concept of shaped charges emerged in the early 20th century. While ea..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "apps.dtic.mil",
+                          "domain": "apps.dtic.mil",
+                          "url": "https://apps.dtic.mil/sti/tr/pdf/ADA240999.pdf",
+                          "title": "Shock Waves in the Study of Shaped Charges - DTIC",
+                          "text": "The warhead weighed 3,500 kg with an explosive weight of 1,720 kg. The fighter pilot flew the combination to the target, aimed It,"
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Facebook ·",
+                          "domain": "www.facebook.com",
+                          "url": "https://www.facebook.com/alfordtech/videos/pluton-highly-versatile-shaped-charge/844553531122699/",
+                          "title": "💥 The Evolution and Impact of Shaped Charges 💥 Only one candidate for 'S' in the Alford A to Z... Shaped charges have a rich history and remain one of the most fascinating innovations in explosives. Developed during World War II, they were first used by German engineers who sought to create more effective anti-tank weapons. But the roots of this technology stretch back even further - to the 1880s - when Munroe first observed the phenomenon of focused explosive energy, later dubbed the 'Munroe Effect'. 🎓 How does a shaped charge work? Concentrating explosive energy into a narrow jet allows it to penetrate thick armour or other materials with astonishing precision. This groundbreaking principle reshaped military strategy, particularly in anti-tank warfare. While WWII marked the beginning of its practical use, the technology has since evolved beyond the battlefield. 👷‍♂️ Who uses them? Today, shaped charges are essential not just in defence but also in industries like oil and gas - where they're used in perforation processes for well completion - demolition, and even space. They are essential to Explosive Ordnance Disposal (EOD) operations, where precision and",
+                          "text": "Sep 30, 2024"
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "ResearchGate",
+                          "domain": "www.researchgate.net",
+                          "url": "https://www.researchgate.net/publication/346752319_A_Review_of_Works_on_Shaped_Charges#:~:text=air%20and%20naval.-,High%20explosives,by%20further%20refinements%20in%20the",
+                          "title": "A Review of Works on Shaped Charges - ResearchGate",
+                          "text": "Nov 19, 2025 — High explosives. compositions fillings produce a thin high velocity metal jet which. is used for target damage. Shaped..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "National Institutes of Health (.gov)",
+                          "domain": "pubmed.ncbi.nlm.nih.gov",
+                          "url": "https://pubmed.ncbi.nlm.nih.gov/18200915/",
+                          "title": "Shaped charges and explosively formed penetrators: background for clinicians - PubMed",
+                          "text": "Shaped charges (SC) and explosively formed penetrators (EFP) are both types of munitions. SCs have been used in the mining industr..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "ScienceDirect.com",
+                          "domain": "www.sciencedirect.com",
+                          "url": "https://www.sciencedirect.com/topics/engineering/shaped-charge",
+                          "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                          "text": "25.3 Shaped charges and applications * 25.3. 1 Shaped Charges. Shaped charges are used in not only military but also civil engine..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "ScienceDirect.com",
+                          "domain": "www.sciencedirect.com",
+                          "url": "https://www.sciencedirect.com/topics/materials-science/shaped-charge#:~:text=Shaped%20charges%20are%20devices%20in,Walters%20&%20Zukas%2C%201989).",
+                          "title": "Shaped Charge - an overview | ScienceDirect Topics",
+                          "text": "Shaped charges are devices in which an explosive load is used to collapse a (usually metal) liner, thereby creating a high velocit..."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "video",
+              "rank_group": 1,
+              "rank_absolute": 4,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[5]/div[1]",
+              "items": [
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Ballistic High-Speed",
+                  "title": "Shaped Charges vs Ballistic Heads! - Ballistic High-Speed",
+                  "timestamp": "2024-06-16 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=TVOTUpMdft8"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Ballistic High-Speed",
+                  "title": "Shaped Charges vs Tungsten Cube! ft. @HoustonJones and ...",
+                  "timestamp": "2024-12-30 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=e9GP-RsA-JY"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Operational Facts",
+                  "title": "Shaped Charge",
+                  "timestamp": "2020-12-11 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=Li2Kt4DtUdY"
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "people_also_ask",
+              "rank_group": 1,
+              "rank_absolute": 5,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]/div[1]/div[1]",
+              "items": [
+                {
+                  "type": "people_also_ask_element",
+                  "title": "How fast is a shaped charge?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://en.wikipedia.org/wiki/Shaped_charge",
+                      "domain": "en.wikipedia.org",
+                      "title": "Shaped charge - Wikipedia",
+                      "description": "The speed can reach 10 km/s, peaking some 40 microseconds after detonation; the cone tip is subjected to acceleration of about 25 million g. The jet tail reaches about 2–5 km/s.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What is the difference between EFP and shaped charge?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_ai_overview_expanded_element",
+                      "items": null,
+                      "references": null,
+                      "asynchronous_ai_overview": true
+                    }
+                  ]
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "images",
+              "rank_group": 1,
+              "rank_absolute": 6,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[9]/div[1]",
+              "title": "Images",
+              "url": "https://www.google.com/search?sca_esv=06de5ba07996f893&hl=en&gl=US&q=shaped+charge&udm=2&source=univ&fir=FV_rpN3Q6d_L9M%252CvXrriN39i8oBxM%252C_%253BRO-gr8W6jFSsrM%252CszbCF19zepRVxM%252C_%253BLnWA2CaUZo7vtM%252Ck3EIav9aPPRZtM%252C_%253BkV5814xdEPZwIM%252C7k0eNAW90LMkdM%252C_%253BL0waXxcXdWxWaM%252CgPgmcBg2YuHdXM%252C_%253BDDUs95NNVifkqM%252CszbCF19zepRVxM%252C_%253BkN0h-if6h60QcM%252CsAwkuUWFWNqI6M%252C_%253BIvlpcqqpCW7pTM%252CtP1E5EBBjK899M%252C_%253Ba-m4uP1vKrIFjM%252CvXrriN39i8oBxM%252C_%253BQFXOjz-8tW8FCM%252CaIyjUw8tT9uKKM%252C_%253BFBsnrqS8LCC6KM%252Clhoz7ZGqdRNATM%252C_%253BYW0f_fg7nrMZGM%252C_1v-KuxxcmyebM%252C_&usg=AI4_-kRuyPvxlQ179_yKwfpBQy3Ro11Log&sa=X&ved=2ahUKEwii5-r0lZGUAxVYkysGHXXxLy8Q7Al6BAhPEAU",
+              "items": [
+                {
+                  "type": "images_element",
+                  "alt": "Shaped charge - Wikipedia",
+                  "url": "https://en.wikipedia.org/wiki/Shaped_charge",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7SxB8PNKtdo25I4GZWt_baPQjzcmZnM_BZNG-7f9Ajs-ZSYh9IoITk5w&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charges For Oil Well Perforating - Drilling Manual",
+                  "url": "https://www.drillingmanual.com/shaped-charges-oil-well-perforating/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFdQX2wd54_11xf-q3hiilyfD3vDAp_ovS5LQ80CFaWO8lBf5Q7qnRSEo&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charge - YouTube",
+                  "url": "https://www.youtube.com/watch?v=Li2Kt4DtUdY",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeI4NLn4HNkBUCHb5a5UpF0KKJ86bBO_XVT02siLOg&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charge - an overview | ScienceDirect Topics",
+                  "url": "https://www.sciencedirect.com/topics/engineering/shaped-charge",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbVzxHYSrkZ5lFGN7Dx48DvDvT-kFzc6lWk82JMOtfyVuhVBpEwcRLAH8&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charges: A Guide to their Explosive Potential",
+                  "url": "https://www.explosives.net/shaped-charges-explosive-technology/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRatH6S9qubqHUnVhqdgFT32pmKGfUOVSis9Q4fme9nfocBsHs_a6wtK18&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charges For Oil Well Perforating - Drilling Manual",
+                  "url": "https://www.drillingmanual.com/shaped-charges-oil-well-perforating/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaGPR_Gb6XVXcQXr7cC2ZD8x0eiCKgomJgIcQHXQG7sdg1ZY6Nh7yQ5oE&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charge - an overview | ScienceDirect Topics",
+                  "url": "https://www.sciencedirect.com/topics/materials-science/shaped-charge",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkZFkV2R-i9x58uRYRzYRHy4RRqDmInHFeKAl2dyUe910RJc1wX4IrVjE&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Explosive Charges - 911Metallurgist",
+                  "url": "https://www.911metallurgist.com/blog/shaped-explosive-charges/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdtdRRuORla6i5S_HcFHomMOiR3u4LmD1QA0lkm1sgNak64jNE2wYa9rs&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped charge - Wikipedia",
+                  "url": "https://en.wikipedia.org/wiki/Shaped_charge",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfVCvUt1HQWwUpk-Kvjzw7JJvhJvihwMkH_vWfwCDRb6iy90Jzt8Yc4dI&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "What is perforating? What are shaped charges? - YouTube",
+                  "url": "https://www.youtube.com/watch?v=WUVrvYEueLc",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBvL0huux4KSPwIAnx9wxzqH-sVhLfsE1HE79w4iHP&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "A shaped charge, principle of work | Download Scientific Diagram",
+                  "url": "https://www.researchgate.net/figure/A-shaped-charge-principle-of-work_fig1_287466669",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQmhISwPvX64ESCe8S2Duhl5jqyUR0bOCMDJnZnXYGEANjm_0uxugvS_Y&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Structural Evolution and Microstructural Features of the ...",
+                  "url": "https://link.springer.com/article/10.1007/s11665-021-05514-9",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQX5WV_uBTaY_TtMEDHl1SGJMZ7x5cfrry88FJiZs82EIMARMo50EMwsQ&s"
+                }
+              ],
+              "related_image_searches": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 2,
+              "rank_absolute": 7,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[11]/div[1]/div[1]",
+              "domain": "www.explosives.net",
+              "title": "Shaped Charges: A Guide to their Explosive Potential",
+              "url": "https://www.explosives.net/shaped-charges-explosive-technology/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.explosives.net › Resources",
+              "website_name": "Alford Technologies",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Jan 20, 2025 — A shaped charge is a carefully engineered explosive device that focuses its energy in a specific direction – think of it as a laser beam of explosive force. Read more",
+              "pre_snippet": "01/20/2025 00:00:00",
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": "shaped charge from www.explosives.net",
+                  "url": "https://www.explosives.net/shaped-charges-explosive-technology/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQl4QuBFj6ln8CVj1XHCVSt06K9lBZXfjJn_BZ14RI&usqp=CAE&s"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "a carefully engineered explosive device that focuses its energy in a specific direction"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-01-20 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "short_videos",
+              "rank_group": 1,
+              "rank_absolute": 8,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[13]/div[1]",
+              "title": "Short videos",
+              "items": [
+                {
+                  "type": "short_videos_element",
+                  "title": "How Shaped Charge Warheads Make Armor Irrelevant ...",
+                  "url": "https://www.facebook.com/100083329457086/videos/how-shaped-charge-warheads-make-armor-irrelevant/1428799948627280/",
+                  "domain": "www.facebook.com",
+                  "source": "Military Technology"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "Shaped Charge vs Ballistic Heads!",
+                  "url": "https://www.youtube.com/shorts/BvgVoDrblf4",
+                  "domain": "www.youtube.com",
+                  "source": "Ballistic High-Speed"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "The Founding Father you've probably never heard of (but ...",
+                  "url": "https://www.reddit.com/r/USHistory/comments/1sxyil0/the_founding_father_youve_probably_never_heard_of/",
+                  "domain": "www.reddit.com",
+                  "source": "Alive-Pomelo5802"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "How Explosives Shape the Future of Demolition - Curious ...",
+                  "url": "https://www.youtube.com/shorts/LiwReqrKI8o",
+                  "domain": "www.youtube.com",
+                  "source": "Curious? Science and Engineering"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "Did you know that not all shape charges are used for warfare?",
+                  "url": "https://www.instagram.com/reel/DNmH22zOmER/",
+                  "domain": "www.instagram.com",
+                  "source": "Matt Barnett"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "Explosive Engineering: Shaped Charges vs. Dynamite",
+                  "url": "https://www.youtube.com/shorts/T2I0cOWjiYc",
+                  "domain": "www.youtube.com",
+                  "source": "MattyOnshift aka TheDemolitionMentor"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "GOING VIRAL: Meet The JBN Follower Calmly Eats Salad ...",
+                  "url": "https://www.instagram.com/reel/DXqaZ_xjUdz/",
+                  "domain": "www.instagram.com",
+                  "source": "Jewish Breaking News"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "To my squibber friends, the bar is much, much higher! Let me ...",
+                  "url": "https://x.com/BlakeBednarz/status/2048543464439058581",
+                  "domain": "x.com",
+                  "source": "Blake"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "A Ukrainian civilian records an Iranian/Russian \"Shahed\" UAV ...",
+                  "url": "https://www.reddit.com/r/CombatFootage/comments/1srnsvc/a_ukrainian_civilian_records_an_iranianrussian/",
+                  "domain": "www.reddit.com",
+                  "source": "MilesLongthe3rd"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "[Un groupe de reconstituteurs de la Wehrmacht traversent la ...",
+                  "url": "https://www.instagram.com/reel/DXqbOEKjiZb/",
+                  "domain": "www.instagram.com",
+                  "source": "PassionMilitaria"
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 3,
+              "rank_absolute": 9,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[15]/div[1]/div[1]",
+              "domain": "apps.dtic.mil",
+              "title": "Introduction to Shaped Charges - DTIC",
+              "url": "https://apps.dtic.mil/sti/pdfs/ADA469696.pdf",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://apps.dtic.mil › sti › pdfs › ADA469696",
+              "website_name": "dtic.mil",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "by W Walters · 2007 · Cited by 54 — A shaped charge detonates on impact, liquefying metal, which melts the tanks armor. • The jet is a high temperature plasma (about. 20,000 °C). • The jet reaches ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "detonates on impact, liquefying metal"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 4,
+              "rank_absolute": 10,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[17]/div[1]/div[1]",
+              "domain": "www.sciencedirect.com",
+              "title": "Shaped Charge - an overview",
+              "url": "https://www.sciencedirect.com/topics/materials-science/shaped-charge",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.sciencedirect.com › topics › materials-science",
+              "website_name": "ScienceDirect.com",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Shaped charges are devices in which an explosive load is used to collapse a (usually metal) liner, thereby creating a high velocity jet that is capable of ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": "shaped charge from www.sciencedirect.com",
+                  "url": "https://www.sciencedirect.com/topics/materials-science/shaped-charge",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6TjgCXzx4rVkCZrVC0-9lEEN50qMZVu5uJSsXX2U&usqp=CAE&s"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "devices in which an explosive load is used to collapse a (usually metal) liner"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 5,
+              "rank_absolute": 11,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[19]/div[1]/div[1]",
+              "domain": "ebad.com",
+              "title": "Linear Shaped Charge Product (LSC) - EBAD",
+              "url": "https://ebad.com/product/linear-shaped-charge-lsc/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://ebad.com › product › linear-shaped-charge-lsc",
+              "website_name": "Ensign-Bickford Aerospace & Defense",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "LSC is an explosive product that produces a cutting jet to sever a wide range of materials and applications such as cutting launch vehicle and missile skins. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": "shaped charge from ebad.com",
+                  "url": "https://ebad.com/product/linear-shaped-charge-lsc/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQohCpdRA7OyCQXnXKZF_ffpWOrEGGA7bqO2LOLRfFEqRehx2wCoM9i&usqp=CAE&s"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "LSC is an explosive product"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 6,
+              "rank_absolute": 12,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[21]/div[1]/div[1]",
+              "domain": "www.reddit.com",
+              "title": "Use and effectiveness of non- copper shaped charges",
+              "url": "https://www.reddit.com/r/WarCollege/comments/1f0u96t/use_and_effectiveness_of_non_copper_shaped_charges/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "20+ comments  ·  1 year ago",
+              "website_name": "Reddit · r/WarCollege",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Materials such as gold and tungsten are suitable for use in shaped charges apart from being more expensive or more difficult to machine than copper. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Materials such as gold and tungsten are suitable for use in shaped charges"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 7,
+              "rank_absolute": 13,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[23]/div[1]/div[1]",
+              "domain": "www.osti.gov",
+              "title": "Explosive Shaped Charge Penetration Into Tuff Rock",
+              "url": "https://www.osti.gov/servlets/purl/6563055",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.osti.gov › servlets › purl",
+              "website_name": "DOE OSTI (.gov)",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "by MG Vigil · 1988 · Cited by 5 — Explosive Shaped Charges (ESC) were used to generate holes in tuff rock formations. This ESC technology has application in the mining industry!, road ... Read more",
+              "pre_snippet": "by MG Vigil · 1988 · Cited by 5",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Explosive Shaped Charges (ESC"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 1,
+              "rank_absolute": 14,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[2]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Shaped charge vs shape charge",
+                "Shaped charge explosive",
+                "Improvised shaped charge",
+                "Types of shaped charge",
+                "Shaped charge bullet",
+                "Shaped charge meaning",
+                "Shaped charge IED",
+                "Shaped charge simulation"
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 8,
+              "rank_absolute": 15,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "domain": "glossary.slb.com",
+              "title": "shaped charge - Energy Glossary - SLB",
+              "url": "https://glossary.slb.com/terms/s/shaped_charge",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://glossary.slb.com › terms › shaped_charge",
+              "website_name": "SLB",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Explosives designed to affect a certain direction preferentially. Shaped charges are most commonly used to perforate wells, but can be an energy source for ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Explosives designed to affect a certain direction preferentially"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 9,
+              "rank_absolute": 16,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+              "domain": "apps.dtic.mil",
+              "title": "THE SHAPED CHARGE CONCEPT, PART I. INTRODUCTION",
+              "url": "https://apps.dtic.mil/sti/pdfs/ADA226401.pdf",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://apps.dtic.mil › sti › pdfs › ADA226401",
+              "website_name": "dtic.mil",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "by WP Walters · 1990 · Cited by 5 — Devices of this nature are called lined cavity charges or shaped charges. The shaped charge was extensively used in World War n for penetration of hardened. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "lined cavity charges or shaped charges"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 10,
+              "rank_absolute": 17,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]",
+              "domain": "techlinkcenter.org",
+              "title": "Low-cost method and device for shaped charge testing an",
+              "url": "https://techlinkcenter.org/technologies/low-cost-method-and-device-for-shaped-charge-testing-and-analyzing/02e2ff62-f13e-4d32-a246-8f3c106b3072",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://techlinkcenter.org › technologies › low-cost-met...",
+              "website_name": "techlinkcenter.org",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "A shaped charge is an explosive shaped to focus the effect of the energy. Various types are used to cut and form metal, initiate nuclear weapons, penetrate ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "an explosive shaped to focus the effect of the energy"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 11,
+              "rank_absolute": 18,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]",
+              "domain": "www.britannica.com",
+              "title": "Shaped charge | explosive",
+              "url": "https://www.britannica.com/technology/shaped-charge",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.britannica.com › ... › Mechanical Engineering",
+              "website_name": "Britannica",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "A shaped charge normally consists of a cone made of metal or glass surrounded by a high-strength, high-density explosive and means to obtain the proper ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": "shaped charge from www.britannica.com",
+                  "url": "https://www.britannica.com/technology/shaped-charge",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-a299ac343c72:1"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "a cone made of metal or glass surrounded by a high-strength, high-density explosive"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 12,
+              "rank_absolute": 19,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]",
+              "domain": "www.911metallurgist.com",
+              "title": "Shaped Explosive Charges",
+              "url": "https://www.911metallurgist.com/blog/shaped-explosive-charges/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.911metallurgist.com › Mining",
+              "website_name": "911Metallurgist",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Oct 16, 2020 — Shaped charges employ the principle known as the “Munroe effect,” which was discovered by Charles E. Munroe more than 50 years ago (in 1888). Read more",
+              "pre_snippet": "10/16/2020 00:00:00",
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": "shaped charge from www.911metallurgist.com",
+                  "url": "https://www.911metallurgist.com/blog/shaped-explosive-charges/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-a299ac343c72:2"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Shaped charges employ the principle known as the “Munroe effect"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2020-10-16 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 13,
+              "rank_absolute": 20,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+              "domain": "physics.stackexchange.com",
+              "title": "Shaped Charge Physics - thermodynamics",
+              "url": "https://physics.stackexchange.com/questions/599682/shaped-charge-physics",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://physics.stackexchange.com › questions › shaped...",
+              "website_name": "Physics Stack Exchange",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Dec 10, 2020 — I was told that shaped charges are the way they are because a hollow conical shape in the middle of an explosive will concentrate the explosive ... Read more",
+              "pre_snippet": "12/10/2020 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "shaped charges are the way they are"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2020-12-10 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "images",
+              "rank_group": 2,
+              "rank_absolute": 21,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]",
+              "title": "Images",
+              "url": "https://www.google.com/search?sa=N&hl=en&gl=US&sca_esv=06de5ba07996f893&q=shaped+charge&udm=2&source=univ&fir=FV_rpN3Q6d_L9M%252CvXrriN39i8oBxM%252C_%253BRO-gr8W6jFSsrM%252CszbCF19zepRVxM%252C_%253BLnWA2CaUZo7vtM%252Ck3EIav9aPPRZtM%252C_%253BkV5814xdEPZwIM%252C7k0eNAW90LMkdM%252C_%253BL0waXxcXdWxWaM%252CgPgmcBg2YuHdXM%252C_%253BDDUs95NNVifkqM%252CszbCF19zepRVxM%252C_%253BkN0h-if6h60QcM%252CsAwkuUWFWNqI6M%252C_%253BIvlpcqqpCW7pTM%252CtP1E5EBBjK899M%252C_%253Ba-m4uP1vKrIFjM%252CvXrriN39i8oBxM%252C_%253BQFXOjz-8tW8FCM%252CaIyjUw8tT9uKKM%252C_%253BFBsnrqS8LCC6KM%252Clhoz7ZGqdRNATM%252C_%253BACW2_pJAjJ6pBM%252CxR1RSwPuqPI-SM%252C_&usg=AI4_-kTIqpndvdENmNl5gnzwtN_b-y62NA&ved=2ahUKEwio2v_1lZGUAxWKrSsGHcwQBgc4ChDsCXoECCwQBQ",
+              "items": [
+                {
+                  "type": "images_element",
+                  "alt": "Shaped charge - Wikipedia",
+                  "url": "https://en.wikipedia.org/wiki/Shaped_charge",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-a299ac343c72:3"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charges For Oil Well Perforating - Drilling Manual",
+                  "url": "https://www.drillingmanual.com/shaped-charges-oil-well-perforating/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-a299ac343c72:4"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charge - YouTube",
+                  "url": "https://www.youtube.com/watch?v=Li2Kt4DtUdY",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-a299ac343c72:5"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charge - an overview | ScienceDirect Topics",
+                  "url": "https://www.sciencedirect.com/topics/engineering/shaped-charge",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-a299ac343c72:6"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charges: A Guide to their Explosive Potential",
+                  "url": "https://www.explosives.net/shaped-charges-explosive-technology/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-a299ac343c72:7"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charges For Oil Well Perforating - Drilling Manual",
+                  "url": "https://www.drillingmanual.com/shaped-charges-oil-well-perforating/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-a299ac343c72:8"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Charge - an overview | ScienceDirect Topics",
+                  "url": "https://www.sciencedirect.com/topics/materials-science/shaped-charge",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkZFkV2R-i9x58uRYRzYRHy4RRqDmInHFeKAl2dyUe910RJc1wX4IrVjE&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped Explosive Charges - 911Metallurgist",
+                  "url": "https://www.911metallurgist.com/blog/shaped-explosive-charges/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdtdRRuORla6i5S_HcFHomMOiR3u4LmD1QA0lkm1sgNak64jNE2wYa9rs&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Shaped charge - Wikipedia",
+                  "url": "https://en.wikipedia.org/wiki/Shaped_charge",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfVCvUt1HQWwUpk-Kvjzw7JJvhJvihwMkH_vWfwCDRb6iy90Jzt8Yc4dI&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "What is perforating? What are shaped charges? - YouTube",
+                  "url": "https://www.youtube.com/watch?v=WUVrvYEueLc",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBvL0huux4KSPwIAnx9wxzqH-sVhLfsE1HE79w4iHP&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "A shaped charge, principle of work | Download Scientific Diagram",
+                  "url": "https://www.researchgate.net/figure/A-shaped-charge-principle-of-work_fig1_287466669",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQmhISwPvX64ESCe8S2Duhl5jqyUR0bOCMDJnZnXYGEANjm_0uxugvS_Y&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Effect of explosives charges types on the jet ...",
+                  "url": "https://www.nature.com/articles/s41598-024-75727-0",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTMyF4jAHO2YGfXRYgrT2b7ZcFytImFxd_x9Zim0D1pworr6bQOs4Dhrs&s"
+                }
+              ],
+              "related_image_searches": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 14,
+              "rank_absolute": 22,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]/div[1]",
+              "domain": "www.facebook.com",
+              "title": "The Evolution and Impact of Shaped Charges Only one ...",
+              "url": "https://www.facebook.com/alfordtech/videos/pluton-highly-versatile-shaped-charge/844553531122699/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "4 reactions  ·  1 year ago",
+              "website_name": "Facebook · Alford Group",
+              "is_image": false,
+              "is_video": true,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Shaped charges have a rich history and remain one of the most fascinating innovations in explosives. Developed during World War II, they were ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Shaped charges"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-04-28 18:26:31 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 15,
+              "rank_absolute": 23,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+              "domain": "www.nist.gov",
+              "title": "Shaped Charge | NIST",
+              "url": "https://www.nist.gov/glossary-term/40466",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.nist.gov › glossary-term",
+              "website_name": "National Institute of Standards and Technology (.gov)",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Jan 15, 2025 — Shaped Charge. an explosive charge configuration incorporating a liner, usually metal, shaped so as to concentrate its explosive force in a ... Read more",
+              "pre_snippet": "01/15/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "an explosive charge configuration incorporating a liner, usually metal"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-01-15 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 16,
+              "rank_absolute": 24,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]/div[1]/div[1]",
+              "domain": "www.reddit.com",
+              "title": "Slow Mo Guys playing around with shaped charges. : r ...",
+              "url": "https://www.reddit.com/r/Warthunder/comments/93nmrn/slow_mo_guys_playing_around_with_shaped_charges/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "10+ comments  ·  7 years ago",
+              "website_name": "Reddit · r/Warthunder",
+              "is_image": false,
+              "is_video": true,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The shaped charge does pretty much exactly what it does in the game. It doesn't produce a lot of shrapnel, the damaging effect is in a pretty much straight ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "charge does pretty much exactly what it does in the game"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2019-04-28 18:26:31 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 2,
+              "rank_absolute": 25,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[3]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Shaped charge vs shape charge",
+                "Shaped charge explosive",
+                "Improvised shaped charge",
+                "Types of shaped charge",
+                "Shaped charge meaning",
+                "Shaped charge bullet",
+                "Shaped charge missile",
+                "Shaped charge IED"
+              ],
+              "rectangle": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

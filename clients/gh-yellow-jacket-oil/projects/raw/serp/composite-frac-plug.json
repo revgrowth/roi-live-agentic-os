@@ -1,0 +1,1319 @@
+{
+  "version": "0.1.20260420",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "1.8185 sec.",
+  "cost": 0.0035,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "04282126-1032-0139-0000-9fae12228cf7",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "1.7280 sec.",
+      "cost": 0.0035,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "serp",
+        "google",
+        "organic",
+        "live",
+        "advanced"
+      ],
+      "data": {
+        "api": "serp",
+        "function": "live",
+        "se": "google",
+        "se_type": "organic",
+        "keyword": "composite frac plug",
+        "location_code": 2840,
+        "language_code": "en",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20,
+        "load_async_ai_overview": true
+      },
+      "result": [
+        {
+          "keyword": "composite frac plug",
+          "type": "organic",
+          "se_domain": "google.com",
+          "location_code": 2840,
+          "language_code": "en",
+          "check_url": "https://www.google.com/search?q=composite%20frac%20plug&hl=en&gl=US&ie=UTF-8&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc",
+          "datetime": "2026-04-28 18:27:00 +00:00",
+          "spell": null,
+          "refinement_chips": {
+            "type": "refinement_chips",
+            "xpath": "/html[1]/body[1]/div[3]/div[1]/div[9]/div[1]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]",
+            "items": [
+              {
+                "type": "refinement_chips_element",
+                "title": "Nearby",
+                "url": "https://www.google.com/search?q=composite+frac+plug+nearby&hl=en&gl=US&shoprs=GAMqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyDAgDEgZOZWFyYnkYAmAB&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAF6BAgmEEE",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "For Sale",
+                "url": "https://www.google.com/search?q=composite+frac+plug+for+sale&hl=en&gl=US&shoprs=GBIqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyDAgSEghGb3IgU2FsZWAB&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAJ6BAgmEEI",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Electrical Outlets & Receptacles",
+                "url": "https://www.google.com/search?q=electrical+outlets+%26+receptacles+composite+frac+plug&hl=en&gl=US&shoprs=GAkqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyJAgJEiBFbGVjdHJpY2FsIE91dGxldHMgJiBSZWNlcHRhY2xlc2AB&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAN6BAgmEEM",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Price",
+                "url": "https://www.google.com/search?q=price+composite+frac+plug&hl=en&gl=US&shoprs=GBIqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyCQgSEgVQcmljZWAB&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAR6BAgmEEQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Female",
+                "url": "https://www.google.com/search?q=female+composite+frac+plug&hl=en&gl=US&shoprs=GBIqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyCggSEgZGZW1hbGVgAQ&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAV6BAgmEEU",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "On sale",
+                "url": "https://www.google.com/search?q=composite+frac+plug+sale&hl=en&gl=US&shoprs=EgRKAhgBGAYqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyEwgGEgdPbiBzYWxlGAIiBEoCGAFgAQ&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAZ6BAgmEEY",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Male",
+                "url": "https://www.google.com/search?q=male+composite+frac+plug&hl=en&gl=US&shoprs=GBIqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyCAgSEgRNYWxlYAE&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAd6BAgmEEc",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Replacement",
+                "url": "https://www.google.com/search?q=replacement+composite+frac+plug&hl=en&gl=US&shoprs=GBIqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyDwgSEgtSZXBsYWNlbWVudGAB&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAh6BAgmEEg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Rubber",
+                "url": "https://www.google.com/search?q=rubber+composite+frac+plug&hl=en&gl=US&shoprs=GAEqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyGAgBEgZSdWJiZXI6DAiDqsQBEM3_xAEwAGAB&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAl6BAgmEEk",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Drain Assemblies & Parts",
+                "url": "https://www.google.com/search?q=drain+assemblies+%26+parts+composite+frac+plug&hl=en&gl=US&shoprs=GAkqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyHAgJEhhEcmFpbiBBc3NlbWJsaWVzICYgUGFydHNgAQ&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAp6BAgmEEo",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Size",
+                "url": "https://www.google.com/search?q=size+composite+frac+plug&hl=en&gl=US&shoprs=GBIqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyCAgSEgRTaXplYAE&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAt6BAgmEEs",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Plastic",
+                "url": "https://www.google.com/search?q=plastic+composite+frac+plug&hl=en&gl=US&shoprs=GAEqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyGQgBEgdQbGFzdGljOgwIg6rEARC-4scBMABgAQ&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKAx6BAgmEEw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Get it by Thu",
+                "url": "https://www.google.com/search?q=composite+frac+plug&hl=en&gl=US&shoprs=Eg2aAQoKCBACOAFABEgBGBQqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyJggUEg1HZXQgaXQgYnkgVGh1Ig2aAQoKCBACOAFABEgBKgQQARgBYAE&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKA16BAgmEE0",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Black",
+                "url": "https://www.google.com/search?q=black+composite+frac+plug&hl=en&gl=US&shoprs=GAEqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyFwgBEgVCbGFjazoMCNiM9QEQ5Yr1ATALYAE&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKA56BAgmEE4",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Buy",
+                "url": "https://www.google.com/search?q=buy+composite+frac+plug&hl=en&gl=US&shoprs=GBIqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyBwgSEgNCdXlgAQ&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKA96BAgmEE8",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "New",
+                "url": "https://www.google.com/search?q=new+composite+frac+plug&hl=en&gl=US&shoprs=GAoqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyBwgKEgNOZXdgAQ&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKBB6BAgmEFA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Used",
+                "url": "https://www.google.com/search?q=used+composite+frac+plug&hl=en&gl=US&shoprs=GAoqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyCAgKEgRVc2VkYAE&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKBF6BAgmEFE",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Tools",
+                "url": "https://www.google.com/search?q=tools+composite+frac+plug&hl=en&gl=US&shoprs=GAkqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyCQgJEgVUb29sc2AB&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKBJ6BAgmEFI",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Drill Accessories",
+                "url": "https://www.google.com/search?q=drill+accessories+composite+frac+plug&hl=en&gl=US&shoprs=GAkqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyFQgJEhFEcmlsbCBBY2Nlc3Nvcmllc2AB&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKBN6BAgmEFM",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Blue",
+                "url": "https://www.google.com/search?q=blue+composite+frac+plug&hl=en&gl=US&shoprs=GAEqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyFggBEgRCbHVlOgwI2Iz1ARDmivUBMAtgAQ&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKBR6BAgmEFQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Gray",
+                "url": "https://www.google.com/search?q=gray+composite+frac+plug&hl=en&gl=US&shoprs=GAEqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyFggBEgRHcmF5OgwI2Iz1ARDqivUBMAtgAQ&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKBV6BAgmEFU",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Under $100",
+                "url": "https://www.google.com/search?q=composite+frac+plug+under+$100&hl=en&gl=US&shoprs=Eg0SCxEAAAAAhNeXQRgBGAUqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyIwgFEgpVbmRlciAkMTAwGAIiDRILEQAAAACE15dBGAEqAhgBYAE&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKBZ6BAgmEFY",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "White",
+                "url": "https://www.google.com/search?q=white+composite+frac+plug&hl=en&gl=US&shoprs=GAEqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyFwgBEgVXaGl0ZToMCNiM9QEQoYv1ATALYAE&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKBd6BAgmEFc",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Red",
+                "url": "https://www.google.com/search?q=red+composite+frac+plug&hl=en&gl=US&shoprs=GAEqE2NvbXBvc2l0ZSBmcmFjIHBsdWcyFQgBEgNSZWQ6DAjYjPUBEOeK9QEwC2AB&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQip4GKBh6BAgmEFg",
+                "domain": "www.google.com",
+                "options": null
+              }
+            ]
+          },
+          "item_types": [
+            "organic",
+            "video",
+            "popular_products",
+            "images",
+            "related_searches"
+          ],
+          "se_results_count": 386000,
+          "pages_count": 2,
+          "items_count": 24,
+          "items": [
+            {
+              "type": "organic",
+              "rank_group": 1,
+              "rank_absolute": 1,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "domain": "www.weatherford.com",
+              "title": "Composite Frac Plugs",
+              "url": "https://www.weatherford.com/well-construction-and-completions/sand-face-solutions/multistage-fracturing/composite-plugs/composite-frac-plugs/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.weatherford.com › multistage-fracturing",
+              "website_name": "Weatherford International",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The Resolve Minima frac plug is field proven to withstand temperatures up to 250°F (121°C) for challenging environments. Cuts circulation time. MILLS OUT Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "field proven to withstand temperatures up to 250°F (121°C"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 2,
+              "rank_absolute": 2,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]",
+              "domain": "www.halliburton.com",
+              "title": "Composite and dissolvable frac plugs for downhole ...",
+              "url": "https://www.halliburton.com/en/completions/well-completions/frac-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.halliburton.com › well-completions › frac-pl...",
+              "website_name": "Halliburton",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Halliburton frac plugs isolate zones during stimulation and serve as check valves to provide wellbore zonal isolation in multistage stimulation treatments.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Halliburton frac plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 3,
+              "rank_absolute": 3,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]",
+              "domain": "www.nov.com",
+              "title": "Composite Frac Plugs",
+              "url": "https://www.nov.com/products/composite-frac-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.nov.com › products › composite-frac-plugs",
+              "website_name": "National Oilwell Varco",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Our Setter composite frac plugs provide a dependable method for temporary zonal isolation during frac operations in horizontal completions.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "provide a dependable method for temporary zonal isolation"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 4,
+              "rank_absolute": 4,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]/div[1]",
+              "domain": "ghdiv.com",
+              "title": "Frac Plugs Downhole Completion Tools",
+              "url": "https://ghdiv.com/frac-plugs-overview/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://ghdiv.com › frac-plugs-overview",
+              "website_name": "Yellow Jacket Oil Tools",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Dec 17, 2025 — Shortest top-set dissolvable frac plug on the market. Fully dissolves in 4-10 days, based on well conditions. No metal left behind. Read more",
+              "pre_snippet": "12/17/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Shortest top-set dissolvable frac plug on the market"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-12-17 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 5,
+              "rank_absolute": 5,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+              "domain": "www.slb.com",
+              "title": "Composite and Dissolvable Frac Plugs",
+              "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/frac-plugs-and-sleeves/frac-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.slb.com › ... › Frac Plugs and Sleeves",
+              "website_name": "SLB",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Oct 22, 2022 — SLB frac plugs include several versatile isolation options to best suit your downhole requirements. Designed to optimize production from cased hole wells. Read more",
+              "pre_snippet": "10/22/2022 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "SLB frac plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2022-10-22 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "video",
+              "rank_group": 1,
+              "rank_absolute": 6,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[11]/div[1]",
+              "items": [
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Weatherford",
+                  "title": "TruFrac™ composite plug – the next generation frac plug",
+                  "timestamp": "2016-05-11 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=JqtbyZlQ_zY"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Aaron Burton",
+                  "title": "Comparing Types of Composite Frac Plugs",
+                  "timestamp": "2016-09-07 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=GX-yhj8dm4c"
+                },
+                {
+                  "type": "video_element",
+                  "source": "SLB",
+                  "title": "FracXion Micro Fully Composite Frac Plug | Video",
+                  "timestamp": "2020-04-16 00:00:00 +00:00",
+                  "url": "https://www.slb.com/videos/fracxion-micro-fully-composite-frac-plug"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Advanced Upstream Ltd.",
+                  "title": "GOLDMAX™ Composite Frac Plug - Advanced Upstream",
+                  "timestamp": "2020-05-26 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=Tko6jtbElQU"
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 6,
+              "rank_absolute": 7,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[13]/div[1]/div[1]",
+              "domain": "www.sevencanyonscomposites.com",
+              "title": "Composite Frac Plug",
+              "url": "https://www.sevencanyonscomposites.com/composite-frac-plug/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.sevencanyonscomposites.com › composite-...",
+              "website_name": "Seven Canyons Composites",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Frac plugs are employed to isolate zones in a well for hydraulic fracturing. The well is drilled, and metal casing is installed. Yet, before production can ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Frac plugs are employed to isolate zones in a well for hydraulic fracturing"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 7,
+              "rank_absolute": 8,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[15]/div[1]/div[1]",
+              "domain": "www.nineenergyservice.com",
+              "title": "Scorpion™ Composite Frac Plug",
+              "url": "https://www.nineenergyservice.com/completion-tools/composites/scorpion",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.nineenergyservice.com › ... › Composites",
+              "website_name": "Nine Energy Service",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The Scorpion Composite Frac Plug combines reliable zonal operation with enhanced pumpdown efficiency. Adding a Dissolvable Pumpdown Ring dramatically reduces ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "reliable zonal operation with enhanced pumpdown efficiency"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "popular_products",
+              "rank_group": 1,
+              "rank_absolute": 9,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[17]/div[1]/div[1]/div[1]/g-card[1]",
+              "title": "Popular products",
+              "items": [
+                {
+                  "type": "popular_products_element",
+                  "title": "Baker Hughes 438 3.0 Quik Drill Composite Frac Plug H0e0128700",
+                  "description": "eBay - theliquidationco\nFree delivery",
+                  "more_sellers": false,
+                  "seller": "eBay - theliquidationco",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSWK3BrBOj4ytZe7ib5Icz2QTHCoP261lO8H_kfeiH4NdBDxkZQAMMKyqvODsH1EBgE7iSGnRHJGO50ipaXCpqoeDF8JWd_OeVWUuvw3g",
+                  "price": {
+                    "current": 148.95,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$148.95"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Composite Plug",
+                  "description": "Polyconn",
+                  "more_sellers": false,
+                  "seller": "Polyconn",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTVRLYbymRYJOEE251xhMWdo_wdaSulCY_qKzsczGzOeepiVJbR1ThJqjxWc8nFsraXrtVxOteyfnOfJ_svJemh8f4xB9cD4O2RNA9vyTT7HXhVLA-04TP4-A",
+                  "price": {
+                    "current": 3.9,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$3.90"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Sewell Deadbolt RCA Plugs",
+                  "description": "Sewell Direct & more",
+                  "more_sellers": true,
+                  "seller": "Sewell Direct",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRffhlu0uCskdMYxA01YtQDfouRnz8_jP8GYxFkenBWs-rwfZTqGYyPpNuQh8oBf-1mRx2YRbGshY6MBzqp_1-6JvRn_xVkQUaJSyS0rbOHssIYtClFJW8u",
+                  "price": {
+                    "current": 17.98,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$17.98"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 4,
+                    "votes_count": 2,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Fracxion Fully Composite Frac Plug 104458483, 5-1/2 Micro (23-26.8)",
+                  "description": "eBay - epjohnson78",
+                  "more_sellers": false,
+                  "seller": "eBay - epjohnson78",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcToGWoZmHYqEv2g38Kb84MhpJuYAbeteA3C6nFqpNav_eMfKuaJbCVrtwNJa3uP8bEs6FNDskSCsSL-O9GvD4ap9ygCdJsR1d8SRYWgPQwe",
+                  "price": {
+                    "current": 785.85,
+                    "regular": 845,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$785.85 $845"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "1-1/8 Inch Compression Plug - Wound Up Composites",
+                  "description": "Wound Up Composites",
+                  "more_sellers": false,
+                  "seller": "Wound Up Composites",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcShBHka6AnsvRnaQxUTPhH8UaNo3nSmOU70B0hzENiuq1uUnZVty36jPD0_J6jcuQkw5N81R_ljOpupnvBr6HMlI2TYOxQ6n_YJBTIPzxySd_MykyrL",
+                  "price": {
+                    "current": 16.24,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$16.24"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Silver Fox Completion Services Composite Frac Plug 4 1/2\", 10K 13.5-15.1",
+                  "description": "eBay - industrial.surplus.liquidators",
+                  "more_sellers": false,
+                  "seller": "eBay - industrial.surplus.liquidators",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTDDYr0EZjhNEXxPXAviJVpmeCRUEL2Lnihvh4wlnX5xeGym6toEZ8U04NDDLxNoDQ7hHu5AOPHkTDk40cnDIIYUlIaCzWCVVvUnIyZAuRj7-YKe63FzAx9",
+                  "price": {
+                    "current": 699.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$699.99"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "1 Inch Compression Plug - Wound Up Composites",
+                  "description": "Wound Up Composites",
+                  "more_sellers": false,
+                  "seller": "Wound Up Composites",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ53XPM9nZ2Cwt968HzQDdynGMgDiq4tlZNWEsWQfgPqZksGGcHZQXJ139kD9wuWwr8w6X3_BieGWgfqs3sTt9F9IxocpTlh9C_w-Mej8ZTCAuSF3MAo7s",
+                  "price": {
+                    "current": 9.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$9.99"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Evolv Frac Plug By GeoDynamics Part # EFP-55-106",
+                  "description": "eBay",
+                  "more_sellers": false,
+                  "seller": "eBay",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSgfGQCHwclA5yzsGzPkwWB3yj5_BDo5dW2jsORJNuGWykUXmPlJYRBOryUWEE5nq-U9-NbOUuuptJm0tOjIdU2cC3aYeI4xw",
+                  "price": {
+                    "current": 799.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$799.99 Pre-owned"
+                  },
+                  "rating": null
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 8,
+              "rank_absolute": 10,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[19]/div[1]/div[1]",
+              "domain": "www.matthewacrump.com",
+              "title": "Plug & Perf: How Traditional Frac Plugs Work",
+              "url": "https://www.matthewacrump.com/content/howplugswork",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.matthewacrump.com › content › howplugs...",
+              "website_name": "matthewacrump.com",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Dec 11, 2025 — A traditional composite plug will contain a mandrel, upper slip/cone, element, and lower slip/cone. The mandrel will provide the structure of ... Read more",
+              "pre_snippet": "12/11/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "contain a mandrel, upper slip/cone, element, and lower slip/cone"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-12-11 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "images",
+              "rank_group": 1,
+              "rank_absolute": 11,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[21]/div[1]",
+              "title": "Images",
+              "url": "https://www.google.com/search?sca_esv=06de5ba07996f893&hl=en&gl=US&q=composite+frac+plug&udm=2&source=univ&fir=4AFa5mVXYS2_nM%252COhGE0s6SGllrCM%252C_%253BgOIY6gf9CziVzM%252CSxWSGWlid0rGJM%252C_%253BMDd8YA5rk6zQkM%252CfH_7u4vj_nPzVM%252C_%253BttWzv7s8hdc6gM%252CllX8B4DWbBOHlM%252C_%253B5iTOR2qUayEo1M%252CyVVNY0XITcaNOM%252C_%253BchjUyHQzGW_KjM%252CPh_iHwsy_dIr4M%252C_%253ByITR8U3BhmHT1M%252CcLanpSHEwWE2tM%252C_%253BGx7Td5XFhP_YUM%252Cz4CwDGjLEJ8G2M%252C_%253Bh7TdH7x8ZZ-CSM%252CJ02C6Ib8K58JxM%252C_&usg=AI4_-kQyeI7vBwHjHQ6kMyEsjca9LZ8jPQ&sa=X&ved=2ahUKEwij37-DlpGUAxVmg_0HHcTZIegQ7Al6BAhKEAU",
+              "items": [
+                {
+                  "type": "images_element",
+                  "alt": "Frac Plugs | Vertice Oil Tools",
+                  "url": "https://verticeoiltools.com/frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgiFFQBo0npNvhxZUOkRHra2jRds78LRel6Ub2pfk_EH3n9gT29yOipSM&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "FracXion Micro Fully Composite Frac Plug | SLB",
+                  "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/frac-plugs-and-sleeves/frac-plugs/fracxion-micro-fully-composite-frac-plug",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwUUYJSibe0rDd-y6g2P4tl3eqnNIUF88cHP8Dac9YPZLxHDKOhbB_HTE&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Composite Frac Plugs | Weatherford International",
+                  "url": "https://www.weatherford.com/well-construction-and-completions/sand-face-solutions/multistage-fracturing/composite-plugs/composite-frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWmwHi6dwtLhlwXiLuN-TJtI58w261tjjs-wn6ENeB8aGWgbbpOJSwocw&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Frac Plugs | Copyright 2026 Innovex International, Inc. All ...",
+                  "url": "https://www.innovex-inc.com/our-products/well-completion/frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwZQMoh7_Wza0x-eFesKGrAPfnakiU6jOxiPAyxgeJ-5bm6xwYi_I_ld0&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Behind the Tech: Scorpion",
+                  "url": "https://www.nineenergyservice.com/completion-tools/composites/scorpion",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvd1iTJM3S9C8Lj0sFNhEsgODLKLOf9NJdNh-3pQ5U&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "PurpleSeal™ Frac Plug - Repeat Precision",
+                  "url": "https://www.repeatprecision.com/products/frac-plugs",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAOpvdtu0xeCke-gHKxbM8B57j2eJqunDdYypvZda9MXbX86E84rkBMPg&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Composite Frac Plug | Seven Canyons Composites",
+                  "url": "https://www.sevencanyonscomposites.com/composite-frac-plug/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRlGtyDry6thqh0uys93VJID-y7nhih4M5Uu9tId1vT2e_4fEExwN3QOs&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "China Composite Frac Plug Manufacturers and Supplier - China ...",
+                  "url": "https://www.vigordrilling.com/completion-tools/composite-frac-plug.html",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwKU2upDPwxOOzehiN-U4GC5wSXgtZWKG832NfVcKZMovIpAhPndZy0DY&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Composite Frac Plugs | NOV",
+                  "url": "https://www.nov.com/products/composite-frac-plugs",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR74VpxZwbgNlyvYTZLfNWIzIVLKIvs5pmuTNBGY3oi6Cqq9EbHrZZDXUs&s"
+                }
+              ],
+              "related_image_searches": null,
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 1,
+              "rank_absolute": 12,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[3]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Composite frac plug sizes",
+                "Dissolvable frac plugs",
+                "Frac plugs Oil field",
+                "Frac plug companies",
+                "Halliburton dissolvable frac plug",
+                "Schlumberger reaction frac plug",
+                "Obsidian prime frac plug",
+                "Ball in place frac plug"
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 9,
+              "rank_absolute": 13,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "domain": "www.nineenergyservice.com",
+              "title": "Scorpion™ Composite Frac Plug",
+              "url": "https://www.nineenergyservice.com/completion-tools/composites/scorpion",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.nineenergyservice.com › ... › Composites",
+              "website_name": "Nine Energy Service",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The Scorpion Composite Frac Plug combines reliable zonal operation with enhanced pumpdown efficiency. Adding a Dissolvable Pumpdown Ring dramatically reduces ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "reliable zonal operation with enhanced pumpdown efficiency"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 10,
+              "rank_absolute": 14,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+              "domain": "www.jjtamez.com",
+              "title": "Explained: Dissolvable Frac Plugs",
+              "url": "https://www.jjtamez.com/blog/explained-dissolvable-frac-plugs/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.jjtamez.com › News & Updates",
+              "website_name": "J&J Tamez LLC",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Jul 8, 2020 — A dissolvable frac plug-and-perf system uses degradable plugs rather than composite plugs to isolate zones during stimulation. Read more",
+              "pre_snippet": "07/08/2020 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "uses degradable plugs rather than composite plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2020-07-08 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 11,
+              "rank_absolute": 15,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]",
+              "domain": "www.wildcatoiltools.com",
+              "title": "Wildcat Composite Plug",
+              "url": "https://www.wildcatoiltools.com/wildcat-composite-plug",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.wildcatoiltools.com › wildcat-composite-plug",
+              "website_name": "Wildcat Oil Tools",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Wildcat Oil Tools frac plugs offer a dependable and cost-effective solution to temporarily zonal isolation in vertical and horizontal wells during fracturing ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Wildcat Oil Tools frac plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 12,
+              "rank_absolute": 16,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]",
+              "domain": "www.rockwestcomposites.com",
+              "title": "Case Study: Frac Plugs",
+              "url": "https://www.rockwestcomposites.com/case-study-frac-plugs.html?srsltid=AfmBOopNmejyprC5m_LeSFzqS5BkXfn9br9FLzzhJ5GpLFNMIcHo41L4",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.rockwestcomposites.com › case-study-frac-...",
+              "website_name": "Rock West Composites",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "A composite lower slip that could withstand the high loads yet still drill out as easily as the rest of the composite plug. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "composite",
+                "composite plug"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 13,
+              "rank_absolute": 17,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]",
+              "domain": "www.aogr.com",
+              "title": "Composite Frac Plugs Optimize Costs In Plug-And-Perf ...",
+              "url": "https://www.aogr.com/magazine/cover-story/composite-frac-plugs-optimize-cost-capabilities-in-plug-and-perf-completion",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.aogr.com › magazine › cover-story › comp...",
+              "website_name": "American Oil & Gas Reporter",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Composite plugs generally contain relatively high amounts of metal. The length of traditional plugs increases the amount of material that must be milled out ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Composite plugs generally contain relatively high amounts of metal"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 14,
+              "rank_absolute": 18,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+              "domain": "cnpcusa.com",
+              "title": "Silver Arrow™ - Composite Frac Plug",
+              "url": "https://cnpcusa.com/en/product42.html",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://cnpcusa.com › product42",
+              "website_name": "CNPC USA",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The Silver Arrow™ full composite bridge plug is engineered from proprietary high-strength materials, featuring a robust bidirectional slip structure. The high- ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "is engineered from proprietary high-strength materials"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 15,
+              "rank_absolute": 19,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]/div[1]",
+              "domain": "silver-fox.net",
+              "title": "Composite Frac Plugs",
+              "url": "https://silver-fox.net/downhole-tools/plug-perf/cf-frac-plug/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://silver-fox.net › Plug & Perf",
+              "website_name": "Silver Fox Completion Services",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Composite Frac Plugs temporarily isolate multiple zones during high-pressure stimulation stage frac ops in horizontal & vertical applications.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "temporarily isolate multiple zones"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 16,
+              "rank_absolute": 20,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]",
+              "domain": "info.stonewallco.com",
+              "title": "Dissolvable vs Composite Frac Plugs",
+              "url": "https://info.stonewallco.com/blog/well-stimulation-technology-dissolvable-vs-composite-frac-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://info.stonewallco.com › blog › well-stimulation-tec...",
+              "website_name": "The Stonewall Group",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Aug 15, 2017 — Composite fracture plugs have been used since the late 1980s. Initial composite plug designs were based on legacy cast iron bridge plugs ... Read more",
+              "pre_snippet": "08/15/2017 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "have been used since the late 1980s"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2017-08-15 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 17,
+              "rank_absolute": 21,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+              "domain": "www.innovex-inc.com",
+              "title": "Frac Plugs",
+              "url": "https://www.innovex-inc.com/our-products/well-completion/frac-plugs/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.innovex-inc.com › ... › Well Completion",
+              "website_name": "Innovex International",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The Innovex B3 Frac Plug, with its industry-leading dissolvable technology, offers a dependable, cost-effective dissolving frac plug optimized for zonal ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "offers a dependable, cost-effective dissolving frac plug"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "images",
+              "rank_group": 2,
+              "rank_absolute": 22,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]",
+              "title": "Images",
+              "url": "https://www.google.com/search?sa=N&hl=en&gl=US&sca_esv=06de5ba07996f893&q=composite+frac+plug&udm=2&source=univ&fir=5iTOR2qUayEo1M%252CyVVNY0XITcaNOM%252C_%253B1K2D_LXRvsZdRM%252CoEg2nSTO8QVCHM%252C_%253ByDgh5FBfi_0zfM%252CP6OusUuHkPRLYM%252C_%253BX9ZRR0T_a24gAM%252CTHmXIaXO4PmfbM%252C_%253BjeIsqh0SeCDFeM%252C3AH9L9DHnyVvzM%252C_%253BxSlW7_GdaFMLCM%252C7OkwwP_4hwKl0M%252C_%253B8wkp5VbLfXTwUM%252CoEaxq-U-zg473M%252C_%253BMzsYqfWB9DorKM%252C-QL7V9K9R6GWSM%252C_%253BoXFI6mh93Thd3M%252CunQ1tchRbKwqPM%252C_&usg=AI4_-kTkubfpI37krmPnM1dysF7GMzqnmA&ved=2ahUKEwjJ7_eDlpGUAxXI2gIHHdHnGVI4ChDsCXoECEMQBQ",
+              "items": [
+                {
+                  "type": "images_element",
+                  "alt": "Behind the Tech: Scorpion",
+                  "url": "https://www.nineenergyservice.com/completion-tools/composites/scorpion",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-9fae12228cf7:0"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Complete Composite Frac Plug - Five Star Downhole Services Inc.",
+                  "url": "https://fivestardownhole.com/well-completion/complete-composite-frac-plug/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-9fae12228cf7:1"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "How Does a Composite Bridge Plug Work? - Knowledge - China Vigor",
+                  "url": "https://www.vigordrilling.com/info/how-does-a-composite-bridge-plug-work-79561883.html",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-9fae12228cf7:2"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "New Standard Composite Bridge Plugs - General Plastics ...",
+                  "url": "https://genplastics.com/2022/09/26/new-standard-composite-bridge-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSX3kq6H3JjyaAIeX_I07O3F0PgcLfAZGOJqsoW2izBYrJpH80hOiR9xHo&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Plugs – Frontier Oil Tools",
+                  "url": "https://frontieroiltools.com/completiontechnologies/plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMSnNtWLg8Ccrvqypg_4S5Ga79DSL6qdc98nS7Rf3BWzcFk8DLOYZ-E6c&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Case Study: Frac Plugs | Rock West Composites",
+                  "url": "https://www.rockwestcomposites.com/case-study-frac-plugs.html?srsltid=AfmBOoogM8UhFMHK4FmrPVD8J_oylrey6pM7gW6jWX2Pp4yjwiiwfTHo",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXlAOxPHNVMWtRNYib0GJccyvPKctpEhY9uG1cx3muBrR0OITiAuekVjA&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Composite Frac Plug – ID OIL TOOLS",
+                  "url": "https://www.id-oiltools.com/portfolio-item/composite-frac-plug/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5wyE8sDq5tu0oWEKHZKe5FjC6eNxVeJgMmogpLc3jc8yIKVU9HWIJRNs&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "5 Types of Frac Plugs You Could Be Using Downhole",
+                  "url": "https://www.repeatprecision.com/news/types-of-frac-plugs",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmytAIV96PuisLoYGzrChGJ00DNT_1WULDkaNXHiA6dRsLn28nqUNGkhA&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Composite and Dissolvable Frac Plugs | SLB",
+                  "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/frac-plugs-and-sleeves/frac-plugs",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA1RPnQTkUKkA3BBVfCDn3LVAypH3xPyf9alYcdCPAi9EasQUyjRmICuA&s"
+                }
+              ],
+              "related_image_searches": null,
+              "rectangle": null
+            },
+            {
+              "type": "popular_products",
+              "rank_group": 2,
+              "rank_absolute": 23,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[11]/div[1]/div[1]/div[1]/g-card[1]",
+              "title": "Popular products",
+              "items": [
+                {
+                  "type": "popular_products_element",
+                  "title": "Midland Metal Mfg. | 591000C | 5/8 DOT COMPOSITE PLUG",
+                  "description": "Blackhawk Supply",
+                  "more_sellers": false,
+                  "seller": "Blackhawk Supply",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSJ-vGigtVlLGqlbmIor_byp7kTN3FWPuhw5RKPg-lje46EQHwJIysI5SQ0FanDQFOMwrfA9LBdND_1__4n0MLA6y1A-xT7",
+                  "price": {
+                    "current": 6.34,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$6.34"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "(5 Pack) Composite Ptc Plug 1/4 Q5 Replaces OEM: 12-90040",
+                  "description": "Mytee Products",
+                  "more_sellers": false,
+                  "seller": "Mytee Products",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ91JQajR00sTtFJxBaiD_tTpIu3pEUDHfJGsFo1GszAFf2frEZZuxxStmi1lAHoNl6Y95PV8pQ2ikLJOILVTLmFYzwzfm5m5S7qYEXlFtYkxnsxFa67J1Ijw",
+                  "price": {
+                    "current": 21.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$21.99"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "7x Bubbletight Degradable Frac Plug For Check 110-109996-00-00 Corvus",
+                  "description": "eBay - racingrose44\nFree delivery by Mon",
+                  "more_sellers": false,
+                  "seller": "eBay - racingrose44",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRwi1ObA5XhHqPhNgI5sJNuDLYPOM2dX6H1fMPmUKSLfYDsDijWMZGre6govWmyBcR-A1IkVepu4Q8lfoOYMyuTe6gA1-4WczC8d8KQmjir",
+                  "price": {
+                    "current": 350,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$350.00"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "REAN RF2C-B-2 RCA Phono Plug",
+                  "description": "Parts Express & more\nFree delivery on $99+",
+                  "more_sellers": true,
+                  "seller": "Parts Express",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ2QXr9_hY6kProtpEOnGJUkZLjl6ViusXNp8VCBCXsmIdMoNKcoYlkVp-lkonyDP67Chw2YypkJbN3H_1SVE5-jrXdzVZDADG5OVwclkzDf6qiZ-1heJD06d_Q",
+                  "price": {
+                    "current": 3.18,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$3.18"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 5,
+                    "votes_count": 2,
+                    "rating_max": 5
+                  }
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 2,
+              "rank_absolute": 24,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[3]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Dissolvable frac plugs",
+                "Frac plugs Oil field",
+                "Schlumberger reaction frac plug",
+                "Frac plug companies",
+                "Halliburton Illusion plug",
+                "Ball in place frac plug",
+                "Obsidian prime frac plug",
+                "Composite Cement Retainer"
+              ],
+              "rectangle": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

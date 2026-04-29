@@ -1,0 +1,1324 @@
+{
+  "version": "0.1.20260420",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "11.6626 sec.",
+  "cost": 0.0035,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "04282127-1032-0139-0000-96d1bcf6b78d",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "11.5835 sec.",
+      "cost": 0.0035,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "serp",
+        "google",
+        "organic",
+        "live",
+        "advanced"
+      ],
+      "data": {
+        "api": "serp",
+        "function": "live",
+        "se": "google",
+        "se_type": "organic",
+        "keyword": "well completion",
+        "location_code": 2840,
+        "language_code": "en",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20,
+        "load_async_ai_overview": true
+      },
+      "result": [
+        {
+          "keyword": "well completion",
+          "type": "organic",
+          "se_domain": "google.com",
+          "location_code": 2840,
+          "language_code": "en",
+          "check_url": "https://www.google.com/search?q=well%20completion&hl=en&gl=US&ie=UTF-8&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc",
+          "datetime": "2026-04-28 18:28:00 +00:00",
+          "spell": null,
+          "refinement_chips": null,
+          "item_types": [
+            "ai_overview",
+            "organic",
+            "people_also_ask",
+            "video",
+            "related_searches",
+            "images"
+          ],
+          "se_results_count": 118,
+          "pages_count": 2,
+          "items_count": 23,
+          "items": [
+            {
+              "type": "ai_overview",
+              "rank_group": 1,
+              "rank_absolute": 1,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "asynchronous_ai_overview": true,
+              "markdown": "![Types Of Well Completion In Oil &amp; Gas - Drilling Manual](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:32)\n![A Comprehensive Guide to Well Completion - Esimtech](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:33)\n![How Does Well Completion Work? What You Need To Know - Silver ...](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:34)\n![Efficient Well Completion Strategies by DeepData](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:35)\n![SAGD Well Completion Design Considerations](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:36)\n\nWell completion is `the process of making an oil or gas well ready for production after drilling, involving casing, cementing, perforating, and installing downhole equipment to safely extract hydrocarbons` . This final phase optimizes production rates by connecting the wellbore to the reservoir, often taking days to weeks, and includes methods like fracking and acid stimulation.[[1]](https://www.epa.gov/natural-gas-star-program/well-completions-and-workovers)[[2]](https://www.sciencedirect.com/topics/engineering/well-completion)[[3]](https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477)\n\nThis video provides an introduction to the process of well completion:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:37)\n06:36[![](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:38)\n![](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:39)\nPetro Proficient YouTube• Dec 21, 2020](https://www.youtube.com/watch?v=N8enNcbuKUw) **Key Components and Types** \n\n- **[Casing and Cementing](https://www.google.com/search?q=Casing+and+Cementing&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjHquuflpGUAxVjhf0HHbtWO6gQgK4QegYIAQgBEAw):** Setting steel pipe (casing) and pumping cement to stabilize the borehole, isolate fluids, and prevent collapse.\n- **[Perforation](https://www.google.com/search?q=Perforation&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjHquuflpGUAxVjhf0HHbtWO6gQgK4QegYIAQgBEA4):** Using perforating guns to create holes in the casing and cement, allowing oil/gas to flow from the formation into the well.\n- **[Production Tubing/Packers](https://www.google.com/search?q=Production+Tubing%2FPackers&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjHquuflpGUAxVjhf0HHbtWO6gQgK4QegYIAQgBEBA):** Installing tubing to transport fluids, and packers to seal the casing and manage pressure.\n- **[Wellhead/Christmas Tree](https://www.google.com/search?q=Wellhead%2FChristmas+Tree&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjHquuflpGUAxVjhf0HHbtWO6gQgK4QegYIAQgBEBI):** Installing valves and fittings on top to control flow.[[1]](https://en.wikipedia.org/wiki/Completion_%28oil_and_gas_wells%29)[[2]](https://www.sciencedirect.com/topics/engineering/well-completion)[[3]](https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477)[[4]](https://www.youtube.com/watch?v=sVQmuZBt20Q&t=17)\n\n**Common Completion Methods** \n\n- **Open Hole:** The most simple type, leaving the producing formation uncased.\n- **Perforated/Cased Hole:** The most common method, where the casing is cemented through the zone and then perforated.\n- **Sand Control/Gravel Pack:** A filter system installed to prevent formation sand from entering the well.[[1]](https://en.wikipedia.org/wiki/Completion_%28oil_and_gas_wells%29)[[2]](https://wiki.aapg.org/Well_completion#:~:text=There%20are%20several%20types%20of%20well%20completions%2C,and%20method%20of%20conveyance%20*%20Thru-tubing%20gun)[[3]](https://www.jjtamez.com/blog/how-does-well-completion-work/)[[4]](https://new.abb.com/oil-and-gas/production-book/reservoir-wellheads#:~:text=Open%20hole%20completions%20are%20the%20most%20basic,piping%20open%20without%20any%20other%20protective%20filter.)\n\nThis video explains the various types of well completions:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:40)\n1m[![](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:41)\n![](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:42)\nllau13 YouTube• Jan 28, 2013](https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477) **Major Considerations** \n\n- **Stimulation:** Techniques such as hydraulic fracturing (fracking) or acidizing are often required to increase flow in lower permeability reservoirs.\n- **Safety & Economics:** Designs must prioritize safe production, environmental protection, and economic viability.\n- **Artificial Lift:** Installation of pumps (e.g., electrical submersible pumps, rod lift) to raise fluids to the surface if natural pressure is insufficient.[[1]](https://www.epa.gov/natural-gas-star-program/well-completions-and-workovers)[[2]](https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477)[[3]](https://www.youtube.com/watch?v=noEFjR5HCyI&t=7)[[4]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions)[[5]](https://syntillica.com/services/well-engineering/#:~:text=Pump%20Selection:%20Installing%20pumps%20%28e.g.%2C%20electric%20submersible,particularly%20in%20wells%20with%20low%20natural%20pressure.)\n\n*Note: For official California water well documentation, stakeholders can access forms and information via the [DWR Well Completion Report Request](https://water.ca.gov/Programs/Groundwater-Management/Wells/Well-Completion-Reports) page.* [[1]](https://water.ca.gov/Programs/Groundwater-Management/Wells/Well-Completion-Reports)",
+              "items": [
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": null,
+                  "markdown": "![Types Of Well Completion In Oil &amp; Gas - Drilling Manual](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:16)\n![A Comprehensive Guide to Well Completion - Esimtech](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:17)\n![How Does Well Completion Work? What You Need To Know - Silver ...](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:18)\n![Efficient Well Completion Strategies by DeepData](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:19)\n![SAGD Well Completion Design Considerations](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:20)",
+                  "links": null,
+                  "images": [
+                    {
+                      "type": "images_element",
+                      "alt": "Types Of Well Completion In Oil & Gas - Drilling Manual",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:21"
+                    },
+                    {
+                      "type": "images_element",
+                      "alt": "A Comprehensive Guide to Well Completion - Esimtech",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:22"
+                    },
+                    {
+                      "type": "images_element",
+                      "alt": "How Does Well Completion Work? What You Need To Know - Silver ...",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:23"
+                    },
+                    {
+                      "type": "images_element",
+                      "alt": "Efficient Well Completion Strategies by DeepData",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:24"
+                    },
+                    {
+                      "type": "images_element",
+                      "alt": "SAGD Well Completion Design Considerations",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:25"
+                    }
+                  ],
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "Well completion is the process of making an oil or gas well ready for production after drilling, involving casing, cementing, perforating, and installing downhole equipment to safely extract hydrocarbons. This final phase optimizes production rates by connecting the wellbore to the reservoir, often taking days to weeks, and includes methods like fracking and acid stimulation. U.S. Environmental Protection Agency (.gov) +2",
+                  "markdown": "Well completion is `the process of making an oil or gas well ready for production after drilling, involving casing, cementing, perforating, and installing downhole equipment to safely extract hydrocarbons` . This final phase optimizes production rates by connecting the wellbore to the reservoir, often taking days to weeks, and includes methods like fracking and acid stimulation.[[1]](https://www.epa.gov/natural-gas-star-program/well-completions-and-workovers)[[2]](https://www.sciencedirect.com/topics/engineering/well-completion)[[3]](https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "U.S. Environmental Protection Agency (.gov)",
+                      "domain": "www.epa.gov",
+                      "url": "https://www.epa.gov/natural-gas-star-program/well-completions-and-workovers",
+                      "title": "Well Completions and Workovers | US EPA",
+                      "text": "Well completion is the process of bringing an oil or natural gas well into production after initial drilling or \"workover\" has bee..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "ScienceDirect.com",
+                      "domain": "www.sciencedirect.com",
+                      "url": "https://www.sciencedirect.com/topics/engineering/well-completion",
+                      "title": "Well Completion - an overview | ScienceDirect Topics",
+                      "text": "Smart upstream sector. 2023, IoT for Smart Operations in the Oil and Gas IndustryRazin Farhan Hussain, ... Mohsen Amini Salehi. 2."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477",
+                      "title": "Overview Chapter 8 Part 3 Well Completion",
+                      "text": "its advantage is that the tubing convey Perforating. allows the perforating gun to be pushed into highly deviated or horizontal ho..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "This video provides an introduction to the process of well completion: 06:36 Petro Proficient YouTube• Dec 21, 2020",
+                  "markdown": "This video provides an introduction to the process of well completion:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:26)\n06:36[![](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:27)\n![](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:28)\nPetro Proficient YouTube• Dec 21, 2020](https://www.youtube.com/watch?v=N8enNcbuKUw)",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Key Components and Types",
+                  "text": "Casing and Cementing : Setting steel pipe (casing) and pumping cement to stabilize the borehole, isolate fluids, and prevent collapse. Perforation : Using perforating guns to create holes in the casing and cement, allowing oil/gas to flow from the formation into the well. Production Tubing/Packers : Installing tubing to transport fluids, and packers to seal the casing and manage pressure. Wellhead/Christmas Tree : Installing valves and fittings on top to control flow.",
+                  "markdown": "- **[Casing and Cementing](https://www.google.com/search?q=Casing+and+Cementing&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjHquuflpGUAxVjhf0HHbtWO6gQgK4QegYIAQgBEAw):** Setting steel pipe (casing) and pumping cement to stabilize the borehole, isolate fluids, and prevent collapse.\n- **[Perforation](https://www.google.com/search?q=Perforation&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjHquuflpGUAxVjhf0HHbtWO6gQgK4QegYIAQgBEA4):** Using perforating guns to create holes in the casing and cement, allowing oil/gas to flow from the formation into the well.\n- **[Production Tubing/Packers](https://www.google.com/search?q=Production+Tubing%2FPackers&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjHquuflpGUAxVjhf0HHbtWO6gQgK4QegYIAQgBEBA):** Installing tubing to transport fluids, and packers to seal the casing and manage pressure.\n- **[Wellhead/Christmas Tree](https://www.google.com/search?q=Wellhead%2FChristmas+Tree&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjHquuflpGUAxVjhf0HHbtWO6gQgK4QegYIAQgBEBI):** Installing valves and fittings on top to control flow.[[1]](https://en.wikipedia.org/wiki/Completion_%28oil_and_gas_wells%29)[[2]](https://www.sciencedirect.com/topics/engineering/well-completion)[[3]](https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477)[[4]](https://www.youtube.com/watch?v=sVQmuZBt20Q&t=17)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Wikipedia",
+                      "domain": "en.wikipedia.org",
+                      "url": "https://en.wikipedia.org/wiki/Completion_%28oil_and_gas_wells%29",
+                      "title": "Completion (oil and gas wells) - Wikipedia",
+                      "text": "This involves running casing and a liner down through the production zone, and cementing it in place. Connection between the well ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "ScienceDirect.com",
+                      "domain": "www.sciencedirect.com",
+                      "url": "https://www.sciencedirect.com/topics/engineering/well-completion",
+                      "title": "Well Completion - an overview | ScienceDirect Topics",
+                      "text": "Smart upstream sector. 2023, IoT for Smart Operations in the Oil and Gas IndustryRazin Farhan Hussain, ... Mohsen Amini Salehi. 2."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477",
+                      "title": "Overview Chapter 8 Part 3 Well Completion",
+                      "text": "its advantage is that the tubing convey Perforating. allows the perforating gun to be pushed into highly deviated or horizontal ho..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=sVQmuZBt20Q&t=17",
+                      "title": "What are the Types of Well Completions (Liner, Single, Dual ...",
+                      "text": "Dual tubing completion is a technique where two production tubing sets are run parallel to each other to the bottom of the well. T..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Common Completion Methods",
+                  "text": "Open Hole: The most simple type, leaving the producing formation uncased. Perforated/Cased Hole: The most common method, where the casing is cemented through the zone and then perforated. Sand Control/Gravel Pack: A filter system installed to prevent formation sand from entering the well.",
+                  "markdown": "- **Open Hole:** The most simple type, leaving the producing formation uncased.\n- **Perforated/Cased Hole:** The most common method, where the casing is cemented through the zone and then perforated.\n- **Sand Control/Gravel Pack:** A filter system installed to prevent formation sand from entering the well.[[1]](https://en.wikipedia.org/wiki/Completion_%28oil_and_gas_wells%29)[[2]](https://wiki.aapg.org/Well_completion#:~:text=There%20are%20several%20types%20of%20well%20completions%2C,and%20method%20of%20conveyance%20*%20Thru-tubing%20gun)[[3]](https://www.jjtamez.com/blog/how-does-well-completion-work/)[[4]](https://new.abb.com/oil-and-gas/production-book/reservoir-wellheads#:~:text=Open%20hole%20completions%20are%20the%20most%20basic,piping%20open%20without%20any%20other%20protective%20filter.)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Wikipedia",
+                      "domain": "en.wikipedia.org",
+                      "url": "https://en.wikipedia.org/wiki/Completion_%28oil_and_gas_wells%29",
+                      "title": "Completion (oil and gas wells) - Wikipedia",
+                      "text": "This involves running casing and a liner down through the production zone, and cementing it in place. Connection between the well ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "AAPG Wiki",
+                      "domain": "wiki.aapg.org",
+                      "url": "https://wiki.aapg.org/Well_completion#:~:text=There%20are%20several%20types%20of%20well%20completions%2C,and%20method%20of%20conveyance%20*%20Thru-tubing%20gun",
+                      "title": "Well completion - AAPG Wiki",
+                      "text": "There are several types of well completions, including: * Open hole completions * Liner completions * Perforated casing completion..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "J&J Tamez LLC",
+                      "domain": "www.jjtamez.com",
+                      "url": "https://www.jjtamez.com/blog/how-does-well-completion-work/",
+                      "title": "How Does 'Well Completion' Work? - J&J Tamez LLC",
+                      "text": "Gravel Pack Some wells need filtration systems to keep their water clear of sand. Additionally, running a casing with a liner, gra..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "ABB",
+                      "domain": "new.abb.com",
+                      "url": "https://new.abb.com/oil-and-gas/production-book/reservoir-wellheads#:~:text=Open%20hole%20completions%20are%20the%20most%20basic,piping%20open%20without%20any%20other%20protective%20filter.",
+                      "title": "Reservoir and Wellheads | Production book",
+                      "text": "Open hole completions are the most basic type and are only used in very competent formations that are unlikely to cave in. An open..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "This video explains the various types of well completions: 1m llau13 YouTube• Jan 28, 2013",
+                  "markdown": "This video explains the various types of well completions:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:29)\n1m[![](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:30)\n![](https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:31)\nllau13 YouTube• Jan 28, 2013](https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477)",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Major Considerations",
+                  "text": "Stimulation: Techniques such as hydraulic fracturing (fracking) or acidizing are often required to increase flow in lower permeability reservoirs. Safety & Economics: Designs must prioritize safe production, environmental protection, and economic viability. Artificial Lift: Installation of pumps (e.g., electrical submersible pumps, rod lift) to raise fluids to the surface if natural pressure is insufficient.",
+                  "markdown": "- **Stimulation:** Techniques such as hydraulic fracturing (fracking) or acidizing are often required to increase flow in lower permeability reservoirs.\n- **Safety & Economics:** Designs must prioritize safe production, environmental protection, and economic viability.\n- **Artificial Lift:** Installation of pumps (e.g., electrical submersible pumps, rod lift) to raise fluids to the surface if natural pressure is insufficient.[[1]](https://www.epa.gov/natural-gas-star-program/well-completions-and-workovers)[[2]](https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477)[[3]](https://www.youtube.com/watch?v=noEFjR5HCyI&t=7)[[4]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions)[[5]](https://syntillica.com/services/well-engineering/#:~:text=Pump%20Selection:%20Installing%20pumps%20%28e.g.%2C%20electric%20submersible,particularly%20in%20wells%20with%20low%20natural%20pressure.)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "U.S. Environmental Protection Agency (.gov)",
+                      "domain": "www.epa.gov",
+                      "url": "https://www.epa.gov/natural-gas-star-program/well-completions-and-workovers",
+                      "title": "Well Completions and Workovers | US EPA",
+                      "text": "Well completion is the process of bringing an oil or natural gas well into production after initial drilling or \"workover\" has bee..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477",
+                      "title": "Overview Chapter 8 Part 3 Well Completion",
+                      "text": "its advantage is that the tubing convey Perforating. allows the perforating gun to be pushed into highly deviated or horizontal ho..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=noEFjR5HCyI&t=7",
+                      "title": "Introduction to Well Completions by Syed Hassaan A",
+                      "text": "um I will just go back. and uh retrace my steps uh so the completion system must provide an effective means of producing or gas an..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "SLB",
+                      "domain": "www.slb.com",
+                      "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions",
+                      "title": "Well completions to maximize recovery and cut costs - SLB",
+                      "text": "Electris™ electric completions — SLB's electric completions platform empowers operators to predict, adapt, and act with confidence..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Syntillica",
+                      "domain": "syntillica.com",
+                      "url": "https://syntillica.com/services/well-engineering/#:~:text=Pump%20Selection:%20Installing%20pumps%20%28e.g.%2C%20electric%20submersible,particularly%20in%20wells%20with%20low%20natural%20pressure.",
+                      "title": "Well Engineering",
+                      "text": "Pump Selection: Installing pumps (e.g., electric submersible pumps, rod pumps) to lift fluids to the surface, particularly in well..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "Note: For official California water well documentation, stakeholders can access forms and information via the DWR Well Completion Report Request page. California Department of Water Resources (.gov)",
+                  "markdown": "*Note: For official California water well documentation, stakeholders can access forms and information via the [DWR Well Completion Report Request](https://water.ca.gov/Programs/Groundwater-Management/Wells/Well-Completion-Reports) page.* [[1]](https://water.ca.gov/Programs/Groundwater-Management/Wells/Well-Completion-Reports)",
+                  "links": [
+                    {
+                      "type": "link_element",
+                      "title": "DWR Well Completion Report Request",
+                      "description": null,
+                      "url": "https://water.ca.gov/Programs/Groundwater-Management/Wells/Well-Completion-Reports",
+                      "domain": "water.ca.gov"
+                    }
+                  ],
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "California Department of Water Resources (.gov)",
+                      "domain": "water.ca.gov",
+                      "url": "https://water.ca.gov/Programs/Groundwater-Management/Wells/Well-Completion-Reports",
+                      "title": "Well Completion Reports",
+                      "text": "If you are having trouble submitting a report to OSWCR, you can email DWR headquarters at OSWCR_Admin@water.ca.gov. You can also r..."
+                    }
+                  ]
+                }
+              ],
+              "references": [
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "California Department of Water Resources (.gov)",
+                  "domain": "water.ca.gov",
+                  "url": "https://water.ca.gov/Programs/Groundwater-Management/Wells/Well-Completion-Reports",
+                  "title": "Well Completion Reports",
+                  "text": "If you are having trouble submitting a report to OSWCR, you can email DWR headquarters at OSWCR_Admin@water.ca.gov. You can also r..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Wikipedia",
+                  "domain": "en.wikipedia.org",
+                  "url": "https://en.wikipedia.org/wiki/Completion_%28oil_and_gas_wells%29",
+                  "title": "Completion (oil and gas wells) - Wikipedia",
+                  "text": "This involves running casing and a liner down through the production zone, and cementing it in place. Connection between the well ..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "U.S. Environmental Protection Agency (.gov)",
+                  "domain": "www.epa.gov",
+                  "url": "https://www.epa.gov/natural-gas-star-program/well-completions-and-workovers",
+                  "title": "Well Completions and Workovers | US EPA",
+                  "text": "Well completion is the process of bringing an oil or natural gas well into production after initial drilling or \"workover\" has bee..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "AAPG Wiki",
+                  "domain": "wiki.aapg.org",
+                  "url": "https://wiki.aapg.org/Well_completion#:~:text=There%20are%20several%20types%20of%20well%20completions%2C,and%20method%20of%20conveyance%20*%20Thru-tubing%20gun",
+                  "title": "Well completion - AAPG Wiki",
+                  "text": "There are several types of well completions, including: * Open hole completions * Liner completions * Perforated casing completion..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "ScienceDirect.com",
+                  "domain": "www.sciencedirect.com",
+                  "url": "https://www.sciencedirect.com/topics/engineering/well-completion",
+                  "title": "Well Completion - an overview | ScienceDirect Topics",
+                  "text": "Smart upstream sector. 2023, IoT for Smart Operations in the Oil and Gas IndustryRazin Farhan Hussain, ... Mohsen Amini Salehi. 2."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "SLB",
+                  "domain": "www.slb.com",
+                  "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions",
+                  "title": "Well completions to maximize recovery and cut costs - SLB",
+                  "text": "Electris™ electric completions — SLB's electric completions platform empowers operators to predict, adapt, and act with confidence..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=noEFjR5HCyI&t=7",
+                  "title": "Introduction to Well Completions by Syed Hassaan A",
+                  "text": "um I will just go back. and uh retrace my steps uh so the completion system must provide an effective means of producing or gas an..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "J&J Tamez LLC",
+                  "domain": "www.jjtamez.com",
+                  "url": "https://www.jjtamez.com/blog/how-does-well-completion-work/",
+                  "title": "How Does 'Well Completion' Work? - J&J Tamez LLC",
+                  "text": "Gravel Pack Some wells need filtration systems to keep their water clear of sand. Additionally, running a casing with a liner, gra..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=sVQmuZBt20Q&t=17",
+                  "title": "What are the Types of Well Completions (Liner, Single, Dual ...",
+                  "text": "Dual tubing completion is a technique where two production tubing sets are run parallel to each other to the bottom of the well. T..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=TKHfDSnjbXE&t=477",
+                  "title": "Overview Chapter 8 Part 3 Well Completion",
+                  "text": "its advantage is that the tubing convey Perforating. allows the perforating gun to be pushed into highly deviated or horizontal ho..."
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 1,
+              "rank_absolute": 2,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]",
+              "domain": "en.wikipedia.org",
+              "title": "Completion (oil and gas wells)",
+              "url": "https://en.wikipedia.org/wiki/Completion_(oil_and_gas_wells)",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://en.wikipedia.org › wiki › Completion_(oil_and_...",
+              "website_name": "Wikipedia",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Well completion is the process of making a well ready for production (or injection) after drilling operations. This principally involves preparing the ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "making a well ready for production"
+              ],
+              "links": [
+                {
+                  "type": "link_element",
+                  "title": "Lower completion (downhole...",
+                  "description": null,
+                  "url": "https://en.wikipedia.org/wiki/Completion_(oil_and_gas_wells)#Lower_completion_(downhole_completion)",
+                  "domain": "en.wikipedia.org"
+                },
+                {
+                  "type": "link_element",
+                  "title": "Open hole completion",
+                  "description": null,
+                  "url": "https://en.wikipedia.org/wiki/Completion_(oil_and_gas_wells)#Open_hole_completion",
+                  "domain": "en.wikipedia.org"
+                },
+                {
+                  "type": "link_element",
+                  "title": "Completion components",
+                  "description": null,
+                  "url": "https://en.wikipedia.org/wiki/Completion_(oil_and_gas_wells)#Completion_components",
+                  "domain": "en.wikipedia.org"
+                }
+              ],
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 2,
+              "rank_absolute": 3,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]",
+              "domain": "www.epa.gov",
+              "title": "Well Completions and Workovers",
+              "url": "https://www.epa.gov/natural-gas-star-program/well-completions-and-workovers",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.epa.gov › natural-gas-star-program › well-...",
+              "website_name": "U.S. Environmental Protection Agency (.gov)",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Jun 24, 2025 — Well completion is the process of bringing an oil or gas well into production. Completion steps involve casing, cementing, perforating, ...",
+              "pre_snippet": "06/24/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "the process of bringing an oil or gas well into production"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-06-24 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 3,
+              "rank_absolute": 4,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[5]/div[1]/div[1]",
+              "domain": "www.slb.com",
+              "title": "The Defining Series: Introduction to Well Completions",
+              "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-completion",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.slb.com › Resource Library",
+              "website_name": "SLB",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Sep 1, 2015 — Once a well has been drilled to total depth (TD), evaluated, cased and cemented, engineers complete it by inserting equipment, designed to ...",
+              "pre_snippet": "09/01/2015 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "well"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2015-09-01 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "people_also_ask",
+              "rank_group": 1,
+              "rank_absolute": 5,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]/div[1]/div[1]",
+              "items": [
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What does well completion mean?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_ai_overview_expanded_element",
+                      "items": null,
+                      "references": null,
+                      "asynchronous_ai_overview": true
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What are the three types of well completion?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://wiki.aapg.org/Well_completion",
+                      "domain": "wiki.aapg.org",
+                      "title": "Well completion - AAPG Wiki",
+                      "description": "Once the decision has been made to either complete a well using an open hole completion, liner completion or perforated casing completion, a decision must be made on how many different intervals will be produced.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What are the steps in well completion?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]/div[1]/div[1]/div[1]/div[2]/div[3]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://www.epa.gov/natural-gas-star-program/well-completions-and-workovers",
+                      "domain": "www.epa.gov",
+                      "title": "Well Completions and Workovers | US EPA",
+                      "description": "Completion steps involve removal of the drill string, casing, cementing, perforating, hydraulically fracturing in the reservoir to stimulate production, expelling drilling and fracturing fluids, and installing the production valve.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "How long does well completion take?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]/div[1]/div[1]/div[1]/div[2]/div[4]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://scwellservice.com/blog/how-long-to-drill-well.html",
+                      "domain": "scwellservice.com",
+                      "title": "How Long Does It Take to Drill a Well? Timeline & Process Explained",
+                      "description": "The actual drilling typically takes 1-3 days for most residential wells. However, the complete project from permit application to flowing water usually takes 2-4 weeks. Deeper wells (500+ feet) or difficult geology may extend drilling to 4-5 days.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "video",
+              "rank_group": 1,
+              "rank_absolute": 6,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[9]/div[1]",
+              "items": [
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Petro Proficient",
+                  "title": "Well Completions | Introduction",
+                  "timestamp": "2020-12-21 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=N8enNcbuKUw"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Gulfwell Solutions FZCO",
+                  "title": "Mastering Well Completion",
+                  "timestamp": "2023-12-30 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=OxRBfL6HJRA"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Pass Petroleum",
+                  "title": "well completion",
+                  "timestamp": "2023-07-13 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=xEfZ1ksoQxk"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Atlantic International University - AIU",
+                  "title": "Introduction to Well Completions by Syed Hassaan A",
+                  "timestamp": "2024-03-15 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=noEFjR5HCyI"
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 4,
+              "rank_absolute": 7,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[11]/div[1]/div[1]",
+              "domain": "www.halliburton.com",
+              "title": "Well completions",
+              "url": "https://www.halliburton.com/en/completions/well-completions",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.halliburton.com › completions › well-compl...",
+              "website_name": "Halliburton",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Halliburton's intelligent completions provide operators with precise control and monitoring to optimize production across the entire wellbore. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "intelligent completions"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 5,
+              "rank_absolute": 8,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[13]/div[1]/div[1]",
+              "domain": "www.enverus.com",
+              "title": "WELL COMPLETION 101: UNLOCKING DOWNHOLE ...",
+              "url": "https://www.enverus.com/blog/well-completion-101-part-1-casing/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.enverus.com › blog › well-completion-101...",
+              "website_name": "Enverus",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Well completion is the process of making a drilled well ready for production. In the days of Mr. Joiner, well completion consisted of running a steel pipe down ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "making a drilled well ready for production"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 6,
+              "rank_absolute": 9,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[15]/div[1]/div[1]",
+              "domain": "www.sciencedirect.com",
+              "title": "Well Completion - an overview",
+              "url": "https://www.sciencedirect.com/topics/engineering/well-completion",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.sciencedirect.com › topics › engineering › w...",
+              "website_name": "ScienceDirect.com",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Well completion is defined as a single operation involving the installation of production casing and equipment in order to bring the well into production from ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "a single operation involving the installation of production casing and equipment"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 7,
+              "rank_absolute": 10,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[17]/div[1]/div[1]",
+              "domain": "wiki.aapg.org",
+              "title": "Well completion",
+              "url": "https://wiki.aapg.org/Well_completion",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://wiki.aapg.org › Well_completion",
+              "website_name": "AAPG Wiki",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Jan 18, 2022 — Purpose of well completions · Connect the reservoir to the surface so that fluids can be produced from or injected into the reservoir · Provide ... Read more",
+              "pre_snippet": "01/18/2022 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Connect the reservoir to the surface"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2022-01-18 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 8,
+              "rank_absolute": 11,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[19]/div[1]/div[1]",
+              "domain": "www.osha.gov",
+              "title": "Oil and Gas Well Drilling and Servicing - Well Completion",
+              "url": "http://www.osha.gov/etools/oil-and-gas/well-completion",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "http://www.osha.gov › etools › well-completion",
+              "website_name": "Occupational Safety and Health Administration (.gov)",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "To complete the well production, casing is installed and cemented and the drilling rig is dismantled and moved to the next site. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "casing is installed and cemented"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 1,
+              "rank_absolute": 12,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[2]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Well completion pdf",
+                "Well completion process",
+                "Types of well completion",
+                "Well completion equipment",
+                "What is well completion in oil and gas",
+                "Well completion diagram",
+                "Types of Well Completion pdf",
+                "Well completion equipment PDF"
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 9,
+              "rank_absolute": 13,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "domain": "www.e-education.psu.edu",
+              "title": "7.5: Well Completion Design | PNG 301",
+              "url": "https://www.e-education.psu.edu/png301/node/689",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.e-education.psu.edu › png301 › node",
+              "website_name": "Dutton Institute",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The well completion is the lowermost portion of the well, comprised of tubulars and downhole equipment, that enables the safe and effective production from an ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "The well completion is the lowermost portion of the well"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 10,
+              "rank_absolute": 14,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]",
+              "domain": "www.youtube.com",
+              "title": "Process of completing a well",
+              "url": "https://www.youtube.com/watch?v=19QqFwMbNTU",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "15.3K+ views  ·  6 years ago",
+              "website_name": "YouTube · Petroleum Today Magazine",
+              "is_image": false,
+              "is_video": true,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": null,
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": null,
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2019-11-16 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 11,
+              "rank_absolute": 15,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]",
+              "domain": "www.rangerminerals.com",
+              "title": "Oil and Gas Well Completion Definition | In-Depth Guide",
+              "url": "https://www.rangerminerals.com/glossary/well-completion/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.rangerminerals.com › glossary › well-com...",
+              "website_name": "Ranger Land and Minerals",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Well completion refers to readying an oil or gas well for production. It can also be used when the well is ready for testing, and not yet commercial production. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "readying an oil or gas well for production"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 12,
+              "rank_absolute": 16,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]",
+              "domain": "www.osha.gov",
+              "title": "Oil and Gas Well Drilling and Servicing - Well Completion",
+              "url": "http://www.osha.gov/etools/oil-and-gas/well-completion",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "http://www.osha.gov › etools › well-completion",
+              "website_name": "Occupational Safety and Health Administration (.gov)",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "To complete the well production, casing is installed and cemented and the drilling rig is dismantled and moved to the next site. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "casing is installed and cemented"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 13,
+              "rank_absolute": 17,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]",
+              "domain": "kh.aquaenergyexpo.com",
+              "title": "WELL COMPLETION PROGRAM",
+              "url": "https://kh.aquaenergyexpo.com/wp-content/uploads/2023/01/Well-Completion-Program-.pdf",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://kh.aquaenergyexpo.com › 2023/01 › Wel...",
+              "website_name": "AquaEnergy Expo Knowledge Hub",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Why well completion is so important ? • To effectively drain out the reservoir fluids to surface. Proper completion design is crucial in maximizing recovery. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "To effectively drain out the reservoir fluids to surface"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 14,
+              "rank_absolute": 18,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+              "domain": "www.bakerhughes.com",
+              "title": "Completions",
+              "url": "https://www.bakerhughes.com/completions",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.bakerhughes.com › completions",
+              "website_name": "Baker Hughes",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Maximize the long-term performance of your wells with well completion services from Baker Hughes. From the reservoir to the production facility, ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "well completion services from Baker Hughes"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 15,
+              "rank_absolute": 19,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]/div[1]",
+              "domain": "petex.utexas.edu",
+              "title": "Well Completion - Petroleum Extension (PETEX)",
+              "url": "https://petex.utexas.edu/e-learning/modules/well-completion-and-workover/356-well-completion",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://petex.utexas.edu › well-completion-and-workover",
+              "website_name": "The University of Texas at Austin",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Well Completion. After a well is drilled, there is still much that needs to be done before oil and gas can begin to flow to the surface. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "After a well is drilled, there is still much that needs to be done"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 16,
+              "rank_absolute": 20,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]",
+              "domain": "www.ogmpartnership.org",
+              "title": "Well-Completion-TGD.pdf",
+              "url": "https://www.ogmpartnership.org/sites/default/files/2025-04/Well-Completion-TGD.pdf",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.ogmpartnership.org › default › files",
+              "website_name": "The Oil & Gas Methane Partnership 2.0",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Well completion refers to the procedure of making an oil or natural gas well for production following the initial drilling or 'workover'. The process includes ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "making an oil or natural gas well for production"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 17,
+              "rank_absolute": 21,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+              "domain": "medium.com",
+              "title": "6 Things about Oil & Gas Well Completion Your Boss ...",
+              "url": "https://medium.com/@marleerosegreasebook/6-things-about-oil-gas-well-completion-your-boss-wants-you-to-know-50d020742bc5",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "10+ likes  ·  9 years ago",
+              "website_name": "Medium · Marlee Rose",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Drilling the well and cementing the casing are only the first steps to completing the well. Once complete, the rig crew will install tubing to bring the oil ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Drilling the well and cementing the casing are only the first steps to completing the well"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "images",
+              "rank_group": 1,
+              "rank_absolute": 22,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]",
+              "title": "Images",
+              "url": "https://www.google.com/search?sa=N&hl=en&gl=US&sca_esv=06de5ba07996f893&q=well+completion&udm=2&source=univ&fir=F4hraxirdDAReM%252Cmf9xZ6LCMSR6fM%252C_%253BpvMOd8EnuGbQxM%252C-11FNYyMvdOONM%252C_%253BVovjhuT9nobOdM%252CFGPGKLJ7jjXvBM%252C_%253BA5AShQIpbEN-fM%252CT07Jxgx_3-JUFM%252C_%253BmvqNH7ItbTXJ_M%252CFGPGKLJ7jjXvBM%252C_%253BZxujgiI0RSKijM%252C9z8HVfiiubywdM%252C_%253BBKI8jQC3jIi1EM%252C27kyqaI9NzF9HM%252C_%253BMYmrtpMuPbg1qM%252CwSdDlzUrx7xxJM%252C_%253B814zSY9vk9rdoM%252CgKupnI-5Xj35sM%252C_&usg=AI4_-kSdu7Elk97LAasDrAN2nKXtcqUXWA&ved=2ahUKEwjHp6-glpGUAxXMVUEAHVIhHwg4ChDsCXoECDkQBQ",
+              "items": [
+                {
+                  "type": "images_element",
+                  "alt": "The Defining Series: Introduction to Well Completions | SLB",
+                  "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-completion",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:43"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Types Of Well Completion In Oil & Gas - Drilling Manual",
+                  "url": "https://www.drillingmanual.com/types-well-completion-oil-gas/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:44"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Well Completion - an overview | ScienceDirect Topics",
+                  "url": "https://www.sciencedirect.com/topics/engineering/well-completion",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282127-1032-0139-0000-96d1bcf6b78d:45"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Well completion for gas hydrate production | GRID-Arendal",
+                  "url": "https://www.grida.no/resources/6611",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGP2-S5Zw2kxvpKgi2hr7ybi-tCe1yfk1SXoUMsQppARAVi_ABpf_2zB0&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Well Completion - an overview | ScienceDirect Topics",
+                  "url": "https://www.sciencedirect.com/topics/engineering/well-completion",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmr9EubHLFTRcB7yDES44jt4cYVbTIxN8yN4SLvmpYA0jk_wX6a796amE&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "How Does Well Completion Work? What You Need To Know ...",
+                  "url": "https://silver-fox.net/how-does-well-completion-work-what-you-need-to-know/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPTQV_kElBIEqFjZydZ0M9JTvd6BiKyMpN-Tis2dnYusG47lRciDhTp8o&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "7.5.3: Cased and Perforated Completion | PNG 301 ...",
+                  "url": "https://www.e-education.psu.edu/png301/node/893",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8PtyKUhtMLEE0fGt_QjlSSbeVPFGSKTmVVyJ_yF6z3oPuc7eKMr60Gx8&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "How Does 'Well Completion' Work? | J&J Tamez LLC",
+                  "url": "https://www.jjtamez.com/blog/how-does-well-completion-work/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT_9TEy7N6JzXiISCXhnuna_UE9gkE8ZDVjSSCylVA2LcjAeb5T-VXhrY&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Introduction to Well Completion II Learn with PETRO PROFICIENT",
+                  "url": "https://www.youtube.com/watch?v=mHH7T4dpWlQ",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoCm4h2Xvlun98ka3L-0jNkXNZOH61Z0IHhwuC6tC4&s"
+                }
+              ],
+              "related_image_searches": null,
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 2,
+              "rank_absolute": 23,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[3]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Well completion pdf",
+                "Well completion process",
+                "Types of well completion",
+                "What is well completion in oil and gas",
+                "Well completion equipment",
+                "Well completion diagram",
+                "Types of Well Completion pdf",
+                "Well completion equipment PDF"
+              ],
+              "rectangle": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -92,6 +92,7 @@ Agentic OS is built on three layers:
 | `ops-cron` | Schedule recurring Claude Code tasks | -- |
 | `tool-stitch` | Fetch UI designs from Google Stitch projects | gcloud auth |
 | `viz-stitch-design` | Design and iterate on UI screens with Google Stitch | gcloud auth |
+| `tool-dataforseo` | Keyword research and SERP analysis (volume, KD, AI Overview citations) | `DATAFORSEO_LOGIN` + `DATAFORSEO_PASSWORD` |
 
 ---
 

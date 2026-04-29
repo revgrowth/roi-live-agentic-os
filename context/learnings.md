@@ -33,6 +33,8 @@
 
 ## str-ai-seo
 
+- 2026-04-28: Head-term keywords frequently return AI Overviews for the wrong industry intent. Examples from gh-yellow-jacket-oil Phase 1: `frac plug` (oilfield target) returns 71% saltwater-aquarium AIO citations; `shot density` (perforating target) returns 57% shotgun-ammunition citations. Targeting these head terms for AEO measurement is leverage-poor — Yellow Jacket can win organic SEO but AIO citations won't flow until Google's intent classification shifts. Always classify AIO citation domains for intent-mismatch before locking in AEO strategy: if ≥30% of cited domains are from a different industry AND zero are from the target industry, refine the keyword to a longer-tail variant that disambiguates intent. The `analyze-cached-serps.js` helper in the gh-yellow-jacket-oil client has a working detector pattern.
+
 ## str-trending-research
 
 ## viz-nano-banana
@@ -50,6 +52,13 @@
 ## tool-humanizer
 
 ## tool-youtube
+
+## tool-dataforseo
+
+- 2026-04-28: First version built during gh-yellow-jacket-oil Phase 1 keyword validation. Three scripts: keyword-overview, serp-advanced, validate-keywords. Per-keyword JSON cache is a hard requirement — earlier client-level helper lost ~$0.10 of paid SERP output to a mid-run filesystem reset because raw responses lived only in memory until end-of-run. New design persists immediately on each call.
+- 2026-04-28: AI Overview citation references appear in two response shapes — sometimes `item.references`, sometimes nested under `item.items[].references`. Summariser handles both. Watch for further variants as DataForSEO updates the AIO endpoint.
+- 2026-04-28: Keyword Overview Live silently omits keywords with no measured volume — they don't return as a row at all. Treat missing keywords as a soft LOW_VOLUME signal, not as a fetch error. Validation table flags them in a dedicated "No Overview Data Returned" section.
+- 2026-04-28: SERP Organic Live Advanced returns up to `depth: 20` results by default in this skill's scripts — when reporting "competitor organic appearances" downstream, label the bucket as "top 20" not "top 10". The earlier auditor markdown labeled it "top 10" but actually included ranks up to 20; fix the label, don't filter the data (page-2 ranks are still informative for competitive landscape).
 
 ## viz-excalidraw-diagram
 
