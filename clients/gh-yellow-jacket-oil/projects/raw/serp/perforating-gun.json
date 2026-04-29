@@ -1,0 +1,1897 @@
+{
+  "version": "0.1.20260420",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "3.9452 sec.",
+  "cost": 0.0035,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "04282126-1032-0139-0000-8a975a3cc5fb",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "3.8008 sec.",
+      "cost": 0.0035,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "serp",
+        "google",
+        "organic",
+        "live",
+        "advanced"
+      ],
+      "data": {
+        "api": "serp",
+        "function": "live",
+        "se": "google",
+        "se_type": "organic",
+        "keyword": "perforating gun",
+        "location_code": 2840,
+        "language_code": "en",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20,
+        "load_async_ai_overview": true
+      },
+      "result": [
+        {
+          "keyword": "perforating gun",
+          "type": "organic",
+          "se_domain": "google.com",
+          "location_code": 2840,
+          "language_code": "en",
+          "check_url": "https://www.google.com/search?q=perforating%20gun&hl=en&gl=US&ie=UTF-8&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc",
+          "datetime": "2026-04-28 18:26:04 +00:00",
+          "spell": null,
+          "refinement_chips": {
+            "type": "refinement_chips",
+            "xpath": "/html[1]/body[1]/div[3]/div[1]/div[9]/div[1]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]",
+            "items": [
+              {
+                "type": "refinement_chips_element",
+                "title": "Nearby",
+                "url": "https://www.google.com/search?q=perforating+gun+nearby&hl=en&gl=US&shoprs=GAMqD3BlcmZvcmF0aW5nIGd1bjIMCAMSBk5lYXJieRgCYAE&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoAXoECBwQMA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "For Sale",
+                "url": "https://www.google.com/search?q=perforating+gun+for+sale&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIMCBISCEZvciBTYWxlYAE&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoAnoECBwQMQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "On sale",
+                "url": "https://www.google.com/search?q=perforating+gun+sale&hl=en&gl=US&shoprs=EgRKAhgBGAYqD3BlcmZvcmF0aW5nIGd1bjITCAYSB09uIHNhbGUYAiIESgIYAWAB&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoA3oECBwQMg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Price",
+                "url": "https://www.google.com/search?q=price+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIJCBISBVByaWNlYAE&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoBHoECBwQMw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "New",
+                "url": "https://www.google.com/search?q=new+perforating+gun&hl=en&gl=US&shoprs=GAoqD3BlcmZvcmF0aW5nIGd1bjIHCAoSA05ld2AB&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoBXoECBwQNA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Used",
+                "url": "https://www.google.com/search?q=used+perforating+gun&hl=en&gl=US&shoprs=GAoqD3BlcmZvcmF0aW5nIGd1bjIICAoSBFVzZWRgAQ&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoBnoECBwQNQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Buy",
+                "url": "https://www.google.com/search?q=buy+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIHCBISA0J1eWAB&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoB3oECBwQNg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Under $1,500",
+                "url": "https://www.google.com/search?q=perforating+gun+under+$1,500&hl=en&gl=US&shoprs=Eg0SCxEAAADAC1rWQRgBGAUqD3BlcmZvcmF0aW5nIGd1bjIlCAUSDFVuZGVyICQxLDUwMBgCIg0SCxEAAADAC1rWQRgBKgIYAWAB&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoCHoECBwQNw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Black",
+                "url": "https://www.google.com/search?q=black+perforating+gun&hl=en&gl=US&shoprs=GAEqD3BlcmZvcmF0aW5nIGd1bjIXCAESBUJsYWNrOgwI2Iz1ARDlivUBMAtgAQ&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoCXoECBwQOA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Tools",
+                "url": "https://www.google.com/search?q=tools+perforating+gun&hl=en&gl=US&shoprs=GAkqD3BlcmZvcmF0aW5nIGd1bjIJCAkSBVRvb2xzYAE&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoCnoECBwQOQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Reviews",
+                "url": "https://www.google.com/search?q=reviews+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjILCBISB1Jldmlld3NgAQ&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoC3oECBwQOg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Green",
+                "url": "https://www.google.com/search?q=green+perforating+gun&hl=en&gl=US&shoprs=GAEqD3BlcmZvcmF0aW5nIGd1bjIXCAESBUdyZWVuOgwI2Iz1ARDoivUBMAtgAQ&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoDHoECBwQOw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Welding & Soldering Tools",
+                "url": "https://www.google.com/search?q=welding+%26+soldering+tools+perforating+gun&hl=en&gl=US&shoprs=GAkqD3BlcmZvcmF0aW5nIGd1bjIdCAkSGVdlbGRpbmcgJiBTb2xkZXJpbmcgVG9vbHNgAQ&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoDXoECBwQPA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Size",
+                "url": "https://www.google.com/search?q=size+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIICBISBFNpemVgAQ&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoDnoECBwQPQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Electric",
+                "url": "https://www.google.com/search?q=electric+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIMCBISCEVsZWN0cmljYAE&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoD3oECBwQPg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Diy",
+                "url": "https://www.google.com/search?q=diy+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIHCBISA0RpeWAB&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoEHoECBwQPw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Online",
+                "url": "https://www.google.com/search?q=online+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIKCBISBk9ubGluZWAB&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoEXoECBwQQA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Pneumatic",
+                "url": "https://www.google.com/search?q=pneumatic+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjINCBISCVBuZXVtYXRpY2AB&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoEnoECBwQQQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Large",
+                "url": "https://www.google.com/search?q=large+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIJCBISBUxhcmdlYAE&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoE3oECBwQQg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Paper",
+                "url": "https://www.google.com/search?q=paper+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIJCBISBVBhcGVyYAE&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoFHoECBwQQw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Brand",
+                "url": "https://www.google.com/search?q=brand+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIJCBISBUJyYW5kYAE&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoFXoECBwQRA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Heavy Duty",
+                "url": "https://www.google.com/search?q=heavy+duty+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIOCBISCkhlYXZ5IER1dHlgAQ&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoFnoECBwQRQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Jewelry",
+                "url": "https://www.google.com/search?q=jewelry+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjILCBISB0pld2VscnlgAQ&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoF3oECBwQRg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Small",
+                "url": "https://www.google.com/search?q=small+perforating+gun&hl=en&gl=US&shoprs=GBIqD3BlcmZvcmF0aW5nIGd1bjIJCBISBVNtYWxsYAE&sa=X&ved=2ahUKEwiom-_olZGUAxUZIbkGHSy8KLI4ChCKngYoGHoECBwQRw",
+                "domain": "www.google.com",
+                "options": null
+              }
+            ]
+          },
+          "item_types": [
+            "ai_overview",
+            "images",
+            "organic",
+            "video",
+            "people_also_ask",
+            "short_videos",
+            "discussions_and_forums",
+            "related_searches",
+            "popular_products"
+          ],
+          "se_results_count": 533000,
+          "pages_count": 2,
+          "items_count": 26,
+          "items": [
+            {
+              "type": "ai_overview",
+              "rank_group": 1,
+              "rank_absolute": 1,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "asynchronous_ai_overview": true,
+              "markdown": "A perforating gun is a specialized oilfield tool used to create holes (perforations) in well casing, cement, and formation, allowing oil or gas to flow into the wellbore . These devices use explosives (shaped charges) typically carried on wireline or pipe, which are detonated to pierce the steel and rock, optimizing reservoir productivity.[[1]](https://www.youtube.com/watch?v=8ZQ9yjzreNo&t=31)[[2]](https://www.slb.com/resource-library/oilfield-review/defining-series/defining-perforating#:~:text=Perforating%20guns%20carry%20explosive%20shaped%20charges%20downhole%2C,of%20cementing%20metal%20pipe%20in%20the%20wellbore.)\n\n**Key Components and Types** \n\n- **Components:** A typical gun includes a gun barrel (housing), shaped charges, detonating cord, and a detonator.\n- **[Hollow Carrier Guns](https://www.google.com/search?q=Hollow+Carrier+Guns&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgAEAo):** Steel tubes that protect charges from wellbore fluids, offering high reliability, pressure/temperature resistance, and reduced debris.\n- **[Expendable/Capsule Guns](https://www.google.com/search?q=Expendable%2FCapsule+Guns&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgAEAw):** Typically cheaper and flexible, allowing for larger charges, but may leave debris and damage the casing.\n- **[Tubing Conveyed Perforating (TCP)](https://www.google.com/search?q=Tubing+Conveyed+Perforating+%28TCP%29&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgBEAE):** Guns attached to tubing, ideal for long, deviated, or horizontal intervals, allowing, and allowing for underbalanced perforating.[[1]](https://www.youtube.com/watch?v=8ZQ9yjzreNo&t=31)[[2]](https://www.youtube.com/watch?v=b5n5mmW_vgo&t=521)[[3]](https://www.indiamart.com/proddetail/ported-gun-perforating-system-9951485348.html#:~:text=Here%20are%20some%20features%20of%20the%20guns:,*%20Charges%20are%20tested%20to%20API%20standards)[[4]](https://www.youtube.com/shorts/iBfyZB3-fVA)[[5]](https://www.youtube.com/watch?v=duToyzpZqos#:~:text=Perforation%20methods%20include%20conventional%20casing%2C%20through%20tubing%2C,each%20with%20different%20charge%20carriers%20and%20benefits.)\n\n**Modern Technologies and Features** \n\n- **Oriented Perforating:** Systems like Hunting's H-4 ensure charges face a specific direction.\n- **Automated/Smart Systems:** [Hunting's ControlFire Perf+](https://www.youtube.com/watch?v=eo1oX_BxBS4) enables automated, positive-initiation firing.\n- **Disposable/Pre-loaded:** Systems like the [Yellow Jacket Pull & Play™](https://ghdiv.com/perforating-guns/) focus on speed and reducing, or eliminating, plastic components.\n- **Shock Reduction:** Technologies like [SLB's INsidr](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems) aim to reduce shock damage.[[1]](https://ghdiv.com/perforating-guns/#:~:text=Yellow%20Jacket%20is%20a%20perforating%20gun%20manufacturer,provide%20solid%20ground%20path%20for%20addressable%20switch)[[2]](https://huntingplc.com/products-services/perforating-logging-systems/perforating-systems/h-4-oriented-perforating/)[[3]](https://www.youtube.com/watch?v=eo1oX_BxBS4&t=9)[[4]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems)[[5]](https://huntingplc.com/products-services/perforating-logging-systems/perforating-systems/h-4-oriented-perforating/#:~:text=Product%20summary%20The%20H-4%20Perforating%20System%20is,lock%20collars%20needed%20for%20conventional%20gravity-driven%20orientation.)\n\n**Common Applications** \n\n- **[Well Completion](https://www.google.com/search?q=Well+Completion&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgCEBI):** Making the initial connection to the reservoir.\n- **[Reperforation](https://www.google.com/search?q=Reperforation&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgCEBQ):** Enhancing production in declining wells.\n- **[Sand Control](https://www.google.com/search?q=Sand+Control&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgCEBY):** Precise perforation to facilitate gravel packing.[[1]](https://www.epa.gov/sites/default/files/documents/casingperforatedoverview.pdf#:~:text=The%20primary%20objective%20of%20a%20perforating%20gun,cement%20sheath%20and%20into%20the%20productive%20formation.)[[2]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems/exposed#:~:text=Revive%20declining%20wells%20with%20exposed%20perforating%20systems,specifically%20designed%20for%20reperforation%20and%20well%20revitalization.)[[3]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems)[[4]](https://www.sciencedirect.com/topics/engineering/perforating-gun#:~:text=Figure%206-9%20shows%20the%20combination%20TCP-inside%20casing,able%20to%20effectively%20pack%20gravel%20into%20perforations.)",
+              "items": [
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "A perforating gun is a specialized oilfield tool used to create holes (perforations) in well casing, cement, and formation, allowing oil or gas to flow into the wellbore. These devices use explosives (shaped charges) typically carried on wireline or pipe, which are detonated to pierce the steel and rock, optimizing reservoir productivity. YouTube +1",
+                  "markdown": "A perforating gun is a specialized oilfield tool used to create holes (perforations) in well casing, cement, and formation, allowing oil or gas to flow into the wellbore . These devices use explosives (shaped charges) typically carried on wireline or pipe, which are detonated to pierce the steel and rock, optimizing reservoir productivity.[[1]](https://www.youtube.com/watch?v=8ZQ9yjzreNo&t=31)[[2]](https://www.slb.com/resource-library/oilfield-review/defining-series/defining-perforating#:~:text=Perforating%20guns%20carry%20explosive%20shaped%20charges%20downhole%2C,of%20cementing%20metal%20pipe%20in%20the%20wellbore.)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=8ZQ9yjzreNo&t=31",
+                      "title": "Perforating Guns",
+                      "text": "A perforating gun includes a gun barrel, the loading tube, detonating cord, a detonator, and shaped charges. The gun barrel serves..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "SLB",
+                      "domain": "www.slb.com",
+                      "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-perforating#:~:text=Perforating%20guns%20carry%20explosive%20shaped%20charges%20downhole%2C,of%20cementing%20metal%20pipe%20in%20the%20wellbore.",
+                      "title": "The Defining Series: Perforating Fundamentals - SLB",
+                      "text": "Perforating guns carry explosive shaped charges downhole, where they are detonated to create tunnels that act as conduits through ..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Key Components and Types",
+                  "text": "Components: A typical gun includes a gun barrel (housing), shaped charges, detonating cord, and a detonator. Hollow Carrier Guns : Steel tubes that protect charges from wellbore fluids, offering high reliability, pressure/temperature resistance, and reduced debris. Expendable/Capsule Guns : Typically cheaper and flexible, allowing for larger charges, but may leave debris and damage the casing. Tubing Conveyed Perforating (TCP) : Guns attached to tubing, ideal for long, deviated, or horizontal intervals, allowing, and allowing for underbalanced perforating.",
+                  "markdown": "- **Components:** A typical gun includes a gun barrel (housing), shaped charges, detonating cord, and a detonator.\n- **[Hollow Carrier Guns](https://www.google.com/search?q=Hollow+Carrier+Guns&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgAEAo):** Steel tubes that protect charges from wellbore fluids, offering high reliability, pressure/temperature resistance, and reduced debris.\n- **[Expendable/Capsule Guns](https://www.google.com/search?q=Expendable%2FCapsule+Guns&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgAEAw):** Typically cheaper and flexible, allowing for larger charges, but may leave debris and damage the casing.\n- **[Tubing Conveyed Perforating (TCP)](https://www.google.com/search?q=Tubing+Conveyed+Perforating+%28TCP%29&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgBEAE):** Guns attached to tubing, ideal for long, deviated, or horizontal intervals, allowing, and allowing for underbalanced perforating.[[1]](https://www.youtube.com/watch?v=8ZQ9yjzreNo&t=31)[[2]](https://www.youtube.com/watch?v=b5n5mmW_vgo&t=521)[[3]](https://www.indiamart.com/proddetail/ported-gun-perforating-system-9951485348.html#:~:text=Here%20are%20some%20features%20of%20the%20guns:,*%20Charges%20are%20tested%20to%20API%20standards)[[4]](https://www.youtube.com/shorts/iBfyZB3-fVA)[[5]](https://www.youtube.com/watch?v=duToyzpZqos#:~:text=Perforation%20methods%20include%20conventional%20casing%2C%20through%20tubing%2C,each%20with%20different%20charge%20carriers%20and%20benefits.)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=8ZQ9yjzreNo&t=31",
+                      "title": "Perforating Guns",
+                      "text": "A perforating gun includes a gun barrel, the loading tube, detonating cord, a detonator, and shaped charges. The gun barrel serves..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=b5n5mmW_vgo&t=521",
+                      "title": "Basic Introduction To Oil & Gas Well Perforating",
+                      "text": "Wireline perforation systems include steel hollow carrier guns, semi-expendable guns, and fully expendable guns. Retrievable hollo..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "IndiaMART",
+                      "domain": "www.indiamart.com",
+                      "url": "https://www.indiamart.com/proddetail/ported-gun-perforating-system-9951485348.html#:~:text=Here%20are%20some%20features%20of%20the%20guns:,*%20Charges%20are%20tested%20to%20API%20standards",
+                      "title": "Ported Gun Perforating System",
+                      "text": "Here are some features of the guns: * Charges are protected from well fluids, formation pressure, and abrasion * Debris is retaine..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/shorts/iBfyZB3-fVA",
+                      "title": "Tubing conveyed perforation (TCP): Pros and cons",
+                      "text": "Tubing conveyed perforation (TCP) involves deploying the gun on tubing. In this method, guns are attached to the tubing and run in..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=duToyzpZqos#:~:text=Perforation%20methods%20include%20conventional%20casing%2C%20through%20tubing%2C,each%20with%20different%20charge%20carriers%20and%20benefits.",
+                      "title": "Well Completion : Perforation",
+                      "text": "Perforation methods include conventional casing, through tubing, and tubing conveyed guns, each with different charge carriers and..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Modern Technologies and Features",
+                  "text": "Oriented Perforating: Systems like Hunting's H-4 ensure charges face a specific direction. Hunting's H-4 Automated/Smart Systems: Hunting's ControlFire Perf+ enables automated, positive-initiation firing. Disposable/Pre-loaded: Systems like the Yellow Jacket Pull & Play™ focus on speed and reducing, or eliminating, plastic components. Shock Reduction: Technologies like SLB's INsidr aim to reduce shock damage.",
+                  "markdown": "- **Oriented Perforating:** Systems like Hunting's H-4 ensure charges face a specific direction.\n- **Automated/Smart Systems:** [Hunting's ControlFire Perf+](https://www.youtube.com/watch?v=eo1oX_BxBS4) enables automated, positive-initiation firing.\n- **Disposable/Pre-loaded:** Systems like the [Yellow Jacket Pull & Play™](https://ghdiv.com/perforating-guns/) focus on speed and reducing, or eliminating, plastic components.\n- **Shock Reduction:** Technologies like [SLB's INsidr](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems) aim to reduce shock damage.[[1]](https://ghdiv.com/perforating-guns/#:~:text=Yellow%20Jacket%20is%20a%20perforating%20gun%20manufacturer,provide%20solid%20ground%20path%20for%20addressable%20switch)[[2]](https://huntingplc.com/products-services/perforating-logging-systems/perforating-systems/h-4-oriented-perforating/)[[3]](https://www.youtube.com/watch?v=eo1oX_BxBS4&t=9)[[4]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems)[[5]](https://huntingplc.com/products-services/perforating-logging-systems/perforating-systems/h-4-oriented-perforating/#:~:text=Product%20summary%20The%20H-4%20Perforating%20System%20is,lock%20collars%20needed%20for%20conventional%20gravity-driven%20orientation.)",
+                  "links": [
+                    {
+                      "type": "link_element",
+                      "title": "Hunting's ControlFire Perf+",
+                      "description": null,
+                      "url": "https://www.youtube.com/watch?v=eo1oX_BxBS4",
+                      "domain": "www.youtube.com"
+                    },
+                    {
+                      "type": "link_element",
+                      "title": "Yellow Jacket Pull & Play™",
+                      "description": null,
+                      "url": "https://ghdiv.com/perforating-guns/",
+                      "domain": "ghdiv.com"
+                    },
+                    {
+                      "type": "link_element",
+                      "title": "SLB's INsidr",
+                      "description": null,
+                      "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems",
+                      "domain": "www.slb.com"
+                    }
+                  ],
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Yellow Jacket Oil Tools",
+                      "domain": "ghdiv.com",
+                      "url": "https://ghdiv.com/perforating-guns/#:~:text=Yellow%20Jacket%20is%20a%20perforating%20gun%20manufacturer,provide%20solid%20ground%20path%20for%20addressable%20switch",
+                      "title": "Perforating Guns - Yellow Jacket Oil Tools",
+                      "text": "Yellow Jacket is a perforating gun manufacturer that offers a variety of guns: * **Pull & Play™ Perforating Gun** This gun is load..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Hunting PLC",
+                      "domain": "huntingplc.com",
+                      "url": "https://huntingplc.com/products-services/perforating-logging-systems/perforating-systems/h-4-oriented-perforating/",
+                      "title": "H-4 Oriented Perforating System - Hunting PLC",
+                      "text": "Features * Self-orienting, plug and play perforating system. * V3.0 ControlFire Recon Switch embedded in charge tube. * Fully disp..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=eo1oX_BxBS4&t=9",
+                      "title": "Hunting's Latest Perforating Technology: ControlFire Perf+, H4 ...",
+                      "text": "Hunting has developed a unique tool string that features top-to-bottom communication and automated firing capabilities. Control Fi..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "SLB",
+                      "domain": "www.slb.com",
+                      "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems",
+                      "title": "Perforating Gun Systems | SLB",
+                      "text": "Engineered and manufactured perforating gun systems for consistent high performance. Regardless of the type of gun or perforating ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Hunting PLC",
+                      "domain": "huntingplc.com",
+                      "url": "https://huntingplc.com/products-services/perforating-logging-systems/perforating-systems/h-4-oriented-perforating/#:~:text=Product%20summary%20The%20H-4%20Perforating%20System%20is,lock%20collars%20needed%20for%20conventional%20gravity-driven%20orientation.",
+                      "title": "Hunting | H-4 Oriented Perforating System",
+                      "text": "Product summary The H-4 Perforating System is Hunting's plug-and-play, self-orienting perforating gun which integrates ControlFire..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Common Applications",
+                  "text": "Well Completion : Making the initial connection to the reservoir. Reperforation : Enhancing production in declining wells. Sand Control : Precise perforation to facilitate gravel packing.",
+                  "markdown": "- **[Well Completion](https://www.google.com/search?q=Well+Completion&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgCEBI):** Making the initial connection to the reservoir.\n- **[Reperforation](https://www.google.com/search?q=Reperforation&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgCEBQ):** Enhancing production in declining wells.\n- **[Sand Control](https://www.google.com/search?q=Sand+Control&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQgK4QegYIAQgCEBY):** Precise perforation to facilitate gravel packing.[[1]](https://www.epa.gov/sites/default/files/documents/casingperforatedoverview.pdf#:~:text=The%20primary%20objective%20of%20a%20perforating%20gun,cement%20sheath%20and%20into%20the%20productive%20formation.)[[2]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems/exposed#:~:text=Revive%20declining%20wells%20with%20exposed%20perforating%20systems,specifically%20designed%20for%20reperforation%20and%20well%20revitalization.)[[3]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems)[[4]](https://www.sciencedirect.com/topics/engineering/perforating-gun#:~:text=Figure%206-9%20shows%20the%20combination%20TCP-inside%20casing,able%20to%20effectively%20pack%20gravel%20into%20perforations.)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "U.S. Environmental Protection Agency (.gov)",
+                      "domain": "www.epa.gov",
+                      "url": "https://www.epa.gov/sites/default/files/documents/casingperforatedoverview.pdf#:~:text=The%20primary%20objective%20of%20a%20perforating%20gun,cement%20sheath%20and%20into%20the%20productive%20formation.",
+                      "title": "Casing Perforating Overview | EPA",
+                      "text": "The primary objective of a perforating gun is to provide effective flow communication between a cased wellbore and a productive re..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "SLB",
+                      "domain": "www.slb.com",
+                      "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems/exposed#:~:text=Revive%20declining%20wells%20with%20exposed%20perforating%20systems,specifically%20designed%20for%20reperforation%20and%20well%20revitalization.",
+                      "title": "Exposed Perforating Gun Systems - SLB",
+                      "text": "Revive declining wells with exposed perforating systems Exposed perforating gun systems, including capsule guns, are engineered to..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "SLB",
+                      "domain": "www.slb.com",
+                      "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems",
+                      "title": "Perforating Gun Systems | SLB",
+                      "text": "Engineered and manufactured perforating gun systems for consistent high performance. Regardless of the type of gun or perforating ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "ScienceDirect.com",
+                      "domain": "www.sciencedirect.com",
+                      "url": "https://www.sciencedirect.com/topics/engineering/perforating-gun#:~:text=Figure%206-9%20shows%20the%20combination%20TCP-inside%20casing,able%20to%20effectively%20pack%20gravel%20into%20perforations.",
+                      "title": "Perforating Gun - an overview",
+                      "text": "Figure 6-9 shows the combination TCP-inside casing gravel pack. A work string with a flight-type perforating gun is adopted. Thus ..."
+                    }
+                  ]
+                }
+              ],
+              "references": [
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "U.S. Environmental Protection Agency (.gov)",
+                  "domain": "www.epa.gov",
+                  "url": "https://www.epa.gov/sites/default/files/documents/casingperforatedoverview.pdf#:~:text=The%20primary%20objective%20of%20a%20perforating%20gun,cement%20sheath%20and%20into%20the%20productive%20formation.",
+                  "title": "Casing Perforating Overview | EPA",
+                  "text": "The primary objective of a perforating gun is to provide effective flow communication between a cased wellbore and a productive re..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Yellow Jacket Oil Tools",
+                  "domain": "ghdiv.com",
+                  "url": "https://ghdiv.com/perforating-guns/#:~:text=Yellow%20Jacket%20is%20a%20perforating%20gun%20manufacturer,provide%20solid%20ground%20path%20for%20addressable%20switch",
+                  "title": "Perforating Guns - Yellow Jacket Oil Tools",
+                  "text": "Yellow Jacket is a perforating gun manufacturer that offers a variety of guns: * **Pull & Play™ Perforating Gun** This gun is load..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=8ZQ9yjzreNo&t=31",
+                  "title": "Perforating Guns",
+                  "text": "A perforating gun includes a gun barrel, the loading tube, detonating cord, a detonator, and shaped charges. The gun barrel serves..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "SLB",
+                  "domain": "www.slb.com",
+                  "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems",
+                  "title": "Perforating Gun Systems | SLB",
+                  "text": "Engineered and manufactured perforating gun systems for consistent high performance. Regardless of the type of gun or perforating ..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "SLB",
+                  "domain": "www.slb.com",
+                  "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems/exposed#:~:text=Revive%20declining%20wells%20with%20exposed%20perforating%20systems,specifically%20designed%20for%20reperforation%20and%20well%20revitalization.",
+                  "title": "Exposed Perforating Gun Systems - SLB",
+                  "text": "Revive declining wells with exposed perforating systems Exposed perforating gun systems, including capsule guns, are engineered to..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "SLB",
+                  "domain": "www.slb.com",
+                  "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-perforating#:~:text=Perforating%20guns%20carry%20explosive%20shaped%20charges%20downhole%2C,of%20cementing%20metal%20pipe%20in%20the%20wellbore.",
+                  "title": "The Defining Series: Perforating Fundamentals - SLB",
+                  "text": "Perforating guns carry explosive shaped charges downhole, where they are detonated to create tunnels that act as conduits through ..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=b5n5mmW_vgo&t=521",
+                  "title": "Basic Introduction To Oil & Gas Well Perforating",
+                  "text": "Wireline perforation systems include steel hollow carrier guns, semi-expendable guns, and fully expendable guns. Retrievable hollo..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=duToyzpZqos#:~:text=Perforation%20methods%20include%20conventional%20casing%2C%20through%20tubing%2C,each%20with%20different%20charge%20carriers%20and%20benefits.",
+                  "title": "Well Completion : Perforation",
+                  "text": "Perforation methods include conventional casing, through tubing, and tubing conveyed guns, each with different charge carriers and..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Hunting PLC",
+                  "domain": "huntingplc.com",
+                  "url": "https://huntingplc.com/products-services/perforating-logging-systems/perforating-systems/h-4-oriented-perforating/",
+                  "title": "H-4 Oriented Perforating System - Hunting PLC",
+                  "text": "Features * Self-orienting, plug and play perforating system. * V3.0 ControlFire Recon Switch embedded in charge tube. * Fully disp..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=eo1oX_BxBS4&t=9",
+                  "title": "Hunting's Latest Perforating Technology: ControlFire Perf+, H4 ...",
+                  "text": "Hunting has developed a unique tool string that features top-to-bottom communication and automated firing capabilities. Control Fi..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "IndiaMART",
+                  "domain": "www.indiamart.com",
+                  "url": "https://www.indiamart.com/proddetail/ported-gun-perforating-system-9951485348.html#:~:text=Here%20are%20some%20features%20of%20the%20guns:,*%20Charges%20are%20tested%20to%20API%20standards",
+                  "title": "Ported Gun Perforating System",
+                  "text": "Here are some features of the guns: * Charges are protected from well fluids, formation pressure, and abrasion * Debris is retaine..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/shorts/iBfyZB3-fVA",
+                  "title": "Tubing conveyed perforation (TCP): Pros and cons",
+                  "text": "Tubing conveyed perforation (TCP) involves deploying the gun on tubing. In this method, guns are attached to the tubing and run in..."
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "images",
+              "rank_group": 1,
+              "rank_absolute": 2,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+              "title": "Images",
+              "url": "https://www.google.com/search?sca_esv=06de5ba07996f893&hl=en&gl=US&q=perforating+gun&udm=2&source=univ&fir=E7txwCnAudnzYM%252CldjAN5AmqlxulM%252C_%253BiwN5zjfiPDz4EM%252CgybdCECPCE0X7M%252C_%253BbSfsNWimPrHWBM%252CHxovDdsRLfzH-M%252C_%253Bg-MmdVEhNk3D-M%252Cgtfe2ZP3amWknM%252C_%253BTa4u1X5iSu9W9M%252CmIAJk46lgjOchM%252C_%253BJElIqZE5igN22M%252Con8c1u104OuyNM%252C_%253BLFwM0OYHPBD7mM%252CZXNDvQoMpLeJdM%252C_%253Bd1HOx6n7m4eK6M%252CGDKuc2CeCI3fUM%252C_%253BSX2ZWJUXMcd19M%252C5HGAE_ULgOcQjM%252C_%253Bz9gqYYkrvqjTOM%252CFa9Sa-T1yCNqEM%252C_%253BN3M2zuwfdGSYxM%252CMduXaTtkfqjifM%252C_%253BMsBIOyoMNP1lCM%252ChTrVyTfCbMgK-M%252C_&usg=AI4_-kTGIyBjOUDeBhOX6lARr5dWBnDz3g&sa=X&ved=2ahUKEwi8moDolZGUAxVoBbkGHULFLuIQ7Al6BAgaEAU",
+              "items": [
+                {
+                  "type": "images_element",
+                  "alt": "Hunting | Perforating Systems",
+                  "url": "https://huntingplc.com/products-services/perforating-logging-systems/perforating-systems/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-8a975a3cc5fb:0"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "What is a Perforating Gun and How Does It Work? - MSI",
+                  "url": "https://msipipeprotection.com/what-is-a-perforating-gun-how-does-it-work/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-8a975a3cc5fb:1"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "PerfAlign+™ – The ONLY Self-Orienting Perforating System",
+                  "url": "https://swmtx.com/self-orienting-perforating-system-guns-charges/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-8a975a3cc5fb:2"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Perforating Gun for Hydraulic Fracturing | U.S. Geological ...",
+                  "url": "https://www.usgs.gov/media/images/perforating-gun-hydraulic-fracturing",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-8a975a3cc5fb:3"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Perforating | Baker Hughes",
+                  "url": "https://www.bakerhughes.com/completions/perforating",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-8a975a3cc5fb:4"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Perforating Gun Systems for Oil & Gas Industry | Texas",
+                  "url": "https://huntandhunt.com/services/perforating-gun-systems-for-oil-gas/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-8a975a3cc5fb:5"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "PERFORATING | Precision Wireline",
+                  "url": "https://precisionwls.com/perforating",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFmuAwldCOvnyGq_cTAGoBA6qXmfV6HrO5bmguROnIZaPoYoBQNBUvJTc&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "The Defining Series: Perforating Fundamentals | SLB",
+                  "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-perforating",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPGBF0aNZpCUXCf1DEtDF2TgOW-ukzt_l50OQ5ghqutd2A9GmVva9uvuw&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "New Perforating Gun System Increases Safety and Efficiency",
+                  "url": "https://jpt.spe.org/new-perforating-gun-system-increases-safety-and-efficiency",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR64PBZgZUR6zJRnuQVxguuKKZqvZ4giuS5oRA_SbwYJF0234RJcK4PzJw&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Perforating Guns - Yellow Jacket Oil Tools",
+                  "url": "https://ghdiv.com/perforating-guns/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpGg8VV73ihue2w721UXP3kNS5e6LAjXDynIIyzddTlKMiZVApCQCpMJw&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Perforating Gun - an overview | ScienceDirect Topics",
+                  "url": "https://www.sciencedirect.com/topics/engineering/perforating-gun",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL8EDO27xAuu3MEH2BCBr09ut0RvnkkVCKdh877GQbgTp2HNcvgphRe9s&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Animation Test Perforating Gun in Lab - YouTube",
+                  "url": "https://www.youtube.com/watch?v=oQlbQeq5FfA",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqHXy5igcTXcXUtsqT2HCVKHBltpaNCnB42hy4ZQko9g&s"
+                }
+              ],
+              "related_image_searches": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 1,
+              "rank_absolute": 3,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]",
+              "domain": "ghdiv.com",
+              "title": "Perforating Guns",
+              "url": "https://ghdiv.com/perforating-guns/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://ghdiv.com › perforating-guns",
+              "website_name": "Yellow Jacket Oil Tools",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Feb 23, 2026 — Yellow Jacket is the only perforating gun manufacturer with the patented technology, approved by DOT and Transport Canada, for on-highway transportation. Read more",
+              "pre_snippet": "02/23/2026 00:00:00",
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": "perforating gun from ghdiv.com",
+                  "url": "https://ghdiv.com/perforating-guns/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-8a975a3cc5fb:6"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Yellow Jacket is the only perforating gun manufacturer with the patented technology"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2026-02-23 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 2,
+              "rank_absolute": 4,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[5]/div[1]/div[1]",
+              "domain": "www.epa.gov",
+              "title": "Casing Perforating Overview",
+              "url": "https://www.epa.gov/sites/default/files/documents/casingperforatedoverview.pdf",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.epa.gov › casingperforatedoverview",
+              "website_name": "U.S. Environmental Protection Agency (.gov)",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The primary objective of a perforating gun is to provide effective flow communication between a cased wellbore and a productive reservoir. • To achieve this, ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "perforating gun"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "video",
+              "rank_group": 1,
+              "rank_absolute": 5,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]",
+              "items": [
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Liberty Energy",
+                  "title": "Perforating Guns",
+                  "timestamp": "2021-03-31 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=8ZQ9yjzreNo"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Steel Islander",
+                  "title": "Basic Introduction To Oil & Gas Well Perforating",
+                  "timestamp": "2024-04-29 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=b5n5mmW_vgo"
+                },
+                {
+                  "type": "video_element",
+                  "source": "Instagram · TheMassielDiezShow",
+                  "title": "What does perforating a well mean? And how do you do that ...",
+                  "timestamp": "2025-12-22 00:00:00 +00:00",
+                  "url": "https://www.instagram.com/reel/DSkmDVJkSt_/"
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "people_also_ask",
+              "rank_group": 1,
+              "rank_absolute": 6,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[9]/div[1]/div[1]/div[1]",
+              "items": [
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What is a perforating gun?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[9]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://www.epa.gov/sites/default/files/documents/casingperforatedoverview.pdf",
+                      "domain": "www.epa.gov",
+                      "title": "Casing Perforating Overview | EPA",
+                      "description": "The primary objective of a perforating gun is to provide effective flow communication between the cased wellbore and a productive reservoir. To achieve this, the perforating gun “punches” a pattern of perforation through the casing and cement sheath and into the productive formation.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "How safe is it to operate a perforating gun?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[9]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://msipipeprotection.com/top-perforating-gun-safety-practices/",
+                      "domain": "msipipeprotection.com",
+                      "title": "Top Perforating Gun Safety Practices - MSI Pipe Protection Technologies",
+                      "description": "Although perforating operations are necessary, it's also a hazardous process. Therefore, only trained and experienced operators should perform these kinds of tasks. And having perforating gun safety and other thread protective tools will only help enhance well-site practices during operations.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What are the regulations for perforating guns?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[9]/div[1]/div[1]/div[1]/div[1]/div[2]/div[3]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://www.atf.gov/media/19091/download",
+                      "domain": "www.atf.gov",
+                      "title": "STORAGE - ATF",
+                      "description": "During transportation of perforating guns, Department of Transportation regulations require a detonator interrupter device to be placed between the detonators and detonating cord, which prevents the possibility of an unintended initiation.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What tools are used for perforating?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[9]/div[1]/div[1]/div[1]/div[1]/div[2]/div[4]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://en.wikipedia.org/wiki/Perforation",
+                      "domain": "en.wikipedia.org",
+                      "title": "Perforation - Wikipedia",
+                      "description": "Pins and needles. Rotary pinned perforation rollers are precision tools that can be used to perforate a wide variety of materials. The pins or needles can be used cold or heated. Cold perforation tools include needle punches.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 3,
+              "rank_absolute": 7,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[11]/div[1]/div[1]",
+              "domain": "msipipeprotection.com",
+              "title": "What is a Perforating Gun and How Does It Work?",
+              "url": "https://msipipeprotection.com/what-is-a-perforating-gun-how-does-it-work/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://msipipeprotection.com › what-is-a-perforating-g...",
+              "website_name": "MSI Pipe Protection Technologies",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "A perforating gun is used to create openings in casings used in oil and gas well drilling. These guns generally hold several explosive-shaped charges. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": "perforating gun from msipipeprotection.com",
+                  "url": "https://msipipeprotection.com/what-is-a-perforating-gun-how-does-it-work/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU4Bux9iEkU3FN6PtKLzEs0gHzqt7wwQIL7dAi-ZsqtUfakoI4p9bm&usqp=CAE&s"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "used to create openings in casings used in oil and gas well drilling"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 4,
+              "rank_absolute": 8,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[13]/div[1]/div[1]",
+              "domain": "www.bakerhughes.com",
+              "title": "Perforating",
+              "url": "https://www.bakerhughes.com/completions/perforating",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.bakerhughes.com › completions › perforating",
+              "website_name": "Baker Hughes",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Baker Hughes engineers and builds perforating systems that perform at the optimal level you expect, every time. We design our gun systems based on your unique ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": "perforating gun from www.bakerhughes.com",
+                  "url": "https://www.bakerhughes.com/completions/perforating",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGF-pdhYaSONN4BbuQI99kIZQXiG9F6uJLxTCZiEJZ0X9jeG-HKIF5&usqp=CAE&s"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Baker Hughes engineers and builds perforating systems"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 5,
+              "rank_absolute": 9,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[15]/div[1]/div[1]",
+              "domain": "www.slb.com",
+              "title": "Perforating Gun Systems",
+              "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.slb.com › ... › Perforating",
+              "website_name": "SLB",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Oct 22, 2022 — Our hollow carrier and capsule perforating gun systems are engineered for the wellbore environment, reservoir, and completion geometry. Read more",
+              "pre_snippet": "10/22/2022 00:00:00",
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": "perforating gun from www.slb.com",
+                  "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/perforating/perforating-gun-systems",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtlohLVrD74Qo12Id1LUPN2fFcIDzIHaq8v9e7btoV8FDpxFzB2JTX&usqp=CAE&s"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "perforating gun"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2022-10-22 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "short_videos",
+              "rank_group": 1,
+              "rank_absolute": 10,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[17]/div[1]",
+              "title": "Short videos",
+              "items": [
+                {
+                  "type": "short_videos_element",
+                  "title": "Gun Perforation in Oil & Gas A Glimpse into Subsurface ...",
+                  "url": "https://www.facebook.com/DrillingEquipmentSupply/videos/gun-perforation-in-oil-gasa-glimpse-into-subsurface-precisioni-recently-came-acr/832216212592360/",
+                  "domain": "www.facebook.com",
+                  "source": "Drilling Equipment Supply"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "What does perforating a well mean? And how do you do that ...",
+                  "url": "https://www.instagram.com/reel/DSkmDVJkSt_/",
+                  "domain": "www.instagram.com",
+                  "source": "TheMassielDiezShow"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "Perforating Guns #Explosives #OilWell #Completions ...",
+                  "url": "https://www.youtube.com/shorts/SkeMfpLG1VY",
+                  "domain": "www.youtube.com",
+                  "source": "Fact & Function"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "‏Perforating Oil and Gas Wells: ‏the act of blasting holes ...",
+                  "url": "https://www.instagram.com/reel/DI4TfFytIvC/",
+                  "domain": "www.instagram.com",
+                  "source": "🔷 𝐅𝐚𝐢𝐬𝐚𝐥 & 𝐆𝐡𝐚𝐧𝐧𝐚𝐦 𝐚𝐥𝐠𝐡𝐚𝐧𝐧𝐚𝐦 🔷"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "𝗣𝗲𝗿𝗳𝗼𝗿𝗮𝘁𝗶𝗼𝗻 𝗙𝘂𝗻 | Petroleum Engineers Association",
+                  "url": "https://www.facebook.com/petroleumengineersassociation/videos/%F0%9D%97%A3%F0%9D%97%B2%F0%9D%97%BF%F0%9D%97%B3%F0%9D%97%BC%F0%9D%97%BF%F0%9D%97%AE%F0%9D%98%81%F0%9D%97%B6%F0%9D%97%BC%F0%9D%97%BB-%F0%9D%97%99%F0%9D%98%82%F0%9D%97%BB%F0%9D%97%B1%F0%9D%97%AE%F0%9D%97%BA%F0%9D%97%B2%F0%9D%97%BB%F0%9D%98%81%F0%9D%97%AE%F0%9D%97%B9%F0%9D%98%80perforation-is-a-special-operation-to-create-an-efficien/287400230926349/",
+                  "domain": "www.facebook.com",
+                  "source": "Petroleum Engineers Association"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "“Perforating Oil and Gas Wells: the act of blasting holes ...",
+                  "url": "https://www.instagram.com/reel/DGp8_0fIWRt/",
+                  "domain": "www.instagram.com",
+                  "source": "تجمع هندسة النفط و الغاز👷🏼‍♂️🛢️"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "PinPoint internal orienting perforating guns are engineered for ...",
+                  "url": "https://www.facebook.com/RepeatPrecision/videos/pinpoint-internal-orienting-perforating-guns-are-engineered-for-more-accurate-sh/1826773201160741/",
+                  "domain": "www.facebook.com",
+                  "source": "Repeat Precision"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "Tubing conveyed perforation (TCP): Pros and cons",
+                  "url": "https://www.youtube.com/shorts/iBfyZB3-fVA",
+                  "domain": "www.youtube.com",
+                  "source": "PETROLEUM BITES"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "Wireline Perforating in Oilfield Operations",
+                  "url": "https://www.tiktok.com/@taylorjeeps/video/7632271824776072462",
+                  "domain": "www.tiktok.com",
+                  "source": "taylorjeeps"
+                },
+                {
+                  "type": "short_videos_element",
+                  "title": "𝐆𝐮𝐧 𝐏𝐞𝐫𝐟𝐨𝐫𝐚𝐭𝐢𝐨𝐧 𝐢𝐧 𝐎𝐢𝐥 & 𝐆𝐚𝐬: 𝐀 𝐆𝐥𝐢𝐦𝐩𝐬𝐞 ...",
+                  "url": "https://www.instagram.com/reel/DJJWoSPIDIS/?hl=en",
+                  "domain": "www.instagram.com",
+                  "source": "𝐊𝐚𝐫𝐰𝐚𝐧 𝐘 𝐒𝐚𝐥𝐢𝐡"
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "discussions_and_forums",
+              "rank_group": 1,
+              "rank_absolute": 11,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[19]/div[1]",
+              "title": "Discussions and forums",
+              "items": [
+                {
+                  "type": "discussions_and_forums_element",
+                  "title": "Well Perforators - General Ammunition Discussion",
+                  "url": "https://forum.cartridgecollectors.org/t/well-perforators/52660",
+                  "domain": "forum.cartridgecollectors.org",
+                  "source": "International Ammunition Association",
+                  "description": null,
+                  "timestamp": "2023-04-28 18:26:02 +00:00",
+                  "posts_count": 3
+                },
+                {
+                  "type": "discussions_and_forums_element",
+                  "title": "perforating guns for oil and gas",
+                  "url": "https://www.reddit.com/r/oilandgasworkers/comments/cyqsko/perforating_guns_for_oil_and_gas/",
+                  "domain": "www.reddit.com",
+                  "source": "Reddit",
+                  "description": null,
+                  "timestamp": "2020-04-28 18:26:02 +00:00",
+                  "posts_count": 10
+                },
+                {
+                  "type": "discussions_and_forums_element",
+                  "title": "Perforating Charges Assembled Into a Cannon",
+                  "url": "https://www.reddit.com/r/MachinePorn/comments/r3gdrj/perforating_charges_assembled_into_a_cannon/",
+                  "domain": "www.reddit.com",
+                  "source": "Reddit",
+                  "description": null,
+                  "timestamp": "2022-04-28 18:26:02 +00:00",
+                  "posts_count": 50
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 6,
+              "rank_absolute": 12,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[21]/div[1]/div[1]",
+              "domain": "www.sciencedirect.com",
+              "title": "Perforating Gun - an overview",
+              "url": "https://www.sciencedirect.com/topics/engineering/perforating-gun",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.sciencedirect.com › topics › engineering › p...",
+              "website_name": "ScienceDirect.com",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Perforating guns are usually made up of a number of shaped charges, but there are some bullet guns for specialized applications. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": "perforating gun from www.sciencedirect.com",
+                  "url": "https://www.sciencedirect.com/topics/engineering/perforating-gun",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4mfVf5wqAWi1BiKA8d29wQZxIO3sEx7qoKQGGxJY&usqp=CAE&s"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "made up of a number of shaped charges"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 1,
+              "rank_absolute": 13,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[2]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Perforating gun for sale",
+                "Perforating gun oil and gas",
+                "Perforating guns wireline",
+                "Perforating gun manufacturers",
+                "Types of perforating guns",
+                "Best perforating gun",
+                "Perforating gun carrier",
+                "Jet perforating guns"
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 7,
+              "rank_absolute": 14,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "domain": "www.halliburton.com",
+              "title": "Velocity™ modular perforating gun system",
+              "url": "https://www.halliburton.com/en/products/velocity-modular-gun-system",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.halliburton.com › products › velocity-modu...",
+              "website_name": "Halliburton",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "This system is engineered for the fast-paced, pump-down perforating environments, without requiring any field wiring of guns, detonators, or igniters.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "fast-paced, pump-down perforating environments"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 8,
+              "rank_absolute": 15,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+              "domain": "www.jetresearch.com",
+              "title": "Perforating Gun Systems",
+              "url": "https://www.jetresearch.com/en/perforating-systems/perforating-gun-systems",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.jetresearch.com › perforating-systems › perf...",
+              "website_name": "Jet Research Center",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "JRC offers a comprehensive array of perforating guns to deliver its industry-leading charges safely on depth for optimal penetration and performance. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "JRC offers a comprehensive array of perforating guns"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 9,
+              "rank_absolute": 16,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]",
+              "domain": "www.slb.com",
+              "title": "Tempo Instrumented Docking Perforating Gun System | Video",
+              "url": "https://www.slb.com/videos/tempo",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.slb.com · Mar 21, 2018",
+              "website_name": "SLB",
+              "is_image": false,
+              "is_video": true,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The Tempo instrumented docking perforating gun system is the industry's first perforating gun system to fully integrate an innovative plug-in gun.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "industry's first perforating gun system"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2018-03-21 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 10,
+              "rank_absolute": 17,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]",
+              "domain": "huntingplc.com",
+              "title": "Perforating Systems",
+              "url": "https://huntingplc.com/products-services/perforating-logging-systems/perforating-systems/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://huntingplc.com › products-services › perforating-...",
+              "website_name": "Hunting PLC",
+              "is_image": true,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Titan offers perforating guns, setting tools and associated hardware that are compatible for wireline and TCP operations.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": [
+                {
+                  "type": "images_element",
+                  "alt": null,
+                  "url": null,
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-8a975a3cc5fb:7"
+                },
+                {
+                  "type": "images_element",
+                  "alt": null,
+                  "url": null,
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-8a975a3cc5fb:8"
+                },
+                {
+                  "type": "images_element",
+                  "alt": null,
+                  "url": null,
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-8a975a3cc5fb:9"
+                }
+              ],
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Titan offers perforating guns"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 11,
+              "rank_absolute": 18,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]/div[1]",
+              "domain": "www.facebook.com",
+              "title": "Gun Perforation in Oil & Gas A Glimpse into Subsurface ...",
+              "url": "https://www.facebook.com/DrillingEquipmentSupply/videos/gun-perforation-in-oil-gasa-glimpse-into-subsurface-precisioni-recently-came-acr/832216212592360/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "750+ reactions  ·  6 months ago",
+              "website_name": "Facebook · Drilling Equipment Supply",
+              "is_image": false,
+              "is_video": true,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Here's what it represents and why it matters: Gun Perforation: Is the method by which shaped explosive charges are used to pierce through steel ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "shaped explosive charges are used"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-10-28 18:26:04 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 12,
+              "rank_absolute": 19,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+              "domain": "www.slb.com",
+              "title": "The Defining Series: Perforating Fundamentals",
+              "url": "https://www.slb.com/resource-library/oilfield-review/defining-series/defining-perforating",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.slb.com › Resource Library",
+              "website_name": "SLB",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Sep 9, 2015 — Perforating guns carry explosive shaped charges downhole, where they are detonated to create tunnels that act as conduits through which reservoir fluids flow. Read more",
+              "pre_snippet": "09/09/2015 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "explosive shaped charges downhole"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2015-09-09 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 13,
+              "rank_absolute": 20,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]/div[1]",
+              "domain": "dynaenergetics.com",
+              "title": "Conventional Systems > Perforating Guns",
+              "url": "https://dynaenergetics.com/products/Conventional-Systems/Perforating-Guns",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://dynaenergetics.com › products › Perforating-Guns",
+              "website_name": "DynaEnergetics",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "All explosive components of DynaEnergetics Perforating Systems are engineered and manufactured in-house, resulting in the best possible perforating performance. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "All explosive components of DynaEnergetics Perforating Systems"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 14,
+              "rank_absolute": 21,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]",
+              "domain": "huntandhunt.com",
+              "title": "Perforating Gun Systems for Oil & Gas Industry | Texas",
+              "url": "https://huntandhunt.com/services/perforating-gun-systems-for-oil-gas/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://huntandhunt.com › services › perforating-gun-s...",
+              "website_name": "Hunt & Hunt, Ltd.",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "We produce every Perforating gun system available size from 1.56″ up to 7″ in diameter, which includes 25 different gun diameters.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Perforating gun"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 15,
+              "rank_absolute": 22,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+              "domain": "www.corelab.com",
+              "title": "Oriented Perforating System",
+              "url": "https://www.corelab.com/products/oriented-perforating-system/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.corelab.com › Owen Oil Tools",
+              "website_name": "Core Lab",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The PSJ can rotate up to 80ft of 3 3/8″ fully loaded guns in a horizontal well with no rollers, standoffs or other friction reducing aids. This allows the ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "guns"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 16,
+              "rank_absolute": 23,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]/div[1]",
+              "domain": "www.enhancedenergetics.com",
+              "title": "Kraken Gun",
+              "url": "https://www.enhancedenergetics.com/our-services/kraken-gun/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.enhancedenergetics.com › our-services › kra...",
+              "website_name": "Enhanced Energetics",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Kraken technology is a progressively burning, solid propellant designed to increase penetration, eliminate clogged perforations and overcome nearwellbore damage ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": null,
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "popular_products",
+              "rank_group": 1,
+              "rank_absolute": 24,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[11]/div[1]/div[1]/div[1]/g-card[1]",
+              "title": "Popular products",
+              "items": [
+                {
+                  "type": "popular_products_element",
+                  "title": "3 In 1 Manual Perforating Scoring Machine",
+                  "description": "PrintFinish\nFree delivery",
+                  "more_sellers": false,
+                  "seller": "PrintFinish",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQICaCKAJdtaJg111_FZd6_fS0nC0uSqxw2mACFzt5qhfZyVi-LxjQWIFQcVYwgMBIKsl5SwAWM9p2T-q-Zr5lNOJ0uASDdvo3WYRnMJUtCsysPijSl3DccSA",
+                  "price": {
+                    "current": 275,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$275.00"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Tonic Studios Mini Rotary Perforator",
+                  "description": "michaels.com & more\nFree delivery on $50+",
+                  "more_sellers": true,
+                  "seller": "michaels.com",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT8Pea-jzfBAOLvuGAqyO2B1puIdogy9cVdWxBQrpAc4rwKPlXqYXfQTtqK_1iK03bb19aCWx2dctQNvL2kaOng_526RY8O",
+                  "price": {
+                    "current": 6.39,
+                    "regular": 7.99,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$6.39 $7.99"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 4,
+                    "votes_count": 4,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Perforator",
+                  "description": "Polyguard Products\nFree delivery",
+                  "more_sellers": false,
+                  "seller": "Polyguard Products",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRgwVqQoge8G4ndtZ7133JeSYIy_07qS3LZfkEb7Avx3YLmPpyZr2KuWZ2mqbiOWzoalvd1S8LOtSQd4VTYS65K-10fz8opC2dhrReEIlvkqlnAm9TiOKdZjw",
+                  "price": {
+                    "current": 165,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$165.00"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Martin Yale SP100 Desktop Score and Perforating Machine",
+                  "description": "Martin Yale & more",
+                  "more_sellers": true,
+                  "seller": "Martin Yale",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcScBBHHx6x3lMDuexOavcqO1qR3_JwxjqZt2nKLTPkEEEWoHNU8LMx724XqmA4TsxFnnvnyFdbc7CZfxrcX9U1TbMpPe4cn",
+                  "price": {
+                    "current": 1526.51,
+                    "regular": 2061,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$1,526.51 $2,061"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 4.8,
+                    "votes_count": 4,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Van Mark 3024a perforator package",
+                  "description": "FBI Supply\nFree next-day delivery",
+                  "more_sellers": false,
+                  "seller": "FBI Supply",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTaKXa9LW5WV6xIFnCqnTe378a_8ycTGj-KDHVaRKjoMHbxz6qKZh2ur019vssUmxw52Dv_GBd6k1xBicccz_Rj54ykz15xj_5yQtB4UwOuz96_c-a-qUpctQ",
+                  "price": {
+                    "current": 825,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$825.00"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Galaxy Perforate & Go A3 A4 A5 Manual Paper Card Punching Machine",
+                  "description": "eBay & more",
+                  "more_sellers": true,
+                  "seller": "eBay",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcT74fzIq6PXsV2jO2R3Auog3x-aolJMCzUaF3mLnhPx0Bo5QOiTuRNc_mt-iOlW-VCoH37QS3ORehHaYk2pRvd64Ek0Yql8yWMXUnpjZaHiCdMzl8ZvZ9oA",
+                  "price": {
+                    "current": 174.36,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$174.36"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Whitaker Brothers American Perforator 410",
+                  "description": "WhitakerBrothers.com",
+                  "more_sellers": false,
+                  "seller": "WhitakerBrothers.com",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQWQjmdqQQHMw9O-k5i_ivI_bGlVlf2SpXhPNAKZWfJiI3YeTakEyyZkuRQ4yEPVxQCTUtXlFUrJkzl5Ggj3Z_Ybj-rCIPPXkw5VT7yTBiSTnzfdX6Sxqjb",
+                  "price": {
+                    "current": 10080,
+                    "regular": 11949,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$10,080.00 $11,949"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Mini Rotary Perforator from Tim Holtz",
+                  "description": "Teaspoon of Fun\nFree delivery on $70+",
+                  "more_sellers": false,
+                  "seller": "Teaspoon of Fun",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTiIIBtNnenCu2ZSCE6FGx50wpxqyb1z0iUGdZOp56HErqEuuYRTXmW9wDGlMztCLb1chI-nkyNxP7TtvRdUkTsNZJWtqMSyC7nlK4u1mt2TGFMOCvwE-obiA",
+                  "price": {
+                    "current": 4,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$4.00"
+                  },
+                  "rating": null
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "popular_products",
+              "rank_group": 2,
+              "rank_absolute": 25,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[12]/div[1]/div[1]/div[1]/g-card[1]",
+              "title": null,
+              "items": [
+                {
+                  "type": "popular_products_element",
+                  "title": "Widmer Model P410 Perforator steadfast and sturdy tabletop perforator",
+                  "description": "www.datafinancial.com",
+                  "more_sellers": false,
+                  "seller": "www.datafinancial.com",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTunRkEL0VsC4d_KL5s0NtgBjJYQsSAh4UPsDDMXFloqWn7syX05sx9w2HIWdOwx9wK8oS6agHGTyQw28ZjHJs0l5Htbl3SaEYWg2sCF6D0FqkUjN63RbME-OQ",
+                  "price": {
+                    "current": 566,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$566.00"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "MBM Perforating Tool 2:1.9 TPI (standard STRIKE tool for F-SPEED/AutoAir)",
+                  "description": "Paper Machines",
+                  "more_sellers": false,
+                  "seller": "Paper Machines",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTxC55fEvQJyFnDEXzrhG_q6DrAKjjEzKSEkJRYUr5XOnE8H-797fIAxQLMa05Wu2qG4u3lXG7In2ZllrFgfkVPLQ5yjR8d2pndU7HB9ZlwjHW9e_OktYC1Bg",
+                  "price": {
+                    "current": 337.09,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$337.09"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "DP 480 2 Perforator - KAN/P/DP480",
+                  "description": "DM Office Solutions",
+                  "more_sellers": false,
+                  "seller": "DM Office Solutions",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ3VEsSOKDdV3ahD2xl7M60n6hR1snNo2XQYUDl6BK8E-B8fJfhEEBLxH-4s0L4NDJ6lijSo_d5gZ9dse3-BzBXQZzJAl6AP5kz63gE60nZfVj4pzPrTEbi",
+                  "price": {
+                    "current": 2.28,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$2.28"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Pergamano 2-Needle Perforating Tool",
+                  "description": "Pergashop",
+                  "more_sellers": false,
+                  "seller": "Pergashop",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ3WEcUdzH3fYaHaqec4hR2HbNCxZmYJO-Ua5Yrb1HgE3F8rV5qvXNJ8O3wg4OiZXBhIy7MRuNLXpOxXY2zYyIC21US3UvtMsloZM3dstzZFllBmoXbTA",
+                  "price": {
+                    "current": 13.41,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$13.41"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 5,
+                    "votes_count": 5,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "CNCEST Pneumatic Hole Opener Punch Punching Machine",
+                  "description": "eBay - aosdirectsales & more",
+                  "more_sellers": true,
+                  "seller": "eBay - aosdirectsales",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSmzzdt9mgqdUCbtSLjlOgEgSEnLoyYZfF5_bNoQZLrg-_2gZshFlmUtzCHYccBwIUZiOQdHnX38VoleLmuyl9818oT2Y5Cybyu0QsCZlVdcKa22Tdn16FX",
+                  "price": {
+                    "current": 89.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$89.99"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Martin Yale SP100 Scoring & Perforating Machine",
+                  "description": "Martin Yale & more",
+                  "more_sellers": true,
+                  "seller": "Martin Yale",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcScBBHHx6x3lMDuexOavcqO1qR3_JwxjqZt2nKLTPkEEEWoHNU8LMx724XqmA4TsxFnnvnyFdbc7CZfxrcX9U1TbMpPe4cn",
+                  "price": {
+                    "current": 1347.36,
+                    "regular": 1819,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$1,347.36 $1,819"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Esselte Rapid Mini Perforator 2-gaats Kleine Plastic Perforator Voor 10 Vellen Compact Thuis Op Kantoor En Op",
+                  "description": "Alibaba.com",
+                  "more_sellers": false,
+                  "seller": "Alibaba.com",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQCOzkXWr3LW0Rq1Mbd6BwSgWY9KSuOzrkCJKX3MgpYA6p6o3G7G7Ybh0YSnxjUb96JB8hbaygzJd4FSkP27bgMVBN9V75Hy2JDaAPXzIij3AvxGs6Kc3_6Ew",
+                  "price": {
+                    "current": 5.43,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$5.43"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Wholesale Voucher Punching Machine Voucher Perforator Paper Perforator Machine Hand Press Punching Machine,1 Unit",
+                  "description": "Alibaba.com",
+                  "more_sellers": false,
+                  "seller": "Alibaba.com",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ1qC7AwVYlNY003Ci7NmD0Paxc1ZI9vSBDn1G2Q5iwPK408VEDzEV-dBGP46vkBGYCe8j2rYUZGEyvlVxQ1DOIsev0tpqilL5bDXcAoSSyekC8fmSZub6e",
+                  "price": {
+                    "current": 44,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$44.00"
+                  },
+                  "rating": null
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 2,
+              "rank_absolute": 26,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[3]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Perforating gun for sale",
+                "Perforating gun oil and gas",
+                "Perforating guns wireline",
+                "Perforating gun manufacturers",
+                "Types of perforating guns",
+                "Best perforating gun",
+                "Perforating gun carrier",
+                "Jet perforating guns"
+              ],
+              "rectangle": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

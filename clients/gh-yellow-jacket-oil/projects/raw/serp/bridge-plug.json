@@ -1,0 +1,2236 @@
+{
+  "version": "0.1.20260420",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "2.5334 sec.",
+  "cost": 0.0035,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "04282128-1032-0139-0000-c32766a0c140",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "2.4271 sec.",
+      "cost": 0.0035,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "serp",
+        "google",
+        "organic",
+        "live",
+        "advanced"
+      ],
+      "data": {
+        "api": "serp",
+        "function": "live",
+        "se": "google",
+        "se_type": "organic",
+        "keyword": "bridge plug",
+        "location_code": 2840,
+        "language_code": "en",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20,
+        "load_async_ai_overview": true
+      },
+      "result": [
+        {
+          "keyword": "bridge plug",
+          "type": "organic",
+          "se_domain": "google.com",
+          "location_code": 2840,
+          "language_code": "en",
+          "check_url": "https://www.google.com/search?q=bridge%20plug&hl=en&gl=US&ie=UTF-8&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc",
+          "datetime": "2026-04-28 18:28:03 +00:00",
+          "spell": null,
+          "refinement_chips": {
+            "type": "refinement_chips",
+            "xpath": "/html[1]/body[1]/div[3]/div[1]/div[9]/div[1]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]",
+            "items": [
+              {
+                "type": "refinement_chips_element",
+                "title": "Nearby",
+                "url": "https://www.google.com/search?q=bridge+plug+nearby&hl=en&gl=US&shoprs=GAMqC2JyaWRnZSBwbHVnMgwIAxIGTmVhcmJ5GAJYpvAgYAE&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoAXoECBoQNg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "On sale",
+                "url": "https://www.google.com/search?q=bridge+plug+sale&hl=en&gl=US&shoprs=EgRKAhgBGAYqC2JyaWRnZSBwbHVnMhMIBhIHT24gc2FsZRgCIgRKAhgBWKbwIGAB&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoAnoECBoQNw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Size",
+                "url": "https://www.google.com/search?q=size+bridge+plug&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMggIEhIEU2l6ZWAB&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoA3oECBoQOA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Get it by Thu",
+                "url": "https://www.google.com/search?q=bridge+plug&hl=en&gl=US&shoprs=Eg2aAQoKCBACOAFABEgBGBQqC2JyaWRnZSBwbHVnMiYIFBINR2V0IGl0IGJ5IFRodSINmgEKCggQAjgBQARIASoEEAEYAWAB&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoBHoECBoQOQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Female",
+                "url": "https://www.google.com/search?q=female+bridge+plug&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMgoIEhIGRmVtYWxlYAE&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoBXoECBoQOg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "For Sale",
+                "url": "https://www.google.com/search?q=bridge+plug+for+sale&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMgwIEhIIRm9yIFNhbGVgAQ&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoBnoECBoQOw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Male",
+                "url": "https://www.google.com/search?q=male+bridge+plug&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMggIEhIETWFsZWAB&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoB3oECBoQPA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Extension Cords",
+                "url": "https://www.google.com/search?q=extension+cords+bridge+plug&hl=en&gl=US&shoprs=GAkqC2JyaWRnZSBwbHVnMhMICRIPRXh0ZW5zaW9uIENvcmRzYAE&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoCHoECBoQPQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Buy",
+                "url": "https://www.google.com/search?q=buy+bridge+plug&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMgcIEhIDQnV5YAE&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoCXoECBoQPg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Red",
+                "url": "https://www.google.com/search?q=red+bridge+plug&hl=en&gl=US&shoprs=GAEqC2JyaWRnZSBwbHVnMhUIARIDUmVkOgwI2Iz1ARDnivUBMAtYpvAgYAE&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoCnoECBoQPw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "New",
+                "url": "https://www.google.com/search?q=new+bridge+plug&hl=en&gl=US&shoprs=GAoqC2JyaWRnZSBwbHVnMgcIChIDTmV3WKbwIGAB&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoC3oECBoQQA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Used",
+                "url": "https://www.google.com/search?q=used+bridge+plug&hl=en&gl=US&shoprs=GAoqC2JyaWRnZSBwbHVnMggIChIEVXNlZFim8CBgAQ&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoDHoECBoQQQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Rubber",
+                "url": "https://www.google.com/search?q=rubber+bridge+plug&hl=en&gl=US&shoprs=GAEqC2JyaWRnZSBwbHVnMhgIARIGUnViYmVyOgwIg6rEARDN_8QBMABYpvAgYAE&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoDXoECBoQQg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Cable Adapters",
+                "url": "https://www.google.com/search?q=cable+adapters+bridge+plug&hl=en&gl=US&shoprs=GAkqC2JyaWRnZSBwbHVnMhIICRIOQ2FibGUgQWRhcHRlcnNgAQ&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoDnoECBoQQw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Black",
+                "url": "https://www.google.com/search?q=black+bridge+plug&hl=en&gl=US&shoprs=GAEqC2JyaWRnZSBwbHVnMhcIARIFQmxhY2s6DAjYjPUBEOWK9QEwC1im8CBgAQ&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoD3oECBoQRA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Reviews",
+                "url": "https://www.google.com/search?q=reviews+bridge+plug&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMgsIEhIHUmV2aWV3c2AB&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoEHoECBoQRQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Socket",
+                "url": "https://www.google.com/search?q=socket+bridge+plug&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMgoIEhIGU29ja2V0YAE&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoEXoECBoQRg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Price",
+                "url": "https://www.google.com/search?q=price+bridge+plug&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMgkIEhIFUHJpY2VgAQ&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoEnoECBoQRw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Green",
+                "url": "https://www.google.com/search?q=green+bridge+plug&hl=en&gl=US&shoprs=GAEqC2JyaWRnZSBwbHVnMhcIARIFR3JlZW46DAjYjPUBEOiK9QEwC1im8CBgAQ&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoE3oECBoQSA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "White",
+                "url": "https://www.google.com/search?q=white+bridge+plug&hl=en&gl=US&shoprs=GAEqC2JyaWRnZSBwbHVnMhcIARIFV2hpdGU6DAjYjPUBEKGL9QEwC1im8CBgAQ&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoFHoECBoQSQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Definition",
+                "url": "https://www.google.com/search?q=definition+bridge+plug&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMg4IEhIKRGVmaW5pdGlvbmAB&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoFXoECBoQSg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Location",
+                "url": "https://www.google.com/search?q=location+bridge+plug&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMgwIEhIITG9jYXRpb25gAQ&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoFnoECBoQSw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Boat",
+                "url": "https://www.google.com/search?q=boat+bridge+plug&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMggIEhIEQm9hdGAB&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoF3oECBoQTA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Adapter",
+                "url": "https://www.google.com/search?q=adapter+bridge+plug&hl=en&gl=US&shoprs=GBIqC2JyaWRnZSBwbHVnMgsIEhIHQWRhcHRlcmAB&sa=X&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChCKngYoGHoECBoQTQ",
+                "domain": "www.google.com",
+                "options": null
+              }
+            ]
+          },
+          "item_types": [
+            "ai_overview",
+            "organic",
+            "people_also_ask",
+            "video",
+            "popular_products",
+            "related_searches",
+            "images"
+          ],
+          "se_results_count": 139000000,
+          "pages_count": 2,
+          "items_count": 27,
+          "items": [
+            {
+              "type": "ai_overview",
+              "rank_group": 1,
+              "rank_absolute": 1,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "asynchronous_ai_overview": true,
+              "markdown": "![Premium Bridge Plugs - Core Lab](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:32)\n![Understanding the Role of Bridge Plugs, in Oil and Gas Operations](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:33)\n![Cast Iron Bridge Plugs| Composite Bridge Plugs Manufacturer](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:34)\n![Bridge Plug &amp; Cement Retainer - Wellcare Oil Tools®](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:35)\n![Retrievable Bridge Plugs | Copyright 2026 Innovex ...](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:36)\n\nBridge plugs are `downhole tools used to isolate specific sections of a wellbore, allowing for zonal isolation, stimulation, or abandonment` . They can be permanent (drillable) or retrievable, featuring slips, a mandrel, and sealing elements that withstand high pressure, often up to 10,000 psi, and high temperatures.[[1]](https://alphaoiltools.com/bridge-plugs/#:~:text=Hydraulic%20Set%20Alpha%20Oil%20Tools%20manufactures%20a,maintaining%20the%20ability%20for%20future%20drill%20out.)[[2]](https://www.instagram.com/reel/DGqkXqeID4s/)[[3]](https://silver-fox.net/downhole-tools/bridge-plugs/#:~:text=Bridge%20plugs%20are%20downhole%20tools%20composed%20primarily,either%20permanently%20or%20temporarily%20within%20the%20wellbore.)[[4]](https://glossary.slb.com/terms/b/bridge_plug)[[5]](https://www.corelab.com/products/premium-bridge-plugs/)[[6]](https://www.oilfieldserviceprofessionals.com/retrievable-bridge-plugs#:~:text=The%20plug%20has%20the%20following%20features%20and,ability%20to%20hang%20gauges%20below%20the%20WRBP)\n\n**Key Aspects of Bridge Plugs** \n\n- **Types:** Permanent/Millable plugs (for long-term abandonment) and Retrievable Bridge Plugs (RBP) (for temporary isolation).\n- **Applications:** Used in multi-zone stimulation (fracturing, acidizing), cementing, and permanent plug-and-abandonment (P&A) operations.\n- **Setting Methods:** Set via electric wireline, coiled tubing, or hydraulic setting tools.\n- **Components:** Composed of anchoring slips (to grip the casing) and elastomer sealing elements.\n- **Manufacturers:** Major providers include [Baker Hughes](https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs), [Halliburton](https://www.halliburton.com/en/completions/well-completions/frac-plugs/cementing-retainers-bridge-plugs), [SLB (Schlumberger)](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/packers/blueplug-max-p-bridge-plug) , and [Expro](https://www.expro.com/products/maximus-bridge-plug).[[1]](https://www.instagram.com/reel/DGqkXqeID4s/)[[2]](https://www.instagram.com/reel/C64JeVFN3vN/)[[3]](https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs)[[4]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/packers/blueplug-max-p-bridge-plug#:~:text=Effective%20barrier%20for%20remedial%20work%20and%20well,or%20remedial%20cement%20injection%20above%20the%20plug.)[[5]](https://www.halliburton.com/en/completions/well-completions/frac-plugs/cementing-retainers-bridge-plugs#:~:text=High-performance%20tools%20for%20unconventional%20completions%20Halliburton%20drillable,in%20wellbore%20conditions%20up%20to%20425%E2%81%B0F%20%28218.3%E2%81%B0C%29.)[[6]](https://www.corelab.com/products/premium-bridge-plugs/)[[7]](https://www.expro.com/products/maximus-bridge-plug)[[8]](https://silver-fox.net/downhole-tools/bridge-plugs/#:~:text=Bridge%20plugs%20are%20downhole%20tools%20composed%20primarily,either%20permanently%20or%20temporarily%20within%20the%20wellbore.)[[9]](https://www.oilfieldserviceprofessionals.com/retrievable-bridge-plugs#:~:text=The%20plug%20has%20the%20following%20features%20and,ability%20to%20hang%20gauges%20below%20the%20WRBP)\n\nThis video provides a detailed look at the components and structure of a bridge plug:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:37)\n06:33[![](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:38)\n![](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:39)\nDrilling HSE YouTube• Dec 12, 2025](https://www.youtube.com/watch?v=47F3dinJI6c) **Common Scenarios** \n\n- **Temporary Isolation:** Retrievable plugs D&L Oil Tools WR Bridge Plug isolate a lower zone while testing or treating an upper zone.\n- **Permanent Abandonment:** [Owen Oil Tools' Premium Bridge Plugs](https://www.corelab.com/products/premium-bridge-plugs/) ensure a sealed wellbore, tested up to 10,000 psi.\n- **High-Pressure Zones:** Expro's Maximus Bridge Plug uses carbide button slips to manage high pressures and temperatures.[[1]](https://dloiltools.com/products/wr-bridge-plug/#:~:text=The%20WR%20Bridge%20Plug%20is%20a%20wireline,utilizes%20standard%20wireline%20or%20hydraulic%20setting%20tools.)[[2]](https://www.corelab.com/products/premium-bridge-plugs/)[[3]](https://www.expro.com/products/maximus-bridge-plug)\n\n**Key Advantages** \n\n- **Cost Efficiency:** Reduces the need for multiple trips during interventions.\n- **Versatility:** Compatible with various casing sizes and grades, including high-grade P-110.\n- **Reliability:** High-performance sealing systems (e.g., SLB BluePlug Max P ) provide secure barriers against gas or fluids.[[1]](https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs)[[2]](https://www.corelab.com/products/magna-range-bridge-plugs/)[[3]](https://www.corelab.com/products/premium-bridge-plugs/)[[4]](https://owendata.corelab.com/owen/cms/docs/Brochures/BridgePlugs.pdf)[[5]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/packers/blueplug-max-p-bridge-plug#:~:text=Effective%20barrier%20for%20remedial%20work%20and%20well,or%20remedial%20cement%20injection%20above%20the%20plug.)\n\nWatch this video to understand the different types of drillable bridge plugs and their applications:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:40)\n58s[![](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:41)\n![](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:42)\nCarlos Oliver YouTube• Dec 21, 2019](https://www.youtube.com/watch?v=xAhi5oG0LOk&t=173)",
+              "items": [
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": null,
+                  "markdown": "![Premium Bridge Plugs - Core Lab](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:16)\n![Understanding the Role of Bridge Plugs, in Oil and Gas Operations](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:17)\n![Cast Iron Bridge Plugs| Composite Bridge Plugs Manufacturer](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:18)\n![Bridge Plug &amp; Cement Retainer - Wellcare Oil Tools®](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:19)\n![Retrievable Bridge Plugs | Copyright 2026 Innovex ...](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:20)",
+                  "links": null,
+                  "images": [
+                    {
+                      "type": "images_element",
+                      "alt": "Premium Bridge Plugs - Core Lab",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:21"
+                    },
+                    {
+                      "type": "images_element",
+                      "alt": "Understanding the Role of Bridge Plugs, in Oil and Gas Operations",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:22"
+                    },
+                    {
+                      "type": "images_element",
+                      "alt": "Cast Iron Bridge Plugs| Composite Bridge Plugs Manufacturer",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:23"
+                    },
+                    {
+                      "type": "images_element",
+                      "alt": "Bridge Plug & Cement Retainer - Wellcare Oil Tools®",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:24"
+                    },
+                    {
+                      "type": "images_element",
+                      "alt": "Retrievable Bridge Plugs | Copyright 2026 Innovex ...",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:25"
+                    }
+                  ],
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "Bridge plugs are downhole tools used to isolate specific sections of a wellbore, allowing for zonal isolation, stimulation, or abandonment. They can be permanent (drillable) or retrievable, featuring slips, a mandrel, and sealing elements that withstand high pressure, often up to 10,000 psi, and high temperatures. Alpha Oil Tools +5",
+                  "markdown": "Bridge plugs are `downhole tools used to isolate specific sections of a wellbore, allowing for zonal isolation, stimulation, or abandonment` . They can be permanent (drillable) or retrievable, featuring slips, a mandrel, and sealing elements that withstand high pressure, often up to 10,000 psi, and high temperatures.[[1]](https://alphaoiltools.com/bridge-plugs/#:~:text=Hydraulic%20Set%20Alpha%20Oil%20Tools%20manufactures%20a,maintaining%20the%20ability%20for%20future%20drill%20out.)[[2]](https://www.instagram.com/reel/DGqkXqeID4s/)[[3]](https://silver-fox.net/downhole-tools/bridge-plugs/#:~:text=Bridge%20plugs%20are%20downhole%20tools%20composed%20primarily,either%20permanently%20or%20temporarily%20within%20the%20wellbore.)[[4]](https://glossary.slb.com/terms/b/bridge_plug)[[5]](https://www.corelab.com/products/premium-bridge-plugs/)[[6]](https://www.oilfieldserviceprofessionals.com/retrievable-bridge-plugs#:~:text=The%20plug%20has%20the%20following%20features%20and,ability%20to%20hang%20gauges%20below%20the%20WRBP)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Alpha Oil Tools",
+                      "domain": "alphaoiltools.com",
+                      "url": "https://alphaoiltools.com/bridge-plugs/#:~:text=Hydraulic%20Set%20Alpha%20Oil%20Tools%20manufactures%20a,maintaining%20the%20ability%20for%20future%20drill%20out.",
+                      "title": "Bridge Plugs - Alpha Oil Tools",
+                      "text": "Hydraulic Set Alpha Oil Tools manufactures a wide array of bridge plugs for every type of size, set, temperature, pressure, casing..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Instagram",
+                      "domain": "www.instagram.com",
+                      "url": "https://www.instagram.com/reel/DGqkXqeID4s/",
+                      "title": "What is bridge plug setting tool »« Bridge plugs are downhole tools ...",
+                      "text": "Bridge plugs are downhole tools utilized to isolate the lower section of a wellbore. These plugs can be either permanent or retrie..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Silver Fox Completion Services",
+                      "domain": "silver-fox.net",
+                      "url": "https://silver-fox.net/downhole-tools/bridge-plugs/#:~:text=Bridge%20plugs%20are%20downhole%20tools%20composed%20primarily,either%20permanently%20or%20temporarily%20within%20the%20wellbore.",
+                      "title": "Drilling Bridge Plugs - Silver Fox Completion Services",
+                      "text": "Bridge plugs are downhole tools composed primarily of slips, a plug mandrel, and a rubber sealing element. They are utilized in a ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "SLB",
+                      "domain": "glossary.slb.com",
+                      "url": "https://glossary.slb.com/terms/b/bridge_plug",
+                      "title": "bridge plug - Energy Glossary - SLB",
+                      "text": "bridge plug. 1. n. [Perforating, Well Completions]. A downhole tool that is located and set to isolate the lower part of the wellb..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Core Lab",
+                      "domain": "www.corelab.com",
+                      "url": "https://www.corelab.com/products/premium-bridge-plugs/",
+                      "title": "Premium Bridge Plugs - Core Lab",
+                      "text": "Owen Oil Tools' Premium Bridge Plugs are designed for extra high-pressure and rapid drill-out. Tested to 10,000 psi at 275°F with ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Oilfield Service Professionals",
+                      "domain": "www.oilfieldserviceprofessionals.com",
+                      "url": "https://www.oilfieldserviceprofessionals.com/retrievable-bridge-plugs#:~:text=The%20plug%20has%20the%20following%20features%20and,ability%20to%20hang%20gauges%20below%20the%20WRBP",
+                      "title": "Retrievable Bridge Plugs | Houston, TX | Oilfield Service Professionals (OSP)",
+                      "text": "The plug has the following features and benefits: * **Unique elastomer and backup system** Increases pressure capabilities up to 1..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "Key Aspects of Bridge Plugs",
+                  "markdown": "**Key Aspects of Bridge Plugs**",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "Types: Permanent/Millable plugs (for long-term abandonment) and Retrievable Bridge Plugs (RBP) (for temporary isolation). Applications: Used in multi-zone stimulation (fracturing, acidizing), cementing, and permanent plug-and-abandonment (P&A) operations. Setting Methods: Set via electric wireline, coiled tubing, or hydraulic setting tools. Components: Composed of anchoring slips (to grip the casing) and elastomer sealing elements. Manufacturers: Major providers include Baker Hughes, Halliburton, SLB (Schlumberger), and Expro.",
+                  "markdown": "- **Types:** Permanent/Millable plugs (for long-term abandonment) and Retrievable Bridge Plugs (RBP) (for temporary isolation).\n- **Applications:** Used in multi-zone stimulation (fracturing, acidizing), cementing, and permanent plug-and-abandonment (P&A) operations.\n- **Setting Methods:** Set via electric wireline, coiled tubing, or hydraulic setting tools.\n- **Components:** Composed of anchoring slips (to grip the casing) and elastomer sealing elements.\n- **Manufacturers:** Major providers include [Baker Hughes](https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs), [Halliburton](https://www.halliburton.com/en/completions/well-completions/frac-plugs/cementing-retainers-bridge-plugs), [SLB (Schlumberger)](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/packers/blueplug-max-p-bridge-plug) , and [Expro](https://www.expro.com/products/maximus-bridge-plug).[[1]](https://www.instagram.com/reel/DGqkXqeID4s/)[[2]](https://www.instagram.com/reel/C64JeVFN3vN/)[[3]](https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs)[[4]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/packers/blueplug-max-p-bridge-plug#:~:text=Effective%20barrier%20for%20remedial%20work%20and%20well,or%20remedial%20cement%20injection%20above%20the%20plug.)[[5]](https://www.halliburton.com/en/completions/well-completions/frac-plugs/cementing-retainers-bridge-plugs#:~:text=High-performance%20tools%20for%20unconventional%20completions%20Halliburton%20drillable,in%20wellbore%20conditions%20up%20to%20425%E2%81%B0F%20%28218.3%E2%81%B0C%29.)[[6]](https://www.corelab.com/products/premium-bridge-plugs/)[[7]](https://www.expro.com/products/maximus-bridge-plug)[[8]](https://silver-fox.net/downhole-tools/bridge-plugs/#:~:text=Bridge%20plugs%20are%20downhole%20tools%20composed%20primarily,either%20permanently%20or%20temporarily%20within%20the%20wellbore.)[[9]](https://www.oilfieldserviceprofessionals.com/retrievable-bridge-plugs#:~:text=The%20plug%20has%20the%20following%20features%20and,ability%20to%20hang%20gauges%20below%20the%20WRBP)",
+                  "links": [
+                    {
+                      "type": "link_element",
+                      "title": "Baker Hughes",
+                      "description": null,
+                      "url": "https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs",
+                      "domain": "www.bakerhughes.com"
+                    },
+                    {
+                      "type": "link_element",
+                      "title": "Halliburton",
+                      "description": null,
+                      "url": "https://www.halliburton.com/en/completions/well-completions/frac-plugs/cementing-retainers-bridge-plugs",
+                      "domain": "www.halliburton.com"
+                    },
+                    {
+                      "type": "link_element",
+                      "title": "SLB (Schlumberger)",
+                      "description": null,
+                      "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/packers/blueplug-max-p-bridge-plug",
+                      "domain": "www.slb.com"
+                    },
+                    {
+                      "type": "link_element",
+                      "title": "Expro",
+                      "description": null,
+                      "url": "https://www.expro.com/products/maximus-bridge-plug",
+                      "domain": "www.expro.com"
+                    }
+                  ],
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Instagram",
+                      "domain": "www.instagram.com",
+                      "url": "https://www.instagram.com/reel/DGqkXqeID4s/",
+                      "title": "What is bridge plug setting tool »« Bridge plugs are downhole tools ...",
+                      "text": "Bridge plugs are downhole tools utilized to isolate the lower section of a wellbore. These plugs can be either permanent or retrie..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Instagram",
+                      "domain": "www.instagram.com",
+                      "url": "https://www.instagram.com/reel/C64JeVFN3vN/",
+                      "title": "Bridge Plug is a #downhole #tool that is located and set to isolate the ...",
+                      "text": "A bridge plug is a downhole tool used to isolate the lower part of the wellbore. It is set in place to achieve this isolation. Bri..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Baker Hughes",
+                      "domain": "www.bakerhughes.com",
+                      "url": "https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs",
+                      "title": "Bridge plugs | Baker Hughes",
+                      "text": "Overview. We offer an industry leading portfolio of drillable and retrievable bridge plugs that have proven their efficiency and r..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "SLB",
+                      "domain": "www.slb.com",
+                      "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/packers/blueplug-max-p-bridge-plug#:~:text=Effective%20barrier%20for%20remedial%20work%20and%20well,or%20remedial%20cement%20injection%20above%20the%20plug.",
+                      "title": "BluePlug Max P Bridge Plug - SLB",
+                      "text": "Effective barrier for remedial work and well abandonment BluePlug Max P high-pressure permanent wireline- or tubing-set bridge plu..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Halliburton",
+                      "domain": "www.halliburton.com",
+                      "url": "https://www.halliburton.com/en/completions/well-completions/frac-plugs/cementing-retainers-bridge-plugs#:~:text=High-performance%20tools%20for%20unconventional%20completions%20Halliburton%20drillable,in%20wellbore%20conditions%20up%20to%20425%E2%81%B0F%20%28218.3%E2%81%B0C%29.",
+                      "title": "Cementing retainers and bridge plugs - Halliburton",
+                      "text": "High-performance tools for unconventional completions Halliburton drillable squeeze packers and bridge plugs are designed for well..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Core Lab",
+                      "domain": "www.corelab.com",
+                      "url": "https://www.corelab.com/products/premium-bridge-plugs/",
+                      "title": "Premium Bridge Plugs - Core Lab",
+                      "text": "Owen Oil Tools' Premium Bridge Plugs are designed for extra high-pressure and rapid drill-out. Tested to 10,000 psi at 275°F with ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Expro",
+                      "domain": "www.expro.com",
+                      "url": "https://www.expro.com/products/maximus-bridge-plug",
+                      "title": "Maximus Bridge Plug - Expro",
+                      "text": "Maximus Bridge Plug * Can be wireline, tubing, or coiled tubing set providing an off-the-shelf solution for well phases. * Patente..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Silver Fox Completion Services",
+                      "domain": "silver-fox.net",
+                      "url": "https://silver-fox.net/downhole-tools/bridge-plugs/#:~:text=Bridge%20plugs%20are%20downhole%20tools%20composed%20primarily,either%20permanently%20or%20temporarily%20within%20the%20wellbore.",
+                      "title": "Drilling Bridge Plugs - Silver Fox Completion Services",
+                      "text": "Bridge plugs are downhole tools composed primarily of slips, a plug mandrel, and a rubber sealing element. They are utilized in a ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Oilfield Service Professionals",
+                      "domain": "www.oilfieldserviceprofessionals.com",
+                      "url": "https://www.oilfieldserviceprofessionals.com/retrievable-bridge-plugs#:~:text=The%20plug%20has%20the%20following%20features%20and,ability%20to%20hang%20gauges%20below%20the%20WRBP",
+                      "title": "Retrievable Bridge Plugs | Houston, TX | Oilfield Service Professionals (OSP)",
+                      "text": "The plug has the following features and benefits: * **Unique elastomer and backup system** Increases pressure capabilities up to 1..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "This video provides a detailed look at the components and structure of a bridge plug: 06:33 Drilling HSE YouTube• Dec 12, 2025",
+                  "markdown": "This video provides a detailed look at the components and structure of a bridge plug:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:26)\n06:33[![](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:27)\n![](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:28)\nDrilling HSE YouTube• Dec 12, 2025](https://www.youtube.com/watch?v=47F3dinJI6c)",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Common Scenarios",
+                  "text": "Temporary Isolation: Retrievable plugs D&L Oil Tools WR Bridge Plug isolate a lower zone while testing or treating an upper zone. D&L Oil Tools WR Bridge Plug Permanent Abandonment: Owen Oil Tools' Premium Bridge Plugs ensure a sealed wellbore, tested up to 10,000 psi. High-Pressure Zones: Expro's Maximus Bridge Plug uses carbide button slips to manage high pressures and temperatures. Expro's Maximus Bridge Plug",
+                  "markdown": "- **Temporary Isolation:** Retrievable plugs D&L Oil Tools WR Bridge Plug isolate a lower zone while testing or treating an upper zone.\n- **Permanent Abandonment:** [Owen Oil Tools' Premium Bridge Plugs](https://www.corelab.com/products/premium-bridge-plugs/) ensure a sealed wellbore, tested up to 10,000 psi.\n- **High-Pressure Zones:** Expro's Maximus Bridge Plug uses carbide button slips to manage high pressures and temperatures.[[1]](https://dloiltools.com/products/wr-bridge-plug/#:~:text=The%20WR%20Bridge%20Plug%20is%20a%20wireline,utilizes%20standard%20wireline%20or%20hydraulic%20setting%20tools.)[[2]](https://www.corelab.com/products/premium-bridge-plugs/)[[3]](https://www.expro.com/products/maximus-bridge-plug)",
+                  "links": [
+                    {
+                      "type": "link_element",
+                      "title": "Owen Oil Tools' Premium Bridge Plugs",
+                      "description": null,
+                      "url": "https://www.corelab.com/products/premium-bridge-plugs/",
+                      "domain": "www.corelab.com"
+                    }
+                  ],
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "D&L Oil Tools",
+                      "domain": "dloiltools.com",
+                      "url": "https://dloiltools.com/products/wr-bridge-plug/#:~:text=The%20WR%20Bridge%20Plug%20is%20a%20wireline,utilizes%20standard%20wireline%20or%20hydraulic%20setting%20tools.",
+                      "title": "WR Bridge Plug - D&L Oil Tools",
+                      "text": "The WR Bridge Plug is a wireline set, wireline retrieve, packer-type bridge plug capable of holding differential pressure from abo..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Core Lab",
+                      "domain": "www.corelab.com",
+                      "url": "https://www.corelab.com/products/premium-bridge-plugs/",
+                      "title": "Premium Bridge Plugs - Core Lab",
+                      "text": "Owen Oil Tools' Premium Bridge Plugs are designed for extra high-pressure and rapid drill-out. Tested to 10,000 psi at 275°F with ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Expro",
+                      "domain": "www.expro.com",
+                      "url": "https://www.expro.com/products/maximus-bridge-plug",
+                      "title": "Maximus Bridge Plug - Expro",
+                      "text": "Maximus Bridge Plug * Can be wireline, tubing, or coiled tubing set providing an off-the-shelf solution for well phases. * Patente..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Key Advantages",
+                  "text": "Cost Efficiency: Reduces the need for multiple trips during interventions. Versatility: Compatible with various casing sizes and grades, including high-grade P-110. Reliability: High-performance sealing systems (e.g., SLB BluePlug Max P ) provide secure barriers against gas or fluids. SLB BluePlug Max P",
+                  "markdown": "- **Cost Efficiency:** Reduces the need for multiple trips during interventions.\n- **Versatility:** Compatible with various casing sizes and grades, including high-grade P-110.\n- **Reliability:** High-performance sealing systems (e.g., SLB BluePlug Max P ) provide secure barriers against gas or fluids.[[1]](https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs)[[2]](https://www.corelab.com/products/magna-range-bridge-plugs/)[[3]](https://www.corelab.com/products/premium-bridge-plugs/)[[4]](https://owendata.corelab.com/owen/cms/docs/Brochures/BridgePlugs.pdf)[[5]](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/packers/blueplug-max-p-bridge-plug#:~:text=Effective%20barrier%20for%20remedial%20work%20and%20well,or%20remedial%20cement%20injection%20above%20the%20plug.)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Baker Hughes",
+                      "domain": "www.bakerhughes.com",
+                      "url": "https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs",
+                      "title": "Bridge plugs | Baker Hughes",
+                      "text": "Overview. We offer an industry leading portfolio of drillable and retrievable bridge plugs that have proven their efficiency and r..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Core Lab",
+                      "domain": "www.corelab.com",
+                      "url": "https://www.corelab.com/products/magna-range-bridge-plugs/",
+                      "title": "Magna Range Bridge Plugs - Core Lab",
+                      "text": "The Owen Magna Range Bridge Plug is specially designed to pass through restricted I.D. tubing and set securely in the larger tubin..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Core Lab",
+                      "domain": "www.corelab.com",
+                      "url": "https://www.corelab.com/products/premium-bridge-plugs/",
+                      "title": "Premium Bridge Plugs - Core Lab",
+                      "text": "Owen Oil Tools' Premium Bridge Plugs are designed for extra high-pressure and rapid drill-out. Tested to 10,000 psi at 275°F with ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Core Laboratories: Owen: Product Catalog and Technical Documentation",
+                      "domain": "owendata.corelab.com",
+                      "url": "https://owendata.corelab.com/owen/cms/docs/Brochures/BridgePlugs.pdf",
+                      "title": "Bridge Plugs - Owen Oil Tools",
+                      "text": "Bridge Plug are used to isolate sections of the wellbore. Owen offers a wide range of plugs to cover many typical completion and a..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "SLB",
+                      "domain": "www.slb.com",
+                      "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/packers/blueplug-max-p-bridge-plug#:~:text=Effective%20barrier%20for%20remedial%20work%20and%20well,or%20remedial%20cement%20injection%20above%20the%20plug.",
+                      "title": "BluePlug Max P Bridge Plug - SLB",
+                      "text": "Effective barrier for remedial work and well abandonment BluePlug Max P high-pressure permanent wireline- or tubing-set bridge plu..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "Watch this video to understand the different types of drillable bridge plugs and their applications: 58s Carlos Oliver YouTube• Dec 21, 2019",
+                  "markdown": "Watch this video to understand the different types of drillable bridge plugs and their applications:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:29)\n58s[![](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:30)\n![](https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:31)\nCarlos Oliver YouTube• Dec 21, 2019](https://www.youtube.com/watch?v=xAhi5oG0LOk&t=173)",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                }
+              ],
+              "references": [
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Baker Hughes",
+                  "domain": "www.bakerhughes.com",
+                  "url": "https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs",
+                  "title": "Bridge plugs | Baker Hughes",
+                  "text": "Overview. We offer an industry leading portfolio of drillable and retrievable bridge plugs that have proven their efficiency and r..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Alpha Oil Tools",
+                  "domain": "alphaoiltools.com",
+                  "url": "https://alphaoiltools.com/bridge-plugs/#:~:text=Hydraulic%20Set%20Alpha%20Oil%20Tools%20manufactures%20a,maintaining%20the%20ability%20for%20future%20drill%20out.",
+                  "title": "Bridge Plugs - Alpha Oil Tools",
+                  "text": "Hydraulic Set Alpha Oil Tools manufactures a wide array of bridge plugs for every type of size, set, temperature, pressure, casing..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Silver Fox Completion Services",
+                  "domain": "silver-fox.net",
+                  "url": "https://silver-fox.net/downhole-tools/bridge-plugs/#:~:text=Bridge%20plugs%20are%20downhole%20tools%20composed%20primarily,either%20permanently%20or%20temporarily%20within%20the%20wellbore.",
+                  "title": "Drilling Bridge Plugs - Silver Fox Completion Services",
+                  "text": "Bridge plugs are downhole tools composed primarily of slips, a plug mandrel, and a rubber sealing element. They are utilized in a ..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "SLB",
+                  "domain": "www.slb.com",
+                  "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/packers/blueplug-max-p-bridge-plug#:~:text=Effective%20barrier%20for%20remedial%20work%20and%20well,or%20remedial%20cement%20injection%20above%20the%20plug.",
+                  "title": "BluePlug Max P Bridge Plug - SLB",
+                  "text": "Effective barrier for remedial work and well abandonment BluePlug Max P high-pressure permanent wireline- or tubing-set bridge plu..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "SLB",
+                  "domain": "glossary.slb.com",
+                  "url": "https://glossary.slb.com/terms/b/bridge_plug",
+                  "title": "bridge plug - Energy Glossary - SLB",
+                  "text": "bridge plug. 1. n. [Perforating, Well Completions]. A downhole tool that is located and set to isolate the lower part of the wellb..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "D&L Oil Tools",
+                  "domain": "dloiltools.com",
+                  "url": "https://dloiltools.com/products/wr-bridge-plug/#:~:text=The%20WR%20Bridge%20Plug%20is%20a%20wireline,utilizes%20standard%20wireline%20or%20hydraulic%20setting%20tools.",
+                  "title": "WR Bridge Plug - D&L Oil Tools",
+                  "text": "The WR Bridge Plug is a wireline set, wireline retrieve, packer-type bridge plug capable of holding differential pressure from abo..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Oilfield Service Professionals",
+                  "domain": "www.oilfieldserviceprofessionals.com",
+                  "url": "https://www.oilfieldserviceprofessionals.com/retrievable-bridge-plugs#:~:text=The%20plug%20has%20the%20following%20features%20and,ability%20to%20hang%20gauges%20below%20the%20WRBP",
+                  "title": "Retrievable Bridge Plugs | Houston, TX | Oilfield Service Professionals (OSP)",
+                  "text": "The plug has the following features and benefits: * **Unique elastomer and backup system** Increases pressure capabilities up to 1..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Halliburton",
+                  "domain": "www.halliburton.com",
+                  "url": "https://www.halliburton.com/en/completions/well-completions/frac-plugs/cementing-retainers-bridge-plugs#:~:text=High-performance%20tools%20for%20unconventional%20completions%20Halliburton%20drillable,in%20wellbore%20conditions%20up%20to%20425%E2%81%B0F%20%28218.3%E2%81%B0C%29.",
+                  "title": "Cementing retainers and bridge plugs - Halliburton",
+                  "text": "High-performance tools for unconventional completions Halliburton drillable squeeze packers and bridge plugs are designed for well..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Expro",
+                  "domain": "www.expro.com",
+                  "url": "https://www.expro.com/products/maximus-bridge-plug",
+                  "title": "Maximus Bridge Plug - Expro",
+                  "text": "Maximus Bridge Plug * Can be wireline, tubing, or coiled tubing set providing an off-the-shelf solution for well phases. * Patente..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Core Laboratories: Owen: Product Catalog and Technical Documentation",
+                  "domain": "owendata.corelab.com",
+                  "url": "https://owendata.corelab.com/owen/cms/docs/Brochures/BridgePlugs.pdf",
+                  "title": "Bridge Plugs - Owen Oil Tools",
+                  "text": "Bridge Plug are used to isolate sections of the wellbore. Owen offers a wide range of plugs to cover many typical completion and a..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Core Lab",
+                  "domain": "www.corelab.com",
+                  "url": "https://www.corelab.com/products/magna-range-bridge-plugs/",
+                  "title": "Magna Range Bridge Plugs - Core Lab",
+                  "text": "The Owen Magna Range Bridge Plug is specially designed to pass through restricted I.D. tubing and set securely in the larger tubin..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Core Lab",
+                  "domain": "www.corelab.com",
+                  "url": "https://www.corelab.com/products/premium-bridge-plugs/",
+                  "title": "Premium Bridge Plugs - Core Lab",
+                  "text": "Owen Oil Tools' Premium Bridge Plugs are designed for extra high-pressure and rapid drill-out. Tested to 10,000 psi at 275°F with ..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Instagram",
+                  "domain": "www.instagram.com",
+                  "url": "https://www.instagram.com/reel/C64JeVFN3vN/",
+                  "title": "Bridge Plug is a #downhole #tool that is located and set to isolate the ...",
+                  "text": "A bridge plug is a downhole tool used to isolate the lower part of the wellbore. It is set in place to achieve this isolation. Bri..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Instagram",
+                  "domain": "www.instagram.com",
+                  "url": "https://www.instagram.com/reel/DGqkXqeID4s/",
+                  "title": "What is bridge plug setting tool »« Bridge plugs are downhole tools ...",
+                  "text": "Bridge plugs are downhole tools utilized to isolate the lower section of a wellbore. These plugs can be either permanent or retrie..."
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 1,
+              "rank_absolute": 2,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]",
+              "domain": "glossary.slb.com",
+              "title": "bridge plug - Energy Glossary - SLB",
+              "url": "https://glossary.slb.com/terms/b/bridge_plug",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://glossary.slb.com › terms › bridge_plug",
+              "website_name": "SLB",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "A downhole tool that is located and set to isolate the lower part of the wellbore. Bridge plugs may be permanent or retrievable, enabling the lower wellbore to ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "A downhole tool that is located and set to isolate the lower part of the wellbore"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "people_also_ask",
+              "rank_group": 1,
+              "rank_absolute": 3,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[1]",
+              "items": [
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What is the purpose of a bridge plug?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://northstardst.com/the-uses-of-retrievable-bridge-plugs/",
+                      "domain": "northstardst.com",
+                      "title": "The Uses of Retrievable Bridge Plugs - Northstar Downhole Specialists",
+                      "description": "A bridge plug is a specialist downhole tool designed to isolate wellbore at a chosen depth. When set, bridge plugs prevent fluids from a lower zone reaching an upper zone or the surface.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What is the difference between a bridge plug and a cement plug?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://www.oilfieldserviceprofessionals.com/cement-retainer-vs-bridge-plug-key-tools-for-wellbore-isolation-in-oil-gas-operations",
+                      "domain": "www.oilfieldserviceprofessionals.com",
+                      "title": "Cement Retainers vs. Bridge Plugs: Essential Well Tools",
+                      "description": "The bridge plug is another downhole tool widely used in oil and gas well operations, but its function differs significantly from that of a cement retainer. Unlike cement retainers, which allow for fluid flow control, a bridge plug provides complete isolation of the wellbore section below it.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What is a bridging plug?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[3]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://glossary.slb.com/terms/b/bridge_plug",
+                      "domain": "glossary.slb.com",
+                      "title": "bridge plug - Energy Glossary - SLB",
+                      "description": "1. n. [Perforating, Well Completions] A downhole tool that is located and set to isolate the lower part of the wellbore. Bridge plugs may be permanent or retrievable, enabling the lower wellbore to be permanently sealed from production or temporarily isolated from a treatment conducted on an upper zone.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What is the difference between a packer and a bridge plug?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[4]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://mff-oilfield.com/packers-bridge-plugs/",
+                      "domain": "mff-oilfield.com",
+                      "title": "API 11D1 Packers & Bridge Plugs Supplier | Completion Isolation Tools",
+                      "description": "Packer vs bridge plug — what's the difference? A packer typically isolates annular space to enable controlled production/injection; a bridge plug is primarily a barrier plug to isolate sections of the wellbore for intervention or abandonment stages. Can you supply API 11D1 “validation grade” tools (V0/V3 etc.)?",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "video",
+              "rank_group": 1,
+              "rank_absolute": 4,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[5]/div[1]",
+              "items": [
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Production Technology",
+                  "title": "Retrievable Bridge Plug",
+                  "timestamp": "2018-01-12 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=_gmZ1SV0OmU"
+                },
+                {
+                  "type": "video_element",
+                  "source": "SLB",
+                  "title": "Hi-Ex Retrievable Bridge Plug | Video",
+                  "timestamp": "2024-09-26 00:00:00 +00:00",
+                  "url": "https://www.slb.com/videos/hi-ex-retrievable-bridge-plug"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Drilling HSE",
+                  "title": "Bridge Plug",
+                  "timestamp": "2025-12-12 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=47F3dinJI6c"
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 2,
+              "rank_absolute": 5,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]/div[1]",
+              "domain": "www.bakerhughes.com",
+              "title": "Bridge plugs",
+              "url": "https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.bakerhughes.com › service-tools › bridge-pl...",
+              "website_name": "Baker Hughes",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "We offer an industry leading portfolio of drillable and retrievable bridge plugs that have proven their efficiency and reliability over many decades. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "drillable and retrievable bridge plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 3,
+              "rank_absolute": 6,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[9]/div[1]/div[1]",
+              "domain": "alphaoiltools.com",
+              "title": "Bridge Plugs",
+              "url": "https://alphaoiltools.com/bridge-plugs/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://alphaoiltools.com › bridge-plugs",
+              "website_name": "Alpha Oil Tools",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Alpha Oil Tools manufactures a wide array of bridge plugs for every type of size, set, temperature, pressure, casing weight, or application. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Alpha Oil Tools manufactures a wide array of bridge plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "popular_products",
+              "rank_group": 1,
+              "rank_absolute": 7,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[11]/div[1]/div[1]/div[1]/g-card[1]",
+              "title": "More products",
+              "items": [
+                {
+                  "type": "popular_products_element",
+                  "title": "Novelty Lights Bridge Wire Connector",
+                  "description": "Walmart - Novelty Lights LLC & more\nFree delivery",
+                  "more_sellers": true,
+                  "seller": "Walmart - Novelty Lights LLC",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRhRGeNnK15FhfIEQsvDjtIAiWdiyokXHpvzV3EexQD6ZyozCz_CvETNmrm1c7CiTbF_aXU5tA_gIJYbeMJOijVUoJ5Hq15pnMWliVxw-Rb",
+                  "price": {
+                    "current": 16.39,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$16.39"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 4,
+                    "votes_count": 4,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "StewMac Bridge Pin Hole Repair Plugs",
+                  "description": "StewMac.com & more",
+                  "more_sellers": true,
+                  "seller": "StewMac.com",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT0mpPJLbEumaoBWccqKjgrk75mK8wvzfNpDsQ-dJFyL8v_Em91LVaZopp6qJJc1xl-51B3HNOQQ2h_V4BjQrOrgdJCqwnvYWjJ0bvEt1f0ClsRIyFyZT6g_Q",
+                  "price": {
+                    "current": 20.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$20.99"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 5,
+                    "votes_count": 3,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "meibb Madison Electric Inline Bonding Bridge",
+                  "description": "Home Depot & more\nFree delivery",
+                  "more_sellers": true,
+                  "seller": "Home Depot",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTb6PVgHwZ6gLqEFT25-tGwnr6LEsHD2w5i_fz34viJH4r8ERPfKiyysCI0dEmX71GG9u39VKdMMpqGuUluy0xltbbPjimCmOUamoZUrHFa7BYjY4Iz-VA5vA",
+                  "price": {
+                    "current": 19.9,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$19.90"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 4.7,
+                    "votes_count": 67,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "konektor Pro kobylku Bridge Plug",
+                  "description": "Presto Music",
+                  "more_sellers": false,
+                  "seller": "Presto Music",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRMKBeVjUJYhkX59uwHztDBIk-BCRNuNTqRjeBrBmsyHBalg9Zx4zb_mT2gx8Cyri-MZIvPRQ-UBdRYpSZQJM2p4QiS8gEkXhrOmAoM_DqXdWUwsoiYXQkRNg",
+                  "price": {
+                    "current": 2.25,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$2.25"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 5,
+                    "votes_count": 4,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "HLO Lighting Bridge Plugs SPT-1 Wire Connectors SPT-1",
+                  "description": "HLO Lighting\nFree delivery",
+                  "more_sellers": false,
+                  "seller": "HLO Lighting",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRhYQphh-w5h6WEKO00kr9QpAEa9kcHkFk3ziwkyxWGa4GX9bMzbctJO1YHxRKXvxWerDFsM3DXf5C2CBdgUQeTWXEvlKtt-m_hkO9mpOzaB4EQ57V5KGQ7",
+                  "price": {
+                    "current": 30,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$30.00"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Bridge Plug (100 pk) - Black",
+                  "description": "Big Star Lights US\nFree delivery on $300+",
+                  "more_sellers": false,
+                  "seller": "Big Star Lights US",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSSJSsUgZjlSW8JQ-6iZSiInf3BUtF-y7fLzJE3UMe5xDiPYJzpMxt3D7zUsyj_sEDgmkTqFAWfdbvg61QTZeJ5XGc1IiHu0ZDS7zE8jWVH",
+                  "price": {
+                    "current": 178,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$178.00"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Gewa Bridge Plug",
+                  "description": "Presto Music",
+                  "more_sellers": false,
+                  "seller": "Presto Music",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRYu6g-ot7EGdSAqBi2jDI5xMkL5mOtwJKNuCY4WxthsFYa0gR2sL6vZxJqBJitQJvcYv7QOivgJi7EVfLl4LFKJtmH-QaTzOTNOXs4OAMeZM069ZTLY2bU",
+                  "price": {
+                    "current": 2.25,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$2.25"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 5,
+                    "votes_count": 2,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Schneider Electric Plug-in Bridge NSYTRAL23",
+                  "description": "Grainger Industrial Supply & more\nNext-day delivery $12",
+                  "more_sellers": true,
+                  "seller": "Grainger Industrial Supply",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSsVajGdkskWgj8ZYHiQDAurKcotBKG7jnvkHf44E-uc5_tw3Mlo_uZH5UmepOyTIB6Swn542HTDsL5UWQ_CaoM55XeRjmOwUiPHxq7zX9aW3Cr5nQQhVf4Uw",
+                  "price": {
+                    "current": 1.69,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$1.69"
+                  },
+                  "rating": null
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 4,
+              "rank_absolute": 8,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[13]/div[1]/div[1]",
+              "domain": "www.drilllab.com",
+              "title": "Liquid Bridge Plug",
+              "url": "https://www.drilllab.com/products-applications-case-studies/resin-technology/liquid-bridge-plug%E2%80%A8/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.drilllab.com › resin-technology › liquid-bri...",
+              "website_name": "M&D Industries of Louisiana",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Liquid Bridge Plug is a non-shrinking exothermic reaction resin designed to provide the best, impermeable seal for micro leaks of gas through and around cement ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Liquid Bridge Plug"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 5,
+              "rank_absolute": 9,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[15]/div[1]/div[1]",
+              "domain": "www.drillingmanual.com",
+              "title": "Bridge Plug In Oil & Gas",
+              "url": "https://www.drillingmanual.com/bridge-plug-in-oil-gas/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.drillingmanual.com › Completion",
+              "website_name": "Drilling Manual",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Aug 26, 2022 — Bridge plugs are essential downhole tools used in oil and gas operations for pressure equalization, temporary abandonment, and zonal isolation. Read more",
+              "pre_snippet": "08/26/2022 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "essential downhole tools used in oil and gas operations"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2022-08-26 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 6,
+              "rank_absolute": 10,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[17]/div[1]/div[1]",
+              "domain": "www.expro.com",
+              "title": "Cast Iron Bridge Plug",
+              "url": "https://www.expro.com/products/cast-iron-bridge-plug",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.expro.com › products › cast-iron-bridge-pl...",
+              "website_name": "Expro",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The Cast Iron Bridge Plug is among the most dependable and well known isolation plugs on the market. It is used for zonal isolation, well abandonment, casing ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "among the most dependable and well known isolation plugs on the market"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 7,
+              "rank_absolute": 11,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[19]/div[1]/div[1]",
+              "domain": "www.halliburton.com",
+              "title": "High-Expansion Thru-Tubing Bridge Plug (TTBP) solution",
+              "url": "https://www.halliburton.com/en/resources/high-expansion-thru-tubing-bridge-plug",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.halliburton.com › resources › high-expansio...",
+              "website_name": "Halliburton",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Discover Halliburton's high-expansion thru-tubing bridge plug solution for rigless recompletions, superior sealing, and reduced HSE risks in well ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Halliburton's high-expansion thru-tubing bridge plug solution"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "popular_products",
+              "rank_group": 2,
+              "rank_absolute": 12,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[21]/div[1]/div[1]/div[1]/g-card[1]",
+              "title": "More products",
+              "items": [
+                {
+                  "type": "popular_products_element",
+                  "title": "Buy Alpha Oil Tools Big Boy Bridge Plug online | TheOFMP",
+                  "description": "theofmp.com\nFree delivery",
+                  "more_sellers": false,
+                  "seller": "theofmp.com",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSPhdPOK1G32_CXyfDwKP3LnvIrAfi5RYBzgF5aY3BiAjyH_i_0TihzflMOoceN87LKCJ1g439Ljd0pQMJ3WBU3LJn9GXJ1nU6sAyrgRXbfypIutIpCfSL_fQ",
+                  "price": {
+                    "current": 534,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$534.00"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Gewa Bridge Plug for Konektor Pro kobylku",
+                  "description": "Presto Music",
+                  "more_sellers": false,
+                  "seller": "Presto Music",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTE932QVC6IJ76IlQYsh4Y540LJ3yzA6Y_gEAFKPLR4mCto8qc89mk2XMqrcUGzO4HP83z_Obt4x-EcRDCXLy2Qxri_Z2sZiQvK6N1ucL_kb617oXSav8ZPdg",
+                  "price": {
+                    "current": 5.5,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$5.50"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 4,
+                    "votes_count": 1,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Phoenix Contact 3030187 FBS 4-5",
+                  "description": "RS - America & more",
+                  "more_sellers": true,
+                  "seller": "RS - America",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTD9t7usJoH_KCcp59c8WQF9d2yK9Jn1wnig0x_89CMvrrSQ6UJhtA_mTktKjo8dH-XhqyI8S-mjBaMiW5CLEwNBxvLsJkcN8rF02-YhcuSa1L3lzpfs60gjA",
+                  "price": {
+                    "current": 2.63,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$2.63"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 4.8,
+                    "votes_count": 4,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Schneider Electric nsytral25 Plug-In Bridge",
+                  "description": "Grainger Industrial Supply & more\nNext-day delivery $12",
+                  "more_sellers": true,
+                  "seller": "Grainger Industrial Supply",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRSmdTXwFGVj-ZqHvPcEdt8lf2gzWYGHsY7auE7lEqxU2-RmFM5DfoZKshUVALLdr53YTUX6OY4Kl1D_PIfM5PqxfvkpZv3H3CWn-vsu4IbU-RZIeXuk3UO",
+                  "price": {
+                    "current": 3.85,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$3.85"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Alpha Oil Tools 000-1710-000 Big Boy Bridge Plug, O.D., CH, 1.71, GO 1 11/16",
+                  "description": "Transcat\nFree delivery",
+                  "more_sellers": false,
+                  "seller": "Transcat",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQqOErphwhgEUouO2G_UufQAQTZRmnbBzfbuJaEvW-C1efNA145ulhVm3tMPIAaCZUOWAHjlY4FNpWgWd9fn6KzcqRe26NDToTIL9ZRUJoxZrjg9qidgI3W",
+                  "price": {
+                    "current": 650,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$650.00"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Phoenix Contact Plug-in Bridge",
+                  "description": "RS - America & more",
+                  "more_sellers": true,
+                  "seller": "RS - America",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRR0oJZTOaWq3SIUQ92QqLOF89vBaxu7IbpRT7i1oWJGCVgKJyFL9I7k1ixYL_XohnwVMCECgaHJ3B6r104aJshv0z6KtgLe85IXlIvAV3HmXP1jke5dab_",
+                  "price": {
+                    "current": 4.09,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$4.09"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Schneider Electric Bridge nsytral610",
+                  "description": "Grainger Industrial Supply & more\nNext-day delivery $12",
+                  "more_sellers": true,
+                  "seller": "Grainger Industrial Supply",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTyBcYshhbcmjdIxMv70mbxDhMBPSkd0lajApBZPfu3of_b8VEZWkSNLrEwjcEYTLf38NYIXrH6Vevv4ctBBDUe43cYHiMwNeBcshlS45yPBD_hyH2LbFk4Zg",
+                  "price": {
+                    "current": 9.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$9.99"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Alpha Oil Tools 11750000 Extra Range Bridge Plug, ERBP, 1.75 O.D.",
+                  "description": "Transcat\nFree delivery",
+                  "more_sellers": false,
+                  "seller": "Transcat",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ6B1L1pmohg0Qz1v3IQbb7dWohGpLlZLwrvhoRGRXggv1WqoYYaoKQ2nLJ_jhSn8Rk7iJy9O62ozHE-hQHUA5Ii9BhTBod68CyX77mCDIfM4Rm13FUW1d0",
+                  "price": {
+                    "current": 1800,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$1,800.00"
+                  },
+                  "rating": null
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 8,
+              "rank_absolute": 13,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[22]/div[1]/div[1]/div[1]",
+              "domain": "www.youtube.com",
+              "title": "SIMextra Retrievable Bridge Plug for Gas-Tight, Full ...",
+              "url": "https://www.youtube.com/watch?v=LEVE-IPEiMM",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "86.7K+ views  ·  2 years ago",
+              "website_name": "YouTube · SLB",
+              "is_image": false,
+              "is_video": true,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The SIMextra™ retrievable bridge plug is a gas-tight, full-expansion plug for temporary zonal isolation.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "gas-tight, full-expansion plug"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2024-02-12 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 1,
+              "rank_absolute": 14,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[2]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Bridge plug vs packer",
+                "Bridge plug oil and gas",
+                "Bridge plug sizes",
+                "Retrievable bridge plug",
+                "Permanent Bridge Plug",
+                "Bridge Plug setting procedure",
+                "Wireline Retrievable Bridge plug",
+                "Baker Hughes retrievable bridge plug"
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 9,
+              "rank_absolute": 15,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "domain": "www.expro.com",
+              "title": "Composite Bridge Plug",
+              "url": "https://www.expro.com/products/composite-bridge-plug",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.expro.com › products › composite-bridge-...",
+              "website_name": "Expro",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The Composite Bridge Plug is a nonmetallic high-quality tool primarily used for temporary isolation in intervention wells (thru-tubing), multi-stage vertical, ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "nonmetallic high-quality tool"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 10,
+              "rank_absolute": 16,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]",
+              "domain": "www.facebook.com",
+              "title": "Running A Bridge Plug In An Oil Well It is a critical operation ...",
+              "url": "https://www.facebook.com/DrillingEquipmentSupply/videos/running-a-bridge-plug-in-an-oil-wellit-is-a-critical-operation-for-isolating-zon/714029598281486/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "2.7K+ reactions  ·  9 months ago",
+              "website_name": "Facebook · Drilling Equipment Supply",
+              "is_image": false,
+              "is_video": true,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Here's a step-by-step guide on how to run a bridge plug properly : 1. Pre-Job Planning Select the Right Bridge Plug: Choose a plug suitable for ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Here's a step-by-step guide on how to run a bridge plug properly"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-07-28 18:28:02 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 11,
+              "rank_absolute": 17,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]",
+              "domain": "www.repeatprecision.com",
+              "title": "What Is a Bridge Plug? Everything You Need to Know",
+              "url": "https://www.repeatprecision.com/news/what-is-a-bridge-plug",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.repeatprecision.com › news › what-is-a-bri...",
+              "website_name": "Repeat Precision",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "May 26, 2025 — A bridge plug is a mechanical tool that's installed downhole in oil and gas completions to isolate the lower zone from the upper section in ... Read more",
+              "pre_snippet": "05/26/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "a mechanical tool that's installed downhole in oil and gas completions"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-05-26 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 12,
+              "rank_absolute": 18,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]/div[1]",
+              "domain": "www.slb.com",
+              "title": "SIMplus Retrievable Bridge Plug | Video",
+              "url": "https://www.slb.com/videos/simplus-retrievable-bridge-plug",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.slb.com · Sep 3, 2024",
+              "website_name": "SLB",
+              "is_image": false,
+              "is_video": true,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The SIMplus retrievable bridge plug delivers high-performance downhole seal technology for reliable isolation and retrieval.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "delivers high-performance downhole seal technology"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2024-09-03 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 13,
+              "rank_absolute": 19,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]/div[1]",
+              "domain": "www.youtube.com",
+              "title": "Bridge Plug and Mech-10 packer",
+              "url": "https://www.youtube.com/watch?v=CK7mfD_cQls",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "38.4K+ views  ·  11 years ago",
+              "website_name": "YouTube · WellCare Oil Tools",
+              "is_image": false,
+              "is_video": true,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Go to channel Brace Tool Inc. Activating Bridge Plugs just got safer ! || Brace Tool Safety Timer tested on the Bridge Plug. Brace Tool Inc.• ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Activating Bridge Plugs just got safer"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2014-09-19 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 14,
+              "rank_absolute": 20,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+              "domain": "www.slb.com",
+              "title": "Copperhead Drillable Bridge and Frac Plug",
+              "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/frac-plugs-and-sleeves/frac-plugs/copperhead-drillable-bridge-and-frac-plug",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.slb.com › ... › Frac Plugs",
+              "website_name": "SLB",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Oct 23, 2023 — Minimize risks of presetting and plug movement during multistage fracture stimulation and expedite millout; the plug can also be configured ...",
+              "pre_snippet": "10/23/2023 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Minimize risks of presetting and plug movement"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2023-10-23 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 15,
+              "rank_absolute": 21,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]/div[1]",
+              "domain": "northstardst.com",
+              "title": "The Uses of Retrievable Bridge Plugs",
+              "url": "https://northstardst.com/the-uses-of-retrievable-bridge-plugs/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://northstardst.com › Blog",
+              "website_name": "Northstar Downhole Specialists",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "A bridge plug is a specialist downhole tool designed to isolate wellbore at a chosen depth. When set, bridge plugs prevent fluids from a lower zone reaching an ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "a specialist downhole tool designed to isolate wellbore at a chosen depth"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "images",
+              "rank_group": 1,
+              "rank_absolute": 22,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]",
+              "title": "Images",
+              "url": "https://www.google.com/search?sa=N&hl=en&gl=US&sca_esv=06de5ba07996f893&q=bridge+plug&udm=2&source=univ&fir=uYo43HysC9X3LM%252C84TwJGL8NzJXbM%252C_%253BKtSM0uDjqMPvJM%252C9S4ZS9BFytj3-M%252C_%253B5dzQtyDI-E_s7M%252CUxpq2y_rQixVBM%252C_%253BHxIgg6UZ5eF-aM%252CaXlRrfVcoc1tRM%252C_%253BEj8PQSE9Al4_HM%252COb86YYwpU9PdJM%252C_%253BBX68dyclDcOS7M%252C-xdPT7FsJZohrM%252C_%253BjYFMj1I-kXgDSM%252C0B1IqmMMDbP3CM%252C_%253BAprkE6_NOrNy9M%252ClHRbea3N5R-G3M%252C_%253BilIl11YszA80pM%252CjOrRmHARrF2APM%252C_&usg=AI4_-kTX6ogQHZYjOLyWpqzw5zXfmr6KNA&ved=2ahUKEwj_69uhlpGUAxXvBNsEHS8iAIc4ChDsCXoECEsQBQ",
+              "items": [
+                {
+                  "type": "images_element",
+                  "alt": "ACT MODEL A PREMIUM BRIDGE PLUG – WIRELINE SET / DRILLABLE ...",
+                  "url": "https://americancompletiontools.com/act-model-a-premium-bridge-plug-wireline-set-drillable/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:43"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "China China Vigor Hydro-Mech Set Bridge Plug (VHMB ...",
+                  "url": "https://www.vigordrilling.com/completion-tools/vigor-hydro-mech-set-bridge-plug-vhmb.html",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:44"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "What Is a Bridge Plug? Everything You Need to Know",
+                  "url": "https://www.repeatprecision.com/news/what-is-a-bridge-plug",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282128-1032-0139-0000-c32766a0c140:45"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "What Is a Cast Iron Bridge Plug Used For?",
+                  "url": "https://silver-fox.net/what-is-a-cast-iron-bridge-plug-used-for/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcAJgoilTqepM8cT1z0jM43JyqUGHc238EbTseW6B9LPaCIUVvAmbcuWc&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Retrievable bridge plugs | Baker Hughes",
+                  "url": "https://www.bakerhughes.com/well-intervention/plug-and-abandonment-services/pa-barrier-installation/workover-systems/service-tools/bridge-plugs/retrievable-bridge-plugs",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWs0LKq_0DB6d0qZhioIC23HH79c4dCHQ3kbyiqgf97e6IOje1VKaarNc&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "China Cast Iron Bridge Plug Manufacturers and Supplier ...",
+                  "url": "https://www.vigordrilling.com/completion-tools/cast-iron-bridge-plug.html",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0fPldN-UXWqSeUntX4s2LM_g-Dxk1A-8mvaMOUCQZtM3_WILF3Qz4tkY&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Difference Between Cement Retainers and Bridge Plugs ...",
+                  "url": "https://silver-fox.net/difference-between-cement-retainers-and-bridge-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4HKARaInqM9J_azZjNPMS-memyAEPWw2mekTPNZDzKstX-qzgHu7doUg&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "News - What is the main difference between packers and ...",
+                  "url": "https://www.landrilloiltools.com/news/what-is-the-main-difference-between-packers-and-bridge-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzfDQBPTCLFqQvvAaL8Qw7Xe5VmpoMd70IvoBpMW_bR8mc_MWe9B0uzeg&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Understanding the Role of Bridge Plugs, in Oil and Gas ...",
+                  "url": "https://kf-oiltools.com/bridge-plug/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqAXtfIdlffTeOX2Lp2IKZ-xUdPxyS1Pbsh-OpMo8HYOTTA8Fn_zdE6fQ&s"
+                }
+              ],
+              "related_image_searches": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 16,
+              "rank_absolute": 23,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+              "domain": "www.transcat.com",
+              "title": "Wellbore Bridge Plugs",
+              "url": "https://www.transcat.com/products/oil-well-downhole-tools/bridge-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.transcat.com › oil-well-downhole-tools › b...",
+              "website_name": "Transcat",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Order industry-grade bridge plugs designed to perform in the most demanding subsurface conditions from Transcat. Free shipping over $100!",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "industry-grade bridge plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 17,
+              "rank_absolute": 24,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]/div[1]",
+              "domain": "www.neoproducts.net",
+              "title": "All Bridge Plugs",
+              "url": "https://www.neoproducts.net/all-bridge-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.neoproducts.net › all-bridge-plugs",
+              "website_name": "NeoProducts",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Our bridge plugs are used to isolate sections of a well, preventing fluid migration and ensuring safety during each operation. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "used to isolate sections of a well"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "popular_products",
+              "rank_group": 3,
+              "rank_absolute": 25,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[11]/div[1]/div[1]/div[1]/g-card[1]",
+              "title": "Popular products",
+              "items": [
+                {
+                  "type": "popular_products_element",
+                  "title": "Arlington Grounding Bridge",
+                  "description": "Tech Tool Supply",
+                  "more_sellers": false,
+                  "seller": "Tech Tool Supply",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQadPvEJ15gaZ8DQ3aIzfIANPVOKnUeWBXVLFh4oG7lfZQGsArJJ5nmsPvHfuZ4BF9jD4lmuC_ZydjmPYkn8-0xPTP4F-_Z4RytVBhATbM",
+                  "price": {
+                    "current": 10.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$10.99"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 4.5,
+                    "votes_count": 6,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Phoenix Contact FBS Plug-in Bridge",
+                  "description": "RSP Supply & more",
+                  "more_sellers": true,
+                  "seller": "RSP Supply",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTI2InWMy_9W7wEcJngCXiNMPc91B0Migm_WH3588Q-wVWz4QXcLhQyHb2kigHEYfg8vqpDF50FR05RKHyL6T-mGyJ6hfH20w2uD49Gfd3mB8oo3Dn8gmNQ",
+                  "price": {
+                    "current": 1.13,
+                    "regular": 1.36,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$1.13 $1.36"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 5,
+                    "votes_count": 4,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "PLUG IN BRIDGE 5 POSITION",
+                  "description": "American Copper & Brass",
+                  "more_sellers": false,
+                  "seller": "American Copper & Brass",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQFoxwQT9XoxHlDUW3fkYtU9dxTcad-SanMmuUb_XGpU7O1-M2DOu98gpt-zOUIXBmxhHv1Ahhc5U9HtoHgW1tY3HNSE3QfvXyqQfhIK06l",
+                  "price": {
+                    "current": 1.63,
+                    "regular": 1.96,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$1.63 $1.96"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Set of 10 side plugs for bridging bars 1P",
+                  "description": "domeashop",
+                  "more_sellers": false,
+                  "seller": "domeashop",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTNR6bIDW6i1APC1eruFoHQnTLyUVBonF6kqXjtnqgdZgkoELJwGr0l4hO1IL2e_rV4EQQznhRsvib0gJfR6ahpJriT9gY2SpYtqdcNnA6ZpJmgAtgAEL-0wQ",
+                  "price": {
+                    "current": 17.18,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$17.18"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Phoenix Contact Plug-in Bridge 3030213",
+                  "description": "RSP Supply & more",
+                  "more_sellers": true,
+                  "seller": "RSP Supply",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRWP2jhM6K0gC2vCCuvS_J1N-DIbTvtbfQFa5onbq88Tlq-rgYPa0pFp9bnQLNQBi0_o-dGcnjqzCGHzE0kdYYVpuxleNoHKJaLwg9MUTTsVtJgqKBqqhPo",
+                  "price": {
+                    "current": 4.63,
+                    "regular": 5.56,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$4.63 $5.56"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 5,
+                    "votes_count": 1,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Square D Plug-In Bridge",
+                  "description": "Standard Electric Supply Co. & more",
+                  "more_sellers": true,
+                  "seller": "Standard Electric Supply Co.",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcR1XWeywMVLl5QrUtuDP_IUPnEA3zSTu9szh3BN4GcezJDNz9Kcb7LxhKqbvLFG1kiG6ilm2GDiBnEU1RTBXn0htbvXdQYxZA",
+                  "price": {
+                    "current": 7.28,
+                    "regular": null,
+                    "max_value": 11,
+                    "currency": "USD",
+                    "is_price_range": true,
+                    "displayed_price": "$7.28 Usually $11"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Plug-In Bridge 2 Points For 4 Mm2 Terminal Blocks",
+                  "description": "Remiex",
+                  "more_sellers": false,
+                  "seller": "Remiex",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQV0EMb-ksr2wa3OudMgqgdczMIEevT1K49UBXZV9F18mUoJHnt4NOGaLDNZNwfl_zJZsvJfHx5N-va309QB4iy-Axo8fPvKr5ggys9iye0MzeRLAL4QgP5",
+                  "price": {
+                    "current": 24.2,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$24.20"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Schneider Electric nsytral44 Plug-In Bridge",
+                  "description": "Standard Electric Supply Co.",
+                  "more_sellers": false,
+                  "seller": "Standard Electric Supply Co.",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSsW7YgAZAiJ7Yu47kicJKNkTLWLKDE8B1fT41qcOLycCweS6JblaaGQAIUkfuWemPZcnUUD8IE8Z6jlf9dsaUPJJj9-OxhwT7JsYJdHLwT",
+                  "price": {
+                    "current": 3.79,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$3.79"
+                  },
+                  "rating": null
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "popular_products",
+              "rank_group": 4,
+              "rank_absolute": 26,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[12]/div[1]/div[1]/div[1]/g-card[1]",
+              "title": null,
+              "items": [
+                {
+                  "type": "popular_products_element",
+                  "title": "Alpha Oil Tools 11750100 Extra Range Bridge Plug Setting Sleeve, ERBP GO 1.750 O.D.",
+                  "description": "Transcat\nFree delivery",
+                  "more_sellers": false,
+                  "seller": "Transcat",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQBSrRXYSWee9uzB6kEkK9Q94dnZJhloZzKTAlPJgXMtkoiAG1bH1O85iif3Wxp9Z3Ocden6m-uU8r_EKOw3logTBhu7EUO-F_u5H2S85CmNsNxeQbF-xxb",
+                  "price": {
+                    "current": 320,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$320.00"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Phoenix Contact Plug-in Bridge FBS 1/3-6",
+                  "description": "RSP Supply & more",
+                  "more_sellers": true,
+                  "seller": "RSP Supply",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTMU3siRz8fqu59VJaHlq1fI8mPFqaDeFT5_pLlJ1lcfCIQI8G7f1z5uaaMnBjCLs8COwkim9jLOeh7QdpL7I0AUmlGiFnQQPN2zwWbdaI18ht4kliHqxQx",
+                  "price": {
+                    "current": 1.55,
+                    "regular": 1.86,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$1.55 $1.86"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "ONKA 10/10 Plug 10-stage comb bridge, insulated, for spring clip 10 mm2, 1060134",
+                  "description": "pelek-sl.com",
+                  "more_sellers": false,
+                  "seller": "pelek-sl.com",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ73eBEDE0kaiWbrSComubG2gLcIaoHjcEBCGk84BSlybAWOf3FysGUMxRPPuYFeBw6dOpQso3pbt1zsWnCEQUqtmgHhODwrfOKllYByRL5g8GdUZ5VXnX7Fw",
+                  "price": {
+                    "current": 3.09,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$3.09"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "SQD NSYTRAL45 Plug-in Bridge Liner",
+                  "description": "Echo Electric",
+                  "more_sellers": false,
+                  "seller": "Echo Electric",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRhr1vBBYAOFr2sM5zsWDA-Uji3K9haKkZDycD1CPecmguwLmmyruXzzo8O57BAlI6gcUpfKNgvrSQq1NWvO7nAvhgFwxTeSsSDcEJzqUm6fkxaHl6TK34fDQ",
+                  "price": {
+                    "current": 6.57,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$6.57"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "2-Wire Bridge Tap Connector, 21-26 AWG Wires, Polycarbonate Shell",
+                  "description": "vpi.us",
+                  "more_sellers": false,
+                  "seller": "vpi.us",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQUTjw05gXBaaVKyBGWyMDd9GkHhUtv8QheMtcl4Rw5jJIlnrre0nKFlGqMTM9bmMCPCqoU30OcIB1ZvUtjg6MUglHyKKgYOg",
+                  "price": {
+                    "current": 0.18,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$0.18"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Square D NSYTRAL42 4 mm 2-Point Screw Terminal Block Plug-in Bridge",
+                  "description": "Crescent Electric Supply Company & more",
+                  "more_sellers": true,
+                  "seller": "Crescent Electric Supply Company",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQullLZBPs3QA9caF1n2FvtpH5m58zg9P30wRPYJ1Bo3zyHPkFcFXa9DWAI2Gu2f9zuOPmscboVnXUnrfJxiMq4fvVMB6L6CH9QhNLOSiAxYmbe-KjqV5UO",
+                  "price": {
+                    "current": 1.12,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$1.12"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Plug bridge",
+                  "description": "Rose Passion",
+                  "more_sellers": false,
+                  "seller": "Rose Passion",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSDwekF65M2y-lhk5tJ_GczxWPPdP4S4Yrqrs7VmftrRzWv4cqy7dC8GpZwXNC9teeiU6GcCQWqR5vJC6p8kGQVBTxVyY2zArDAowTYnXOOLtcsAeZ6aXkj",
+                  "price": {
+                    "current": 32.33,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$32.33"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Schneider Electric Plug-In Bridge",
+                  "description": "RS - America & more",
+                  "more_sellers": true,
+                  "seller": "RS - America",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRefDovAnbMleL9gZkyJIlv4tyqxguT7cqHHUjuSW3n5I84rvOd-YRY1EJel86XWOnP6lNKOux2kjj15fKn9aveP5hYk2g5HLVCF1okT2aW4TgQqmLxxIqW",
+                  "price": {
+                    "current": 2.94,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$2.94"
+                  },
+                  "rating": null
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 2,
+              "rank_absolute": 27,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[3]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Bridge plug vs packer",
+                "Bridge plug oil and gas",
+                "Bridge plug sizes",
+                "Retrievable bridge plug",
+                "Permanent Bridge Plug",
+                "Bridge Plug setting procedure",
+                "Wireline Retrievable Bridge plug",
+                "Cast iron Bridge Plug specs"
+              ],
+              "rectangle": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

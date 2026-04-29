@@ -1,0 +1,2032 @@
+{
+  "version": "0.1.20260420",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "4.0313 sec.",
+  "cost": 0.0035,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "04282126-1032-0139-0000-40179c61b2a5",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "3.9225 sec.",
+      "cost": 0.0035,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "serp",
+        "google",
+        "organic",
+        "live",
+        "advanced"
+      ],
+      "data": {
+        "api": "serp",
+        "function": "live",
+        "se": "google",
+        "se_type": "organic",
+        "keyword": "frac plug",
+        "location_code": 2840,
+        "language_code": "en",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20,
+        "load_async_ai_overview": true
+      },
+      "result": [
+        {
+          "keyword": "frac plug",
+          "type": "organic",
+          "se_domain": "google.com",
+          "location_code": 2840,
+          "language_code": "en",
+          "check_url": "https://www.google.com/search?q=frac%20plug&hl=en&gl=US&ie=UTF-8&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc",
+          "datetime": "2026-04-28 18:26:58 +00:00",
+          "spell": null,
+          "refinement_chips": {
+            "type": "refinement_chips",
+            "xpath": "/html[1]/body[1]/div[3]/div[1]/div[9]/div[1]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]/div[1]",
+            "items": [
+              {
+                "type": "refinement_chips_element",
+                "title": "Nearby",
+                "url": "https://www.google.com/search?q=frac+plug+nearby&hl=en&gl=US&shoprs=GAMqCWZyYWMgcGx1ZzIMCAMSBk5lYXJieRgCWLzpIGAB&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAF6BAgaEEo",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Female",
+                "url": "https://www.google.com/search?q=female+frac+plug&hl=en&gl=US&shoprs=GBIqCWZyYWMgcGx1ZzIKCBISBkZlbWFsZWAB&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAJ6BAgaEEs",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Electrical Outlets & Receptacles",
+                "url": "https://www.google.com/search?q=electrical+outlets+%26+receptacles+frac+plug&hl=en&gl=US&shoprs=GAkqCWZyYWMgcGx1ZzIkCAkSIEVsZWN0cmljYWwgT3V0bGV0cyAmIFJlY2VwdGFjbGVzYAE&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAN6BAgaEEw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Male",
+                "url": "https://www.google.com/search?q=male+frac+plug&hl=en&gl=US&shoprs=GBIqCWZyYWMgcGx1ZzIICBISBE1hbGVgAQ&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAR6BAgaEE0",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Spark Plugs",
+                "url": "https://www.google.com/search?q=spark+plugs+frac+plug&hl=en&gl=US&shoprs=GAkqCWZyYWMgcGx1ZzIPCAkSC1NwYXJrIFBsdWdzYAE&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAV6BAgaEE4",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "For Sale",
+                "url": "https://www.google.com/search?q=frac+plug+for+sale&hl=en&gl=US&shoprs=GBIqCWZyYWMgcGx1ZzIMCBISCEZvciBTYWxlYAE&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAZ6BAgaEE8",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Power Adapters & Chargers",
+                "url": "https://www.google.com/search?q=power+adapters+%26+chargers+frac+plug&hl=en&gl=US&shoprs=GAkqCWZyYWMgcGx1ZzIdCAkSGVBvd2VyIEFkYXB0ZXJzICYgQ2hhcmdlcnNgAQ&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAd6BAgaEFA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "On sale",
+                "url": "https://www.google.com/search?q=frac+plug+sale&hl=en&gl=US&shoprs=EgRKAhgBGAYqCWZyYWMgcGx1ZzITCAYSB09uIHNhbGUYAiIESgIYAVi86SBgAQ&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAh6BAgaEFE",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Price",
+                "url": "https://www.google.com/search?q=price+frac+plug&hl=en&gl=US&shoprs=GBIqCWZyYWMgcGx1ZzIJCBISBVByaWNlYAE&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAl6BAgaEFI",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Replacement",
+                "url": "https://www.google.com/search?q=replacement+frac+plug&hl=en&gl=US&shoprs=GBIqCWZyYWMgcGx1ZzIPCBISC1JlcGxhY2VtZW50YAE&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAp6BAgaEFM",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Size",
+                "url": "https://www.google.com/search?q=size+frac+plug&hl=en&gl=US&shoprs=GBIqCWZyYWMgcGx1ZzIICBISBFNpemVgAQ&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAt6BAgaEFQ",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Get it fast",
+                "url": "https://www.google.com/search?q=frac+plug&hl=en&gl=US&shoprs=Eg2aAQoKCBADOAFABUgBGBQqCWZyYWMgcGx1ZzIkCBQSC0dldCBpdCBmYXN0Ig2aAQoKCBADOAFABUgBKgQQARgBYAE&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKAx6BAgaEFU",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "New",
+                "url": "https://www.google.com/search?q=new+frac+plug&hl=en&gl=US&shoprs=GAoqCWZyYWMgcGx1ZzIHCAoSA05ld1i86SBgAQ&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKA16BAgaEFY",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Used",
+                "url": "https://www.google.com/search?q=used+frac+plug&hl=en&gl=US&shoprs=GAoqCWZyYWMgcGx1ZzIICAoSBFVzZWRYvOkgYAE&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKA56BAgaEFc",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Drain Assemblies & Parts",
+                "url": "https://www.google.com/search?q=drain+assemblies+%26+parts+frac+plug&hl=en&gl=US&shoprs=GAkqCWZyYWMgcGx1ZzIcCAkSGERyYWluIEFzc2VtYmxpZXMgJiBQYXJ0c2AB&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKA96BAgaEFg",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Electrical Fuses",
+                "url": "https://www.google.com/search?q=electrical+fuses+frac+plug&hl=en&gl=US&shoprs=GAkqCWZyYWMgcGx1ZzIUCAkSEEVsZWN0cmljYWwgRnVzZXNgAQ&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKBB6BAgaEFk",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Buy",
+                "url": "https://www.google.com/search?q=buy+frac+plug&hl=en&gl=US&shoprs=GBIqCWZyYWMgcGx1ZzIHCBISA0J1eWAB&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKBF6BAgaEFo",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Black",
+                "url": "https://www.google.com/search?q=black+frac+plug&hl=en&gl=US&shoprs=GAEqCWZyYWMgcGx1ZzIXCAESBUJsYWNrOgwI2Iz1ARDlivUBMAtYvOkgYAE&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKBJ6BAgaEFs",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Blue",
+                "url": "https://www.google.com/search?q=blue+frac+plug&hl=en&gl=US&shoprs=GAEqCWZyYWMgcGx1ZzIWCAESBEJsdWU6DAjYjPUBEOaK9QEwC1i86SBgAQ&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKBN6BAgaEFw",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Red",
+                "url": "https://www.google.com/search?q=red+frac+plug&hl=en&gl=US&shoprs=GAEqCWZyYWMgcGx1ZzIVCAESA1JlZDoMCNiM9QEQ54r1ATALWLzpIGAB&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKBR6BAgaEF0",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "White",
+                "url": "https://www.google.com/search?q=white+frac+plug&hl=en&gl=US&shoprs=GAEqCWZyYWMgcGx1ZzIXCAESBVdoaXRlOgwI2Iz1ARChi_UBMAtYvOkgYAE&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKBV6BAgaEF4",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Green",
+                "url": "https://www.google.com/search?q=green+frac+plug&hl=en&gl=US&shoprs=GAEqCWZyYWMgcGx1ZzIXCAESBUdyZWVuOgwI2Iz1ARDoivUBMAtYvOkgYAE&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKBZ6BAgaEF8",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Under $15",
+                "url": "https://www.google.com/search?q=frac+plug+under+$15&hl=en&gl=US&shoprs=Eg0SCxEAAAAAOJxsQRgBGAUqCWZyYWMgcGx1ZzIiCAUSCVVuZGVyICQxNRgCIg0SCxEAAAAAOJxsQRgBKgIYAVi86SBgAQ&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKBd6BAgaEGA",
+                "domain": "www.google.com",
+                "options": null
+              },
+              {
+                "type": "refinement_chips_element",
+                "title": "Plastic",
+                "url": "https://www.google.com/search?q=plastic+frac+plug&hl=en&gl=US&shoprs=GAEqCWZyYWMgcGx1ZzIZCAESB1BsYXN0aWM6DAiDqsQBEL7ixwEwAFi86SBgAQ&sa=X&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQip4GKBh6BAgaEGE",
+                "domain": "www.google.com",
+                "options": null
+              }
+            ]
+          },
+          "item_types": [
+            "ai_overview",
+            "images",
+            "people_also_ask",
+            "organic",
+            "video",
+            "popular_products",
+            "related_searches"
+          ],
+          "se_results_count": 162,
+          "pages_count": 2,
+          "items_count": 27,
+          "items": [
+            {
+              "type": "ai_overview",
+              "rank_group": 1,
+              "rank_absolute": 1,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "asynchronous_ai_overview": true,
+              "markdown": "![Who Hates Frag Plugs? - ReefBum](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:28)\nFrag plugs are `small, typically ceramic or aragonite bases used in reef tanks to hold coral fragments (frags) while they grow and attach, making it easier to propagate, arrange, or sell corals` . They often feature a stem for insertion into frag racks and are designed to blend into reef rockwork. Common materials include inert, high-temperature fired ceramics for stability.[[1]](https://www.youtube.com/watch?v=oE9RzzhGwO4#:~:text=A%20frag%20plug%20is%20a%20base%20used,LPS%2C%20encrusting%20corals%2C%20or%20a%20natural%20look.)[[2]](https://www.amazon.com/Frag-Plugs-Disks-Awesome-Aquatic/dp/B0BMTLB8ND)[[3]](https://fragbox.ca/product-category/dry/fragging/frag-plugs/#:~:text=Frag%20plugs%20are%20used%20to%20make%20frags,Frag%20Saver%20%E2%80%93%20Ceramic%20Frag%20Plug%20Holder)[[4]](https://www.reefcreators.com/1000-Ceramic-Frag-Plugs_p_15.html)[[5]](https://www.aliexpress.com/s/wiki-ssr/article/frag-plug#:~:text=Frag%20plugs%20offer%20a%20durable%2C%20porous%20alternative,support%20successful%20coral%20propagation%20over%20extended%20periods.)\n\nThis video explains the different types of frag plugs available:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:29)\n1m[![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:30)\n![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:31)\nBRStv - Saltwater Aquariums & Reef Tanks YouTube• Jul 2, 2021](https://www.youtube.com/watch?v=oE9RzzhGwO4&t=321) \n\n**Key Features and Types** \n\n- **Materials:** Primarily ceramic, aragonite, or concrete-based (Agrocrete).\n- **Shapes:** Standard plugs with stems (typically 2 4 m m−1 i n c h ) are common for rack insertion. Flat discs and frag rocks/rubble are used for a more natural look.\n- **Colors:** Available in white, purple (to simulate coralline algae), and black.\n- **Porosity:** Many are porous to encourage faster coral adhesion and bacterial growth.[[1]](https://www.youtube.com/watch?v=ic6XT7wvlws&t=4)[[2]](https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html)[[3]](https://www.saltwateraquarium.com/specialty/fragging/frag-plugs/)[[4]](https://www.amazon.com/Frag-Plugs-Disks-Awesome-Aquatic/dp/B0BMTLB8ND)[[5]](https://fragbox.ca/product-category/dry/fragging/frag-plugs/#:~:text=Frag%20plugs%20are%20used%20to%20make%20frags,Frag%20Saver%20%E2%80%93%20Ceramic%20Frag%20Plug%20Holder)[[6]](https://www.coralvue.com/1in-biological-frag-plugs-with-flat-top)\n\nThis video shows how to make your own frag plugs:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:32)\n57s[![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:33)\n![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:34)\nNiagara Fire Corals YouTube• Jul 5, 2025](https://www.youtube.com/watch?v=V1PhT4j9Ar8&t=237) **Common Uses** \n\n- **Fragging:** Used to propagate SPS (Small Polyp Stony), LPS (Large Polyp Stony), and soft corals.\n- **Stability:** Provides a solid, stable base for frags, preventing them from blowing away in tank currents.\n- **Marketplace:** Used for selling or trading corals, with options like [[Ocean Wonders Ceramic Frag Plugs](https://www.google.com/search?q=Ocean+Wonders+Ceramic+Frag+Plugs&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQgK4QegYIAQgCEA8) ](https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html) and [Maxspect Nano-Tech Bio-Plugs](https://www.google.com/search?q=Maxspect+Nano-Tech+Bio-Plugs&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQgK4QegYIAQgCEBA) popular in the industry.[[1]](https://www.youtube.com/watch?v=ic6XT7wvlws&t=4)[[2]](https://www.amazon.com/Frag-Plugs-Disks-Awesome-Aquatic/dp/B0BMTLB8ND)[[3]](https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html)\n\nThis video demonstrates how to mount corals on new frag plugs:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:35)\n1m[![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:36)\n![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:37)\nSeaTee Aquatics YouTube• Apr 5, 2024](https://www.youtube.com/watch?v=5EBmcjDSJTs&t=88) **Top Considerations** \n\n- **Curing:** Some cement-based plugs may require curing to avoid pH spikes, while most ceramic options from brands like [ReefCreators](https://www.google.com/search?q=ReefCreators&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQgK4QegYIAQgCEB8) are inert and safe for immediate use.\n- **Algae Management:** Darker colored or purple plugs are often preferred to reduce the visual impact of algae growth compared to bright white plugs.\n- **Size:** Standard 1-i n c h plugs fit most standard eggcrate rack systems.[[1]](https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html)[[2]](https://www.reefcreators.com/1000-Ceramic-Frag-Plugs_p_15.html)[[3]](https://www.bulkreefsupply.com/content/post/brstv-buyers-guide-to-frag-plugs#:~:text=As%20noted%20above%2C%20dark%20frag%20plugs%20will,of%20algae%20when%20compared%20to%20light-colored%20plugs.)[[4]](https://www.ubuy.com.jm/product/1R3H6JNQ-reefing-art-ceramic-coralline-purple-coral-frag-plugs-30-pack-tiles-for-sps-lps#:~:text=Question:%20What%20sizes%20are%20the%20ceramic%20frag,while%20fitting%20conveniently%20into%20standard%20frag%20racks.)[[5]](https://www.kosovo.ubuy.com/en/product/871JKBTQ6-ceramic-coral-frag-plugs-disks-base-with-free-reef-glue-gel-awesome-aquatic-frag-plug-frag-plate-frag-disc-10-pack-24-mm-w-glue#:~:text=Standard%20plugs%20easily%20fit%20in%20various%20setups%20%28eggcrate%2C%20racks%2C%20live%20rock%29.)\n\nThis video explains how to remove the stem from a frag plug:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:38)\n1m[![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:39)\n![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:40)\nBulk Reef Supply - Saltwater Aquariums YouTube• Jan 17, 2022](https://www.youtube.com/watch?v=tWTdQ1YF5Ho&t=119)",
+              "items": [
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "Frag plugs are small, typically ceramic or aragonite bases used in reef tanks to hold coral fragments (frags) while they grow and attach, making it easier to propagate, arrange, or sell corals. They often feature a stem for insertion into frag racks and are designed to blend into reef rockwork. Common materials include inert, high-temperature fired ceramics for stability. YouTube +3",
+                  "markdown": "![Who Hates Frag Plugs? - ReefBum](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:14)\nFrag plugs are `small, typically ceramic or aragonite bases used in reef tanks to hold coral fragments (frags) while they grow and attach, making it easier to propagate, arrange, or sell corals` . They often feature a stem for insertion into frag racks and are designed to blend into reef rockwork. Common materials include inert, high-temperature fired ceramics for stability.[[1]](https://www.youtube.com/watch?v=oE9RzzhGwO4#:~:text=A%20frag%20plug%20is%20a%20base%20used,LPS%2C%20encrusting%20corals%2C%20or%20a%20natural%20look.)[[2]](https://www.amazon.com/Frag-Plugs-Disks-Awesome-Aquatic/dp/B0BMTLB8ND)[[3]](https://fragbox.ca/product-category/dry/fragging/frag-plugs/#:~:text=Frag%20plugs%20are%20used%20to%20make%20frags,Frag%20Saver%20%E2%80%93%20Ceramic%20Frag%20Plug%20Holder)[[4]](https://www.reefcreators.com/1000-Ceramic-Frag-Plugs_p_15.html)[[5]](https://www.aliexpress.com/s/wiki-ssr/article/frag-plug#:~:text=Frag%20plugs%20offer%20a%20durable%2C%20porous%20alternative,support%20successful%20coral%20propagation%20over%20extended%20periods.)",
+                  "links": null,
+                  "images": [
+                    {
+                      "type": "images_element",
+                      "alt": "Who Hates Frag Plugs? - ReefBum",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:15"
+                    }
+                  ],
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=oE9RzzhGwO4#:~:text=A%20frag%20plug%20is%20a%20base%20used,LPS%2C%20encrusting%20corals%2C%20or%20a%20natural%20look.",
+                      "title": "Over 30+ Different Types of Coral Frag Plugs Out There. How Do You ...",
+                      "text": "A frag plug is a base used to grow corals, with different types suited for SPS, LPS, encrusting corals, or a natural look."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Amazon.com",
+                      "domain": "www.amazon.com",
+                      "url": "https://www.amazon.com/Frag-Plugs-Disks-Awesome-Aquatic/dp/B0BMTLB8ND",
+                      "title": "Awesome Aquatic Ceramic Coral Frag Plugs/Disks/Base with Free Reef ...",
+                      "text": "About this Item. 100% AQUARIUM SAFE Solid High Quality Natural White Ceramic Frag Plugs will not create grit or dust. High Tempera..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Frag Box Corals",
+                      "domain": "fragbox.ca",
+                      "url": "https://fragbox.ca/product-category/dry/fragging/frag-plugs/#:~:text=Frag%20plugs%20are%20used%20to%20make%20frags,Frag%20Saver%20%E2%80%93%20Ceramic%20Frag%20Plug%20Holder",
+                      "title": "Frag Plugs Archives - Frag Box Corals",
+                      "text": "Frag plugs are used to make frags at home. They are made of 100% ceramic and are fully cured so they won't leach anything into you..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "ReefCreators",
+                      "domain": "www.reefcreators.com",
+                      "url": "https://www.reefcreators.com/1000-Ceramic-Frag-Plugs_p_15.html",
+                      "title": "1000 Ceramic Frag Plugs - ReefCreators",
+                      "text": "ReefCreators ceramic frag plugs are the perfect choice for your coral propagation needs. Ceramic unlike aragonite frag plugs do no..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "www.aliexpress.com",
+                      "domain": "www.aliexpress.com",
+                      "url": "https://www.aliexpress.com/s/wiki-ssr/article/frag-plug#:~:text=Frag%20plugs%20offer%20a%20durable%2C%20porous%20alternative,support%20successful%20coral%20propagation%20over%20extended%20periods.",
+                      "title": "The Ultimate Guide to Using Frag Plugs for Reef Tank Success",
+                      "text": "Frag plugs offer a durable, porous alternative to plastic for securing coral fragments, promoting healthier root development and r..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "This video explains the different types of frag plugs available: 1m BRStv - Saltwater Aquariums & Reef Tanks YouTube• Jul 2, 2021",
+                  "markdown": "This video explains the different types of frag plugs available:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:16)\n1m[![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:17)\n![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:18)\nBRStv - Saltwater Aquariums & Reef Tanks YouTube• Jul 2, 2021](https://www.youtube.com/watch?v=oE9RzzhGwO4&t=321)",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Key Features and Types",
+                  "text": "Materials: Primarily ceramic, aragonite, or concrete-based (Agrocrete). Shapes: Standard plugs with stems (typically 2 4 m m − 1 i n c h ) are common for rack insertion. Flat discs and frag rocks/rubble are used for a more natural look. Colors: Available in white, purple (to simulate coralline algae), and black. Porosity: Many are porous to encourage faster coral adhesion and bacterial growth.",
+                  "markdown": "- **Materials:** Primarily ceramic, aragonite, or concrete-based (Agrocrete).\n- **Shapes:** Standard plugs with stems (typically 2 4 m m−1 i n c h ) are common for rack insertion. Flat discs and frag rocks/rubble are used for a more natural look.\n- **Colors:** Available in white, purple (to simulate coralline algae), and black.\n- **Porosity:** Many are porous to encourage faster coral adhesion and bacterial growth.[[1]](https://www.youtube.com/watch?v=ic6XT7wvlws&t=4)[[2]](https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html)[[3]](https://www.saltwateraquarium.com/specialty/fragging/frag-plugs/)[[4]](https://www.amazon.com/Frag-Plugs-Disks-Awesome-Aquatic/dp/B0BMTLB8ND)[[5]](https://fragbox.ca/product-category/dry/fragging/frag-plugs/#:~:text=Frag%20plugs%20are%20used%20to%20make%20frags,Frag%20Saver%20%E2%80%93%20Ceramic%20Frag%20Plug%20Holder)[[6]](https://www.coralvue.com/1in-biological-frag-plugs-with-flat-top)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=ic6XT7wvlws&t=4",
+                      "title": "Frag Plugs That Help Grow Corals Faster? That's What Maxspect ...",
+                      "text": "Maxspect designed nanotech bio plugs as frag plugs or biomedia that potentially enhance coral growth. These plugs aim to offer mor..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Bulk Reef Supply",
+                      "domain": "www.bulkreefsupply.com",
+                      "url": "https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html",
+                      "title": "Frag Plugs & Disks",
+                      "text": "9lbs Reef Saver Frag Mount Dry Live Rock. $25.49 $29.99. Maxspect. Nano-Tech Bio-Plugs (1000 pcs) $439.99 $439.99. Aquaforest. AF ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "SaltwaterAquarium.com",
+                      "domain": "www.saltwateraquarium.com",
+                      "url": "https://www.saltwateraquarium.com/specialty/fragging/frag-plugs/",
+                      "title": "Specialty - Fragging - Frag Plugs - Page 1 - SaltwaterAquarium.com",
+                      "text": "Caribsea. 4.9. $16.02. LifeRock FragZone is the result of many requests to make popular LifeRock series in a small rubble size for..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Amazon.com",
+                      "domain": "www.amazon.com",
+                      "url": "https://www.amazon.com/Frag-Plugs-Disks-Awesome-Aquatic/dp/B0BMTLB8ND",
+                      "title": "Awesome Aquatic Ceramic Coral Frag Plugs/Disks/Base with Free Reef ...",
+                      "text": "About this Item. 100% AQUARIUM SAFE Solid High Quality Natural White Ceramic Frag Plugs will not create grit or dust. High Tempera..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Frag Box Corals",
+                      "domain": "fragbox.ca",
+                      "url": "https://fragbox.ca/product-category/dry/fragging/frag-plugs/#:~:text=Frag%20plugs%20are%20used%20to%20make%20frags,Frag%20Saver%20%E2%80%93%20Ceramic%20Frag%20Plug%20Holder",
+                      "title": "Frag Plugs Archives - Frag Box Corals",
+                      "text": "Frag plugs are used to make frags at home. They are made of 100% ceramic and are fully cured so they won't leach anything into you..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "CoralVue",
+                      "domain": "www.coralvue.com",
+                      "url": "https://www.coralvue.com/1in-biological-frag-plugs-with-flat-top",
+                      "title": "IceCap 1in Biological Frag Plugs with Flat Top, 25pcs - CoralVue",
+                      "text": "Why Biological Frag Plugs Are Superior to Traditional Plugs: * Enhanced Coral Bonding - Porous ceramic sphere construction provide..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "This video shows how to make your own frag plugs: 57s Niagara Fire Corals YouTube• Jul 5, 2025",
+                  "markdown": "This video shows how to make your own frag plugs:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:19)\n57s[![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:20)\n![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:21)\nNiagara Fire Corals YouTube• Jul 5, 2025](https://www.youtube.com/watch?v=V1PhT4j9Ar8&t=237)",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Common Uses",
+                  "text": "Fragging: Used to propagate SPS (Small Polyp Stony), LPS (Large Polyp Stony), and soft corals. Stability: Provides a solid, stable base for frags, preventing them from blowing away in tank currents. Marketplace: Used for selling or trading corals, with options like Ocean Wonders Ceramic Frag Plugs and Maxspect Nano-Tech Bio-Plugs popular in the industry. Maxspect Nano-Tech Bio-Plugs",
+                  "markdown": "- **Fragging:** Used to propagate SPS (Small Polyp Stony), LPS (Large Polyp Stony), and soft corals.\n- **Stability:** Provides a solid, stable base for frags, preventing them from blowing away in tank currents.\n- **Marketplace:** Used for selling or trading corals, with options like [[Ocean Wonders Ceramic Frag Plugs](https://www.google.com/search?q=Ocean+Wonders+Ceramic+Frag+Plugs&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQgK4QegYIAQgCEA8) ](https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html) and [Maxspect Nano-Tech Bio-Plugs](https://www.google.com/search?q=Maxspect+Nano-Tech+Bio-Plugs&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQgK4QegYIAQgCEBA) popular in the industry.[[1]](https://www.youtube.com/watch?v=ic6XT7wvlws&t=4)[[2]](https://www.amazon.com/Frag-Plugs-Disks-Awesome-Aquatic/dp/B0BMTLB8ND)[[3]](https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html)",
+                  "links": [
+                    {
+                      "type": "link_element",
+                      "title": "Ocean Wonders Ceramic Frag Plugs",
+                      "description": null,
+                      "url": "https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html",
+                      "domain": "www.bulkreefsupply.com"
+                    }
+                  ],
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=ic6XT7wvlws&t=4",
+                      "title": "Frag Plugs That Help Grow Corals Faster? That's What Maxspect ...",
+                      "text": "Maxspect designed nanotech bio plugs as frag plugs or biomedia that potentially enhance coral growth. These plugs aim to offer mor..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Amazon.com",
+                      "domain": "www.amazon.com",
+                      "url": "https://www.amazon.com/Frag-Plugs-Disks-Awesome-Aquatic/dp/B0BMTLB8ND",
+                      "title": "Awesome Aquatic Ceramic Coral Frag Plugs/Disks/Base with Free Reef ...",
+                      "text": "About this Item. 100% AQUARIUM SAFE Solid High Quality Natural White Ceramic Frag Plugs will not create grit or dust. High Tempera..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Bulk Reef Supply",
+                      "domain": "www.bulkreefsupply.com",
+                      "url": "https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html",
+                      "title": "Frag Plugs & Disks",
+                      "text": "9lbs Reef Saver Frag Mount Dry Live Rock. $25.49 $29.99. Maxspect. Nano-Tech Bio-Plugs (1000 pcs) $439.99 $439.99. Aquaforest. AF ..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "This video demonstrates how to mount corals on new frag plugs: 1m SeaTee Aquatics YouTube• Apr 5, 2024",
+                  "markdown": "This video demonstrates how to mount corals on new frag plugs:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:22)\n1m[![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:23)\n![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:24)\nSeaTee Aquatics YouTube• Apr 5, 2024](https://www.youtube.com/watch?v=5EBmcjDSJTs&t=88)",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Top Considerations",
+                  "text": "Curing: Some cement-based plugs may require curing to avoid pH spikes, while most ceramic options from brands like ReefCreators are inert and safe for immediate use. ReefCreators Algae Management: Darker colored or purple plugs are often preferred to reduce the visual impact of algae growth compared to bright white plugs. Size: Standard 1 - i n c h plugs fit most standard eggcrate rack systems.",
+                  "markdown": "- **Curing:** Some cement-based plugs may require curing to avoid pH spikes, while most ceramic options from brands like [ReefCreators](https://www.google.com/search?q=ReefCreators&csui=3&hl=en&gl=US&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc&ved=2ahUKEwjXuNOBlpGUAxWeIEQIHcILF3cQgK4QegYIAQgCEB8) are inert and safe for immediate use.\n- **Algae Management:** Darker colored or purple plugs are often preferred to reduce the visual impact of algae growth compared to bright white plugs.\n- **Size:** Standard 1-i n c h plugs fit most standard eggcrate rack systems.[[1]](https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html)[[2]](https://www.reefcreators.com/1000-Ceramic-Frag-Plugs_p_15.html)[[3]](https://www.bulkreefsupply.com/content/post/brstv-buyers-guide-to-frag-plugs#:~:text=As%20noted%20above%2C%20dark%20frag%20plugs%20will,of%20algae%20when%20compared%20to%20light-colored%20plugs.)[[4]](https://www.ubuy.com.jm/product/1R3H6JNQ-reefing-art-ceramic-coralline-purple-coral-frag-plugs-30-pack-tiles-for-sps-lps#:~:text=Question:%20What%20sizes%20are%20the%20ceramic%20frag,while%20fitting%20conveniently%20into%20standard%20frag%20racks.)[[5]](https://www.kosovo.ubuy.com/en/product/871JKBTQ6-ceramic-coral-frag-plugs-disks-base-with-free-reef-glue-gel-awesome-aquatic-frag-plug-frag-plate-frag-disc-10-pack-24-mm-w-glue#:~:text=Standard%20plugs%20easily%20fit%20in%20various%20setups%20%28eggcrate%2C%20racks%2C%20live%20rock%29.)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Bulk Reef Supply",
+                      "domain": "www.bulkreefsupply.com",
+                      "url": "https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html",
+                      "title": "Frag Plugs & Disks",
+                      "text": "9lbs Reef Saver Frag Mount Dry Live Rock. $25.49 $29.99. Maxspect. Nano-Tech Bio-Plugs (1000 pcs) $439.99 $439.99. Aquaforest. AF ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "ReefCreators",
+                      "domain": "www.reefcreators.com",
+                      "url": "https://www.reefcreators.com/1000-Ceramic-Frag-Plugs_p_15.html",
+                      "title": "1000 Ceramic Frag Plugs - ReefCreators",
+                      "text": "ReefCreators ceramic frag plugs are the perfect choice for your coral propagation needs. Ceramic unlike aragonite frag plugs do no..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Bulk Reef Supply",
+                      "domain": "www.bulkreefsupply.com",
+                      "url": "https://www.bulkreefsupply.com/content/post/brstv-buyers-guide-to-frag-plugs#:~:text=As%20noted%20above%2C%20dark%20frag%20plugs%20will,of%20algae%20when%20compared%20to%20light-colored%20plugs.",
+                      "title": "BRStv Buyers Guide To Frag Plugs - Bulk Reef Supply",
+                      "text": "As noted above, dark frag plugs will not grow algae as fast. The dark color absorbs aquarium light much better slowing down the gr..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Ubuy Jamaica",
+                      "domain": "www.ubuy.com.jm",
+                      "url": "https://www.ubuy.com.jm/product/1R3H6JNQ-reefing-art-ceramic-coralline-purple-coral-frag-plugs-30-pack-tiles-for-sps-lps#:~:text=Question:%20What%20sizes%20are%20the%20ceramic%20frag,while%20fitting%20conveniently%20into%20standard%20frag%20racks.",
+                      "title": "Ceramic Coralline Purple Coral Frag Plugs 30 Pack Jamaica | Ubuy",
+                      "text": "Question: What sizes are the ceramic frag plugs? Answer: Ceramic Frag Plugs usually come in standardized sizes, commonly around 1 ..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Ubuy Kosovo",
+                      "domain": "www.kosovo.ubuy.com",
+                      "url": "https://www.kosovo.ubuy.com/en/product/871JKBTQ6-ceramic-coral-frag-plugs-disks-base-with-free-reef-glue-gel-awesome-aquatic-frag-plug-frag-plate-frag-disc-10-pack-24-mm-w-glue#:~:text=Standard%20plugs%20easily%20fit%20in%20various%20setups%20%28eggcrate%2C%20racks%2C%20live%20rock%29.",
+                      "title": "Awesome Aquatic Ceramic Coral Frag Plugs/Disks/Base Kosovo | Ubuy",
+                      "text": "Standard plugs easily fit in various setups (eggcrate, racks, live rock)."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "This video explains how to remove the stem from a frag plug: 1m Bulk Reef Supply - Saltwater Aquariums YouTube• Jan 17, 2022",
+                  "markdown": "This video explains how to remove the stem from a frag plug:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:25)\n1m[![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:26)\n![](https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:27)\nBulk Reef Supply - Saltwater Aquariums YouTube• Jan 17, 2022](https://www.youtube.com/watch?v=tWTdQ1YF5Ho&t=119)",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                }
+              ],
+              "references": [
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=ic6XT7wvlws&t=4",
+                  "title": "Frag Plugs That Help Grow Corals Faster? That's What Maxspect ...",
+                  "text": "Maxspect designed nanotech bio plugs as frag plugs or biomedia that potentially enhance coral growth. These plugs aim to offer mor..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=oE9RzzhGwO4#:~:text=A%20frag%20plug%20is%20a%20base%20used,LPS%2C%20encrusting%20corals%2C%20or%20a%20natural%20look.",
+                  "title": "Over 30+ Different Types of Coral Frag Plugs Out There. How Do You ...",
+                  "text": "A frag plug is a base used to grow corals, with different types suited for SPS, LPS, encrusting corals, or a natural look."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Bulk Reef Supply",
+                  "domain": "www.bulkreefsupply.com",
+                  "url": "https://www.bulkreefsupply.com/saltwater-aquarium-fragging-supplies/frag-plugs-disks.html",
+                  "title": "Frag Plugs & Disks",
+                  "text": "9lbs Reef Saver Frag Mount Dry Live Rock. $25.49 $29.99. Maxspect. Nano-Tech Bio-Plugs (1000 pcs) $439.99 $439.99. Aquaforest. AF ..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "SaltwaterAquarium.com",
+                  "domain": "www.saltwateraquarium.com",
+                  "url": "https://www.saltwateraquarium.com/specialty/fragging/frag-plugs/",
+                  "title": "Specialty - Fragging - Frag Plugs - Page 1 - SaltwaterAquarium.com",
+                  "text": "Caribsea. 4.9. $16.02. LifeRock FragZone is the result of many requests to make popular LifeRock series in a small rubble size for..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Amazon.com",
+                  "domain": "www.amazon.com",
+                  "url": "https://www.amazon.com/Frag-Plugs-Disks-Awesome-Aquatic/dp/B0BMTLB8ND",
+                  "title": "Awesome Aquatic Ceramic Coral Frag Plugs/Disks/Base with Free Reef ...",
+                  "text": "About this Item. 100% AQUARIUM SAFE Solid High Quality Natural White Ceramic Frag Plugs will not create grit or dust. High Tempera..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "CoralVue",
+                  "domain": "www.coralvue.com",
+                  "url": "https://www.coralvue.com/1in-biological-frag-plugs-with-flat-top",
+                  "title": "IceCap 1in Biological Frag Plugs with Flat Top, 25pcs - CoralVue",
+                  "text": "Why Biological Frag Plugs Are Superior to Traditional Plugs: * Enhanced Coral Bonding - Porous ceramic sphere construction provide..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Bulk Reef Supply",
+                  "domain": "www.bulkreefsupply.com",
+                  "url": "https://www.bulkreefsupply.com/content/post/brstv-buyers-guide-to-frag-plugs#:~:text=As%20noted%20above%2C%20dark%20frag%20plugs%20will,of%20algae%20when%20compared%20to%20light-colored%20plugs.",
+                  "title": "BRStv Buyers Guide To Frag Plugs - Bulk Reef Supply",
+                  "text": "As noted above, dark frag plugs will not grow algae as fast. The dark color absorbs aquarium light much better slowing down the gr..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "ReefCreators",
+                  "domain": "www.reefcreators.com",
+                  "url": "https://www.reefcreators.com/1000-Ceramic-Frag-Plugs_p_15.html",
+                  "title": "1000 Ceramic Frag Plugs - ReefCreators",
+                  "text": "ReefCreators ceramic frag plugs are the perfect choice for your coral propagation needs. Ceramic unlike aragonite frag plugs do no..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Frag Box Corals",
+                  "domain": "fragbox.ca",
+                  "url": "https://fragbox.ca/product-category/dry/fragging/frag-plugs/#:~:text=Frag%20plugs%20are%20used%20to%20make%20frags,Frag%20Saver%20%E2%80%93%20Ceramic%20Frag%20Plug%20Holder",
+                  "title": "Frag Plugs Archives - Frag Box Corals",
+                  "text": "Frag plugs are used to make frags at home. They are made of 100% ceramic and are fully cured so they won't leach anything into you..."
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "images",
+              "rank_group": 1,
+              "rank_absolute": 2,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[2]",
+              "title": "Frac Plugs | Vertice Oil Tools",
+              "url": null,
+              "items": [
+                {
+                  "type": "images_element",
+                  "alt": "Frac Plugs | Vertice Oil Tools",
+                  "url": "https://verticeoiltools.com/frac-plugs/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:41"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "ReacXion Fully Dissolvable Frac Plugs | SLB",
+                  "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/frac-plugs-and-sleeves/frac-plugs/dissolvable-frac-plugs/reacxion-fully-dissolvable-frac-plug",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:42"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Scorpion™ Composite Frac Plug | Nine Energy Service",
+                  "url": "https://www.nineenergyservice.com/completion-tools/composites/scorpion",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:43"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "WellBoss | Frac Plugs",
+                  "url": "https://thewellboss.com/product_category/frac-plugs/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:44"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Frac Plugs | Copyright 2026 Innovex International, Inc. All ...",
+                  "url": "https://www.innovex-inc.com/our-products/well-completion/frac-plugs/",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:45"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "PurpleSeal™ Composite Frac Plug - Repeat Precision",
+                  "url": "https://www.repeatprecision.com/tools/purpleseal-composite-frac-plug",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:46"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Composite Frac Plugs | NOV",
+                  "url": "https://www.nov.com/products/composite-frac-plugs",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:47"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "FracXion Micro Fully Composite Frac Plug | SLB",
+                  "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/frac-plugs-and-sleeves/frac-plugs/fracxion-micro-fully-composite-frac-plug",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:48"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Behind the Tech: Scorpion",
+                  "url": "https://www.nineenergyservice.com/completion-tools/composites/scorpion",
+                  "image_url": "https://api.dataforseo.com/cdn/i/04282126-1032-0139-0000-40179c61b2a5:49"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Well Stimulation Technology: Dissolvable vs Composite Frac Plugs",
+                  "url": "https://info.stonewallco.com/blog/well-stimulation-technology-dissolvable-vs-composite-frac-plugs",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqVPQqOV6XCHSjGRNtXpH_ZyNDpxkPesJZKMJOyqXJJCJCfySALEIqbnc&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "5 Types of Frac Plugs You Could Be Using Downhole",
+                  "url": "https://www.repeatprecision.com/news/types-of-frac-plugs",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8OK_L6DF6LAeitc8cLRSFUqqb1O1LlosQMXk9KU-Aq9LSI78w98fSlEA&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Differences Between Dissolvable Frac Plugs And ...",
+                  "url": "https://www.wingoil.com/differences-between-dissolvable-frac-plugs-and-disintegrating-frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlEnqOCHo9crMOUe7lB8yu2YJhgDiO8wcFt5TetDNfYdR5ahHUGrbczfY&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Components of frac plug [4]. | Download Scientific Diagram",
+                  "url": "https://www.researchgate.net/figure/Components-of-frac-plug-4_fig1_309313674",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLu62DkoCB9H5viCK_VZP3wqttuVPTtKxYolUVZe-lPBIO1KU34nutCNk&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Frac Plugs | Copyright 2026 Innovex International, Inc. All ...",
+                  "url": "https://www.innovex-inc.com/our-products/well-completion/frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpCB67XnEkp5-rOupTUrmv_ZA7zULQnh62-pSc58zPic7dKfp0PWTNHIs&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Best API 11D1 Dissolvable Frac Plug for Hydraulic fracturing ...",
+                  "url": "https://www.landrilloiltools.com/api-11d1-dissolvable-bridge-plug-for-hydraulic-fracturing-product/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWs-cKwI5IWUqU0MVj0COwAEEzTYY9MNwC2P06XjIMqtWZZVvoiw5mpXk&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Improving efficiency is driving a new generation of frac plugs",
+                  "url": "https://www.worldoil.com/magazine/2020/january-2020/features/improving-efficiency-is-driving-a-new-generation-of-frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJaXIfAtu8Mwya1TNu6Tpx2NyiKC1sOSNIlb4PiG7fEOhAolrkpjvSoDA&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "TREX Lightning Frac Plugs | Packers Plus",
+                  "url": "https://www.packersplus.com/en/solutions/trex-lightning-frac-plugs",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgYzu1za-91SMHkjTFlHT2-dvcm_hM4itYEcamGT3Q0BsQPbtKpQuRAhg&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Frac Plugs | Vertice Oil Tools",
+                  "url": "https://verticeoiltools.com/frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRY7G2si7Ej0U_mMpJvF3-E8DseMeO2PIBe_ub67hTl9HjqvLryJCVZJCU&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Plugs – Frontier Oil Tools",
+                  "url": "https://frontieroiltools.com/completiontechnologies/plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxDbL__TZdT9YgrhSEG3oEOycOUnvHBNfd7C7i3xuXKDT_U1BDnFJizAo&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Nighthawk® Frac Plug - Tally Energy Services",
+                  "url": "https://www.tallyenergy.com/project/nighthawk-frac-plug/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQP3Pu_1-u5ZzHiC3hzg22_DpvhDsLKpya281bfPsnGiCHOb7iV6BBJWuc&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Composite Frac Plugs | NOV",
+                  "url": "https://www.nov.com/products/composite-frac-plugs",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDE3ug-0dkkcVYnTQsS61yfD5r3Wzdz9QJPY3M7IBoipI7-CmdOSSR7Mk&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "WellBoss | Frac Plugs",
+                  "url": "https://thewellboss.com/product_category/frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyn59rQDODuixoYi_eEcV7hMeX2wOROHh2vgno3R_DO8hS-9G-zJgjNJI&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Differences Between Dissolvable Frac Plugs And ...",
+                  "url": "https://www.wingoil.com/differences-between-dissolvable-frac-plugs-and-disintegrating-frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShRkPsPSBsQRFen9icFhMh2B_knbjYJWZyP_h_jo_xufHc0zT0VsMFFyg&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Best API 11D1 Dissolvable Frac Plug for Hydraulic fracturing ...",
+                  "url": "https://www.landrilloiltools.com/api-11d1-dissolvable-bridge-plug-for-hydraulic-fracturing-product/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB-VKRszhaRvOr0XDL0g_Tnu7tcZ1GHqQBNoGFv1Y6VT4VKm83lDpUxZ4&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Improving efficiency is driving a new generation of frac plugs",
+                  "url": "https://www.worldoil.com/magazine/2020/january-2020/features/improving-efficiency-is-driving-a-new-generation-of-frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRZbKbJMtN9FX3ktVK3ABXZEA_X9UrQ8_iT4uewhr1rxoxXju6B6X4hcc&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Composite Frac Plugs Optimize Costs In Plug-And-Perf Completions",
+                  "url": "https://www.aogr.com/magazine/cover-story/composite-frac-plugs-optimize-cost-capabilities-in-plug-and-perf-completion",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTm3jifK8JLkQ0f1UOBHbYl3I--t5jheM6NxpXHl3ltu5P5xrM97CwS3Lw&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Frac Plugs | Copyright 2026 Innovex International, Inc. All ...",
+                  "url": "https://www.innovex-inc.com/our-products/well-completion/frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy_5hB65_fWkRmoaz-ZSE6BNq0trwCQpQuUGzUhv2CtqvL_5AZcvAhM2E&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Composite and Dissolvable Frac Plugs | SLB",
+                  "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/frac-plugs-and-sleeves/frac-plugs",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5VRAOsenoNkCi4Reu2cDGIDqSfukQCDSjaj2o5rS7HdjwFP4vK24T2CM&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "PurpleSeal™ Composite Frac Plug - Repeat Precision",
+                  "url": "https://www.repeatprecision.com/tools/purpleseal-composite-frac-plug",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUn52OZKf7_Q8tTVLo0171IVow6nBforV4rzQIpwmsbvss1l12Ts_tO4I&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Differences Between Dissolvable Frac Plugs And ...",
+                  "url": "https://www.wingoil.com/differences-between-dissolvable-frac-plugs-and-disintegrating-frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM8uNjF2B9_iHe09JRpoPG06TuAGAln7pG1tg9dJ6JClw6gJ1gyH5D_aM&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "WellBoss | Frac Plugs",
+                  "url": "https://thewellboss.com/product_category/frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8n0MyYA2w8OKTm6-3G-ASWWBuYxQvhIYXzrXD8Nrt8qKx6CArGNR1zko&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Best API 11D1 Dissolvable Frac Plug for Hydraulic fracturing ...",
+                  "url": "https://www.landrilloiltools.com/api-11d1-dissolvable-bridge-plug-for-hydraulic-fracturing-product/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqNTrcP9f896EOp_2jDhvi_UiSBnD5OGWM9zWvgUSiYXuxu6CisRmfsho&s"
+                },
+                {
+                  "type": "images_element",
+                  "alt": "Frac Plugs | Vertice Oil Tools",
+                  "url": "https://verticeoiltools.com/frac-plugs/",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIxHA8Z5X9KpMxbPEM49vrXof94z2wjV_iNIjOKgobOkC87zYSE3zNKag&s"
+                }
+              ],
+              "related_image_searches": null,
+              "rectangle": null
+            },
+            {
+              "type": "people_also_ask",
+              "rank_group": 1,
+              "rank_absolute": 3,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]",
+              "items": [
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What is a frac plug?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://www.halliburton.com/en/completions/well-completions/frac-plugs",
+                      "domain": "www.halliburton.com",
+                      "title": "Composite and dissolvable frac plugs for downhole challenges",
+                      "description": "Halliburton frac plugs serve as check valves to provide wellbore zonal isolation in multistage stimulation treatments. They isolate the lower zone during stimulation but allow flow from below to aid in well cleanup once the stimulation is over.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What is the difference between a bridge plug and a FRAC plug?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://www.linkedin.com/posts/matthewcrump1_frac-plug-fact-bridge-plugs-vs-frac-plugs-activity-7301239798185213952-BbDc",
+                      "domain": "www.linkedin.com",
+                      "title": "Frac vs Bridge Plugs: Design, Benefits, and Selection - LinkedIn",
+                      "description": "🔑 Key Design Differences 🔹 Mandrel ID – Frac plugs have an open mandrel, while bridge plugs have a sealed mandrel with a permanent isolation mechanism inside. 🔹 Isolation Method – Frac plugs rely on a ball (either dropped or in place) for isolation, whereas a bridge plug's internal \"cork\" provides permanent isolation.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "How do dissolvable frac plugs work?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[3]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://www.youtube.com/watch?v=SsHWhjjC4W8",
+                      "domain": "www.youtube.com",
+                      "title": "Illusion® dissolvable frac plugs - Next generation ... - YouTube",
+                      "description": "This makes it one of the most reliable plugs on the market. As the plug is being set the compressive forces drive the slips up the wedge. And squeezes until both slips and element engage the casing.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What does a frac plug look like?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[4]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://www.youtube.com/watch?v=GX-yhj8dm4c",
+                      "domain": "www.youtube.com",
+                      "title": "Comparing Types of Composite Frac Plugs - YouTube",
+                      "description": "Device built into the plug. So as soon as the plug is set in your casing. Whenever you go to pump it engages that selfisolation device and you have instant isolation.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 1,
+              "rank_absolute": 4,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]",
+              "domain": "www.slb.com",
+              "title": "Composite and Dissolvable Frac Plugs",
+              "url": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/completions/well-completions/frac-plugs-and-sleeves/frac-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.slb.com › ... › Frac Plugs and Sleeves",
+              "website_name": "SLB",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Oct 22, 2022 — SLB frac plugs include several versatile isolation options to best suit your downhole requirements. Designed to optimize production from cased hole wells. Read more",
+              "pre_snippet": "10/22/2022 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "SLB frac plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2022-10-22 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 2,
+              "rank_absolute": 5,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+              "domain": "www.halliburton.com",
+              "title": "Composite and dissolvable frac plugs for downhole ...",
+              "url": "https://www.halliburton.com/en/completions/well-completions/frac-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.halliburton.com › well-completions › frac-pl...",
+              "website_name": "Halliburton",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Halliburton frac plugs isolate zones during stimulation and serve as check valves to provide wellbore zonal isolation in multistage stimulation treatments.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Halliburton frac plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 3,
+              "rank_absolute": 6,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]",
+              "domain": "ghdiv.com",
+              "title": "Frac Plugs Downhole Completion Tools",
+              "url": "https://ghdiv.com/frac-plugs-overview/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://ghdiv.com › frac-plugs-overview",
+              "website_name": "Yellow Jacket Oil Tools",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Dec 17, 2025 — Shortest top-set dissolvable frac plug on the market. Fully dissolves in 4-10 days, based on well conditions. No metal left behind. Read more",
+              "pre_snippet": "12/17/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Shortest top-set dissolvable frac plug on the market"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-12-17 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "video",
+              "rank_group": 1,
+              "rank_absolute": 7,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[10]/div[1]",
+              "items": [
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Halliburton",
+                  "title": "Illusion® dissolvable frac plugs - Next generation of ...",
+                  "timestamp": "2025-10-27 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=SsHWhjjC4W8"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Weatherford",
+                  "title": "TruFrac™ composite plug – the next generation frac plug",
+                  "timestamp": "2016-05-11 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=JqtbyZlQ_zY"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Halliburton",
+                  "title": "Illusion® Frac Plug Reduces Cost and Time of Plug Millout ...",
+                  "timestamp": "2021-03-04 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=4RoYtWSqp0I"
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 4,
+              "rank_absolute": 8,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[12]/div[1]/div[1]",
+              "domain": "www.matthewacrump.com",
+              "title": "Plug & Perf: How Traditional Frac Plugs Work",
+              "url": "https://www.matthewacrump.com/content/howplugswork",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.matthewacrump.com › content › howplugs...",
+              "website_name": "matthewacrump.com",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Dec 11, 2025 — For a frac plug, designed to only hold pressure from above, the lower slip will be designed to hold the full force of the frac and the upper ... Read more",
+              "pre_snippet": "12/11/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "designed to only hold pressure from above"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-12-11 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 5,
+              "rank_absolute": 9,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[14]/div[1]/div[1]",
+              "domain": "www.jjtamez.com",
+              "title": "Explained: Dissolvable Frac Plugs",
+              "url": "https://www.jjtamez.com/blog/explained-dissolvable-frac-plugs/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.jjtamez.com › News & Updates",
+              "website_name": "J&J Tamez LLC",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Jul 8, 2020 — A dissolvable frac plug-and-perf system uses degradable plugs rather than composite plugs to isolate zones during stimulation. Read more",
+              "pre_snippet": "07/08/2020 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "uses degradable plugs rather than composite plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2020-07-08 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "popular_products",
+              "rank_group": 1,
+              "rank_absolute": 10,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[16]/div[1]/div[1]/div[1]/g-card[1]",
+              "title": "Popular products",
+              "items": [
+                {
+                  "type": "popular_products_element",
+                  "title": "Baker Hughes 438 3.0 Quik Drill Composite Frac Plug H0e0128700",
+                  "description": "eBay - theliquidationco\nFree delivery",
+                  "more_sellers": false,
+                  "seller": "eBay - theliquidationco",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSWK3BrBOj4ytZe7ib5Icz2QTHCoP261lO8H_kfeiH4NdBDxkZQAMMKyqvODsH1EBgE7iSGnRHJGO50ipaXCpqoeDF8JWd_OeVWUuvw3g",
+                  "price": {
+                    "current": 148.95,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$148.95"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Iso Drill Frac Plug",
+                  "description": "eBay - mikes-merchandise",
+                  "more_sellers": false,
+                  "seller": "eBay - mikes-merchandise",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSw57nwSpf63S-8nSbah47sBl1_6GOQI8Qb3c1nvpxLIzmvuE5JdqmukHOFRi4lh7khF2fX-2yNal2qK1XlzgLL-jvVOY--e48En1CnLdr-gmJ0NSPbnRw",
+                  "price": {
+                    "current": 299.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$299.99 Pre-owned"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "2pcs Gfci Plug Replacement,Replacement Plug 2-Prong 15Amp 2-Wires Ground Fault Circuit Interrupter Safety Plug US Plug, Black",
+                  "description": "Walmart - aesthetic123\nFree delivery",
+                  "more_sellers": false,
+                  "seller": "Walmart - aesthetic123",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRpQmsyB1V5hrSqllQ8GtIJRD22WLteW-6E6nh_DrCa9zm4hXCRhtuF-SkgZgAWiUWtLFan06fYFgom3tgsxHpV0F35c5n0UirrCbC1wUKZuwQpC568EpbA",
+                  "price": {
+                    "current": 23.97,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$23.97"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Halliburton Obsidian 5-1/2\" Frac Plug Assembly",
+                  "description": "eBay",
+                  "more_sellers": false,
+                  "seller": "eBay",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRvSf5NCIG3jc6HqmvLtWPvTq5Hy49Y2J6Ztlu_NUBwBo-5ahxDZV3yZ8doeOREzit-utv3oMDWXKefyVh-UjjKAzsvSa00",
+                  "price": {
+                    "current": 1800,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$1,800.00 Pre-owned"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Evolv Frac Plug By GeoDynamics Part # EFP-55-106",
+                  "description": "eBay",
+                  "more_sellers": false,
+                  "seller": "eBay",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSgfGQCHwclA5yzsGzPkwWB3yj5_BDo5dW2jsORJNuGWykUXmPlJYRBOryUWEE5nq-U9-NbOUuuptJm0tOjIdU2cC3aYeI4xw",
+                  "price": {
+                    "current": 799.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$799.99 Pre-owned"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Better Homes & Gardens Dual Aroma Accents",
+                  "description": "Walmart & more",
+                  "more_sellers": true,
+                  "seller": "Walmart",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSgWCweGhFJHIvxvuJhWWOOKIlunxmjpvXJuoWPTrxc9xO3IuBUwbUTpQuwsg--XLfK_Ye7xXYQUGKRP4jBSecXfe155ME7X61iMNgzeGNzdTOAJyekH3JjDA",
+                  "price": {
+                    "current": 11.97,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$11.97"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 3,
+                    "votes_count": 2,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Yellow Jacket Oil Tools M1 Frac Plugs Dual Slip Fpdd.55.440.y.c.c",
+                  "description": "eBay - amen101230290614\nFree delivery",
+                  "more_sellers": false,
+                  "seller": "eBay - amen101230290614",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSRbs5N3WZFyFdP02q2jEhXxys-IRyhahFEL4XGGlqATENDvVXZyzUMcSpxVk5y6JwYYPbTm986mPw7OUPm73zPMW3VSDlC0O4cGXMcYsQ",
+                  "price": {
+                    "current": 999.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$999.99 Pre-owned"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Fracxion Fully Composite Frac Plug 104458483, 5-1/2 Micro (23-26.8)",
+                  "description": "eBay - epjohnson78",
+                  "more_sellers": false,
+                  "seller": "eBay - epjohnson78",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcToGWoZmHYqEv2g38Kb84MhpJuYAbeteA3C6nFqpNav_eMfKuaJbCVrtwNJa3uP8bEs6FNDskSCsSL-O9GvD4ap9ygCdJsR1d8SRYWgPQwe",
+                  "price": {
+                    "current": 785.85,
+                    "regular": 845,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$785.85 $845"
+                  },
+                  "rating": null
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 6,
+              "rank_absolute": 11,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[17]/div[1]/div[1]/div[1]",
+              "domain": "www.slb.com",
+              "title": "FracXion Micro Fully Composite Frac Plug | Video",
+              "url": "https://www.slb.com/videos/fracxion-micro-fully-composite-frac-plug",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.slb.com · Apr 16, 2020",
+              "website_name": "SLB",
+              "is_image": false,
+              "is_video": true,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Accelerate time to production with rapid millout and minimal debris size —including hollow metal button slips that shatter for easy removal ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "rapid millout and minimal debris size"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2020-04-16 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 7,
+              "rank_absolute": 12,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[19]/div[1]/div[1]",
+              "domain": "www.nov.com",
+              "title": "Composite Frac Plugs",
+              "url": "https://www.nov.com/products/composite-frac-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.nov.com › products › composite-frac-plugs",
+              "website_name": "National Oilwell Varco",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Our Setter composite frac plugs provide a dependable method for temporary zonal isolation during frac operations in horizontal completions.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "provide a dependable method for temporary zonal isolation"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 8,
+              "rank_absolute": 13,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[21]/div[1]/div[1]",
+              "domain": "www.vertechs.com",
+              "title": "Understanding Frac Plugs: A Key Component in Well ...",
+              "url": "https://www.vertechs.com/news-detail/understanding-frac-plugs-a-key-component-in-well-completion",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.vertechs.com › news-detail › understandin...",
+              "website_name": "Vertechs",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Oct 10, 2024 — A Frac Plug on the other hand is a tool employed during the fracturing operations of an oil and/or gas well. Also referred to as “fracking,” ... Read more",
+              "pre_snippet": "10/10/2024 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "a tool employed during the fracturing operations of an oil and/or gas well"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2024-10-10 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 1,
+              "rank_absolute": 14,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[2]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Dissolvable frac plugs",
+                "Composite frac plugs",
+                "Frac plugs Oil field",
+                "Schlumberger reaction frac plug",
+                "Halliburton frac plugs",
+                "Obsidian prime frac plug",
+                "Ball in place frac plug",
+                "Frac plug companies"
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 9,
+              "rank_absolute": 15,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "domain": "www.weatherford.com",
+              "title": "Composite Frac Plugs",
+              "url": "https://www.weatherford.com/well-construction-and-completions/sand-face-solutions/multistage-fracturing/composite-plugs/composite-frac-plugs/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.weatherford.com › multistage-fracturing",
+              "website_name": "Weatherford International",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The Resolve Minima frac plug is field proven to withstand temperatures up to 250°F (121°C) for challenging environments. Cuts circulation time. MILLS OUT Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "field proven to withstand temperatures up to 250°F (121°C"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 10,
+              "rank_absolute": 16,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+              "domain": "www.reddit.com",
+              "title": "Frac Plug Design : r/oilandgasworkers",
+              "url": "https://www.reddit.com/r/oilandgasworkers/comments/3pyiys/frac_plug_design/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "10+ comments  ·  10 years ago",
+              "website_name": "Reddit · r/oilandgasworkers",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "For those with experience using frac plugs, what design qualities do you like or dislike? Did you use anything that worked particularly well ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "what design qualities do you like or dislike"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 11,
+              "rank_absolute": 17,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]",
+              "domain": "verticeoiltools.com",
+              "title": "Frac Plugs",
+              "url": "https://verticeoiltools.com/frac-plugs/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://verticeoiltools.com › frac-plugs",
+              "website_name": "Vertice Oil Tools",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Vertice Oil Tools delivers the industry's most innovative frac plugs. Each plug is designed for peak performance and reliability across diverse frac ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Vertice Oil Tools delivers the industry's most innovative frac plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 12,
+              "rank_absolute": 18,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]",
+              "domain": "www.nov.com",
+              "title": "Composite Frac Plugs",
+              "url": "https://www.nov.com/products/composite-frac-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.nov.com › products › composite-frac-plugs",
+              "website_name": "National Oilwell Varco",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Our Setter composite frac plugs provide a dependable method for temporary zonal isolation during frac operations in horizontal completions.",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "provide a dependable method for temporary zonal isolation"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 13,
+              "rank_absolute": 19,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]/div[1]",
+              "domain": "www.slb.com",
+              "title": "FracXion Micro Fully Composite Frac Plug | Video",
+              "url": "https://www.slb.com/videos/fracxion-micro-fully-composite-frac-plug",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.slb.com · Apr 16, 2020",
+              "website_name": "SLB",
+              "is_image": false,
+              "is_video": true,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Accelerate time to production with rapid millout and minimal debris size —including hollow metal button slips that shatter for easy removal ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "rapid millout and minimal debris size"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2020-04-16 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 14,
+              "rank_absolute": 20,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+              "domain": "www.repeatprecision.com",
+              "title": "5 Types of Frac Plugs You Could Be Using Downhole",
+              "url": "https://www.repeatprecision.com/news/types-of-frac-plugs",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.repeatprecision.com › news › types-of-frac...",
+              "website_name": "Repeat Precision",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Feb 24, 2025 — Types of Frac Plugs: 5 Products That Are Changing the Frac'ing Game · 1. Composite Frac Plugs · 2. StageSaver · 3. Bridge Plug · 4. Dissolvable ... Read more",
+              "pre_snippet": "02/24/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "1. Composite Frac Plugs"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-02-24 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 15,
+              "rank_absolute": 21,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]/div[1]",
+              "domain": "www.innovex-inc.com",
+              "title": "Frac Plugs",
+              "url": "https://www.innovex-inc.com/our-products/well-completion/frac-plugs/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.innovex-inc.com › ... › Well Completion",
+              "website_name": "Innovex International",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The Innovex B3 Frac Plug, with its industry-leading dissolvable technology, offers a dependable, cost-effective dissolving frac plug optimized for zonal ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "offers a dependable, cost-effective dissolving frac plug"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 16,
+              "rank_absolute": 22,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]",
+              "domain": "eureka.patsnap.com",
+              "title": "What is a frac plug and how is it used?",
+              "url": "https://eureka.patsnap.com/article/what-is-a-frac-plug-and-how-is-it-used",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://eureka.patsnap.com › article › what-is-a-frac-plu...",
+              "website_name": "PatSnap Eureka",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Jun 20, 2025 — The primary function of a frac plug is to segment the wellbore, enabling the focus of fracturing efforts on specific sections. This selective ... Read more",
+              "pre_snippet": "06/20/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "to segment the wellbore"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-06-20 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 17,
+              "rank_absolute": 23,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+              "domain": "www.nineenergyservice.com",
+              "title": "Scorpion™ Composite Frac Plug",
+              "url": "https://www.nineenergyservice.com/completion-tools/composites/scorpion",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.nineenergyservice.com › ... › Composites",
+              "website_name": "Nine Energy Service",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "The Scorpion Composite Frac Plug combines reliable zonal operation with enhanced pumpdown efficiency. Adding a Dissolvable Pumpdown Ring dramatically reduces ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "reliable zonal operation with enhanced pumpdown efficiency"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 18,
+              "rank_absolute": 24,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]/div[1]",
+              "domain": "www.bakerhughes.com",
+              "title": "Frac plug milling services",
+              "url": "https://www.bakerhughes.com/integrated-well-services/integrated-intervention-and-production-enhancement-solutions/well-intervention/thrutubing-intervention/frac-plug-milling-services",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.bakerhughes.com › thrutubing-intervention",
+              "website_name": "Baker Hughes",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Frac plug milling services from Baker Hughes give you a full range of tools to effectively mill out every plug—from the toe to the heel of your lateral ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "effectively mill out every plug"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "popular_products",
+              "rank_group": 2,
+              "rank_absolute": 25,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[11]/div[1]/div[1]/div[1]/g-card[1]",
+              "title": "Popular products",
+              "items": [
+                {
+                  "type": "popular_products_element",
+                  "title": "(940A0009H01) Frick Cap Plug",
+                  "description": "Gartner Refrigeration",
+                  "more_sellers": false,
+                  "seller": "Gartner Refrigeration",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTAfWno7qVjv60HAO76iDSpDNf3hyuIuE9q7pIFBanebBe3wwL3nnKDC9Jlt5op0H1ycaR6uJysP_U7h2NgzFiHGLfVE7-LDA9oumYW1e3YnzqMd0mqofL9",
+                  "price": {
+                    "current": 0.15,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$0.15"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "7x Bubbletight Degradable Frac Plug For Check 110-109996-00-00 Corvus",
+                  "description": "eBay - racingrose44\nFree delivery by Mon",
+                  "more_sellers": false,
+                  "seller": "eBay - racingrose44",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRwi1ObA5XhHqPhNgI5sJNuDLYPOM2dX6H1fMPmUKSLfYDsDijWMZGre6govWmyBcR-A1IkVepu4Q8lfoOYMyuTe6gA1-4WczC8d8KQmjir",
+                  "price": {
+                    "current": 350,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$350.00"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Dixon HUMF200200CS by Valve | Boss LPS Frac Fitting Figure 200 Complete Male / Female Assembly 2\" Size Iron/Steel",
+                  "description": "HoseWarehouse.com",
+                  "more_sellers": false,
+                  "seller": "HoseWarehouse.com",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTSRCU9eg-tdOlyEECh1ToAUK9cv3NcA3N88_cjpaM8Qzji35fqL9W5ABuf4DI7r1Jm33TdLVjxjLqNxyDmuVKcftTJQIHgpBcHjXdBy5fULgUtfGYRoGXMWQ",
+                  "price": {
+                    "current": 206.92,
+                    "regular": 345,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$206.92 $345"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Silver Fox Completion Services Composite Frac Plug 4 1/2\", 10K 13.5-15.1",
+                  "description": "eBay - industrial.surplus.liquidators",
+                  "more_sellers": false,
+                  "seller": "eBay - industrial.surplus.liquidators",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTDDYr0EZjhNEXxPXAviJVpmeCRUEL2Lnihvh4wlnX5xeGym6toEZ8U04NDDLxNoDQ7hHu5AOPHkTDk40cnDIIYUlIaCzWCVVvUnIyZAuRj7-YKe63FzAx9",
+                  "price": {
+                    "current": 699.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$699.99"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Nine Energy Service Magnum 5.5\" Caged Ball Frac Plug 10k, 300°, 13-23",
+                  "description": "eBay - oneclickwarehouse\nFree delivery by Mon",
+                  "more_sellers": false,
+                  "seller": "eBay - oneclickwarehouse",
+                  "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQemlcxAHb2iAxqtYv2hjEnjClu2fHyMSOAlcEpiyNnrlZtNU4VJS6kCeXNNuEyn5A3Trxl410mrIqWNkmyZ5tNPE9eWR8du76NX_C9Xe7JIn3EWR5ncbIo",
+                  "price": {
+                    "current": 999.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$999.99"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "12FPX : AFP Flange Plug, Steel, Straight, 0.75 (3/4\") C62 Flange",
+                  "description": "OneHydraulics\nFree delivery on $200+",
+                  "more_sellers": false,
+                  "seller": "OneHydraulics",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQOVAyOu19ggO44g5cw1BYXdqgVkg6laLNOiJfH2luwezQd-ez48zBPmEaE4X1MR5CP1CfDdJ1WJeuwgcbc6xvjYXnEBTjkOV8EHnwX954j5qNl5PrFTTyxMQ",
+                  "price": {
+                    "current": 14.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$14.99"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "FDC Red Quick Plug Cast w/Spreaders Argco Plastic 2-1/2\" w/ Spreaders",
+                  "description": "GetPipe.com",
+                  "more_sellers": false,
+                  "seller": "GetPipe.com",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTmI3gDJSogkNWTRWVcMnpmt0fbNiD7l0Nh1g_sihJBWgh-OaF8kLsEJhHfgb8pWT3GrOclq7hvzQUEXxUVsJcIWIWjjnFTSiCdcolkM84RI4wWdSJKsu56",
+                  "price": {
+                    "current": 3.66,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$3.66"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "ARGCO Quick Plug Cast 2-1/2\" with Spreaders (Set of 2)",
+                  "description": "GetPipe.com & more",
+                  "more_sellers": true,
+                  "seller": "GetPipe.com",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTmI3gDJSogkNWTRWVcMnpmt0fbNiD7l0Nh1g_sihJBWgh-OaF8kLsEJhHfgb8pWT3GrOclq7hvzQUEXxUVsJcIWIWjjnFTSiCdcolkM84RI4wWdSJKsu56",
+                  "price": {
+                    "current": 12.37,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$12.37"
+                  },
+                  "rating": null
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "popular_products",
+              "rank_group": 3,
+              "rank_absolute": 26,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[12]/div[1]/div[1]/div[1]/g-card[1]",
+              "title": null,
+              "items": [
+                {
+                  "type": "popular_products_element",
+                  "title": "149-040 - Fratco Inc. 4\" Perf. End Plug",
+                  "description": "Lee Supply Corp",
+                  "more_sellers": false,
+                  "seller": "Lee Supply Corp",
+                  "image_url": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRHk3zbZ7unGKNiXsJtCYi4_JI49ziGPZHaazq_lf9g4Oq0fm9-Az2ayNtxKkOCI_FLRLZhCzgemVyRJHa02lAk1u_ME8M0qmwljLBvZQhPK_GEZqi5GWSBDg",
+                  "price": {
+                    "current": 1.35,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$1.35"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "150-060 - Fratco Inc. 6\" Drainage End Plug",
+                  "description": "Lee Supply Corp",
+                  "more_sellers": false,
+                  "seller": "Lee Supply Corp",
+                  "image_url": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTYPSsY9i2LI69RfL1UDe8gr1muWVZi4g8KGML7UdZ68h-2ZNIQ20fQgeuX7BtA-0V8IRxdK2TA-7EbEEbrkiZhQ1kDJ4qimUw-3rLm1R_fp5JcZl9qe1mhcQ",
+                  "price": {
+                    "current": 1.52,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$1.52"
+                  },
+                  "rating": null
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Air Wick Scented Oil Air Freshener Warmer",
+                  "description": "eBay - camven_5 & more",
+                  "more_sellers": true,
+                  "seller": "eBay - camven_5",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ2fkZR6ts2wngeoMIljFdFu4yX04cn1tVmp6hvXSsL-kC6xS_j_AnO-qAM2Gs3Yfcr06HoddFs_xposNmQs13bQcLB5gzGlx3Sx6p5oqgxXMBpmE5waxJH",
+                  "price": {
+                    "current": 3.99,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$3.99"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 4.2,
+                    "votes_count": 1600,
+                    "rating_max": 5
+                  }
+                },
+                {
+                  "type": "popular_products_element",
+                  "title": "Yankee Candle Midsummer's Night ScentPlug Refill 2-Pack",
+                  "description": "eBay - yilingcp & more",
+                  "more_sellers": true,
+                  "seller": "eBay - yilingcp",
+                  "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSGqO6TxwSUd8Kelr2-HAEUwpvqIaWT003vWcOBQaGx8NRWK9JZFCxV1x5Xj25Em4AdNIrMhbofAnUKrIRLi9Hh6AJjM9RDrH-Ma5yHYIXVEKUxcXADHEuPooY",
+                  "price": {
+                    "current": 7.9,
+                    "regular": null,
+                    "max_value": null,
+                    "currency": "USD",
+                    "is_price_range": false,
+                    "displayed_price": "$7.90"
+                  },
+                  "rating": {
+                    "rating_type": "Max5",
+                    "value": 4.6,
+                    "votes_count": 972,
+                    "rating_max": 5
+                  }
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 2,
+              "rank_absolute": 27,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[3]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Dissolvable frac plugs",
+                "Composite frac plugs",
+                "Frac plugs Oil field",
+                "Schlumberger reaction frac plug",
+                "Halliburton frac plugs",
+                "Ball in place frac plug",
+                "Obsidian prime frac plug",
+                "Frac plug companies"
+              ],
+              "rectangle": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
