@@ -1,80 +1,145 @@
-# Learnings Journal
+# Learnings Journal — Green Llama Clean
 
 > Auto-maintained by Agentic OS skills. Newest entries at the bottom of each section.
 > Skills append here after deliverable feedback. Never delete entries.
 > Section headings match skill folder names exactly. New skills add their own section when created.
 > Skills read only their own section before running. Cross-skill insights go in `general`.
 
+---
+
 # General
+
 ## What works well
 
-- 2026-04-22: Voice discipline is enforced, not preferred. Every publishable text output runs through `tool-humanizer` and must pass Core Standards Phase 8 banned-phrase scan before saving. See `docs/ROI-LIVE-Agency-Core-Standards-v1_1.md`.
-- 2026-04-22: Receipts, not generalities. Any claim about outcomes, benchmarks, or results should carry a client name (if cleared), a date, and a number. If the data isn't available, name the gap rather than invent directional confidence.
-- 2026-04-22: Peer-to-peer register. Jason is an operator, not an end user. No coaching tone, no hedging, no explaining-the-basics unless he asked. Tradeoffs named in dollars, timeline, or opportunity cost.
-- 2026-04-22: Cross-industry is the house move. A cross-vertical analog (e-commerce principle applied to HVAC, pool-builder math applied to DTC) usually lands harder than an abstract principle stated alone.
+- 2026-04-29: Treat GLC blog content as YMYL-adjacent. The audience touches children, vulnerable populations, and chemical safety. Apply Core Standards §4.5 elevated review, ChemExpo / EWG / PubChem / EPA Tier 1 sourcing, and the agency Citation Discipline SOP three-level review chain (Author → Matt → Kay).
+- 2026-04-29: Em-dashes are fully banned anywhere in GLC editorial. Use spaced en-dash or restructure. Stricter than Core Standards §8.2 baseline. Also a strong AI-detection countermeasure since LLMs over-produce em-dashes.
+- 2026-04-29: "We" is permitted in body copy (DTC override per Core §3.4). Kay and Matt are named explicitly at attribution moments: every key data claim, every Expert Take, every FAQ answer.
+- 2026-04-29: Voice Charter v5.0 emotional-targeting framework (fear · guilt · belonging · pride · joy) is NOT active for blog editorial. Charter applies to social and brand-campaign channels only. Bake this rule into every skill that loads voice context for GLC.
+
+### From the source package — Key Learnings (folded in)
+
+#### On data integrity
+
+- Shopify analytics defaults to period-over-period, not year-over-year. Verify YoY math against prior-year same-period figures. A YoY misread inflated one dashboard metric by 600%+.
+- Returning customer rate is order-level by Shopify default, not customer-level. Always label which view is being used.
+- Tilde (`~`) prefix means derived (calculated, not pulled directly). Asterisk (`*`) on MER figures with footnote noting calculation scope.
+- Chart.js fails silently in hidden tab contexts: canvas inside an inactive tab renders to zero height. Use inline SVG or initialize charts only when the tab activates.
+
+#### On content quality
+
+- Hallucinated citations are existential to the brand. Kay flagged this on the March 20, 2026 call. The `[STAT NEEDED]` flag is the response: never invent a statistic, always flag uncertainty for human review.
+- Tier 1 sourcing with real, verifiable URLs is required. EPA, NIH, peer-reviewed studies, EWG, recognized industry bodies. Generic .org sources do not count.
+- Quantity vs. quality is a real tradeoff. Four articles per week compresses quality control. Verified sources, tighter review, clear escalation when something looks off pre-publish.
+- A 30-minute alignment call between Jason's family member and the GLC team solves more than weeks of post-hoc corrections.
+
+#### On SEO and topical authority
+
+- Core update drops signal cluster gaps, not pillar weakness. When a site reaches #3 then drops after a Google core update, the pillar is rarely the problem. The cluster is missing intent angles.
+- Four jobs-to-be-done for "non toxic cleaning products": (1) understand what the term means, (2) get a vetted product list by category, (3) confirm products work, (4) switch a routine.
+- Cross-cluster link funneling. Articles in adjacent clusters should link to the pillar of the cluster being prioritized for ranking recovery.
+- Anchor text matters more than people think. Swapping generic anchors for exact-match anchors is one of the highest-leverage cluster interventions.
+- Publish order: definitional → freshness → credibility → utility. For the six-article fill: definitional anchor → 2026 buyer's guide → "do they work" → room-by-room → transition → audience-specific. Spaced 5–7 days apart.
+
+#### On email/SMS performance
+
+- Click rate is the structural bottleneck. Open rates 30–37% paired with click rates 0.5–0.7% point to email body design and CTA placement, not subject lines or audience quality.
+- Win-back outperforms everything else per recipient. April Lap Re-engage hit $34.49 RPR vs. campaign average $0.07: a 492x productivity difference.
+- Segment-specific sends beat broadcast. April VIP and ACT-targeted emails pulled 36–43% open rates vs. 30–31% for ALL SUBS.
+- SMS click rate is 6–9x email click rate. SMS carries every deadline and flash offer.
+- Above-the-fold CTA within 150 words. Single biggest structural fix.
+- Triple CTA structure: primary button at top → secondary text link mid-email → primary button repeat at close.
+- Image-resistant CTA. Gmail and Outlook block images by default. Primary CTA must render as HTML text and a button, not an embedded image.
+
+#### On client communication
+
+- Address bad news directly in writing. Soften nothing material. Acknowledge the problem in specific terms ("hallucinated citations," not "quality issues").
+- Recap meetings in the order they happened. Topic-by-topic recap that mirrors meeting flow gives the client a single forwardable document.
+- Owners and dates on every action item. Concrete dates, never relative.
+- Data points anchored to source. Cite where the metric came from (Shopify, Klaviyo, GSC).
+
+#### On revenue trajectory modeling
+
+- Five levers to $30K/mo: paid ads (~$5,500/mo at maturity, 3-month ramp), Klaviyo consistent cadence (~$2,300/mo, immediate), AOV/CVR optimization (~$2,200/mo, 3-month ramp), subscription growth (~$2,390/mo at +10% subscriber growth), SKIO migration retention (~$800/mo, month 4+).
+- Baseline organic growth ~2.5%/mo compound in plateau phase. Hits $30K naturally in back half of 2027.
+- All levers stacked: $30K reachable in 12–14 months with realistic ramp curves.
+- New customer AOV ($44.74) exceeds returning customer AOV ($38.91). Untapped upsell opportunity in moving returning customers back toward bundle/add-on purchases.
+
+#### On client relationships
+
+- Jason's family member needs guardrails, not removal. The path is: verified sources required, tighter review, alignment call between the family member and the GLC team.
+- Bot/international traffic distorts CVR. Cloudflare + Turnstile + Signifyd is the recommended stack.
+- The "Build Your Bundle" button is a CRO problem. Placement, color, discount label all need updating on desktop. Mobile is constrained by the hamburger menu.
+- Subscription platform migration is time-sensitive. Moving from Seal to SKIO gets harder as the subscriber base grows.
 
 ## What doesn't work well
 
+- 2026-04-29: Voice Charter v5.0 fear/guilt emotional triggers in blog content. Out of step with FTC Green Guides substantiation standards and AEO citation patterns. Don't use in editorial.
+- 2026-04-29: Three-item rhetorical lists ("Purpose. Clarity. Impact." pattern). Banned per Core §8.2. Three-item factual enumerations (acidic/alkaline/neutral; proteases/amylases/lipases) are permitted. See clarification logged 2026-04-29.
+
+---
 
 # Individual Skills
+
 ## mkt-brand-voice
 
-- 2026-04-22: Source-of-truth hierarchy for ROI.LIVE voice work. When running brand-voice, import from existing docs in priority order: (1) deployed homepage HTML, (2) Signal SOP v2 Phase 5.2, (3) Core Standards v1.1 Phase 8 (banned phrases), (4) Client Parameter Sheet voice-profile section. Don't re-extract from scratch — the existing docs are more complete than any interview would produce.
-- 2026-04-22: Experience numbers unsettled. Signal SOP says "30+ years," Jason said "18 years / 55+ industries" in /start-here. Voice profile defaults to 18 / 55+ as the more recent / specific. Confirm before external use.
+- 2026-04-29: When loading GLC voice, use this hierarchy: (1) `voice-profile.md` index, (2) `sops/GL_Editorial_Overlay_v1.md` rule layer, (3) `voice-profile-full.md` for deep reference. Do NOT load `reference/voice-charter-v5.md` for blog editorial: Charter applies to non-blog channels only.
 
 ## mkt-positioning
 
-- 2026-04-22: Primary angle = "The Unified Strategy + Execution Operator" — Jason holds the CMO seat AND owns the agency executing against it. Secondary hooks: Receipt Keeper, Operator-Not-Pundit, Quiet Part Out Loud, Cross-Industry Pattern-Finder. See `brand_context/positioning.md` for the full angle map.
-- 2026-04-22: Full competitive search not yet run. Current positioning is built from Jason's own category description, not scraped competitor headlines. Re-run with a proper competitor list when a campaign needs sharper white-space claims.
+- 2026-04-29: GLC primary angle = "Science-led non-toxic cleaning, formulated by a chemist." Founder-credentialed E-E-A-T (Kay's OT, Matt's Ph.D.) is the strongest differentiator. Refillable + EWG Verified + Women-Owned + Tennessee manufacturing are the supporting pillars.
 
 ## mkt-icp
 
-- 2026-04-22: Three-segment ICP structure. Primary is a composite founder profile; three distinct segments under it — e-commerce ($0-3M scaling to 7-figures+), local service (HVAC / landscaping / pool / home contractor, $1-5M scaling to $5-15M+), B2B (service or product-led, $10K-$250K deal sizes). Per-segment voice variants worth building when a campaign or landing page needs to hit one.
+- 2026-04-29: Three-segment ICP by need state, not demo. Primary: health-first parents. Secondary: eco-conscious lifestyle buyers. Tertiary: sensitivity / health-condition driven (asthma, dermatitis). Cross-segment language: "plant- and mineral-based," "EWG Verified," "free from [specific named chemicals]," "compostable," founder credentials.
+
+## mkt-copywriting
+
+## mkt-content-repurposing
+
+## mkt-ugc-scripts
+
+## str-trending-research
+
+## str-ai-seo
+
+- 2026-04-29: For GLC, AEO content runs through agency Citation Discipline SOP. Inline citation hooks ("According to EPA data...", "[Author year] found...") are mandatory: they're the AEO mechanism for source attribution. Hookless claims are extractable but not traceable to source.
+
+## tool-humanizer
+
+- 2026-04-29: GLC has em-dash full ban (stricter than Core baseline). Run `tool-humanizer` deep mode with the GLC overlay loaded; the em-dash check is an additional pass on top of standard Stop Slop scan.
+
+## tool-firecrawl-scraper
+
+## tool-stitch
+
+## tool-dataforseo
+
+- 2026-04-29: GLC's existing topical map and entity-SEO strategy live in `brand_context/reference/`. New keyword research for GLC verifies against the existing cluster plan first; new clusters expand from the eight existing clusters (Eco-Friendly Cleaning, Natural Cleaning Products, Conscious Consumer's Guide, Performance Lab, Sustainable Laundry Room, Symptom Bridge, Toxicology Report, Zero Waste Kitchen) plus the planned six (R1-R6).
+
+## tool-youtube
+
+## viz-nano-banana
+
+- 2026-04-29: GLC image hard rules: NO liquid bottles, NO plastic packaging, NO product mockups unsupported by verified product data, NO text overlay in AI-generated images. USE: natural materials, botanicals, abstract/architectural visuals, powder textures, clean fabrics. The brand is anti-liquid as a model: depicting liquid contradicts the brand identity.
+
+## viz-ugc-heygen
+
+## viz-stitch-design
+
+## viz-interface-design
+
+- 2026-04-29: GLC design system is documented in `brand_context/assets.md`. Greens scale (g0-g9), earth-tone accents (sage / kraft / terra / amber / cream), Playfair Display + DM Sans, max width 780px. Component class inventory present: .hero, .stats, .aeo, .gw, .dim, .sc, .tl, .co, .voice, .cta, .faq, .cn, .qs, .fail, .rel, .prod, .sticky-bar.
+
+## viz-excalidraw-diagram
 
 ## meta-skill-creator
 
 ## meta-wrap-up
 
-## tool-firecrawl-scraper
-
-- 2026-04-22: API key not configured. When any skill triggers Firecrawl, check `.env` for `FIRECRAWL_API_KEY` first. If absent, fall back to WebFetch and flag the gap. Adding the key unlocks roi.live auto-scraping for visual brand assets via Firecrawl branding extraction.
-
-## str-ai-seo
-
-- 2026-04-22: For any ROI.LIVE-branded AEO/AI-SEO work, use Signal SOP Phase 7 + Core Standards Phase 7 as the ruleset, not generic AEO best practices. Casey Keith entity rules (ROI.LIVE bolded 25+ times per pillar, Jason Spencer named 12-18×, zero bare "we," banned-phrase scan) are non-negotiable.
-
-## str-trending-research
-
-## viz-nano-banana
-
-## viz-ugc-heygen
-
-## mkt-ugc-scripts
+## meta-goal-breakdown
 
 ## ops-cron
 
-## mkt-content-repurposing
-
-## mkt-copywriting
-
-## tool-humanizer
-
-- 2026-04-22: Mandatory gate for ROI.LIVE publishable output. Every skill producing text for publication under the ROI.LIVE brand runs output through tool-humanizer before saving. Use `deep` mode (voice-profile loaded). Skip only for research briefs, ICP docs, positioning docs, and internal-only artifacts.
-
-## tool-youtube
-
-## viz-excalidraw-diagram
-
-## viz-interface-design
-
-## tool-stitch
-
-## viz-stitch-design
-
 ## ops-new-feature
 
-- 2026-04-14: Added quick-fix mode (`--quick`) for trivial one-file changes. Express branch lifecycle — create, commit, merge, delete in one flow.
-
 ## ops-release
-
-- 2026-04-14: Added dev→main PR promotion step after tagging. Uses `gh pr create` and optionally `gh pr merge`. Non-blocking — user can decline.

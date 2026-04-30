@@ -457,7 +457,7 @@ These bans apply to every piece of content produced by ROI.LIVE for any client. 
 - Dramatic one-word fragment sentences ("Purpose. Clarity. Impact.")
 - Negative listings ("Not because X. Because Y.")
 - Rhetorical questions answered in the next sentence
-- Three-item rhetorical lists (use two, or expand to five or more factual items)
+- Three-item rhetorical lists. Banned target: pattern-of-three constructions used for emphasis or cadence rather than factual completeness (e.g., "Purpose. Clarity. Impact."; "Smarter, faster, stronger."). Permitted: factual enumerations of three where three is the natural and complete count (e.g., acidic / alkaline / neutral pH categories; solid / liquid / gas states of matter; proteases / amylases / lipases enzyme types). Test: if removing or replacing the third item would harm factual completeness, the list is factual and permitted. If the third item reinforces the first two rhetorically without adding new information, the list is rhetorical and banned — restructure to two items, or expand to five or more.
 - Em-dash reveal structures (em-dash followed by a punchy payoff)
 - Pull-quote-ready sentences written to be screenshot
 
@@ -1001,6 +1001,9 @@ Supporting documents:
 ---
 
 *Version 1.1 — April 2026 — ROI.LIVE / Jason Spencer*
+
+*v1.1 clarification appended 2026-04-29:*
+*§8.2 Three-item list rule clarified to distinguish rhetorical pattern-of-three constructions (banned) from factual enumerations of three (permitted). Triggered by Green Llama Clean onboarding conflict review.*
 
 *Changes from v1.0:*
 *Added Phase 4 — E-E-A-T Framework with Experience, Expertise, Authoritativeness, and Trust signal requirements, YMYL content handling, trust policy documents, and author bio page requirements.*

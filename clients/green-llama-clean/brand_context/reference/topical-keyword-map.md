@@ -1,0 +1,91 @@
+# Green Llama Clean: Topical Keyword Map & Clusters
+#### **Pillar 1: Eco-Friendly Laundry Solutions (Bottom-of-Funnel)**
+This pillar targets high-intent customers actively searching for the products we sell. These are our "money" keywords, and ranking for them is a primary objective. The content here will be conversion-focused, highlighting product benefits and direct comparisons.
+- **Cluster 1.1: Laundry Detergent Sheets (Core Product)**
+  - **Intent:** High Commercial Intent. Users are looking to purchase or are in the final stages of consideration.
+  - **Sample Keywords:**
+    - `laundry detergent sheets`
+    - `laundry sheets`
+    - `detergent sheets`
+    - `best laundry detergent sheets`
+    - `plant-based laundry sheets`
+    - `laundry detergent sheets for sensitive skin`
+    - `zero waste laundry detergent sheets`
+    - `laundry sheets vs liquid`
+- **Cluster 1.2: Wool Dryer Balls (Secondary Product)**
+  - **Intent:** High Commercial & Informational Intent. Users are looking to buy or learn about the benefits over traditional dryer sheets.
+  - **Sample Keywords:**
+    - `wool dryer balls`
+    - `natural fabric softener`
+    - `reusable dryer sheets`
+    - `wool dryer balls benefits`
+    - `how to use wool dryer balls`
+    - `dryer balls vs dryer sheets`
+    - `best wool dryer balls`
+- **Cluster 1.3: Plastic-Free & Sustainable Laundry (Problem/Solution)**
+  - **Intent:** Informational & Commercial. This cluster targets the core pain point of our ICP: plastic waste and environmental harm.
+  - **Sample Keywords:**
+    - `plastic-free laundry detergent`
+    - `zero waste laundry`
+    - `eco-friendly laundry detergent`
+    - `sustainable laundry products`
+    - `refillable laundry detergent`
+    - `biodegradable laundry detergent`
+    - `how to have a zero waste laundry room`
+#### **Pillar 2: Non-Toxic Home & Ingredients (Mid-Funnel)**
+This pillar establishes our authority and trust by addressing a primary motivation of our audience: creating a clean, green, and healthy home free from harmful toxins.
+- **Cluster 2.1: Harmful Chemicals in Detergent (Problem Awareness)**
+  - **Intent:** Informational. Users are aware of a problem (toxins) and are seeking to understand it better.
+  - **Sample Keywords:**
+    - `toxic chemicals in laundry detergent`
+    - `is laundry detergent harmful`
+    - `phthalates in detergent`
+    - `1,4-dioxane in cleaning products`
+    - `synthetic fragrances side effects`
+    - `ingredients to avoid in laundry detergent`
+- **Cluster 2.2: Sensitive Skin & Hypoallergenic Solutions (Niche Audience)**
+  - **Intent:** High Informational & Commercial. Targets a specific segment of our ICP looking for gentle, safe alternatives.
+  - **Sample Keywords:**
+    - `best laundry detergent for sensitive skin`
+    - `hypoallergenic laundry detergent`
+    - `unscented laundry detergent`
+    - `plant-powered laundry detergent`
+    - `detergent for eczema`
+    - `what is the most natural laundry detergent`
+#### **Pillar 3: Zero-Waste & Sustainable Living (Top-of-Funnel)**
+This pillar expands our reach beyond laundry to capture the broader lifestyle and values of our target audience. This is how we build community, drive top-of-funnel awareness, and become a trusted resource for the entire eco-conscious movement.
+- **Cluster 3.1: The Problem with Plastic Waste (Mission-Alignment)**
+  - **Intent:** High Informational. We align with our audience's mission to protect the planet by educating them on the "why" behind our products.
+  - **Sample Keywords:**
+    - `impact of plastic on the environment`
+    - `microplastics from laundry`
+    - `how to reduce plastic waste`
+    - `why go plastic-free`
+    - `laundry detergent plastic jugs`
+- **Cluster 3.2: Eco-Friendly Home Tips (Value-Add Content)**
+  - **Intent:** Informational. Provides value and builds brand loyalty by helping users live more sustainably in all aspects of their lives.
+  - **Sample Keywords:**
+    - `sustainable living tips`
+    - `zero waste kitchen ideas`
+    - `eco-friendly bathroom swaps`
+    - `how to start a low-waste lifestyle`
+    - `natural cleaning hacks`
+#### **Pillar 4: Brand & Authority (All Funnel Stages)**
+This pillar is designed to capture searches for our brand, our unique narrative, and direct comparisons against competitors. It's about owning our space and our story.
+- **Cluster 4.1: Branded & Comparative Search (Bottom-of-Funnel)**
+  - **Intent:** Navigational & Highest Commercial Intent. Users are looking for us specifically or are making a final purchase decision.
+  - **Sample Keywords:**
+    - `Green Llama Clean`
+    - `Green Llama Clean reviews`
+    - `Green Llama laundry sheets`
+    - `Green Llama Clean vs Earth Breeze`
+    - `Green Llama vs Tru Earth`
+    - `best laundry sheets reviews`
+- **Cluster 4.2: Llaina the Llama & Positive Cleaning (Brand Story)**
+  - **Intent:** Informational & Brand Affinity. This is a unique strategic imperative for us. We will build a universe of content around our mascot and core marketing concept to create a powerful bond with our audience.
+  - **Sample Keywords:**
+    - `Llaina the Green Llama`
+    - `Positive Cleaning`
+    - `eco-friendly mascot`
+    - `Green Llama superhero story`
+    - `what is positive cleaning`
