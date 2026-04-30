@@ -1,0 +1,39 @@
+# 27 unique keywords for AC repair cluster — Coastal Air Plus, 2026-04-30
+# Run at US national (location_code 2840) per Step 3 decision.
+# Original spec called for two-pass local; DataForSEO Labs only accepts country
+# codes, so all 27 unique keywords go through one US pass.
+
+# Symptom spokes (8) — spec_geo: Both
+ac not cooling
+ac blowing warm air
+ac frozen
+ac leaking water
+ac making strange noises
+ac short cycling
+ac won't turn on
+ac running but no air from vents
+
+# Brand spokes (6) — spec_geo: Both
+trane ac repair
+carrier ac repair
+goodman ac repair
+lennox ac repair
+rheem ac repair
+york ac repair
+
+# Summerville neighborhood spokes (7) — spec_geo: Summerville
+ac repair cane bay
+ac repair nexton
+ac repair summers corner
+ac repair wescott plantation
+ac repair knightsville
+ac repair carnes crossroads
+ac repair historic downtown summerville
+
+# Charleston neighborhood spokes (6) — spec_geo: Charleston
+ac repair mount pleasant sc
+ac repair daniel island
+ac repair james island
+ac repair west ashley
+ac repair johns island
+ac repair north charleston

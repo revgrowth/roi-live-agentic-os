@@ -1,0 +1,29 @@
+# Summerville, SC pass — location_code 1025666
+# 8 symptom + 6 brand + 7 Summerville neighborhood = 21 keywords
+
+# Symptom spokes (shared)
+ac not cooling
+ac blowing warm air
+ac frozen
+ac leaking water
+ac making strange noises
+ac short cycling
+ac won't turn on
+ac running but no air from vents
+
+# Brand spokes (shared)
+trane ac repair
+carrier ac repair
+goodman ac repair
+lennox ac repair
+rheem ac repair
+york ac repair
+
+# Summerville neighborhood spokes
+ac repair cane bay
+ac repair nexton
+ac repair summers corner
+ac repair wescott plantation
+ac repair knightsville
+ac repair carnes crossroads
+ac repair historic downtown summerville

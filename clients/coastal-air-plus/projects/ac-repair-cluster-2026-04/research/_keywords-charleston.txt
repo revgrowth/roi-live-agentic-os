@@ -1,0 +1,28 @@
+# Charleston, SC pass — location_code 1025521
+# 8 symptom + 6 brand + 6 Charleston neighborhood = 20 keywords
+
+# Symptom spokes (shared)
+ac not cooling
+ac blowing warm air
+ac frozen
+ac leaking water
+ac making strange noises
+ac short cycling
+ac won't turn on
+ac running but no air from vents
+
+# Brand spokes (shared)
+trane ac repair
+carrier ac repair
+goodman ac repair
+lennox ac repair
+rheem ac repair
+york ac repair
+
+# Charleston neighborhood spokes
+ac repair mount pleasant sc
+ac repair daniel island
+ac repair james island
+ac repair west ashley
+ac repair johns island
+ac repair north charleston
