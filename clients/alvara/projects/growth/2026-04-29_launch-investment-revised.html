@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Launch Investment, Revised · ALVARA × ROI.live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0E0F0C;
+    --bg-elevated: #15170F;
+    --bg-card: #1A1D14;
+    --ink: #F4EFE3;
+    --ink-muted: #B8B2A3;
+    --ink-faint: #6E6A5E;
+    --gold: #C9A24A;
+    --gold-bright: #E0BD63;
+    --gold-deep: #8C6E2A;
+    --rule: #2A2D22;
+    --green: #7C8F4F;
+    --red: #B7553B;
+    --amber: #C9892A;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Outfit', system-ui, sans-serif;
+    --mono: 'DM Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(201, 162, 74, 0.07), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(201, 162, 74, 0.05), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 48px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header {
+    padding: 36px 0 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .brand {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .brand span {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+    text-align: right;
+  }
+
+  .meta div { margin-bottom: 4px; }
+  .meta div:last-child { margin-bottom: 0; color: var(--gold); }
+
+  /* HERO */
+  .hero {
+    padding: 120px 0 100px;
+    position: relative;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    margin-bottom: 32px;
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(48px, 7vw, 92px);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    margin-bottom: 36px;
+    max-width: 18ch;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 300;
+  }
+
+  .hero-deck {
+    font-family: var(--serif);
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--ink-muted);
+    max-width: 62ch;
+    font-weight: 300;
+  }
+
+  .hero-deck strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* SIDE NAV */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 80px;
+    padding: 60px 0 120px;
+    align-items: start;
+  }
+
+  nav.side-nav {
+    position: sticky;
+    top: 48px;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+
+  nav.side-nav .nav-label {
+    color: var(--ink-faint);
+    margin-bottom: 24px;
+    font-size: 10px;
+  }
+
+  nav.side-nav ol {
+    list-style: none;
+    border-left: 1px solid var(--rule);
+  }
+
+  nav.side-nav li {
+    padding: 12px 0 12px 18px;
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  nav.side-nav li a {
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: block;
+  }
+
+  nav.side-nav li:hover { border-left-color: var(--gold-deep); }
+  nav.side-nav li:hover a { color: var(--ink); }
+  nav.side-nav li.active { border-left-color: var(--gold); }
+  nav.side-nav li.active a { color: var(--gold); }
+
+  nav.side-nav li .num {
+    font-size: 9px;
+    color: var(--ink-faint);
+    margin-right: 8px;
+  }
+
+  /* CONTENT SECTIONS */
+  section.content-section {
+    padding: 72px 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  section.content-section:first-of-type {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.18em;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+    max-width: 22ch;
+  }
+
+  h2 em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 300;
+  }
+
+  h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1.3;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+
+  h4 {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  p {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink-muted);
+    margin-bottom: 20px;
+    max-width: 68ch;
+  }
+
+  p strong, .body strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .body p:last-child { margin-bottom: 0; }
+
+  /* RECOMMENDATION CALLOUT */
+  .recommendation {
+    background: linear-gradient(135deg, rgba(201, 162, 74, 0.09), rgba(201, 162, 74, 0.02));
+    border: 1px solid var(--gold-deep);
+    padding: 48px 52px;
+    margin: 0 0 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .recommendation::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--gold);
+  }
+
+  .recommendation h4 { margin-bottom: 18px; }
+
+  .recommendation .verdict {
+    font-family: var(--serif);
+    font-size: 36px;
+    line-height: 1.15;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    font-weight: 400;
+    margin-bottom: 18px;
+  }
+
+  .recommendation .verdict em {
+    font-style: italic;
+    color: var(--gold-bright);
+    font-weight: 300;
+  }
+
+  .recommendation p {
+    color: var(--ink-muted);
+    margin: 0;
+    font-size: 16px;
+  }
+
+  /* DELTA TABLE */
+  .delta-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 32px 0 16px;
+    border: 1px solid var(--rule);
+  }
+
+  .delta-table th {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--gold);
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--rule);
+    font-weight: 500;
+    background: rgba(201, 162, 74, 0.04);
+  }
+
+  .delta-table th.right { text-align: right; }
+
+  .delta-table td {
+    padding: 18px 20px;
+    font-size: 15px;
+    color: var(--ink-muted);
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  .delta-table td.label {
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 500;
+  }
+
+  .delta-table td.num {
+    font-family: var(--mono);
+    font-size: 15px;
+    text-align: right;
+    color: var(--ink);
+  }
+
+  .delta-table td.num.was {
+    color: var(--ink-faint);
+    text-decoration: line-through;
+  }
+
+  .delta-table td.num.now {
+    color: var(--gold-bright);
+    font-weight: 500;
+  }
+
+  .delta-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .delta-table tr.total td {
+    background: rgba(201, 162, 74, 0.06);
+    border-top: 2px solid var(--gold-deep);
+  }
+
+  .delta-table tr.total td.label {
+    color: var(--gold-bright);
+  }
+
+  .delta-table tr.total td.num.now {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--gold-bright);
+  }
+
+  /* COST GRID (mirrors Plus memo) */
+  .cost-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 40px 0;
+  }
+
+  .cost-cell {
+    background: var(--bg-card);
+    padding: 32px 36px;
+  }
+
+  .cost-cell .figure {
+    font-family: var(--serif);
+    font-size: 44px;
+    line-height: 1;
+    color: var(--gold);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .cost-cell .figure em {
+    font-style: italic;
+    font-size: 22px;
+    color: var(--ink-muted);
+    font-weight: 300;
+    margin-left: 4px;
+  }
+
+  .cost-cell .figure-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+  }
+
+  .cost-cell .figure-note {
+    font-size: 14px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+  }
+
+  /* SCOPE GRID */
+  .scope-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin: 32px 0 16px;
+    border: 1px solid var(--rule);
+  }
+
+  .scope-col { padding: 32px 36px; }
+
+  .scope-col.original {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent);
+    border-right: 1px solid var(--rule);
+  }
+
+  .scope-col.added {
+    background: linear-gradient(180deg, rgba(201, 162, 74, 0.06), transparent);
+  }
+
+  .scope-col h4 { margin-bottom: 8px; }
+
+  .scope-col .label {
+    font-family: var(--serif);
+    font-size: 22px;
+    margin-bottom: 8px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .scope-col .price-tag {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-faint);
+    margin-bottom: 24px;
+    letter-spacing: 0.04em;
+  }
+
+  .scope-col.added .price-tag {
+    color: var(--gold);
+  }
+
+  .scope-col ul { list-style: none; }
+
+  .scope-col li {
+    font-size: 14px;
+    color: var(--ink-muted);
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--rule);
+    line-height: 1.5;
+  }
+
+  .scope-col li:last-child { border-bottom: none; }
+
+  .scope-col li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 12px;
+    margin-bottom: 2px;
+    vertical-align: middle;
+  }
+
+  .scope-col.original li::before {
+    background: var(--ink-faint);
+    border-radius: 50%;
+  }
+
+  .scope-col.added li::before {
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  /* INVESTMENT TABLE */
+  .invest-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    padding: 40px 44px;
+    margin: 40px 0 16px;
+  }
+
+  .invest-wrap h4 { margin-bottom: 24px; }
+
+  .invest-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8px;
+  }
+
+  .invest-table th {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--gold);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 2px solid rgba(201, 162, 74, 0.25);
+    font-weight: 500;
+  }
+
+  .invest-table th.right { text-align: right; }
+
+  .invest-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--ink-muted);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    vertical-align: top;
+  }
+
+  .invest-table td.label {
+    color: var(--ink);
+  }
+
+  .invest-table td .sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    margin-left: 4px;
+  }
+
+  .invest-table td.num {
+    font-family: var(--mono);
+    font-size: 14px;
+    text-align: right;
+    color: var(--gold-bright);
+  }
+
+  .invest-table tr.subtotal td {
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .invest-table tr.total td {
+    padding: 18px 16px;
+    border-top: 2px solid rgba(201, 162, 74, 0.3);
+    border-bottom: none;
+    color: var(--gold-bright);
+  }
+
+  .invest-table tr.total td.num {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+  }
+
+  /* DECISION CALLOUT */
+  .decision-block {
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--gold);
+    padding: 32px 40px;
+    margin: 32px 0;
+  }
+
+  .decision-block h4 { margin-bottom: 12px; }
+
+  .decision-block p {
+    margin-bottom: 12px;
+    color: var(--ink);
+    font-size: 16px;
+  }
+
+  .decision-block p:last-child { margin-bottom: 0; }
+
+  /* WARNING BLOCK */
+  .warning-block {
+    background: rgba(183, 85, 59, 0.06);
+    border: 1px solid rgba(183, 85, 59, 0.3);
+    border-left: 3px solid var(--red);
+    padding: 32px 40px;
+    margin: 32px 0;
+  }
+
+  .warning-block h4 {
+    color: var(--red);
+    margin-bottom: 12px;
+  }
+
+  .warning-block p {
+    color: var(--ink);
+    font-size: 16px;
+    margin-bottom: 0;
+  }
+
+  /* FINAL CALL */
+  .final-call {
+    margin-top: 48px;
+    padding: 56px 60px;
+    background:
+      linear-gradient(135deg, rgba(201, 162, 74, 0.10), transparent 70%),
+      var(--bg-elevated);
+    border: 1px solid var(--gold-deep);
+    position: relative;
+  }
+
+  .final-call h4 { margin-bottom: 20px; }
+
+  .final-call .statement {
+    font-family: var(--serif);
+    font-size: 28px;
+    line-height: 1.25;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    font-weight: 400;
+    margin-bottom: 28px;
+    max-width: 32ch;
+  }
+
+  .final-call .statement em {
+    font-style: italic;
+    color: var(--gold-bright);
+    font-weight: 300;
+  }
+
+  .final-call .next-steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .next-step {
+    font-size: 14px;
+    color: var(--ink-muted);
+    line-height: 1.55;
+  }
+
+  .next-step strong {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 48px 0 60px;
+    margin-top: 40px;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+  }
+
+  .footer-row .signature { color: var(--ink-muted); }
+  .footer-row .signature span { color: var(--gold); }
+
+  /* RESPONSIVE */
+  @media (max-width: 960px) {
+    .container { padding: 0 28px; }
+    .layout { grid-template-columns: 1fr; gap: 32px; }
+    nav.side-nav { position: relative; top: 0; }
+    nav.side-nav ol {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-left: none;
+    }
+    nav.side-nav li {
+      padding: 8px 14px;
+      border: 1px solid var(--rule);
+      border-left: 1px solid var(--rule);
+      margin-left: 0;
+    }
+    .scope-grid { grid-template-columns: 1fr; }
+    .scope-col.original { border-right: none; border-bottom: 1px solid var(--rule); }
+    .cost-grid { grid-template-columns: 1fr; }
+    .final-call .next-steps { grid-template-columns: 1fr; }
+    .header-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .meta { text-align: left; }
+    .recommendation, .final-call { padding: 32px 28px; }
+    .invest-wrap { padding: 28px 24px; }
+    .invest-table th, .invest-table td { padding: 10px 8px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-row">
+      <div class="brand">ROI<span>.</span>live <span style="color: var(--ink-faint); margin: 0 12px;">/</span> ALVARA Vitality</div>
+      <div class="meta">
+        <div>Launch Investment Memo</div>
+        <div>Revised · April 29, 2026</div>
+        <div>Confidential</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow">Supersedes Launch Pricing in Growth Partnership Proposal</div>
+    <h1>Launch investment, <em>revised</em>.</h1>
+    <p class="hero-deck">Two things shifted since the original proposal: the launch window moved to <strong>mid-July 2026</strong>, and the platform decision moved to <strong>Shopify Plus with native B2B</strong>. Both have downstream effects on the build cost, the platform line, and the ramp math. This memo reconciles all of it against where the MOU sits today.</p>
+  </div>
+</section>
+
+<div class="container">
+  <div class="layout">
+
+    <nav class="side-nav">
+      <div class="nav-label">Contents</div>
+      <ol>
+        <li class="active"><a href="#summary"><span class="num">01</span>What Changed</a></li>
+        <li><a href="#b2b-gap"><span class="num">02</span>The B2B Gap</a></li>
+        <li><a href="#build-shift"><span class="num">03</span>Build Cost Shift</a></li>
+        <li><a href="#platform"><span class="num">04</span>Platform Line</a></li>
+        <li><a href="#totals"><span class="num">05</span>Revised Totals</a></li>
+        <li><a href="#ramp"><span class="num">06</span>Cash Flow & Ramp</a></li>
+        <li><a href="#decisions"><span class="num">07</span>Decision Points</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <!-- 01 SUMMARY -->
+      <section class="content-section" id="summary">
+        <div class="section-num">01 / What Changed</div>
+        <h2>The headline, <em>up top</em>.</h2>
+        <div class="body">
+          <div class="recommendation">
+            <h4>Verdict</h4>
+            <div class="verdict">Same retainer, same equity ladder, same Year 1 budget. <em>One line moves</em>: Shopify build goes from $16K to $28K, and the platform spend lifts to Plus.</div>
+            <p>The MOU §5.9 number was scoped against an Advanced Shopify + bolt-on B2B app architecture. The Shopify Plus memo we delivered April 27 changes that frame. Native Plus with integrated B2B is the right architecture for ALVARA's parallel DTC + wholesale motion — and the build cost reflects the work that was never priced in.</p>
+          </div>
+
+          <h3 style="margin-top: 40px;">What stays the same</h3>
+          <table class="delta-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th class="right">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="label">Year 1 marketing budget</td>
+                <td class="num">$1,380,000 · committed</td>
+              </tr>
+              <tr>
+                <td class="label">Equity ladder</td>
+                <td class="num">1.5% base + ladder to 7% · holds</td>
+              </tr>
+              <tr>
+                <td class="label">Revenue share tiers</td>
+                <td class="num">6% / 8% / 10% · holds</td>
+              </tr>
+              <tr>
+                <td class="label">Architect retainer</td>
+                <td class="num">$8,500/mo · holds</td>
+              </tr>
+              <tr>
+                <td class="label">24-month tail · exclusivity · clearance gates</td>
+                <td class="num">Per MOU · holds</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="margin-top: 40px;">What moves</h3>
+          <table class="delta-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th class="right">Was</th>
+                <th class="right">Now</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="label">Launch date</td>
+                <td class="num was">May 25, 2026</td>
+                <td class="num now">~July 15, 2026</td>
+              </tr>
+              <tr>
+                <td class="label">Ramp window to 10K subs</td>
+                <td class="num was">8 months</td>
+                <td class="num now">~10 months · May 2027 working target</td>
+              </tr>
+              <tr>
+                <td class="label">Shopify custom build (one-time)</td>
+                <td class="num was">$16,000</td>
+                <td class="num now">$28,000</td>
+              </tr>
+              <tr>
+                <td class="label">Shopify platform (monthly)</td>
+                <td class="num was">~$399 · Advanced</td>
+                <td class="num now">$2,300 floor · Plus</td>
+              </tr>
+              <tr class="total">
+                <td class="label">Net Year 1 platform delta</td>
+                <td class="num"></td>
+                <td class="num now">+$12K build · +$23K/yr platform after ramp</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 02 B2B GAP -->
+      <section class="content-section" id="b2b-gap">
+        <div class="section-num">02 / The B2B Gap</div>
+        <h2>What the MOU <em>never covered</em>.</h2>
+        <p>MOU §5.9 was negotiated against the architecture we had on the table at the time: Advanced Shopify with a third-party B2B app — SparkLayer, BSS, or Wholesale Club bolted on top of standard Shopify. The $16K covered DTC theme work, subscription widget, and landing pages. It did not cover the parallel wholesale motion, because the wholesale motion was assumed to live inside an app.</p>
+
+        <p>The Shopify Plus memo we shipped April 27 made the case to abandon that path. Bolted-on B2B works at low volume and breaks at scale. The fix lives in the platform itself — Shopify's native B2B engine, which only exists on Plus. ALVARA is shipping DTC and wholesale in parallel from day one. That motion is what justifies Plus. It also means the build scope expands.</p>
+
+        <div class="warning-block">
+          <h4>Why this surfaces now and not in the MOU</h4>
+          <p>The Shopify platform decision was being treated as a January-2027 problem during MOU drafting — a "growth-stage" upgrade once volume justified it. The Plus memo flipped that: native B2B is a launch-architecture decision, not a scale decision. Doing it later costs more than doing it now. That changes what gets built before launch, which changes what the build line costs.</p>
+        </div>
+
+        <p>This is the right time to surface it. The MOU §5.9 language is open enough to absorb the shift — custom development is carved out of the retainer and priced separately. The number on that line just needs to reflect the actual scope. The structure (50/50 payment schedule, retainer unchanged, Maintenance tier at $1,200/mo on top) all carries forward without renegotiation.</p>
+      </section>
+
+      <!-- 03 BUILD COST SHIFT -->
+      <section class="content-section" id="build-shift">
+        <div class="section-num">03 / Build Cost Shift</div>
+        <h2>Where the extra $12K <em>goes</em>.</h2>
+        <p>The original $16K is intact. Nothing in the DTC scope shrinks. The added $12K covers the native B2B work that didn't exist as a line item when MOU §5.9 was written. Side by side:</p>
+
+        <div class="scope-grid">
+          <div class="scope-col original">
+            <h4>Original MOU §5.9 Scope</h4>
+            <div class="label">DTC Build</div>
+            <div class="price-tag">$16,000 · accepted, holds</div>
+            <ul>
+              <li>Custom theme architecture and Liquid templates</li>
+              <li>Subscription widget engineering (Recharge or Skio)</li>
+              <li>Mobile-first conversion design</li>
+              <li>Checkout flow optimization</li>
+              <li>Product page templates and bundle logic</li>
+              <li>Two campaign landing page templates</li>
+              <li>Klaviyo connection and event mapping</li>
+              <li>Core analytics and pixel installation</li>
+            </ul>
+          </div>
+          <div class="scope-col added">
+            <h4>Added · Native Plus B2B</h4>
+            <div class="label">B2B Build</div>
+            <div class="price-tag">+$12,000 · new line</div>
+            <ul>
+              <li>Company profile architecture (multiple buyers per account)</li>
+              <li>Custom catalogs and price lists per company</li>
+              <li>Net 30 / Net 60 terms and PO checkout flow</li>
+              <li>Tax exemption automation and certificate handling</li>
+              <li>Quantity minimums, volume pricing, B2B-only product gating</li>
+              <li>Wholesale buyer onboarding flow and account portal</li>
+              <li>Expansion store config (international or B2B portal split)</li>
+              <li>Sales team admin training and runbook</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="cost-grid">
+          <div class="cost-cell">
+            <div class="figure-label">Original DTC scope</div>
+            <div class="figure">$16K<em></em></div>
+            <div class="figure-note">Per MOU §5.9 · 50/50 payment schedule on contract execution and launch.</div>
+          </div>
+          <div class="cost-cell">
+            <div class="figure-label">B2B native add</div>
+            <div class="figure">$12K<em></em></div>
+            <div class="figure-note">Same 50/50 schedule. Same Section 5.9 carve-out structure.</div>
+          </div>
+          <div class="cost-cell">
+            <div class="figure-label">Revised total build</div>
+            <div class="figure">$28K<em></em></div>
+            <div class="figure-note">One-time. Paid before launch. Replaces the $16K line in §5.9.</div>
+          </div>
+          <div class="cost-cell">
+            <div class="figure-label">Cost vs migration tax</div>
+            <div class="figure">$0<em>/yr 2</em></div>
+            <div class="figure-note">No platform migration in year two. The $12K now is the cheaper number than rebuilding wholesale during the scale window.</div>
+          </div>
+        </div>
+
+        <p style="margin-top: 8px;">Doing this work in year two — after wholesale velocity is climbing and DTC scale is testing API limits — runs two to four weeks of agency time, customer disruption to the wholesale base, and a forced migration during a launch window or holiday push. The $12K now buys ALVARA out of that scenario entirely.</p>
+      </section>
+
+      <!-- 04 PLATFORM -->
+      <section class="content-section" id="platform">
+        <div class="section-num">04 / Platform Line</div>
+        <h2>Plus replaces <em>Advanced</em>.</h2>
+        <p>The monthly platform line moves with the architecture decision. Plus runs $2,300/month or 0.4% of revenue, whichever is higher, capped at $40K/month. Advanced was $399/month. The delta is real but partially recoverable through the negotiated Plus for Startups ramp.</p>
+
+        <div class="cost-grid">
+          <div class="cost-cell">
+            <div class="figure-label">Plus rack rate</div>
+            <div class="figure">$2,300<em>/mo</em></div>
+            <div class="figure-note">Floor. Lifts to 0.4% of revenue past $6.9M ARR. Capped at $40K/mo.</div>
+          </div>
+          <div class="cost-cell">
+            <div class="figure-label">Advanced (was)</div>
+            <div class="figure">$399<em>/mo</em></div>
+            <div class="figure-note">Plus B2B app at $79–$300 brought it to $478–$699/mo in the original frame.</div>
+          </div>
+          <div class="cost-cell">
+            <div class="figure-label">Negotiated startup ramp</div>
+            <div class="figure">$1–$1K<em>/mo</em></div>
+            <div class="figure-note">Plus for Startups program, months 1–6. ROI.live attends as Partner of Record.</div>
+          </div>
+          <div class="cost-cell">
+            <div class="figure-label">Year 1 platform delta</div>
+            <div class="figure">~$11K<em>/yr</em></div>
+            <div class="figure-note">Net of startup ramp. Year 2 onward: ~$23K/yr until revenue clears the 0.4% threshold.</div>
+          </div>
+        </div>
+
+        <div class="decision-block">
+          <h4>The negotiation play</h4>
+          <p><strong>1.</strong> Schedule the Shopify Plus call in the next 7 days. Heath introduces. ROI.live attends as Partner of Record.</p>
+          <p><strong>2.</strong> Two asks: Plus for Startups ramp pricing across months 1–6, and a named Customer Success Manager in the contract.</p>
+          <p><strong>3.</strong> If both land, the Year 1 platform delta against Advanced shrinks to ~$11K — meaningfully less than the $20K I quoted in the Plus memo.</p>
+        </div>
+      </section>
+
+      <!-- 05 TOTALS -->
+      <section class="content-section" id="totals">
+        <div class="section-num">05 / Revised Totals</div>
+        <h2>The full picture, <em>10-month ramp</em>.</h2>
+        <p>Mid-July 2026 launch through May 2027 working target — the window committed against the $1.38M Year 1 budget. Numbers reflect MOU as currently drafted plus the build / platform deltas above. Ad spend assumes Scenario A ramp; ad management fee uses the tiered V3 structure.</p>
+
+        <div class="invest-wrap">
+          <h4>Year 1 Investment · Mid-July 2026 through Mid-July 2027</h4>
+          <table class="invest-table">
+            <thead>
+              <tr>
+                <th>Investment Category</th>
+                <th class="right">Monthly (Avg)</th>
+                <th class="right">12-Month Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="label">ROI.live retainer <span class="sub">(Architect tier · MOU §4)</span></td>
+                <td class="num">$8,500</td>
+                <td class="num">$102,000</td>
+              </tr>
+              <tr>
+                <td class="label">Shopify custom build <span class="sub">(MOU §5.9 · revised: $16K + $12K B2B)</span></td>
+                <td class="num">—</td>
+                <td class="num">$28,000</td>
+              </tr>
+              <tr>
+                <td class="label">Shopify Plus platform <span class="sub">(net of negotiated startup ramp)</span></td>
+                <td class="num">~$1,900</td>
+                <td class="num">~$23,000</td>
+              </tr>
+              <tr>
+                <td class="label">Plus Maintenance tier <span class="sub">(MOU §5.9 · selected)</span></td>
+                <td class="num">$1,200</td>
+                <td class="num">$14,400</td>
+              </tr>
+              <tr>
+                <td class="label">Affiliate program management <span class="sub">(MOU §5.10 · dedicated line)</span></td>
+                <td class="num">$1,500</td>
+                <td class="num">$18,000</td>
+              </tr>
+              <tr class="subtotal">
+                <td class="label">ROI.live & platform subtotal</td>
+                <td class="num">~$13,100</td>
+                <td class="num">~$185,400</td>
+              </tr>
+              <tr>
+                <td class="label">Paid ad spend <span class="sub">(Scenario A · ramp $25K → $150K/mo)</span></td>
+                <td class="num">~$92,000</td>
+                <td class="num">~$1,100,000</td>
+              </tr>
+              <tr>
+                <td class="label">Ad management fee <span class="sub">(MOU §5.4 V3 · tiered 5%/4%/3%)</span></td>
+                <td class="num">~$4,400</td>
+                <td class="num">~$53,000</td>
+              </tr>
+              <tr>
+                <td class="label">Software stack <span class="sub">(Klaviyo, GHL, Recharge/Skio, UpPromote)</span></td>
+                <td class="num">~$2,500</td>
+                <td class="num">~$30,000</td>
+              </tr>
+              <tr>
+                <td class="label">Content production <span class="sub">(Tosti video/photo · in client budget)</span></td>
+                <td class="num">Existing</td>
+                <td class="num">Existing</td>
+              </tr>
+              <tr class="total">
+                <td class="label">Total Year 1 Investment</td>
+                <td class="num">~$112,000</td>
+                <td class="num">~$1,368,000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top: 8px;">Lands inside the $1,380,000 ALVARA committed in V3. Headroom of ~$12K against the committed budget covers contingency, expanded creative production, or a faster ad spend ramp if the data calls for it. No renegotiation needed against the V3 commitment.</p>
+      </section>
+
+      <!-- 06 RAMP -->
+      <section class="content-section" id="ramp">
+        <div class="section-num">06 / Cash Flow & Ramp</div>
+        <h2>Where the cash <em>shows up</em>.</h2>
+        <p>The build line is front-loaded. The platform line steps up after the startup ramp burns off. The retainer and Maintenance tier are flat. Ad spend is the variable that grows through the window.</p>
+
+        <table class="delta-table">
+          <thead>
+            <tr>
+              <th>Period</th>
+              <th class="right">Build & Platform Cash</th>
+              <th class="right">Ad Spend Range</th>
+              <th class="right">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="label">Pre-launch · Jun–mid-Jul 2026</td>
+              <td class="num">$14K (build pmt 1)</td>
+              <td class="num">$0</td>
+              <td>50% of $28K build on contract execution. Plus contract signed. Foundation work.</td>
+            </tr>
+            <tr>
+              <td class="label">Launch month · mid-Jul 2026</td>
+              <td class="num">$14K (build pmt 2)</td>
+              <td class="num">$25K</td>
+              <td>Final 50% of build at launch. Startup ramp on Plus active. Ad spend opens at floor.</td>
+            </tr>
+            <tr>
+              <td class="label">Months 1–6 · Jul 2026 – Jan 2027</td>
+              <td class="num">~$11K/mo</td>
+              <td class="num">$25K → $90K/mo</td>
+              <td>Plus startup ramp covers months 1–6. Ad spend climbs against subscriber acquisition data.</td>
+            </tr>
+            <tr>
+              <td class="label">Months 7–12 · Jan – Jul 2027</td>
+              <td class="num">~$13K/mo</td>
+              <td class="num">$90K → $150K/mo</td>
+              <td>Plus rack rate kicks in. Ad management fee drops to 4% as managed spend crosses $1M annual.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="decision-block">
+          <h4>Where the math lands against the goal</h4>
+          <p><strong>Subscriber pacing.</strong> ~1,000 net new subscribers per month against the 10K target by May 2027. Compressed from the original 833/mo against an 8-month window.</p>
+          <p><strong>Revenue tracking.</strong> 10K active subscribers × $89/mo = ~$890K MRR / ~$10.7M ARR run rate. B2B layer adds ~$70K/mo against the existing $12K Microsoft pilot signal.</p>
+          <p><strong>Return on Year 1 spend.</strong> Cumulative DTC + B2B revenue through July 2027 lands in the $4–5M range against ~$1.37M Year 1 investment. Healthy 3–4× return before LTV compounding.</p>
+        </div>
+      </section>
+
+      <!-- 07 DECISIONS -->
+      <section class="content-section" id="decisions">
+        <div class="section-num">07 / Decision Points</div>
+        <h2>What I need from <em>you</em>.</h2>
+        <p>Three decisions, all small. None of them block contract execution. All of them want a name on them before the Plus call lands.</p>
+
+        <div class="final-call">
+          <h4>Three signals to send</h4>
+          <div class="statement">Two are platform calls. One is an <em>MOU language tweak</em>.</div>
+
+          <div class="next-steps">
+            <div class="next-step">
+              <strong>Decision 01 · Build line update</strong>
+              Confirm the §5.9 build number lifts from $16K to $28K with the B2B scope detailed in Section 03 above. Same 50/50 payment schedule. Same retainer-unchanged structure. No other §5.9 language moves.
+            </div>
+            <div class="next-step">
+              <strong>Decision 02 · Plus call this week</strong>
+              Heath introduces ALVARA to the Shopify Plus team. ROI.live attends as Partner of Record. We negotiate the startup ramp and the named CSM. You and I sit in.
+            </div>
+            <div class="next-step">
+              <strong>Decision 03 · MOU §5.9 language</strong>
+              I'll send a redline that swaps the $16K reference for $28K and adds one bullet to the scope list naming "native B2B configuration." Everything else in §5.9 — the Maintenance tier selection, upgrade gates, retainer-unchanged language — stays as currently negotiated.
+            </div>
+            <div class="next-step">
+              <strong>Timeline</strong>
+              All three close inside the next 10 business days without affecting the rest of the V4 round. The two open V4 items (5.1 trigger language, §5.4 breakpoint trade) move on their own track.
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-row">
+      <div class="signature">Prepared by <span>ROI.live</span> for ALVARA Vitality leadership</div>
+      <div>Launch Investment Memo · Revised April 29, 2026</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('section.content-section');
+  const navItems = document.querySelectorAll('nav.side-nav li');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navItems.forEach(item => {
+          item.classList.remove('active');
+          const link = item.querySelector('a');
+          if (link && link.getAttribute('href') === '#' + id) {
+            item.classList.add('active');
+          }
+        });
+      }
+    });
+  }, {
+    rootMargin: '-30% 0px -60% 0px',
+    threshold: 0
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

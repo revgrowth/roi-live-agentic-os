@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Launch Breakdown · ALVARA × ROI.live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0E0F0C;
+    --bg-elevated: #15170F;
+    --bg-card: #1A1D14;
+    --ink: #F4EFE3;
+    --ink-muted: #B8B2A3;
+    --ink-faint: #6E6A5E;
+    --gold: #C9A24A;
+    --gold-bright: #E0BD63;
+    --gold-deep: #8C6E2A;
+    --rule: #2A2D22;
+    --green: #7C8F4F;
+    --green-bright: #A3B872;
+    --red: #B7553B;
+    --amber: #C9892A;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Outfit', system-ui, sans-serif;
+    --mono: 'DM Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(201, 162, 74, 0.07), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(201, 162, 74, 0.05), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 48px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header { padding: 36px 0 24px; border-bottom: 1px solid var(--rule); }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .brand {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .brand span { color: var(--gold); font-style: italic; }
+
+  .meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+    text-align: right;
+  }
+
+  .meta div { margin-bottom: 4px; }
+  .meta div:last-child { margin-bottom: 0; color: var(--gold); }
+
+  /* HERO */
+  .hero { padding: 120px 0 100px; position: relative; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    margin-bottom: 32px;
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(48px, 7vw, 92px);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    margin-bottom: 36px;
+    max-width: 18ch;
+  }
+
+  .hero h1 em { font-style: italic; color: var(--gold); font-weight: 300; }
+
+  .hero-deck {
+    font-family: var(--serif);
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--ink-muted);
+    max-width: 62ch;
+    font-weight: 300;
+  }
+
+  .hero-deck strong { color: var(--ink); font-weight: 500; }
+
+  /* HERO TOTALS BAR */
+  .hero-totals {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-top: 56px;
+  }
+
+  .hero-totals .cell {
+    background: var(--bg-card);
+    padding: 28px 32px;
+  }
+
+  .hero-totals .cell-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+    margin-bottom: 12px;
+  }
+
+  .hero-totals .cell-num {
+    font-family: var(--serif);
+    font-size: 38px;
+    font-weight: 400;
+    color: var(--gold-bright);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .hero-totals .cell-sub {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+  }
+
+  /* SIDE NAV */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 80px;
+    padding: 60px 0 120px;
+    align-items: start;
+  }
+
+  nav.side-nav {
+    position: sticky;
+    top: 48px;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+
+  nav.side-nav .nav-label {
+    color: var(--ink-faint);
+    margin-bottom: 24px;
+    font-size: 10px;
+  }
+
+  nav.side-nav ol {
+    list-style: none;
+    border-left: 1px solid var(--rule);
+  }
+
+  nav.side-nav li {
+    padding: 12px 0 12px 18px;
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  nav.side-nav li a {
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: block;
+  }
+
+  nav.side-nav li:hover { border-left-color: var(--gold-deep); }
+  nav.side-nav li:hover a { color: var(--ink); }
+  nav.side-nav li.active { border-left-color: var(--gold); }
+  nav.side-nav li.active a { color: var(--gold); }
+
+  nav.side-nav li .num {
+    font-size: 9px;
+    color: var(--ink-faint);
+    margin-right: 8px;
+  }
+
+  /* CONTENT SECTIONS */
+  section.content-section {
+    padding: 72px 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  section.content-section:first-of-type {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.18em;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+    max-width: 22ch;
+  }
+
+  h2 em { font-style: italic; color: var(--gold); font-weight: 300; }
+
+  h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1.3;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+
+  h4 {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  p {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink-muted);
+    margin-bottom: 20px;
+    max-width: 68ch;
+  }
+
+  p strong, .body strong { color: var(--ink); font-weight: 500; }
+
+  /* DELIVERABLE CARDS */
+  .deliv-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin: 32px 0 16px;
+  }
+
+  .deliv-card {
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    padding: 36px 40px;
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 32px;
+    align-items: start;
+    transition: border-color 0.2s;
+  }
+
+  .deliv-card:hover { border-color: var(--gold-deep); }
+
+  .deliv-card.bonus {
+    background: linear-gradient(135deg, rgba(124, 143, 79, 0.08), rgba(124, 143, 79, 0.02));
+    border: 1px solid rgba(124, 143, 79, 0.4);
+  }
+
+  .deliv-card .deliv-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .deliv-card.bonus .deliv-eyebrow { color: var(--green-bright); }
+
+  .deliv-card h3 {
+    font-size: 26px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .deliv-card h3 em { color: var(--gold); font-weight: 300; font-style: italic; }
+
+  .deliv-card .deliv-desc {
+    font-size: 15px;
+    color: var(--ink-muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+    max-width: none;
+  }
+
+  .deliv-card ul {
+    list-style: none;
+    margin-top: 8px;
+  }
+
+  .deliv-card li {
+    font-size: 14px;
+    color: var(--ink-muted);
+    padding: 6px 0;
+    line-height: 1.5;
+    position: relative;
+    padding-left: 18px;
+  }
+
+  .deliv-card li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  .deliv-card.bonus li::before { background: var(--green-bright); }
+
+  .deliv-price {
+    text-align: right;
+    padding-left: 24px;
+    border-left: 1px solid var(--rule);
+  }
+
+  .deliv-card.bonus .deliv-price { border-left-color: rgba(124, 143, 79, 0.3); }
+
+  .deliv-price .price-num {
+    font-family: var(--serif);
+    font-size: 44px;
+    color: var(--gold-bright);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .deliv-card.bonus .deliv-price .price-num {
+    color: var(--green-bright);
+  }
+
+  .deliv-price .price-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-faint);
+    margin-bottom: 12px;
+  }
+
+  .deliv-price .price-value {
+    font-size: 12px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .deliv-card.bonus .deliv-price .price-value { border-top-color: rgba(124, 143, 79, 0.3); }
+
+  .deliv-price .price-strike {
+    text-decoration: line-through;
+    color: var(--ink-faint);
+    font-family: var(--mono);
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  /* TOTAL ROW */
+  .total-row {
+    background: linear-gradient(135deg, rgba(201, 162, 74, 0.10), rgba(201, 162, 74, 0.02));
+    border: 1px solid var(--gold-deep);
+    padding: 32px 40px;
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .total-row .total-label {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .total-row .total-sub {
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+  }
+
+  .total-row .total-price {
+    text-align: right;
+    padding-left: 24px;
+    border-left: 1px solid var(--gold-deep);
+  }
+
+  .total-row .total-num {
+    font-family: var(--serif);
+    font-size: 52px;
+    color: var(--gold-bright);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .total-row .total-context {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--gold);
+  }
+
+  /* RECURRING TIMELINE */
+  .recurring-timeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 32px 0 16px;
+  }
+
+  .recur-card {
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    padding: 32px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .recur-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  .recur-card.early::before { background: var(--amber); }
+
+  .recur-card .recur-date {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .recur-card.early .recur-date { color: var(--amber); }
+
+  .recur-card .recur-name {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .recur-card .recur-name em { color: var(--gold); font-style: italic; font-weight: 300; }
+
+  .recur-card .recur-source {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+    margin-bottom: 18px;
+  }
+
+  .recur-card .recur-price {
+    font-family: var(--serif);
+    font-size: 38px;
+    color: var(--gold-bright);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .recur-card .recur-period {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 16px;
+  }
+
+  .recur-card .recur-note {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.55;
+    padding-top: 16px;
+    border-top: 1px dashed var(--rule);
+  }
+
+  /* SHOPIFY TIERS */
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 32px 0 16px;
+  }
+
+  .tier-card {
+    background: var(--bg-card);
+    padding: 32px 28px;
+    position: relative;
+  }
+
+  .tier-card.selected {
+    background: linear-gradient(180deg, rgba(201, 162, 74, 0.10), var(--bg-card));
+  }
+
+  .tier-card.selected::before {
+    content: 'Selected';
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--bg);
+    background: var(--gold);
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+
+  .tier-card .tier-name {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .tier-card .tier-name em { color: var(--gold); font-style: italic; font-weight: 300; }
+
+  .tier-card .tier-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 20px;
+  }
+
+  .tier-card .tier-price {
+    font-family: var(--serif);
+    font-size: 36px;
+    color: var(--gold-bright);
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .tier-card.locked .tier-price {
+    color: var(--ink-faint);
+    font-style: italic;
+    font-size: 24px;
+  }
+
+  .tier-card .tier-period {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 20px;
+  }
+
+  .tier-card .tier-gate {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 12px 14px;
+    border-left: 2px solid var(--gold-deep);
+    font-size: 12px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .tier-card .tier-gate strong {
+    display: block;
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--gold);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .tier-card ul { list-style: none; }
+
+  .tier-card li {
+    font-size: 13px;
+    color: var(--ink-muted);
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--rule);
+    line-height: 1.5;
+  }
+
+  .tier-card li:last-child { border-bottom: none; }
+
+  /* PAYMENT OPTIONS */
+  .payment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 32px 0 24px;
+  }
+
+  .payment-col {
+    background: var(--bg-card);
+    padding: 36px 40px;
+  }
+
+  .payment-col.recommended {
+    background: linear-gradient(135deg, rgba(201, 162, 74, 0.10), rgba(201, 162, 74, 0.02));
+    position: relative;
+  }
+
+  .payment-col.recommended::before {
+    content: 'Lower up-front';
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--bg);
+    background: var(--gold);
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+
+  .payment-col h4 { margin-bottom: 8px; }
+
+  .payment-col .payment-name {
+    font-family: var(--serif);
+    font-size: 26px;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .payment-col .payment-name em { color: var(--gold); font-style: italic; font-weight: 300; }
+
+  .payment-col .payment-tag {
+    font-size: 14px;
+    color: var(--ink-muted);
+    margin-bottom: 28px;
+  }
+
+  .payment-col .schedule {
+    margin: 20px 0;
+  }
+
+  .schedule-row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--rule);
+    align-items: center;
+  }
+
+  .schedule-row:last-child { border-bottom: none; }
+
+  .schedule-row .schedule-date {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .schedule-row .schedule-desc {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.4;
+  }
+
+  .schedule-row .schedule-amt {
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--gold-bright);
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .payment-col .payment-note {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.6;
+  }
+
+  /* CASH FLOW TABLE */
+  .cashflow-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    padding: 36px 40px;
+    margin: 32px 0 16px;
+  }
+
+  .cashflow-wrap h4 { margin-bottom: 20px; }
+
+  .cashflow-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .cashflow-table th {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--gold);
+    padding: 12px 12px;
+    text-align: left;
+    border-bottom: 2px solid rgba(201, 162, 74, 0.25);
+    font-weight: 500;
+  }
+
+  .cashflow-table th.right { text-align: right; }
+
+  .cashflow-table td {
+    padding: 12px 12px;
+    font-size: 13px;
+    color: var(--ink-muted);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    vertical-align: middle;
+  }
+
+  .cashflow-table td.label {
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .cashflow-table td.num {
+    font-family: var(--mono);
+    font-size: 13px;
+    text-align: right;
+    color: var(--ink);
+  }
+
+  .cashflow-table td.num.amt { color: var(--gold-bright); }
+
+  .cashflow-table tr.milestone td {
+    background: rgba(201, 162, 74, 0.05);
+  }
+
+  .cashflow-table tr.milestone td.label {
+    color: var(--gold-bright);
+  }
+
+  /* COMPARISON BAR */
+  .compare-bars {
+    margin: 24px 0 8px;
+  }
+
+  .compare-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 100px;
+    gap: 16px;
+    align-items: center;
+    padding: 10px 0;
+  }
+
+  .compare-row .compare-month {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .compare-row .compare-bar {
+    height: 24px;
+    background: var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .compare-row .compare-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright));
+    transition: width 0.6s ease;
+  }
+
+  .compare-row .compare-amt {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--gold-bright);
+    text-align: right;
+    font-weight: 500;
+  }
+
+  /* WARNING / NOTE BLOCK */
+  .note-block {
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--gold);
+    padding: 28px 36px;
+    margin: 32px 0;
+  }
+
+  .note-block h4 { margin-bottom: 12px; }
+
+  .note-block p {
+    color: var(--ink);
+    font-size: 15px;
+    margin-bottom: 0;
+    line-height: 1.65;
+  }
+
+  /* FINAL CALL */
+  .final-call {
+    margin-top: 48px;
+    padding: 56px 60px;
+    background:
+      linear-gradient(135deg, rgba(201, 162, 74, 0.10), transparent 70%),
+      var(--bg-elevated);
+    border: 1px solid var(--gold-deep);
+    position: relative;
+  }
+
+  .final-call h4 { margin-bottom: 20px; }
+
+  .final-call .statement {
+    font-family: var(--serif);
+    font-size: 28px;
+    line-height: 1.25;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    font-weight: 400;
+    margin-bottom: 28px;
+    max-width: 32ch;
+  }
+
+  .final-call .statement em {
+    font-style: italic;
+    color: var(--gold-bright);
+    font-weight: 300;
+  }
+
+  .final-call .next-steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .next-step {
+    font-size: 14px;
+    color: var(--ink-muted);
+    line-height: 1.55;
+  }
+
+  .next-step strong {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 48px 0 60px;
+    margin-top: 40px;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+  }
+
+  .footer-row .signature { color: var(--ink-muted); }
+  .footer-row .signature span { color: var(--gold); }
+
+  /* RESPONSIVE */
+  @media (max-width: 960px) {
+    .container { padding: 0 28px; }
+    .layout { grid-template-columns: 1fr; gap: 32px; }
+    nav.side-nav { position: relative; top: 0; }
+    nav.side-nav ol {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-left: none;
+    }
+    nav.side-nav li {
+      padding: 8px 14px;
+      border: 1px solid var(--rule);
+      border-left: 1px solid var(--rule);
+      margin-left: 0;
+    }
+    .hero-totals { grid-template-columns: 1fr; }
+    .deliv-card, .total-row { grid-template-columns: 1fr; gap: 20px; }
+    .deliv-price, .total-row .total-price {
+      text-align: left;
+      padding-left: 0;
+      padding-top: 20px;
+      border-left: none;
+      border-top: 1px solid var(--rule);
+    }
+    .recurring-timeline { grid-template-columns: 1fr; }
+    .tier-grid { grid-template-columns: 1fr; }
+    .payment-grid { grid-template-columns: 1fr; }
+    .final-call .next-steps { grid-template-columns: 1fr; }
+    .header-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .meta { text-align: left; }
+    .final-call { padding: 32px 28px; }
+    .cashflow-wrap, .payment-col { padding: 24px; }
+    .cashflow-table th, .cashflow-table td { padding: 8px 4px; font-size: 11px; }
+    .compare-row { grid-template-columns: 70px 1fr 80px; }
+    section#cashflow > div > div[style*="grid-template-columns: repeat(3, 1fr)"] { grid-template-columns: 1fr !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-row">
+      <div class="brand">ROI<span>.</span>live <span style="color: var(--ink-faint); margin: 0 12px;">/</span> ALVARA Vitality</div>
+      <div class="meta">
+        <div>Launch Breakdown</div>
+        <div>Prepared April 29, 2026</div>
+        <div>Confidential</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow">Full Launch Cost Picture · May–July 2026</div>
+    <h1>The full <em>launch breakdown</em>.</h1>
+    <p class="hero-deck">Everything that gets built before <strong>July 1 go-live</strong>, what kicks in when, and how to pay for it without front-loading the cash. <strong>$53,000 in launch deliverables</strong> with $8,000 in ADA compliance work added on the house. Build runs May 1 – June 30. Recurring fees stagger across May and July — affiliate setup begins May 1, retainer and Shopify management activate at launch.</p>
+
+    <div class="hero-totals">
+      <div class="cell">
+        <div class="cell-label">One-Time Launch Build</div>
+        <div class="cell-num">$53,000</div>
+        <div class="cell-sub">Content launch package + Shopify Plus build with B2B</div>
+      </div>
+      <div class="cell">
+        <div class="cell-label">Bonus Value Included</div>
+        <div class="cell-num" style="color: var(--green-bright);">$8,000</div>
+        <div class="cell-sub">ADA compliance build · added at no charge</div>
+      </div>
+      <div class="cell">
+        <div class="cell-label">Recurring · Post-Launch</div>
+        <div class="cell-num">$8,200<span style="font-size: 22px; color: var(--ink-muted); font-weight: 300;">/mo</span></div>
+        <div class="cell-sub">Growth Partner retainer + Shopify mgmt + affiliate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="layout">
+
+    <nav class="side-nav">
+      <div class="nav-label">Contents</div>
+      <ol>
+        <li class="active"><a href="#deliverables"><span class="num">01</span>Launch Deliverables</a></li>
+        <li><a href="#bonus"><span class="num">02</span>The ADA Bonus</a></li>
+        <li><a href="#recurring"><span class="num">03</span>Recurring Fees</a></li>
+        <li><a href="#shopify-tiers"><span class="num">04</span>Shopify Mgmt Tiers</a></li>
+        <li><a href="#payment"><span class="num">05</span>Two Payment Options</a></li>
+        <li><a href="#cashflow"><span class="num">06</span>Cash Flow Calendar</a></li>
+        <li><a href="#decisions"><span class="num">07</span>Next Steps</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <!-- 01 DELIVERABLES -->
+      <section class="content-section" id="deliverables">
+        <div class="section-num">01 / Launch Deliverables</div>
+        <h2>What gets built <em>before launch</em>.</h2>
+        <p>Two work streams running parallel through May and June. The content engine and the Shopify storefront. Both ship before the mid-July go-live so launch traffic hits an architecture that compounds from day one.</p>
+
+        <div class="deliv-grid">
+
+          <!-- AEO/SEO -->
+          <div class="deliv-card">
+            <div>
+              <div class="deliv-eyebrow">Deliverable 01 · May 1 – June 30 · Live by July 1</div>
+              <h3>AEO/SEO Content <em>Launch Package</em></h3>
+              <p class="deliv-desc">The topical map and content architecture from the Growth Partnership Proposal, fully produced. Publishes against the launch window so organic and AI Overview presence builds while paid spend fires.</p>
+              <ul>
+                <li>Full topical map across 5 keyword clusters · 120+ keywords mapped</li>
+                <li>6 resource hub pages built and optimized</li>
+                <li>Supporting article production · 8–15 articles per cluster</li>
+                <li>Entity SEO · Organization, Product, and Person schema (Ty)</li>
+                <li>AEO answer-engine formatting across every published asset</li>
+                <li>Internal linking architecture and on-page optimization</li>
+                <li>All written through the ALVARA Brand Voice Agent</li>
+              </ul>
+            </div>
+            <div class="deliv-price">
+              <div class="price-num">$25,000</div>
+              <div class="price-sub">One-time · launch package</div>
+              <div class="price-value">From the Growth Partnership Proposal · scoped against launch window</div>
+            </div>
+          </div>
+
+          <!-- SHOPIFY BUILD -->
+          <div class="deliv-card">
+            <div>
+              <div class="deliv-eyebrow">Deliverable 02 · Build May 1 – June 30 · Launch July 1</div>
+              <h3>Shopify Plus Build <em>with B2B</em></h3>
+              <p class="deliv-desc">Native Plus storefront with parallel DTC and wholesale architecture. Plugins for subscription and affiliate are wired during the build, not bolted on later. See the Shopify Plus memo (April 27) for the platform decision context.</p>
+              <ul>
+                <li>Custom Plus theme architecture and Liquid templates</li>
+                <li>Native B2B configuration · company profiles, price lists, Net 30/60 terms</li>
+                <li>Tax exemption automation and PO checkout flow</li>
+                <li>Skio subscription plugin · full integration and flow setup</li>
+                <li>UpPromote affiliate plugin · multi-tier commission structure live at launch</li>
+                <li>Mobile-first conversion design and checkout optimization</li>
+                <li>Product page templates · DTC and B2B-only product gating</li>
+                <li>Klaviyo, GHL, and Triple Whale integration</li>
+              </ul>
+            </div>
+            <div class="deliv-price">
+              <div class="price-num">$28,000</div>
+              <div class="price-sub">One-time · build complete pre-launch</div>
+              <div class="price-value">Includes all plugin setup, B2B configuration, and integration work</div>
+            </div>
+          </div>
+
+          <!-- ADA BONUS -->
+          <div class="deliv-card bonus">
+            <div>
+              <div class="deliv-eyebrow">Bonus · No Charge</div>
+              <h3>ADA Compliance Build · <em>included free</em></h3>
+              <p class="deliv-desc">Full WCAG 2.1 AA accessibility build during the Shopify development phase. Reduces legal exposure (ADA lawsuits average $20K–$50K to settle), expands the addressable market by ~15%, and signals brand maturity to enterprise wholesale buyers.</p>
+              <ul>
+                <li>WCAG 2.1 AA compliance across DTC and B2B storefronts</li>
+                <li>Screen reader optimization · semantic HTML and ARIA labels</li>
+                <li>Keyboard navigation across cart, checkout, and account flows</li>
+                <li>Color contrast audit and remediation</li>
+                <li>Alt-text protocol for product imagery and content assets</li>
+                <li>Compliance widget integration with on-page reader controls</li>
+              </ul>
+            </div>
+            <div class="deliv-price">
+              <div class="price-strike">$8,000</div>
+              <div class="price-num">$0</div>
+              <div class="price-sub">Bonus · added at no charge</div>
+              <div class="price-value" style="color: var(--green-bright);">$8,000 in build value · waived for ALVARA</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="total-row">
+          <div>
+            <div class="total-label">Total Launch Build</div>
+            <div class="total-sub">Billed: $53,000 · Total Value Delivered: $61,000 ($8K ADA absorbed)</div>
+          </div>
+          <div class="total-price">
+            <div class="total-num">$53,000</div>
+            <div class="total-context">One-time · pre-launch</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 BONUS RATIONALE -->
+      <section class="content-section" id="bonus">
+        <div class="section-num">02 / The ADA Bonus</div>
+        <h2>Why we're <em>absorbing</em> the ADA work.</h2>
+        <p>ADA compliance for ecommerce is a moving target with real legal teeth. Web accessibility lawsuits crossed 4,600 federal filings in 2024 alone, with median settlement costs at $25,000 before legal fees. Most brands address it after the first demand letter arrives — meaning during the busiest growth windows, with retroactive remediation costing 3–4× the price of building it in from the start.</p>
+
+        <p>Building it in during the Shopify development phase is when this work is cheapest. The architecture decisions, the component patterns, the alt-text protocol — all of it gets baked in before the storefront goes live. Doing it after launch means rebuilding theme components and re-auditing every product page that ships in the meantime.</p>
+
+        <div class="note-block">
+          <h4>Why this matters strategically for ALVARA</h4>
+          <p>The 45–65 demographic ALVARA targets has the highest accessibility-needs prevalence of any consumer cohort. ~40% have at least one accessibility consideration (vision, motor, cognitive). Building compliant from day one expands the addressable subscriber base materially in the exact demographic where the brand needs the runway. The legal protection is a side benefit — the market expansion is the real return.</p>
+        </div>
+      </section>
+
+      <!-- 03 RECURRING -->
+      <section class="content-section" id="recurring">
+        <div class="section-num">03 / Recurring Fees</div>
+        <h2>What kicks in <em>and when</em>.</h2>
+        <p>Three recurring lines, two start dates. The affiliate program management starts early because program setup begins May 1 — recruiting, commission structure, partner agreements, fraud controls. The retainer and Shopify management activate July 1 alongside go-live.</p>
+
+        <div class="recurring-timeline">
+
+          <div class="recur-card early">
+            <div class="recur-date">May 1, 2026 · Starts Early</div>
+            <div class="recur-name">Affiliate Program <em>Management</em></div>
+            <div class="recur-source">MOU §5.10 · dedicated line</div>
+            <div class="recur-price">$1,500<span style="font-size: 16px; color: var(--ink-muted); font-weight: 300;">/mo</span></div>
+            <div class="recur-period">Begins May 1 · Setup phase</div>
+            <div class="recur-note">Two months of program build before launch: UpPromote configuration, ambassador and affiliate tier design, commission structure, partner agreements, recruitment outreach, fraud detection setup, branded portal, creative asset kit. Ready to activate at launch.</div>
+          </div>
+
+          <div class="recur-card">
+            <div class="recur-date">July 1, 2026 · Launch Window</div>
+            <div class="recur-name">Growth Partner <em>Retainer</em></div>
+            <div class="recur-source">MOU §4 · equity-aligned tier</div>
+            <div style="font-family: var(--mono); font-size: 14px; color: var(--ink-faint); text-decoration: line-through; margin-bottom: 4px;">$12,500/mo · Scale Engine cash rate</div>
+            <div class="recur-price">$5,500<span style="font-size: 16px; color: var(--ink-muted); font-weight: 300;">/mo</span></div>
+            <div class="recur-period">Activates July 1 · launch month</div>
+            <div class="recur-note">Same scope as the <strong style="color: var(--ink);">Scale Engine</strong> tier (the highest-deliverable package in the original Growth Partnership Proposal at $12,500/mo cash) — reduced to $5,500/mo cash in exchange for the equity ladder and revenue share structure already negotiated in the MOU. Fractional CMO leadership, Brand Voice Agent, full content production, paid ads management across all channels, Klaviyo email/SMS, CRO, attribution dashboard. Excludes affiliate management and Shopify management — those run as separate lines below.</div>
+          </div>
+
+          <div class="recur-card">
+            <div class="recur-date">July 1, 2026 · Launch Window</div>
+            <div class="recur-name">Shopify <em>Maintenance</em></div>
+            <div class="recur-source">MOU §5.9 · selected tier</div>
+            <div class="recur-price">$1,200<span style="font-size: 16px; color: var(--ink-muted); font-weight: 300;">/mo</span></div>
+            <div class="recur-period">Activates July 1 · launch month</div>
+            <div class="recur-note">Ongoing platform operations: theme updates, app integrations, performance monitoring, security patches, light dev hours. Sits on top of the retainer, not as a substitution. Upgrade gates trigger automatically at revenue thresholds (next section).</div>
+          </div>
+
+        </div>
+
+        <div class="note-block">
+          <h4>Combined post-launch monthly</h4>
+          <p>Starting July 1, the recurring monthly is <strong>$8,200</strong> ($5,500 Growth Partner retainer + $1,500 affiliate + $1,200 Shopify management). The Growth Partner cash rate is <strong>$7,000/mo below</strong> the equivalent Scale Engine package — that $84K/year cash discount is what the equity ladder and revenue share structure is paying for on ROI.live's side. Ad spend and ad management fee sit on top per the MOU §5.4 V3 structure (5% / 4% / 3% tiered against annual managed spend), paid against the $1.38M Year 1 marketing budget already committed.</p>
+        </div>
+      </section>
+
+      <!-- 04 SHOPIFY TIERS -->
+      <section class="content-section" id="shopify-tiers">
+        <div class="section-num">04 / Shopify Management Tiers</div>
+        <h2>The three options, <em>upgrade gates set</em>.</h2>
+        <p>Per MOU §5.9, ALVARA selected the Maintenance tier with revenue-driven upgrade gates. The structure protects ALVARA from paying for capacity it doesn't need yet, and protects ROI.live from carrying complexity at scale on a Maintenance fee. Both gates trigger automatically against trailing 3-month DTC revenue.</p>
+
+        <div class="tier-grid">
+
+          <!-- MAINTENANCE -->
+          <div class="tier-card selected">
+            <div class="tier-name">Maintenance</div>
+            <div class="tier-tag">Tier 1 · Active July 1</div>
+            <div class="tier-price">$1,200</div>
+            <div class="tier-period">per month</div>
+            <div class="tier-gate">
+              <strong>Active scope</strong>
+              Ongoing operations through DTC launch and ramp window. Light dev hours, monitoring, integrations.
+            </div>
+            <ul>
+              <li>Theme updates and app management</li>
+              <li>Performance and uptime monitoring</li>
+              <li>Security patches and version control</li>
+              <li>Light dev hours · 5 hrs/month included</li>
+              <li>Subscription and B2B flow oversight</li>
+              <li>Monthly site health report</li>
+            </ul>
+          </div>
+
+          <!-- GROWTH -->
+          <div class="tier-card locked">
+            <div class="tier-name">Growth</div>
+            <div class="tier-tag">Tier 2 · Locked until trigger</div>
+            <div class="tier-price">Auto-engage</div>
+            <div class="tier-period">at revenue gate</div>
+            <div class="tier-gate">
+              <strong>Upgrade gate</strong>
+              Automatically activates when trailing 3-month DTC revenue crosses $500,000 (~$2M annualized).
+            </div>
+            <ul>
+              <li>Everything in Maintenance, plus:</li>
+              <li>Expanded dev hours · 10 hrs/month</li>
+              <li>Proactive CRO testing program</li>
+              <li>Quarterly strategic site review</li>
+              <li>Priority response window</li>
+              <li>Pricing finalized at gate trigger</li>
+            </ul>
+          </div>
+
+          <!-- SCALE -->
+          <div class="tier-card locked">
+            <div class="tier-name">Scale</div>
+            <div class="tier-tag">Tier 3 · Locked until trigger</div>
+            <div class="tier-price">Auto-engage</div>
+            <div class="tier-period">at revenue gate</div>
+            <div class="tier-gate">
+              <strong>Upgrade gate</strong>
+              Automatically activates when trailing 3-month DTC revenue crosses $2,000,000 (~$8M annualized).
+            </div>
+            <ul>
+              <li>Everything in Growth, plus:</li>
+              <li>Full dev capacity · 18+ hrs/month</li>
+              <li>Continuous CRO and feature roadmap</li>
+              <li>Dedicated developer assignment</li>
+              <li>Same-day response · launch-week SLAs</li>
+              <li>Pricing finalized at gate trigger</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div class="note-block">
+          <h4>Why the gates work this way</h4>
+          <p>The structure means ALVARA pays $1,200/mo for as long as the platform load matches the Maintenance scope. The Growth tier doesn't kick in on a calendar date — it kicks in when DTC revenue says the brand has graduated into needing it. Same logic applies to Scale. Both prices get finalized at the gate trigger because dev capacity needs at $2M ARR and $8M ARR look meaningfully different from each other and from today.</p>
+        </div>
+      </section>
+
+      <!-- 05 PAYMENT OPTIONS -->
+      <section class="content-section" id="payment">
+        <div class="section-num">05 / Two Payment Options</div>
+        <h2>Two ways to pay <em>the build</em>.</h2>
+        <p>Standard milestone (50/50 on signing and launch) is the cleaner number on paper. The 3-month plan is the cleaner number on cash flow. Same total, no interest, no hidden cost — just a different distribution. Both apply to the $53,000 launch build (content + Shopify build). Recurring fees run on their own schedule and aren't part of the build payment plan.</p>
+
+        <div class="payment-grid">
+
+          <!-- OPTION A: STANDARD -->
+          <div class="payment-col">
+            <h4>Option A · Standard</h4>
+            <div class="payment-name">Milestone · <em>50/50</em></div>
+            <div class="payment-tag">Per MOU §5.9 default. Two payments tied to contract execution and launch. Covers both the $25K content package and the $28K Shopify build.</div>
+
+            <div class="schedule">
+              <div class="schedule-row">
+                <div class="schedule-date">May 1</div>
+                <div class="schedule-desc">Contract execution · 50% of build</div>
+                <div class="schedule-amt">$26,500</div>
+              </div>
+              <div class="schedule-row">
+                <div class="schedule-date">Jul 1</div>
+                <div class="schedule-desc">Launch · final 50% of build</div>
+                <div class="schedule-amt">$26,500</div>
+              </div>
+              <div class="schedule-row">
+                <div class="schedule-date">Total</div>
+                <div class="schedule-desc">Two payments · 0% interest</div>
+                <div class="schedule-amt" style="color: var(--gold-bright); font-size: 18px;">$53,000</div>
+              </div>
+            </div>
+
+            <div class="payment-note">
+              <strong style="color: var(--ink); display: block; margin-bottom: 6px;">When this fits:</strong>
+              When cash isn't the constraint and ALVARA wants the lowest possible signal-to-noise on the payment side. Two payments, no monthly tracking.
+            </div>
+          </div>
+
+          <!-- OPTION B: 3-MONTH -->
+          <div class="payment-col recommended">
+            <h4>Option B · Recommended for cash flow</h4>
+            <div class="payment-name">3-Month Plan · <em>0% interest</em></div>
+            <div class="payment-tag">Same total. Spread evenly across May, June, and July. Covers both the $25K content package and the $28K Shopify build. No fees, no markup, no interest.</div>
+
+            <div class="schedule">
+              <div class="schedule-row">
+                <div class="schedule-date">May 1</div>
+                <div class="schedule-desc">Payment 1 of 3 · build kickoff</div>
+                <div class="schedule-amt">$17,667</div>
+              </div>
+              <div class="schedule-row">
+                <div class="schedule-date">Jun 1</div>
+                <div class="schedule-desc">Payment 2 of 3 · mid-build</div>
+                <div class="schedule-amt">$17,667</div>
+              </div>
+              <div class="schedule-row">
+                <div class="schedule-date">Jul 1</div>
+                <div class="schedule-desc">Payment 3 of 3 · launch day</div>
+                <div class="schedule-amt">$17,666</div>
+              </div>
+              <div class="schedule-row">
+                <div class="schedule-date">Total</div>
+                <div class="schedule-desc">Three payments · 0% interest</div>
+                <div class="schedule-amt" style="color: var(--gold-bright); font-size: 18px;">$53,000</div>
+              </div>
+            </div>
+
+            <div class="payment-note">
+              <strong style="color: var(--ink); display: block; margin-bottom: 6px;">When this fits:</strong>
+              When ALVARA wants to keep more cash in the ad account during the pre-launch window. Cuts the May 1 outlay by $8,833 vs the standard plan and the third payment lands the same day launch goes live.
+            </div>
+          </div>
+
+        </div>
+
+        <div class="note-block">
+          <h4>Either option pairs with the recurring fees</h4>
+          <p>The build payment schedule is independent of the recurring lines. Affiliate management starts $1,500/mo on May 1 either way. Retainer and Shopify management start $8,500 + $1,200 on July 1 either way. The build plan affects build cash flow only — it doesn't shift the recurring activation dates.</p>
+        </div>
+      </section>
+
+      <!-- 06 CASH FLOW CALENDAR -->
+      <section class="content-section" id="cashflow">
+        <div class="section-num">06 / Cash Flow Calendar</div>
+        <h2>Exactly what's due, <em>each month</em>.</h2>
+        <p>What ALVARA writes a check for on May 1, June 1, and July 1 — under both payment options. Recurring fees layer on top of the build payments. Numbers are gross of ad spend (which sits in its own bucket against the $1.38M Year 1 marketing commitment).</p>
+
+        <!-- HEADLINE PAYMENT CARDS -->
+        <div style="margin: 32px 0 40px;">
+          <h4 style="margin-bottom: 18px;">Headline payments at a glance</h4>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+
+            <!-- MAY 1 -->
+            <div style="background: var(--bg-card); border: 1px solid var(--gold-deep); padding: 28px 28px 24px; position: relative; overflow: hidden;">
+              <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--gold);"></div>
+              <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px;">Payment 1</div>
+              <div style="font-family: var(--serif); font-size: 28px; color: var(--ink); font-weight: 500; line-height: 1.1; margin-bottom: 4px;">May 1, 2026</div>
+              <div style="font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-bottom: 22px; letter-spacing: 0.06em;">Build kickoff · contract execution</div>
+
+              <div style="border-top: 1px dashed var(--rule); padding-top: 18px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <div style="font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint);">Option A · Standard</div>
+                </div>
+                <div style="font-family: var(--serif); font-size: 36px; color: var(--gold-bright); font-weight: 400; line-height: 1; letter-spacing: -0.02em; margin-bottom: 8px;">$28,000</div>
+                <div style="font-size: 12px; color: var(--ink-muted); line-height: 1.5;">$26,500 build (50%) + $1,500 affiliate setup</div>
+              </div>
+
+              <div style="border-top: 1px dashed var(--rule); padding-top: 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <div style="font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold);">Option B · 3-Month Plan</div>
+                </div>
+                <div style="font-family: var(--serif); font-size: 36px; color: var(--gold-bright); font-weight: 400; line-height: 1; letter-spacing: -0.02em; margin-bottom: 8px;">$19,167</div>
+                <div style="font-size: 12px; color: var(--ink-muted); line-height: 1.5;">$17,667 build (1/3) + $1,500 affiliate setup</div>
+              </div>
+            </div>
+
+            <!-- JUNE 1 -->
+            <div style="background: var(--bg-card); border: 1px solid var(--gold-deep); padding: 28px 28px 24px; position: relative; overflow: hidden;">
+              <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--gold);"></div>
+              <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px;">Payment 2</div>
+              <div style="font-family: var(--serif); font-size: 28px; color: var(--ink); font-weight: 500; line-height: 1.1; margin-bottom: 4px;">June 1, 2026</div>
+              <div style="font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-bottom: 22px; letter-spacing: 0.06em;">Mid-build · Shopify dev underway</div>
+
+              <div style="border-top: 1px dashed var(--rule); padding-top: 18px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <div style="font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint);">Option A · Standard</div>
+                </div>
+                <div style="font-family: var(--serif); font-size: 36px; color: var(--gold-bright); font-weight: 400; line-height: 1; letter-spacing: -0.02em; margin-bottom: 8px;">$1,500</div>
+                <div style="font-size: 12px; color: var(--ink-muted); line-height: 1.5;">Affiliate setup only · no build payment due</div>
+              </div>
+
+              <div style="border-top: 1px dashed var(--rule); padding-top: 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <div style="font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold);">Option B · 3-Month Plan</div>
+                </div>
+                <div style="font-family: var(--serif); font-size: 36px; color: var(--gold-bright); font-weight: 400; line-height: 1; letter-spacing: -0.02em; margin-bottom: 8px;">$19,167</div>
+                <div style="font-size: 12px; color: var(--ink-muted); line-height: 1.5;">$17,667 build (2/3) + $1,500 affiliate setup</div>
+              </div>
+            </div>
+
+            <!-- JULY 1 -->
+            <div style="background: linear-gradient(135deg, rgba(201, 162, 74, 0.10), rgba(201, 162, 74, 0.02)); border: 1px solid var(--gold); padding: 28px 28px 24px; position: relative; overflow: hidden;">
+              <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--gold-bright);"></div>
+              <div style="position: absolute; top: 16px; right: 16px; font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--bg); background: var(--gold); padding: 4px 10px; border-radius: 2px; font-weight: 600;">Launch Day</div>
+              <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px;">Payment 3 + Recurring Activation</div>
+              <div style="font-family: var(--serif); font-size: 28px; color: var(--ink); font-weight: 500; line-height: 1.1; margin-bottom: 4px;">July 1, 2026</div>
+              <div style="font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-bottom: 22px; letter-spacing: 0.06em;">Build complete · go-live · retainer + Shopify mgmt activate</div>
+
+              <div style="border-top: 1px dashed var(--rule); padding-top: 18px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <div style="font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint);">Option A · Standard</div>
+                </div>
+                <div style="font-family: var(--serif); font-size: 36px; color: var(--gold-bright); font-weight: 400; line-height: 1; letter-spacing: -0.02em; margin-bottom: 8px;">$34,700</div>
+                <div style="font-size: 12px; color: var(--ink-muted); line-height: 1.5;">$26,500 build (50%) + $5,500 Growth Partner retainer + $1,200 Shopify mgmt + $1,500 affiliate</div>
+              </div>
+
+              <div style="border-top: 1px dashed var(--rule); padding-top: 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <div style="font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold);">Option B · 3-Month Plan</div>
+                </div>
+                <div style="font-family: var(--serif); font-size: 36px; color: var(--gold-bright); font-weight: 400; line-height: 1; letter-spacing: -0.02em; margin-bottom: 8px;">$25,866</div>
+                <div style="font-size: 12px; color: var(--ink-muted); line-height: 1.5;">$17,666 build (3/3) + $5,500 Growth Partner retainer + $1,200 Shopify mgmt + $1,500 affiliate</div>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="margin-top: 20px; padding: 18px 24px; background: var(--bg-elevated); border-left: 3px solid var(--green); display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center;">
+            <div style="font-size: 14px; color: var(--ink); line-height: 1.5;">
+              <strong style="color: var(--green-bright);">Option B keeps $8,833 more cash in the ad account on May 1.</strong> Same $53,000 total over the same 90 days. Same launch date. The third payment lands the morning launch goes live.
+            </div>
+            <div style="font-family: var(--mono); font-size: 11px; color: var(--green-bright); letter-spacing: 0.12em; text-transform: uppercase; text-align: right;">Cash flow advantage<br>· Option B</div>
+          </div>
+        </div>
+
+        <h4 style="margin-top: 40px;">Full month-by-month detail</h4>
+
+        <div class="cashflow-wrap">
+          <h4>Option A · Standard milestone (50/50)</h4>
+          <table class="cashflow-table">
+            <thead>
+              <tr>
+                <th style="width: 100px;">Month</th>
+                <th>Build Payment</th>
+                <th>Affiliate Mgmt</th>
+                <th>Retainer</th>
+                <th>Shopify Mgmt</th>
+                <th class="right">Monthly Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="milestone">
+                <td class="label">May 2026</td>
+                <td class="num amt">$26,500</td>
+                <td class="num amt">$1,500</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+                <td class="num amt"><strong>$28,000</strong></td>
+              </tr>
+              <tr>
+                <td class="label">Jun 2026</td>
+                <td class="num">—</td>
+                <td class="num amt">$1,500</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+                <td class="num amt"><strong>$1,500</strong></td>
+              </tr>
+              <tr class="milestone">
+                <td class="label">Jul 2026</td>
+                <td class="num amt">$26,500</td>
+                <td class="num amt">$1,500</td>
+                <td class="num amt">$5,500</td>
+                <td class="num amt">$1,200</td>
+                <td class="num amt"><strong>$34,700</strong></td>
+              </tr>
+              <tr>
+                <td class="label">Aug 2026+</td>
+                <td class="num">—</td>
+                <td class="num amt">$1,500</td>
+                <td class="num amt">$5,500</td>
+                <td class="num amt">$1,200</td>
+                <td class="num amt"><strong>$8,200</strong>/mo</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="compare-bars" style="margin-top: 24px;">
+            <div class="compare-row">
+              <div class="compare-month">May 1</div>
+              <div class="compare-bar"><div class="compare-fill" style="width: 81%;"></div></div>
+              <div class="compare-amt">$28,000</div>
+            </div>
+            <div class="compare-row">
+              <div class="compare-month">Jun 1</div>
+              <div class="compare-bar"><div class="compare-fill" style="width: 4%;"></div></div>
+              <div class="compare-amt">$1,500</div>
+            </div>
+            <div class="compare-row">
+              <div class="compare-month">Jul 1</div>
+              <div class="compare-bar"><div class="compare-fill" style="width: 100%;"></div></div>
+              <div class="compare-amt">$34,700</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cashflow-wrap">
+          <h4>Option B · 3-month plan (0% interest)</h4>
+          <table class="cashflow-table">
+            <thead>
+              <tr>
+                <th style="width: 100px;">Month</th>
+                <th>Build Payment</th>
+                <th>Affiliate Mgmt</th>
+                <th>Retainer</th>
+                <th>Shopify Mgmt</th>
+                <th class="right">Monthly Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="milestone">
+                <td class="label">May 2026</td>
+                <td class="num amt">$17,667</td>
+                <td class="num amt">$1,500</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+                <td class="num amt"><strong>$19,167</strong></td>
+              </tr>
+              <tr class="milestone">
+                <td class="label">Jun 2026</td>
+                <td class="num amt">$17,667</td>
+                <td class="num amt">$1,500</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+                <td class="num amt"><strong>$19,167</strong></td>
+              </tr>
+              <tr class="milestone">
+                <td class="label">Jul 2026</td>
+                <td class="num amt">$17,666</td>
+                <td class="num amt">$1,500</td>
+                <td class="num amt">$5,500</td>
+                <td class="num amt">$1,200</td>
+                <td class="num amt"><strong>$25,866</strong></td>
+              </tr>
+              <tr>
+                <td class="label">Aug 2026+</td>
+                <td class="num">—</td>
+                <td class="num amt">$1,500</td>
+                <td class="num amt">$5,500</td>
+                <td class="num amt">$1,200</td>
+                <td class="num amt"><strong>$8,200</strong>/mo</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="compare-bars" style="margin-top: 24px;">
+            <div class="compare-row">
+              <div class="compare-month">May 1</div>
+              <div class="compare-bar"><div class="compare-fill" style="width: 55%;"></div></div>
+              <div class="compare-amt">$19,167</div>
+            </div>
+            <div class="compare-row">
+              <div class="compare-month">Jun 1</div>
+              <div class="compare-bar"><div class="compare-fill" style="width: 55%;"></div></div>
+              <div class="compare-amt">$19,167</div>
+            </div>
+            <div class="compare-row">
+              <div class="compare-month">Jul 1</div>
+              <div class="compare-bar"><div class="compare-fill" style="width: 75%;"></div></div>
+              <div class="compare-amt">$25,866</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="note-block">
+          <h4>What changes between the two options</h4>
+          <p>Option B keeps <strong>~$8,800 more cash on hand</strong> during the May–June pre-launch window — the period when Scenario A ramp ad spend is ramping into the ad accounts. Same $53K total over the same 90 days. The only thing that moves is when the cash leaves the account.</p>
+        </div>
+      </section>
+
+      <!-- 07 NEXT STEPS -->
+      <section class="content-section" id="decisions">
+        <div class="section-num">07 / Next Steps</div>
+        <h2>Three quick <em>confirmations</em>.</h2>
+        <p>Each of these closes in a sentence. None of them block contract execution. All three want a name on them so the May 1 work can start clean.</p>
+
+        <div class="final-call">
+          <h4>What I need from you</h4>
+          <div class="statement">Three calls — <em>build scope, payment plan, and start dates</em>.</div>
+
+          <div class="next-steps">
+            <div class="next-step">
+              <strong>Decision 01 · Build scope</strong>
+              Confirm $53K launch build (content + Shopify Plus + B2B + plugins) with $8K ADA included free. The MOU §5.9 number lifts from $16K to $28K on the Shopify line; the $25K content package is per the original Growth Partnership Proposal.
+            </div>
+            <div class="next-step">
+              <strong>Decision 02 · Payment plan</strong>
+              Pick Option A (50/50 milestone) or Option B (3-month, 0% interest, May 1 / Jun 1 / Jul 1). Either way, recurring fees activate per the schedule.
+            </div>
+            <div class="next-step">
+              <strong>Decision 03 · Recurring activation</strong>
+              Confirm affiliate management starts May 1 ($1,500/mo program setup), and Growth Partner retainer + Shopify management activate July 1 ($5,500 + $1,200/mo) at launch.
+            </div>
+            <div class="next-step">
+              <strong>Timeline</strong>
+              All three close inside 5 business days. Affiliate program build kicks off May 1. Shopify build runs May 1 – June 30. Site goes live July 1. Build payment 1 lands May 1 under either option.
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-row">
+      <div class="signature">Prepared by <span>ROI.live</span> for ALVARA Vitality leadership</div>
+      <div>Launch Breakdown · April 29, 2026</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('section.content-section');
+  const navItems = document.querySelectorAll('nav.side-nav li');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navItems.forEach(item => {
+          item.classList.remove('active');
+          const link = item.querySelector('a');
+          if (link && link.getAttribute('href') === '#' + id) {
+            item.classList.add('active');
+          }
+        });
+      }
+    });
+  }, {
+    rootMargin: '-30% 0px -60% 0px',
+    threshold: 0
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>
