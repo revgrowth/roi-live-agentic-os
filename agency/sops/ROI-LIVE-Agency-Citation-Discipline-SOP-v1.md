@@ -129,7 +129,7 @@ These are universal patterns that recur across AI-assisted content production. P
 - Citing a retired or superseded policy document as current guidance
 - Leaving [STAT NEEDED] placeholders in submitted drafts, treating the placeholder as finished work
 
-(For legislative and regulatory citation hallucinations specifically — wrong bill numbers, wrong statute sections, broken .gov URLs — see Phase 8.)
+(For legislative and regulatory citation hallucinations specifically, including wrong bill numbers, wrong statute sections, and broken .gov URLs, see Phase 8.)
 
 ### 4.2 Per-Client Incident Catalog
 Each per-client overlay maintains an appendix that adds specific hallucinations caught in that client's content production, with the date, the false claim, and the corrected version. The catalog grows as the engagement matures. This is the most valuable artifact of any long-running client relationship: the post-incident learnings that keep the same mistake from recurring.
@@ -171,7 +171,9 @@ For non-DOI sources cited in published content:
 - Note the snapshot URL in working notes alongside the original
 - If the original URL later dies, the article updates to point to the snapshot
 
-DOI-backed sources do not require Wayback archival — DOI resolution is a permanent identifier maintained by the publisher.
+DOI-backed sources do not require Wayback archival, since DOI resolution is a permanent identifier maintained by the publisher.
+
+If Wayback Machine is unavailable at verification time, document the attempt (timestamp, original URL, unavailability reason) in working notes and capture the snapshot when service returns. The verification gate passes on documented attempt; the snapshot URL gets backfilled when Wayback is reachable.
 
 ---
 
