@@ -1,0 +1,58 @@
+{
+  "version": "0.1.20260430",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "0.0564 sec.",
+  "cost": 0,
+  "tasks_count": 1,
+  "tasks_error": 1,
+  "tasks": [
+    {
+      "id": "04302008-1032-0607-0000-e476884e1f1c",
+      "status_code": 40501,
+      "status_message": "Invalid Field: 'location_code'.",
+      "time": "0 sec.",
+      "cost": 0,
+      "result_count": 0,
+      "path": [
+        "v3",
+        "dataforseo_labs",
+        "google",
+        "keyword_overview",
+        "live"
+      ],
+      "data": {
+        "api": "dataforseo_labs",
+        "function": "keyword_overview",
+        "se_type": "google",
+        "keywords": [
+          "ac not cooling",
+          "ac blowing warm air",
+          "ac frozen",
+          "ac leaking water",
+          "ac making strange noises",
+          "ac short cycling",
+          "ac won't turn on",
+          "ac running but no air from vents",
+          "trane ac repair",
+          "carrier ac repair",
+          "goodman ac repair",
+          "lennox ac repair",
+          "rheem ac repair",
+          "york ac repair",
+          "ac repair mount pleasant sc",
+          "ac repair daniel island",
+          "ac repair james island",
+          "ac repair west ashley",
+          "ac repair johns island",
+          "ac repair north charleston"
+        ],
+        "location_code": 1025521,
+        "language_code": "en",
+        "include_serp_info": false,
+        "include_clickstream_data": false
+      },
+      "result": null
+    }
+  ]
+}

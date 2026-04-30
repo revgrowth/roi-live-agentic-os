@@ -1,0 +1,2561 @@
+{
+  "version": "0.1.20260430",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "6.6853 sec.",
+  "cost": 0.0035,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "04302029-1032-0139-0000-7a4e5e127f35",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "6.5454 sec.",
+      "cost": 0.0035,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "serp",
+        "google",
+        "organic",
+        "live",
+        "advanced"
+      ],
+      "data": {
+        "api": "serp",
+        "function": "live",
+        "se": "google",
+        "se_type": "organic",
+        "keyword": "ac blowing warm air",
+        "location_code": 1025666,
+        "language_code": "en",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20,
+        "load_async_ai_overview": true
+      },
+      "result": [
+        {
+          "keyword": "ac blowing warm air",
+          "type": "organic",
+          "se_domain": "google.com",
+          "location_code": 1025666,
+          "language_code": "en",
+          "check_url": "https://www.google.com/search?q=ac%20blowing%20warm%20air&hl=en&gl=US&ie=UTF-8&uule=w+CAIQIFISCUvj5xPE9P6IEU9NBigjeSIB",
+          "datetime": "2026-04-30 17:29:54 +00:00",
+          "spell": null,
+          "refinement_chips": null,
+          "item_types": [
+            "ai_overview",
+            "organic",
+            "people_also_ask",
+            "video",
+            "perspectives",
+            "discussions_and_forums",
+            "product_considerations",
+            "related_searches"
+          ],
+          "se_results_count": 46400000,
+          "pages_count": 2,
+          "items_count": 25,
+          "items": [
+            {
+              "type": "ai_overview",
+              "rank_group": 1,
+              "rank_absolute": 1,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "asynchronous_ai_overview": true,
+              "markdown": "![8 Frustrating Reasons Your AC Is Blowing Hot Air (And Fixes)](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-7a4e5e127f35:4)\nAn AC blowing hot air is commonly caused by `a dirty air filter, low refrigerant, thermostat issues, or a tripped circuit breaker` , which prevents the condenser from cooling the air. Other causes include a failed capacitor, a frozen evaporator coil, or a faulty compressor.[[1]](https://www.carrier.com/residential/en/ca/products/air-conditioners/why-is-my-ac-blowing-hot-air/)[[2]](https://www.youtube.com/shorts/3Sq7QRDtmf0#:~:text=AC%20blowing%20warm%20air?%20Don't%20sweat%20it%E2%80%94common,refrigerant%2C%20thermostat%20issues%2C%20or%20a%20faulty%20compressor.)[[3]](https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air)[[4]](https://www.angi.com/articles/why-is-my-ac-blowing-hot-air.htm)[[5]](https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/)\n\n**Common Reasons Your AC is Blowing Hot Air:** \n\n- **Incorrect Thermostat Settings:** The thermostat may be set to \"heat\" or \"fan\" instead of \"cool\".\n- **Dirty Air Filter:** Restricted airflow causes the system to overheat and freeze, causing it to blow warm air.\n- **Low Refrigerant Level:** Leaks in the refrigerant line prevent the system from cooling properly.\n- **Tripped Circuit Breaker:** The outdoor unit may not have power, meaning the fan is running but not cooling.\n- **Clogged Condensate Drain:** A clogged line can cause the system to shut down the cooling process.\n- **Failed Capacitor or Compressor:** These components start and run the motor; if they fail, the system runs but doesn't cool.[[1]](https://www.youtube.com/watch?v=gWRqIRa5600&t=25)[[2]](https://www.bryant.com/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/)[[3]](https://aspenaireinc.com/why-is-ac-blowing-hot-air/)[[4]](https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air)[[5]](https://calldreamteam.com/blog/why-is-my-ac-blowing-warm-air/)[[6]](https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/)[[7]](https://www.angi.com/articles/why-is-my-ac-blowing-hot-air.htm)[[8]](https://www.youtube.com/shorts/93qbSOOw2yI)\n\n**Troubleshooting Steps:** \n\n1. Check that the thermostat is set to **Cool** and **Auto**.\n2. Inspect and change the air filter.\n3. Reset the circuit breaker if it has tripped.\n4. Check the outdoor unit for blockages.[[1]](https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/)[[2]](https://aspenaireinc.com/why-is-ac-blowing-hot-air/)[[3]](https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air)[[4]](https://www.angi.com/articles/why-is-my-ac-blowing-hot-air.htm)\n\nIf these do not work, the issue may require a professional HVAC technician to address refrigerant leaks or compressor failure.[[1]](https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air)[[2]](https://www.youtube.com/watch?v=gWRqIRa5600&t=25)",
+              "items": [
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "An AC blowing hot air is commonly caused by a dirty air filter, low refrigerant, thermostat issues, or a tripped circuit breaker, which prevents the condenser from cooling the air. Other causes include a failed capacitor, a frozen evaporator coil, or a faulty compressor. Carrier +4",
+                  "markdown": "![8 Frustrating Reasons Your AC Is Blowing Hot Air (And Fixes)](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-7a4e5e127f35:2)\nAn AC blowing hot air is commonly caused by `a dirty air filter, low refrigerant, thermostat issues, or a tripped circuit breaker` , which prevents the condenser from cooling the air. Other causes include a failed capacitor, a frozen evaporator coil, or a faulty compressor.[[1]](https://www.carrier.com/residential/en/ca/products/air-conditioners/why-is-my-ac-blowing-hot-air/)[[2]](https://www.youtube.com/shorts/3Sq7QRDtmf0#:~:text=AC%20blowing%20warm%20air?%20Don't%20sweat%20it%E2%80%94common,refrigerant%2C%20thermostat%20issues%2C%20or%20a%20faulty%20compressor.)[[3]](https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air)[[4]](https://www.angi.com/articles/why-is-my-ac-blowing-hot-air.htm)[[5]](https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/)",
+                  "links": null,
+                  "images": [
+                    {
+                      "type": "images_element",
+                      "alt": "8 Frustrating Reasons Your AC Is Blowing Hot Air (And Fixes)",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-7a4e5e127f35:3"
+                    }
+                  ],
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Carrier",
+                      "domain": "www.carrier.com",
+                      "url": "https://www.carrier.com/residential/en/ca/products/air-conditioners/why-is-my-ac-blowing-hot-air/",
+                      "title": "Why Is MY AC Blowing Hot Air - Carrier",
+                      "text": "6. Compressor Problems. The compressor is essential for cooling; if it fails, the system may blow hot air."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/shorts/3Sq7QRDtmf0#:~:text=AC%20blowing%20warm%20air?%20Don't%20sweat%20it%E2%80%94common,refrigerant%2C%20thermostat%20issues%2C%20or%20a%20faulty%20compressor.",
+                      "title": "Why Your AC Is Blowing Warm Air – Common Causes Explained ...",
+                      "text": "AC blowing warm air? Don't sweat it—common causes include dirty filters, low refrigerant, thermostat issues, or a faulty compresso..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "A.J. Perri",
+                      "domain": "www.ajperri.com",
+                      "url": "https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air",
+                      "title": "Why is My AC Blowing Hot Air? 5 Troubleshooting Tips - A.J. Perri",
+                      "text": "OTHER COMMON REASONS YOUR AC IS BLOWING WARM AIR When your AC is blowing warm or even hot air, it usually means something is inter..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Angie's List",
+                      "domain": "www.angi.com",
+                      "url": "https://www.angi.com/articles/why-is-my-ac-blowing-hot-air.htm",
+                      "title": "Why Is My AC Blowing Hot Air? 11 Possible Reasons | Angi",
+                      "text": "How to Fix It. Generally, this is due to a blown fuse or a tripped circuit breaker. You can check your circuit breaker box; if the..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Mechanical One",
+                      "domain": "mechanicalone.com",
+                      "url": "https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/",
+                      "title": "Why Is My AC Blowing Hot Air? Troubleshooting Tips",
+                      "text": "Thermostat malfunction. Refrigerant Leak or Low Refrigerant Levels. AC Compressor Issues. Clogged condensate Drain Line. Tripped B..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Common Reasons Your AC is Blowing Hot Air:",
+                  "text": "Incorrect Thermostat Settings: The thermostat may be set to \"heat\" or \"fan\" instead of \"cool\". Dirty Air Filter: Restricted airflow causes the system to overheat and freeze, causing it to blow warm air. Low Refrigerant Level: Leaks in the refrigerant line prevent the system from cooling properly. Tripped Circuit Breaker: The outdoor unit may not have power, meaning the fan is running but not cooling. Clogged Condensate Drain: A clogged line can cause the system to shut down the cooling process. Failed Capacitor or Compressor: These components start and run the motor; if they fail, the system runs but doesn't cool.",
+                  "markdown": "- **Incorrect Thermostat Settings:** The thermostat may be set to \"heat\" or \"fan\" instead of \"cool\".\n- **Dirty Air Filter:** Restricted airflow causes the system to overheat and freeze, causing it to blow warm air.\n- **Low Refrigerant Level:** Leaks in the refrigerant line prevent the system from cooling properly.\n- **Tripped Circuit Breaker:** The outdoor unit may not have power, meaning the fan is running but not cooling.\n- **Clogged Condensate Drain:** A clogged line can cause the system to shut down the cooling process.\n- **Failed Capacitor or Compressor:** These components start and run the motor; if they fail, the system runs but doesn't cool.[[1]](https://www.youtube.com/watch?v=gWRqIRa5600&t=25)[[2]](https://www.bryant.com/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/)[[3]](https://aspenaireinc.com/why-is-ac-blowing-hot-air/)[[4]](https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air)[[5]](https://calldreamteam.com/blog/why-is-my-ac-blowing-warm-air/)[[6]](https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/)[[7]](https://www.angi.com/articles/why-is-my-ac-blowing-hot-air.htm)[[8]](https://www.youtube.com/shorts/93qbSOOw2yI)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=gWRqIRa5600&t=25",
+                      "title": "Air Conditioner Blowing HOT Air? Here's How To Fix It!",
+                      "text": "To address an air conditioner blowing hot air, initial steps involve ensuring the thermostat is engaged and the indoor fan is runn..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Bryant",
+                      "domain": "www.bryant.com",
+                      "url": "https://www.bryant.com/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/",
+                      "title": "Why Is My AC Blowing Hot Air? | Troubleshooting & Fixes - Bryant",
+                      "text": "Incorrect thermostat settings: Sometimes the issue is as simple as the thermostat being accidentally set to \"heat\" or \"fan\" mode i..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Aspen Aire Heating & Cooling",
+                      "domain": "aspenaireinc.com",
+                      "url": "https://aspenaireinc.com/why-is-ac-blowing-hot-air/",
+                      "title": "Why Is My AC Blowing Hot Air? | Six Common Causes - Aspen Aire",
+                      "text": "Why Is My AC Blowing Hot Air? * Thermostat Issues. First things first, make sure your thermostat is set correctly. Make sure the t..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "A.J. Perri",
+                      "domain": "www.ajperri.com",
+                      "url": "https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air",
+                      "title": "Why is My AC Blowing Hot Air? 5 Troubleshooting Tips - A.J. Perri",
+                      "text": "OTHER COMMON REASONS YOUR AC IS BLOWING WARM AIR When your AC is blowing warm or even hot air, it usually means something is inter..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Dream Team Heating & Air",
+                      "domain": "calldreamteam.com",
+                      "url": "https://calldreamteam.com/blog/why-is-my-ac-blowing-warm-air/",
+                      "title": "Why is Your Ac Blowing Warm Air? 6 Reasons and Fixes",
+                      "text": "There are several reasons why your air conditioner might be blowing warm air: * **Low refrigerant or leak** Your AC needs refriger..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Mechanical One",
+                      "domain": "mechanicalone.com",
+                      "url": "https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/",
+                      "title": "Why Is My AC Blowing Hot Air? Troubleshooting Tips",
+                      "text": "Thermostat malfunction. Refrigerant Leak or Low Refrigerant Levels. AC Compressor Issues. Clogged condensate Drain Line. Tripped B..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Angie's List",
+                      "domain": "www.angi.com",
+                      "url": "https://www.angi.com/articles/why-is-my-ac-blowing-hot-air.htm",
+                      "title": "Why Is My AC Blowing Hot Air? 11 Possible Reasons | Angi",
+                      "text": "How to Fix It. Generally, this is due to a blown fuse or a tripped circuit breaker. You can check your circuit breaker box; if the..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/shorts/93qbSOOw2yI",
+                      "title": "Why is my AC blowing warm air?",
+                      "text": "An air conditioner might blow warm air even when it's running. This could be due to a bad thermostat causing the furnace to run si..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Troubleshooting Steps:",
+                  "text": "If these do not work, the issue may require a professional HVAC technician to address refrigerant leaks or compressor failure. A.J. Perri",
+                  "markdown": "If these do not work, the issue may require a professional HVAC technician to address refrigerant leaks or compressor failure.[[1]](https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air)[[2]](https://www.youtube.com/watch?v=gWRqIRa5600&t=25)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "A.J. Perri",
+                      "domain": "www.ajperri.com",
+                      "url": "https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air",
+                      "title": "Why is My AC Blowing Hot Air? 5 Troubleshooting Tips - A.J. Perri",
+                      "text": "OTHER COMMON REASONS YOUR AC IS BLOWING WARM AIR When your AC is blowing warm or even hot air, it usually means something is inter..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=gWRqIRa5600&t=25",
+                      "title": "Air Conditioner Blowing HOT Air? Here's How To Fix It!",
+                      "text": "To address an air conditioner blowing hot air, initial steps involve ensuring the thermostat is engaged and the indoor fan is runn..."
+                    }
+                  ]
+                }
+              ],
+              "references": [
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=gWRqIRa5600&t=25",
+                  "title": "Air Conditioner Blowing HOT Air? Here's How To Fix It!",
+                  "text": "To address an air conditioner blowing hot air, initial steps involve ensuring the thermostat is engaged and the indoor fan is runn..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Bryant",
+                  "domain": "www.bryant.com",
+                  "url": "https://www.bryant.com/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/",
+                  "title": "Why Is My AC Blowing Hot Air? | Troubleshooting & Fixes - Bryant",
+                  "text": "Incorrect thermostat settings: Sometimes the issue is as simple as the thermostat being accidentally set to \"heat\" or \"fan\" mode i..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/shorts/93qbSOOw2yI",
+                  "title": "Why is my AC blowing warm air?",
+                  "text": "An air conditioner might blow warm air even when it's running. This could be due to a bad thermostat causing the furnace to run si..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Carrier",
+                  "domain": "www.carrier.com",
+                  "url": "https://www.carrier.com/residential/en/ca/products/air-conditioners/why-is-my-ac-blowing-hot-air/",
+                  "title": "Why Is MY AC Blowing Hot Air - Carrier",
+                  "text": "6. Compressor Problems. The compressor is essential for cooling; if it fails, the system may blow hot air."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Mechanical One",
+                  "domain": "mechanicalone.com",
+                  "url": "https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/",
+                  "title": "Why Is My AC Blowing Hot Air? Troubleshooting Tips",
+                  "text": "Thermostat malfunction. Refrigerant Leak or Low Refrigerant Levels. AC Compressor Issues. Clogged condensate Drain Line. Tripped B..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Aspen Aire Heating & Cooling",
+                  "domain": "aspenaireinc.com",
+                  "url": "https://aspenaireinc.com/why-is-ac-blowing-hot-air/",
+                  "title": "Why Is My AC Blowing Hot Air? | Six Common Causes - Aspen Aire",
+                  "text": "Why Is My AC Blowing Hot Air? * Thermostat Issues. First things first, make sure your thermostat is set correctly. Make sure the t..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "A.J. Perri",
+                  "domain": "www.ajperri.com",
+                  "url": "https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air",
+                  "title": "Why is My AC Blowing Hot Air? 5 Troubleshooting Tips - A.J. Perri",
+                  "text": "OTHER COMMON REASONS YOUR AC IS BLOWING WARM AIR When your AC is blowing warm or even hot air, it usually means something is inter..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Dream Team Heating & Air",
+                  "domain": "calldreamteam.com",
+                  "url": "https://calldreamteam.com/blog/why-is-my-ac-blowing-warm-air/",
+                  "title": "Why is Your Ac Blowing Warm Air? 6 Reasons and Fixes",
+                  "text": "There are several reasons why your air conditioner might be blowing warm air: * **Low refrigerant or leak** Your AC needs refriger..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Angie's List",
+                  "domain": "www.angi.com",
+                  "url": "https://www.angi.com/articles/why-is-my-ac-blowing-hot-air.htm",
+                  "title": "Why Is My AC Blowing Hot Air? 11 Possible Reasons | Angi",
+                  "text": "How to Fix It. Generally, this is due to a blown fuse or a tripped circuit breaker. You can check your circuit breaker box; if the..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/shorts/3Sq7QRDtmf0#:~:text=AC%20blowing%20warm%20air?%20Don't%20sweat%20it%E2%80%94common,refrigerant%2C%20thermostat%20issues%2C%20or%20a%20faulty%20compressor.",
+                  "title": "Why Your AC Is Blowing Warm Air – Common Causes Explained ...",
+                  "text": "AC blowing warm air? Don't sweat it—common causes include dirty filters, low refrigerant, thermostat issues, or a faulty compresso..."
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 1,
+              "rank_absolute": 2,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]",
+              "domain": "www.reddit.com",
+              "title": "HVAC Blowing Warm Air : r/hvacadvice",
+              "url": "https://www.reddit.com/r/hvacadvice/comments/1509b6i/hvac_blowing_warm_air/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "10+ comments  ·  2 years ago",
+              "website_name": "Reddit · r/hvacadvice",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Low Refrigerant Levels · Thermostat Issues · Dirty or Clogged Air Filter · Frozen Evaporator Coil · Condenser Unit Problems. · Compressor Failure. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Low Refrigerant Levels"
+              ],
+              "links": [
+                {
+                  "type": "link_element",
+                  "title": "A/C Blowing Warm Air : r/hvacadvice",
+                  "description": null,
+                  "url": "https://www.reddit.com/r/hvacadvice/comments/1digy9u/ac_blowing_warm_air/",
+                  "domain": "www.reddit.com"
+                },
+                {
+                  "type": "link_element",
+                  "title": "AC randomly blows hot air. Can't figure out the issue",
+                  "description": null,
+                  "url": "https://www.reddit.com/r/hvacadvice/comments/14ivo1r/ac_randomly_blows_hot_air_cant_figure_out_the/",
+                  "domain": "www.reddit.com"
+                },
+                {
+                  "type": "link_element",
+                  "title": "More results from www.reddit.com",
+                  "description": null,
+                  "url": "https://www.google.com/search?q=ac+blowing+warm+air+site:www.reddit.com&sca_esv=2063d717304705eb&hl=en&gl=US&sa=X&ved=2ahUKEwjX6Lr9jJaUAxVVOfsDHSdhMRsQrQIoAnoECCgQAw",
+                  "domain": "www.google.com"
+                }
+              ],
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "people_also_ask",
+              "rank_group": 1,
+              "rank_absolute": 3,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[1]",
+              "items": [
+                {
+                  "type": "people_also_ask_element",
+                  "title": "How do I fix my AC blowing warm air?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_ai_overview_expanded_element",
+                      "items": null,
+                      "references": null,
+                      "asynchronous_ai_overview": true
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "Should I turn off the AC if it is blowing warm air?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_ai_overview_expanded_element",
+                      "items": null,
+                      "references": null,
+                      "asynchronous_ai_overview": true
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "Why is my AC suddenly giving hot air?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[3]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_ai_overview_expanded_element",
+                      "items": null,
+                      "references": null,
+                      "asynchronous_ai_overview": true
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "How to reset AC not blowing cold air?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]/div[4]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_ai_overview_expanded_element",
+                      "items": null,
+                      "references": null,
+                      "asynchronous_ai_overview": true
+                    }
+                  ]
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 2,
+              "rank_absolute": 4,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[5]/div[1]/div[1]",
+              "domain": "aquariushomeservices.com",
+              "title": "Troubleshooting Tips When Your AC Is Blowing Warm Air",
+              "url": "https://aquariushomeservices.com/blog/troubleshooting-tips-ac-blowing-warm-air/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://aquariushomeservices.com › blog › troubleshooti...",
+              "website_name": "Aquarius Home Services",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Oct 28, 2024 — The problem of your AC blowing warm air could be a result of a failing compressor. This is a vital component of your cooling system responsible for the heat ... Read more",
+              "pre_snippet": "10/28/2024 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "AC blowing warm air"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2024-10-28 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "video",
+              "rank_group": 1,
+              "rank_absolute": 5,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]",
+              "items": [
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Efficient AC, Electric & Plumbing",
+                  "title": "Air Conditioner Blowing HOT Air? Here's How To Fix It!",
+                  "timestamp": "2024-10-17 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=gWRqIRa5600"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Mechanics For Non Mechanics",
+                  "title": "AC Is Blowing Warm Air - Here's Why",
+                  "timestamp": "2023-09-05 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=SiJBg7mIx8A"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · HVAC Guide for Homeowners",
+                  "title": "SECRET on Why Your AC is BLOWING HOT AIR!!! Thermostat ...",
+                  "timestamp": "2024-08-09 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=DsOWsUGxb0s"
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "perspectives",
+              "rank_group": 1,
+              "rank_absolute": 6,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[9]/div[1]",
+              "title": "What people are saying",
+              "items": [
+                {
+                  "type": "perspectives_element",
+                  "title": "HVAC blowing hot air when AC is on",
+                  "description": null,
+                  "url": "https://www.reddit.com/r/hvacadvice/comments/1s5nf7t/hvac_blowing_hot_air_when_ac_is_on/",
+                  "domain": "www.reddit.com",
+                  "date": null,
+                  "source": "r/hvacadvice",
+                  "timestamp": null
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Air conditioning is blowing hot air!! It’s the first warm day and we are melting. The Freon was recharged last may by the regular mechanic. Where do i go to fix this ?",
+                  "description": null,
+                  "url": "https://www.facebook.com/groups/1974310399501191/posts/4207202676211941/",
+                  "domain": "www.facebook.com",
+                  "date": null,
+                  "source": "Christine Folsom",
+                  "timestamp": null
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Just got this 2000 f350, but the AC blows warm/hot. The compressor kicks on and off rapidly. I went to fill/check the Freon but my gauge said it was full. What are some things I could check or do? Thanks",
+                  "description": null,
+                  "url": "https://www.facebook.com/groups/160790022662417/posts/1314875113920563/",
+                  "domain": "www.facebook.com",
+                  "date": null,
+                  "source": "Ford 7.3L Powerstroke Owners",
+                  "timestamp": null
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Why is my AC blowing hot air instead of cold? #fyp #auto #car #airconditioner #automotive",
+                  "description": null,
+                  "url": "https://www.tiktok.com/@accurateautoinc/video/7621650386801167647",
+                  "domain": "www.tiktok.com",
+                  "date": null,
+                  "source": "AccurateAuto",
+                  "timestamp": null
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Why is my AC blowing hot air instead of cold? \n#fyp #auto #car #airconditioner #automotive ￼",
+                  "description": null,
+                  "url": "https://www.instagram.com/reel/DWXBObqEXXQ/",
+                  "domain": "www.instagram.com",
+                  "date": null,
+                  "source": "accurateautoco",
+                  "timestamp": null
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Pic of the car for reference. 2014 2SS LS3 / 6 speed manual. I’m having a problem where my AC will work for the first 5 minutes flawlessly. I mean it’s ice cold but then goes to luke warm. Passenger side doesn’t get cold at all it’s always like warm or hot. I know i",
+                  "description": null,
+                  "url": "https://www.facebook.com/groups/5thgencamarotalk/posts/10163161183539401/",
+                  "domain": "www.facebook.com",
+                  "date": null,
+                  "source": "5th Generation Camaro talk.",
+                  "timestamp": null
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Dodge Challenger AC Not Blowing Cold Air? (2014-2024) | Causes & Troubleshooting",
+                  "description": null,
+                  "url": "https://www.youtube.com/watch?v=tbkxDrpKOig",
+                  "domain": "www.youtube.com",
+                  "date": null,
+                  "source": "Electrical Car Repair LIVE",
+                  "timestamp": null
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Could this be why my ac blows out boiling hot air but my heat still works?",
+                  "description": null,
+                  "url": "https://www.reddit.com/r/Cartalk/comments/1rs4hrs/could_this_be_why_my_ac_blows_out_boiling_hot_air/",
+                  "domain": "www.reddit.com",
+                  "date": null,
+                  "source": "r/Cartalk",
+                  "timestamp": null
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "It's 70 degrees out. AC blows hot then after some time goes cold. Replaced ambient sensor. AC is charged. Any ideas?",
+                  "description": null,
+                  "url": "https://www.facebook.com/groups/305643765624534/posts/946775321511372/",
+                  "domain": "www.facebook.com",
+                  "date": null,
+                  "source": "Chevrolet Silverado 1500/2500",
+                  "timestamp": null
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "2019 Pacifica AC blowing warm air",
+                  "description": null,
+                  "url": "https://www.reddit.com/r/ChryslerPacifica/comments/1su1ipg/2019_pacifica_ac_blowing_warm_air/",
+                  "domain": "www.reddit.com",
+                  "date": null,
+                  "source": "r/ChryslerPacifica",
+                  "timestamp": null
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Ac blowing a little warm but my AC is full, compressor spinning…any thoughts",
+                  "description": null,
+                  "url": "https://www.facebook.com/groups/infinitilover/posts/2368762826955769/",
+                  "domain": "www.facebook.com",
+                  "date": null,
+                  "source": "INFINITI LOVERS",
+                  "timestamp": null
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "👋🏻 Hi. The A/C on passenger side is now blowing hot air, but it's cold on drivers side. Is it likely to just need a freeon top up? TYIA",
+                  "description": null,
+                  "url": "https://www.facebook.com/groups/468087024845595/posts/1493348365652784/",
+                  "domain": "www.facebook.com",
+                  "date": null,
+                  "source": "Dodge Journey issues and solutions",
+                  "timestamp": null
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "discussions_and_forums",
+              "rank_group": 1,
+              "rank_absolute": 7,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[11]/div[1]",
+              "title": "Discussions and forums",
+              "items": [
+                {
+                  "type": "discussions_and_forums_element",
+                  "title": "A/C Blowing Warm Air",
+                  "url": "https://www.reddit.com/r/hvacadvice/comments/1digy9u/ac_blowing_warm_air/",
+                  "domain": "www.reddit.com",
+                  "source": "Reddit",
+                  "description": null,
+                  "timestamp": null,
+                  "posts_count": 4
+                },
+                {
+                  "type": "discussions_and_forums_element",
+                  "title": "Why is my air conditioner blowing warm air?",
+                  "url": "https://www.quora.com/Why-is-my-air-conditioner-blowing-warm-air",
+                  "domain": "www.quora.com",
+                  "source": "Quora",
+                  "description": null,
+                  "timestamp": null,
+                  "posts_count": 2
+                },
+                {
+                  "type": "discussions_and_forums_element",
+                  "title": "Why does my AC blow warm air instead of cold air?",
+                  "url": "https://www.quora.com/Why-does-my-AC-blow-warm-air-instead-of-cold-air",
+                  "domain": "www.quora.com",
+                  "source": "Quora",
+                  "description": null,
+                  "timestamp": null,
+                  "posts_count": 3
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "product_considerations",
+              "rank_group": 1,
+              "rank_absolute": 8,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[13]/div[1]",
+              "title": "Things to know",
+              "items": [
+                {
+                  "type": "product_considerations_element",
+                  "title": null,
+                  "consideration_category": "Refrigerant Leak Signs",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Signs of a refrigerant leak in an AC blowing warm air include increased energy bills, hissing/bubbling noises, iced-over coils, poor airflow, and higher home humidity. The AC may run constantly without cooling properly. A telltale sign is oily residue on refrigerant lines.",
+                          "images": null,
+                          "references": null
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Common Indicators of a Refrigerant Leak:",
+                          "text": "Warm Air: The most common sign; air from vents is not cold. Ice on Coils/Lines: Evaporator coils or copper lines are frozen due to low pressure. Hissing or Bubbling Noises: Sounds of gas or liquid escaping, particularly near the outdoor unit. Higher Energy Bills: System runs constantly to achieve set temperatures. Reduced Cooling Power: Room takes longer to cool or never reaches the set temperature. Poor Humidity Control: The home feels muggy or sticky. Oil Residue: Oily residue on refrigerant lines (indicates a leak and loss of oil).",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Arista Air",
+                              "domain": "aristair.com",
+                              "url": "https://aristair.com/what-are-the-signs-of-an-ac-refrigerant-leak/#:~:text=Are%20you%20are%20concerned%20because,coming%20from%20your%20indoor%20unit",
+                              "title": "Don't Ignore These 5 Signs of an AC Refrigerant Leak",
+                              "text": "Aug 15, 2023 — Are you are concerned because your place is not cooling off like it should? Perhaps you've noticed warm air or lower t..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Godwin Plumbing",
+                              "domain": "www.godwinplumbing.com",
+                              "url": "https://www.godwinplumbing.com/blog/ac-leaking-heres-how-to-spot-the-signs#:~:text=5%20Signs%20You%20Might%20Have,like%20the%20ones%20at%20Godwin).",
+                              "title": "Is Your AC Leaking Refrigerant? Here's How to Spot the Signs",
+                              "text": "Aug 7, 2025 — 5 Signs You Might Have a Refrigerant Leak. 1. Your home isn't cooling like it used to. If your AC is blowing air but yo..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Energy Air",
+                              "domain": "www.energyair.com",
+                              "url": "https://www.energyair.com/post/signs-your-ac-is-leaking-freon#:~:text=1.,Takes%20Longer%20to%20Cool%20Down",
+                              "title": "Signs Your AC Is Leaking Freon - Energy Air",
+                              "text": "Feb 10, 2023 — 1. Low Airflow. When your air conditioning system is low on refrigerant, it won't produce as much cool air as it usual..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Lennox",
+                              "domain": "www.lennox.com",
+                              "url": "https://www.lennox.com/residential/lennox-life/consumer/how-to-identify-an-ac-refrigerant-leak",
+                              "title": "Signs and Causes of a Refrigerant Leak",
+                              "text": "Aug 30, 2024"
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "First Rate Plumbing Heating and Cooling",
+                              "domain": "firstratephc.com",
+                              "url": "https://firstratephc.com/signs-refrigerant-leak-and-what-to-do/",
+                              "title": "5 Signs of a Refrigerant Leak and What to Do",
+                              "text": "Sep 16, 2025 —  5 Common Signs of a Refrigerant Leak * Warm Airflow from Vents. Your AC unit should consistently blow cold air when r..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "polarbear.ky",
+                              "domain": "polarbear.ky",
+                              "url": "https://polarbear.ky/8-signs-of-an-ac-refrigerant-leak/#:~:text=AC%20refrigerant%20leak.-,Higher%20Electric%20Bills,costly%20repairs%20down%20the%20line.",
+                              "title": "8 Signs of an AC Refrigerant Leak - Polar Bear Air Conditioning",
+                              "text": "Higher Electric Bills If your utility bill suddenly spikes without an obvious explanation, a refrigerant leak could be to blame. Y..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "San Marcos Air Conditioning",
+                              "domain": "www.smairtx.com",
+                              "url": "https://www.smairtx.com/blog/signs-of-freon-leak/#:~:text=1.,could%20indicate%20a%20Freon%20leak.",
+                              "title": "Signs of An AC Freon Leak | What Does Freon Smell Like? - SM Air",
+                              "text": "May 4, 2024 — 1. Little to no airflow coming from your vents: Reduced airflow can indicate a Freon leak, which can affect your AC's c..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "PV Heating, Cooling & Plumbing",
+                              "domain": "www.pvhvac.com",
+                              "url": "https://www.pvhvac.com/blog/signs-your-ac-is-out-of-refrigerant/#:~:text=6.,usually%20to%20replace%20the%20system.",
+                              "title": "Signs Your Air Conditioner Is Out of Refrigerant",
+                              "text": "6. You notice an oil leak. An oil leak is a tell-tale sign of an AC that's completely out of refrigerant. Most people notice their..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Synonyms/Related Terminology: Freon leak (specifically for R-22), Coolant leak, Low refrigerant levels, AC refrigerant loss, and HVAC system pressure loss.",
+                          "images": null,
+                          "references": null
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Actions to Take:",
+                          "text": "Turn off the system: If ice is observed, turn off the AC to prevent damage. Call a professional: Refrigerant repairs require a licensed HVAC technician. Do not attempt DIY repairs: Refrigerant handling requires special certification.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Godwin Plumbing",
+                              "domain": "www.godwinplumbing.com",
+                              "url": "https://www.godwinplumbing.com/blog/ac-leaking-heres-how-to-spot-the-signs#:~:text=5%20Signs%20You%20Might%20Have,like%20the%20ones%20at%20Godwin).",
+                              "title": "Is Your AC Leaking Refrigerant? Here's How to Spot the Signs",
+                              "text": "Aug 7, 2025 — 5 Signs You Might Have a Refrigerant Leak. 1. Your home isn't cooling like it used to. If your AC is blowing air but yo..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Brooks Heating & Air",
+                              "domain": "www.brooksheatingandair.ca",
+                              "url": "https://www.brooksheatingandair.ca/blog/ac-refrigerant-leak#:~:text=Refrigerant%20is%20a%20hazardous%20chemical,leak%20properly%20the%20first%20time.",
+                              "title": "AC refrigerant leak: 5 Warning Signs",
+                              "text": "Refrigerant is a hazardous chemical that requires special handling and EPA licensing to work with legally. While you're waiting fo..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Note: As discussed on Reddit, professionals use methods like soap bubbles or UV dye to locate the exact leak site.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Reddit ·",
+                              "domain": "www.reddit.com",
+                              "url": "https://www.reddit.com/r/HVAC/comments/g9zmmk/what_does_a_refrigerant_leak_look_like/#:~:text=Leak%20Detection%20Methods:%20Common%20methods%20for%20detecting,condenser%2C%20coil)%20to%20identify%20the%20leaking%20part.",
+                              "title": "What does a refrigerant leak look like? : r/HVAC - Reddit",
+                              "text": "Apr 29, 2020 — Leak Detection Methods: Common methods for detecting refrigerant leaks include visual inspection for oil residue, appl..."
+                            }
+                          ]
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Energy Air",
+                          "domain": "www.energyair.com",
+                          "url": "https://www.energyair.com/post/signs-your-ac-is-leaking-freon#:~:text=1.,Takes%20Longer%20to%20Cool%20Down",
+                          "title": "Signs Your AC Is Leaking Freon - Energy Air",
+                          "text": "Feb 10, 2023 — 1. Low Airflow. When your air conditioning system is low on refrigerant, it won't produce as much cool air as it usual..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Reddit ·",
+                          "domain": "www.reddit.com",
+                          "url": "https://www.reddit.com/r/HVAC/comments/g9zmmk/what_does_a_refrigerant_leak_look_like/#:~:text=Leak%20Detection%20Methods:%20Common%20methods%20for%20detecting,condenser%2C%20coil)%20to%20identify%20the%20leaking%20part.",
+                          "title": "What does a refrigerant leak look like? : r/HVAC - Reddit",
+                          "text": "Apr 29, 2020 — Leak Detection Methods: Common methods for detecting refrigerant leaks include visual inspection for oil residue, appl..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Arista Air",
+                          "domain": "aristair.com",
+                          "url": "https://aristair.com/what-are-the-signs-of-an-ac-refrigerant-leak/#:~:text=Are%20you%20are%20concerned%20because,coming%20from%20your%20indoor%20unit",
+                          "title": "Don't Ignore These 5 Signs of an AC Refrigerant Leak",
+                          "text": "Aug 15, 2023 — Are you are concerned because your place is not cooling off like it should? Perhaps you've noticed warm air or lower t..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "polarbear.ky",
+                          "domain": "polarbear.ky",
+                          "url": "https://polarbear.ky/8-signs-of-an-ac-refrigerant-leak/#:~:text=AC%20refrigerant%20leak.-,Higher%20Electric%20Bills,costly%20repairs%20down%20the%20line.",
+                          "title": "8 Signs of an AC Refrigerant Leak - Polar Bear Air Conditioning",
+                          "text": "Higher Electric Bills If your utility bill suddenly spikes without an obvious explanation, a refrigerant leak could be to blame. Y..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Brooks Heating & Air",
+                          "domain": "www.brooksheatingandair.ca",
+                          "url": "https://www.brooksheatingandair.ca/blog/ac-refrigerant-leak#:~:text=Refrigerant%20is%20a%20hazardous%20chemical,leak%20properly%20the%20first%20time.",
+                          "title": "AC refrigerant leak: 5 Warning Signs",
+                          "text": "Refrigerant is a hazardous chemical that requires special handling and EPA licensing to work with legally. While you're waiting fo..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Godwin Plumbing",
+                          "domain": "www.godwinplumbing.com",
+                          "url": "https://www.godwinplumbing.com/blog/ac-leaking-heres-how-to-spot-the-signs#:~:text=5%20Signs%20You%20Might%20Have,like%20the%20ones%20at%20Godwin).",
+                          "title": "Is Your AC Leaking Refrigerant? Here's How to Spot the Signs",
+                          "text": "Aug 7, 2025 — 5 Signs You Might Have a Refrigerant Leak. 1. Your home isn't cooling like it used to. If your AC is blowing air but yo..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "San Marcos Air Conditioning",
+                          "domain": "www.smairtx.com",
+                          "url": "https://www.smairtx.com/blog/signs-of-freon-leak/#:~:text=1.,could%20indicate%20a%20Freon%20leak.",
+                          "title": "Signs of An AC Freon Leak | What Does Freon Smell Like? - SM Air",
+                          "text": "May 4, 2024 — 1. Little to no airflow coming from your vents: Reduced airflow can indicate a Freon leak, which can affect your AC's c..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Lennox",
+                          "domain": "www.lennox.com",
+                          "url": "https://www.lennox.com/residential/lennox-life/consumer/how-to-identify-an-ac-refrigerant-leak",
+                          "title": "Signs and Causes of a Refrigerant Leak",
+                          "text": "Aug 30, 2024"
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "First Rate Plumbing Heating and Cooling",
+                          "domain": "firstratephc.com",
+                          "url": "https://firstratephc.com/signs-refrigerant-leak-and-what-to-do/",
+                          "title": "5 Signs of a Refrigerant Leak and What to Do",
+                          "text": "Sep 16, 2025 —  5 Common Signs of a Refrigerant Leak * Warm Airflow from Vents. Your AC unit should consistently blow cold air when r..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "PV Heating, Cooling & Plumbing",
+                          "domain": "www.pvhvac.com",
+                          "url": "https://www.pvhvac.com/blog/signs-your-ac-is-out-of-refrigerant/#:~:text=6.,usually%20to%20replace%20the%20system.",
+                          "title": "Signs Your Air Conditioner Is Out of Refrigerant",
+                          "text": "6. You notice an oil leak. An oil leak is a tell-tale sign of an AC that's completely out of refrigerant. Most people notice their..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": null,
+                  "consideration_category": "Common Causes",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Common causes of an AC blowing warm air include a dirty air filter restricting airflow, low refrigerant levels from leaks, or a frozen evaporator coil. Other frequent issues involve incorrect thermostat settings, tripped circuit breakers, a faulty compressor, or dirty outdoor condenser coils.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Coolray Heating & Air Conditioning",
+                              "domain": "www.coolray.com",
+                              "url": "https://www.coolray.com/help-guides/4-common-reasons-why-your-ac-will-blow-hot-air-this-summer#:~:text=So%20a%20Freon%20leak%20can,is%20a%20breakdown%20during%20summer.",
+                              "title": "7 Common Reasons Why Your AC Will Blow Hot Air This Summer",
+                              "text": "So a Freon leak can leave you feeling the heat since you'll have a complete loss of cold air. You can tell if your air conditioner..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Mechanical One",
+                              "domain": "mechanicalone.com",
+                              "url": "https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/#:~:text=There%20are%20several%20issues%20ranging,help%20you%20fix%20your%20unit.",
+                              "title": "Why Is My AC Blowing Hot Air? Troubleshooting Tips",
+                              "text": "Jun 30, 2025 — There are several issues ranging from incorrect wiring and refrigerant leaks, to dirty filters or compressor failures ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "CoolToday",
+                              "domain": "www.cooltoday.com",
+                              "url": "https://www.cooltoday.com/blog/5-causes-of-a-central-ac-blowing-warm-air#:~:text=It%20isn't%20an%20urban,Guides%20%7C%20Cool%20Today%20in%20Florida",
+                              "title": "5 Causes of a Central AC Blowing Warm Air - Cool Today",
+                              "text": "It isn't an urban myth; a clean air filter is very important. Why? The air filter protects your AC's inner workings from dust, dir..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Comfort Experts",
+                              "domain": "comfortexpertsinc.com",
+                              "url": "https://comfortexpertsinc.com/air-conditioning/ac-repair/10-reasons-your-ac-is-blowing-warm-air/",
+                              "title": "10 Reasons Your AC Is Blowing Warm Air - Comfort Experts",
+                              "text": "10 Reasons Your AC Is Blowing Warm Air * Thermostat is set wrong. * Dirty filter blocking airflow. * Refrigerant leak. * Frozen e..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Parker & Sons",
+                              "domain": "www.parkerandsons.com",
+                              "url": "https://www.parkerandsons.com/blog/why-is-my-air-conditioner-blowing-warm-air#:~:text=Ensuring%20Proper%20Condenser%20Function,instead%20of%20a%20cool%20breeze.",
+                              "title": "Air Conditioner Blowing Warm Air? - Parker & Sons",
+                              "text": "Ensuring Proper Condenser Function The condenser plays a pivotal role in your air conditioning system. Its job is to release the h..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Common Causes and Usage Examples",
+                          "text": "Dirty Air Filter: Restricted airflow forces the system to work harder, reducing cooling capacity. Example: Replacing a filthy filter after noticing low airflow. Low Refrigerant/Leaks: If the system is low on refrigerant, it cannot absorb heat properly. Example: Calling a technician to fix a leak and recharge the system. Frozen Evaporator Coil: Caused by poor airflow or low refrigerant, ice blocks heat transfer. Example: Turning off the AC to let the indoor unit thaw. Dirty Condenser Coils: Dust buildup on the outdoor unit prevents heat from being released. Example: Cleaning the outside unit with a hose to remove dirt/debris. Thermostat Issues: Incorrect settings or dead batteries. Example: Ensuring the fan setting is on \"Auto\" not \"On.\" Electrical/Breaker Issues: A tripped circuit breaker or failed capacitor stops the compressor. Example: Resetting the circuit breaker. Failed Compressor: The compressor fails to circulate refrigerant. Leaky Ductwork: Cool air escapes before reaching rooms.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Carrier",
+                              "domain": "www.carrier.com",
+                              "url": "https://www.carrier.com/residential/en/ca/products/air-conditioners/why-is-my-ac-blowing-hot-air/#:~:text=1.,all%20ductwork%20is%20installed%20correctly.%E2%80%9D",
+                              "title": "Why Is MY AC Blowing Hot Air - Carrier",
+                              "text": "1. Dirty air filters. Dirty air filters are one of the most frequent culprits if your AC is running but not cooling in Canada. Whe..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "CoolToday",
+                              "domain": "www.cooltoday.com",
+                              "url": "https://www.cooltoday.com/blog/5-causes-of-a-central-ac-blowing-warm-air#:~:text=It%20isn't%20an%20urban,Guides%20%7C%20Cool%20Today%20in%20Florida",
+                              "title": "5 Causes of a Central AC Blowing Warm Air - Cool Today",
+                              "text": "It isn't an urban myth; a clean air filter is very important. Why? The air filter protects your AC's inner workings from dust, dir..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Coolray Heating & Air Conditioning",
+                              "domain": "www.coolray.com",
+                              "url": "https://www.coolray.com/help-guides/4-common-reasons-why-your-ac-will-blow-hot-air-this-summer#:~:text=So%20a%20Freon%20leak%20can,is%20a%20breakdown%20during%20summer.",
+                              "title": "7 Common Reasons Why Your AC Will Blow Hot Air This Summer",
+                              "text": "So a Freon leak can leave you feeling the heat since you'll have a complete loss of cold air. You can tell if your air conditioner..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Parker & Sons",
+                              "domain": "www.parkerandsons.com",
+                              "url": "https://www.parkerandsons.com/blog/why-is-my-air-conditioner-blowing-warm-air#:~:text=Ensuring%20Proper%20Condenser%20Function,instead%20of%20a%20cool%20breeze.",
+                              "title": "Air Conditioner Blowing Warm Air? - Parker & Sons",
+                              "text": "Ensuring Proper Condenser Function The condenser plays a pivotal role in your air conditioning system. Its job is to release the h..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Carrier",
+                              "domain": "www.carrier.com",
+                              "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/#:~:text=Checking%20the%20thermostat%20settings%2C%20replacing,can%20help%20resolve%20this%20issue.",
+                              "title": "Why Is MY AC Blowing Hot Air - Carrier",
+                              "text": "Checking the thermostat settings, replacing batteries, or recalibrating the thermostat can help resolve this issue."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Comfort Experts",
+                              "domain": "comfortexpertsinc.com",
+                              "url": "https://comfortexpertsinc.com/air-conditioning/ac-repair/10-reasons-your-ac-is-blowing-warm-air/",
+                              "title": "10 Reasons Your AC Is Blowing Warm Air - Comfort Experts",
+                              "text": "10 Reasons Your AC Is Blowing Warm Air * Thermostat is set wrong. * Dirty filter blocking airflow. * Refrigerant leak. * Frozen e..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Dream Team Heating & Air",
+                              "domain": "calldreamteam.com",
+                              "url": "https://calldreamteam.com/blog/why-is-my-ac-blowing-warm-air/#:~:text=When%20it's%20functioning%20properly%2C%20the,it%20is%20a%20scorcher%20outside.",
+                              "title": "Why is Your Ac Blowing Warm Air? 6 Reasons and Fixes",
+                              "text": "When it's functioning properly, the compressor circulates refrigerant between the evaporator (indoor unit) and condensing unit (ou..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Pruett Air Conditioning",
+                              "domain": "pruettac.com",
+                              "url": "https://pruettac.com/blog/top-5-reasons-your-ac-is-blowing-warm-air-and-how-to-fix-it/#:~:text=Leaky%20or%20Damaged%20Ductwork,bills%20without%20a%20clear%20reason",
+                              "title": "Top 5 Reasons Your AC Is Blowing Warm Air - Pruett Air Conditioning",
+                              "text": "May 2, 2025 — Leaky or Damaged Ductwork If cool air is leaking into your attic, basement, or crawlspace, your rooms won't get the com..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Synonyms/Related Terms for Causes",
+                          "text": "Refrigerant leaks = Freon leak, low refrigerant, low charge. Frozen coil = Ice buildup, iced-up unit. Dirty condenser = Obstructed condenser, dirty coils. Electrical issue = Tripped breaker, faulty capacitor, bad contactor.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Coolray Heating & Air Conditioning",
+                              "domain": "www.coolray.com",
+                              "url": "https://www.coolray.com/help-guides/4-common-reasons-why-your-ac-will-blow-hot-air-this-summer#:~:text=So%20a%20Freon%20leak%20can,is%20a%20breakdown%20during%20summer.",
+                              "title": "7 Common Reasons Why Your AC Will Blow Hot Air This Summer",
+                              "text": "So a Freon leak can leave you feeling the heat since you'll have a complete loss of cold air. You can tell if your air conditioner..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "CoolToday",
+                              "domain": "www.cooltoday.com",
+                              "url": "https://www.cooltoday.com/blog/5-causes-of-a-central-ac-blowing-warm-air#:~:text=It%20isn't%20an%20urban,Guides%20%7C%20Cool%20Today%20in%20Florida",
+                              "title": "5 Causes of a Central AC Blowing Warm Air - Cool Today",
+                              "text": "It isn't an urban myth; a clean air filter is very important. Why? The air filter protects your AC's inner workings from dust, dir..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Parker & Sons",
+                              "domain": "www.parkerandsons.com",
+                              "url": "https://www.parkerandsons.com/blog/why-is-my-air-conditioner-blowing-warm-air#:~:text=Ensuring%20Proper%20Condenser%20Function,instead%20of%20a%20cool%20breeze.",
+                              "title": "Air Conditioner Blowing Warm Air? - Parker & Sons",
+                              "text": "Ensuring Proper Condenser Function The condenser plays a pivotal role in your air conditioning system. Its job is to release the h..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Note: As discussed on Reddit, a common issue for intermittent warm air, especially with smart thermostats like Nest, is a missing C-wire, which causes the system to cycle incorrectly, users agree.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Reddit ·",
+                              "domain": "www.reddit.com",
+                              "url": "https://www.reddit.com/r/hvacadvice/comments/14ivo1r/ac_randomly_blows_hot_air_cant_figure_out_the/#:~:text=Nest%20Thermostat%20Issue:%20A%20common%20cause%20for,t3%2C%20has%20resolved%20this%20issue%20for%20users.",
+                              "title": "r/hvacadvice - AC randomly blows hot air. Can't figure out the issue - Reddit",
+                              "text": "Jun 25, 2023 — Nest Thermostat Issue: A common cause for an AC unit blowing random hot air, particularly with a Nest thermostat, is t..."
+                            }
+                          ]
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Reddit ·",
+                          "domain": "www.reddit.com",
+                          "url": "https://www.reddit.com/r/hvacadvice/comments/14ivo1r/ac_randomly_blows_hot_air_cant_figure_out_the/#:~:text=Nest%20Thermostat%20Issue:%20A%20common%20cause%20for,t3%2C%20has%20resolved%20this%20issue%20for%20users.",
+                          "title": "r/hvacadvice - AC randomly blows hot air. Can't figure out the issue - Reddit",
+                          "text": "Jun 25, 2023 — Nest Thermostat Issue: A common cause for an AC unit blowing random hot air, particularly with a Nest thermostat, is t..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Carrier",
+                          "domain": "www.carrier.com",
+                          "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/#:~:text=Checking%20the%20thermostat%20settings%2C%20replacing,can%20help%20resolve%20this%20issue.",
+                          "title": "Why Is MY AC Blowing Hot Air - Carrier",
+                          "text": "Checking the thermostat settings, replacing batteries, or recalibrating the thermostat can help resolve this issue."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Coolray Heating & Air Conditioning",
+                          "domain": "www.coolray.com",
+                          "url": "https://www.coolray.com/help-guides/4-common-reasons-why-your-ac-will-blow-hot-air-this-summer#:~:text=So%20a%20Freon%20leak%20can,is%20a%20breakdown%20during%20summer.",
+                          "title": "7 Common Reasons Why Your AC Will Blow Hot Air This Summer",
+                          "text": "So a Freon leak can leave you feeling the heat since you'll have a complete loss of cold air. You can tell if your air conditioner..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Carrier",
+                          "domain": "www.carrier.com",
+                          "url": "https://www.carrier.com/residential/en/ca/products/air-conditioners/why-is-my-ac-blowing-hot-air/#:~:text=1.,all%20ductwork%20is%20installed%20correctly.%E2%80%9D",
+                          "title": "Why Is MY AC Blowing Hot Air - Carrier",
+                          "text": "1. Dirty air filters. Dirty air filters are one of the most frequent culprits if your AC is running but not cooling in Canada. Whe..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Mechanical One",
+                          "domain": "mechanicalone.com",
+                          "url": "https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/#:~:text=There%20are%20several%20issues%20ranging,help%20you%20fix%20your%20unit.",
+                          "title": "Why Is My AC Blowing Hot Air? Troubleshooting Tips",
+                          "text": "Jun 30, 2025 — There are several issues ranging from incorrect wiring and refrigerant leaks, to dirty filters or compressor failures ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "CoolToday",
+                          "domain": "www.cooltoday.com",
+                          "url": "https://www.cooltoday.com/blog/5-causes-of-a-central-ac-blowing-warm-air#:~:text=It%20isn't%20an%20urban,Guides%20%7C%20Cool%20Today%20in%20Florida",
+                          "title": "5 Causes of a Central AC Blowing Warm Air - Cool Today",
+                          "text": "It isn't an urban myth; a clean air filter is very important. Why? The air filter protects your AC's inner workings from dust, dir..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Comfort Experts",
+                          "domain": "comfortexpertsinc.com",
+                          "url": "https://comfortexpertsinc.com/air-conditioning/ac-repair/10-reasons-your-ac-is-blowing-warm-air/",
+                          "title": "10 Reasons Your AC Is Blowing Warm Air - Comfort Experts",
+                          "text": "10 Reasons Your AC Is Blowing Warm Air * Thermostat is set wrong. * Dirty filter blocking airflow. * Refrigerant leak. * Frozen e..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Parker & Sons",
+                          "domain": "www.parkerandsons.com",
+                          "url": "https://www.parkerandsons.com/blog/why-is-my-air-conditioner-blowing-warm-air#:~:text=Ensuring%20Proper%20Condenser%20Function,instead%20of%20a%20cool%20breeze.",
+                          "title": "Air Conditioner Blowing Warm Air? - Parker & Sons",
+                          "text": "Ensuring Proper Condenser Function The condenser plays a pivotal role in your air conditioning system. Its job is to release the h..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Pruett Air Conditioning",
+                          "domain": "pruettac.com",
+                          "url": "https://pruettac.com/blog/top-5-reasons-your-ac-is-blowing-warm-air-and-how-to-fix-it/#:~:text=Leaky%20or%20Damaged%20Ductwork,bills%20without%20a%20clear%20reason",
+                          "title": "Top 5 Reasons Your AC Is Blowing Warm Air - Pruett Air Conditioning",
+                          "text": "May 2, 2025 — Leaky or Damaged Ductwork If cool air is leaking into your attic, basement, or crawlspace, your rooms won't get the com..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Dream Team Heating & Air",
+                          "domain": "calldreamteam.com",
+                          "url": "https://calldreamteam.com/blog/why-is-my-ac-blowing-warm-air/#:~:text=When%20it's%20functioning%20properly%2C%20the,it%20is%20a%20scorcher%20outside.",
+                          "title": "Why is Your Ac Blowing Warm Air? 6 Reasons and Fixes",
+                          "text": "When it's functioning properly, the compressor circulates refrigerant between the evaporator (indoor unit) and condensing unit (ou..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": null,
+                  "consideration_category": "Troubleshooting",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "To troubleshoot an AC blowing warm air, first check that the thermostat is set to \"cool\" and that air filters are clean, as restricted airflow causes overheating. Inspect the outdoor unit for debris, ensure the circuit breaker hasn't tripped, and check for frozen evaporator coils.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Down East Heating & Air Conditioning",
+                              "domain": "downeastheating.com",
+                              "url": "https://downeastheating.com/blog/ac-blowing-warm-air-heres-what-to-do#:~:text=Thermostat%20Issues,lead%20to%20warm%20air%20output.",
+                              "title": "AC Blowing Warm Air? Here's What to Do",
+                              "text": "Oct 10, 2025 — Thermostat Issues. Before assuming there's a bigger issue, check your thermostat. If it's set to “fan” instead of “coo..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Mechanical One",
+                              "domain": "mechanicalone.com",
+                              "url": "https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/",
+                              "title": "Why Is My AC Blowing Hot Air? Troubleshooting Tips - Mechanical One",
+                              "text": "Jun 30, 2025"
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "A.J. Perri",
+                              "domain": "www.ajperri.com",
+                              "url": "https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air#:~:text=OTHER%20COMMON%20REASONS%20YOUR%20AC,but%20it%20won't%20cool.",
+                              "title": "Why is My AC Blowing Hot Air? 5 Troubleshooting Tips - A.J. Perri",
+                              "text": "Sep 8, 2025 — OTHER COMMON REASONS YOUR AC IS BLOWING WARM AIR When your AC is blowing warm or even hot air, it usually means somethi..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "This video provides a quick overview of common causes for an AC blowing warm air:",
+                          "images": null,
+                          "references": null
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Common Causes and Troubleshooting Steps:",
+                          "text": "Thermostat Settings: Ensure the thermostat is set to \"Cool\" and the fan is set to \"Auto\" rather than \"On.\" Check batteries if the display is blank. Dirty Air Filter: A clogged filter restricts airflow, causing the system to overwork and potentially freeze. Replace the filter (usually every 1-3 months). Frozen Evaporator Coil: Restricted airflow or low refrigerant can freeze the coils. Turn off the AC and let it thaw, or replace the air filter. Outdoor Unit Issues: Check that the outdoor condenser isn't blocked by debris, leaves, or shrubs, which prevents heat release. Tripped Circuit Breaker: If the outdoor unit isn't running, check the electrical panel for a tripped breaker. Refrigerant Leaks: If the air is only slightly cool, the system may have a refrigerant leak, which requires a professional technician.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Down East Heating & Air Conditioning",
+                              "domain": "downeastheating.com",
+                              "url": "https://downeastheating.com/blog/ac-blowing-warm-air-heres-what-to-do#:~:text=Thermostat%20Issues,lead%20to%20warm%20air%20output.",
+                              "title": "AC Blowing Warm Air? Here's What to Do",
+                              "text": "Oct 10, 2025 — Thermostat Issues. Before assuming there's a bigger issue, check your thermostat. If it's set to “fan” instead of “coo..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "servicechampions.net",
+                              "domain": "www.servicechampions.net",
+                              "url": "https://www.servicechampions.net/blog/air-conditioner-blowing-warm-air#:~:text=Adjust%20the%20thermostat,repairs%20from%20an%20HVAC%20technician.",
+                              "title": "Why Is My Air Conditioner Blowing Warm Air? - Service Champions",
+                              "text": "Nov 24, 2025 — Adjust the thermostat If your AC is blowing warm air, your thermostat may have accidentally switched to heat. Flip the..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Mechanical One",
+                              "domain": "mechanicalone.com",
+                              "url": "https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/",
+                              "title": "Why Is My AC Blowing Hot Air? Troubleshooting Tips - Mechanical One",
+                              "text": "Jun 30, 2025"
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "A.J. Perri",
+                              "domain": "www.ajperri.com",
+                              "url": "https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air#:~:text=OTHER%20COMMON%20REASONS%20YOUR%20AC,but%20it%20won't%20cool.",
+                              "title": "Why is My AC Blowing Hot Air? 5 Troubleshooting Tips - A.J. Perri",
+                              "text": "Sep 8, 2025 — OTHER COMMON REASONS YOUR AC IS BLOWING WARM AIR When your AC is blowing warm or even hot air, it usually means somethi..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Access Heating & Air Conditioning",
+                              "domain": "accessheating.com",
+                              "url": "https://accessheating.com/ac-blowing-warm-air-your-complete-troubleshooting-repair-guide/#:~:text=Examine%20the%20Outdoor%20Condenser%20Unit,can%20help%20you%20troubleshoot%20further.",
+                              "title": "AC Blowing Warm Air? Your Complete Troubleshooting & Repair ...",
+                              "text": "Jul 18, 2025 — Examine the Outdoor Condenser Unit Your outdoor condenser unit is like the lungs of your AC system – it needs to breat..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Quora",
+                              "domain": "www.quora.com",
+                              "url": "https://www.quora.com/Why-is-my-air-conditioner-blowing-warm-air#:~:text=So%20if%20your%20air%20in,bad%20TXV%2C%20or%20another%20problem.",
+                              "title": "Why is my air conditioner blowing warm air? - Quora",
+                              "text": "Nov 30, 2024 — So if your air in is 80F and the air out is 70F, then you need to have it serviced. They might find a leak. If the air..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Watch this video to learn how to check for a bad capacitor, a common issue with AC units:",
+                          "images": null,
+                          "references": null
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "If these steps do not fix the issue, the problem might be a faulty capacitor, a broken compressor, or a faulty contactor, which generally require professional HVAC servicing.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=gWRqIRa5600&t=25",
+                              "title": "Air Conditioner Blowing HOT Air? Here's How To Fix It!",
+                              "text": "Oct 17, 2024 — we're going to start with the common and easy ones well cuz I like the easy ones. and then we'll get harder and harder..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "alphaleteplumbing.com",
+                              "domain": "alphaleteplumbing.com",
+                              "url": "https://alphaleteplumbing.com/why-is-my-ac-blowing-warm-air-and-how-do-i-fix-it/#:~:text=Broken%20Contactor,contactor%20if%20it%20goes%20bad.",
+                              "title": "Why Is My AC Blowing Warm Air—and How Do I Fix It? | Alphalete",
+                              "text": "Jul 27, 2025 — Broken Contactor. The compressor and fan have a switch called a contactor that controls the flow of electricity to tho..."
+                            }
+                          ]
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "YouTube ·",
+                          "domain": "www.youtube.com",
+                          "url": "https://www.youtube.com/watch?v=gWRqIRa5600&t=25",
+                          "title": "Air Conditioner Blowing HOT Air? Here's How To Fix It!",
+                          "text": "Oct 17, 2024 — we're going to start with the common and easy ones well cuz I like the easy ones. and then we'll get harder and harder..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Down East Heating & Air Conditioning",
+                          "domain": "downeastheating.com",
+                          "url": "https://downeastheating.com/blog/ac-blowing-warm-air-heres-what-to-do#:~:text=Thermostat%20Issues,lead%20to%20warm%20air%20output.",
+                          "title": "AC Blowing Warm Air? Here's What to Do",
+                          "text": "Oct 10, 2025 — Thermostat Issues. Before assuming there's a bigger issue, check your thermostat. If it's set to “fan” instead of “coo..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Mechanical One",
+                          "domain": "mechanicalone.com",
+                          "url": "https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/",
+                          "title": "Why Is My AC Blowing Hot Air? Troubleshooting Tips - Mechanical One",
+                          "text": "Jun 30, 2025"
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "A.J. Perri",
+                          "domain": "www.ajperri.com",
+                          "url": "https://www.ajperri.com/blog/why-is-my-a-c-blowing-hot-air#:~:text=OTHER%20COMMON%20REASONS%20YOUR%20AC,but%20it%20won't%20cool.",
+                          "title": "Why is My AC Blowing Hot Air? 5 Troubleshooting Tips - A.J. Perri",
+                          "text": "Sep 8, 2025 — OTHER COMMON REASONS YOUR AC IS BLOWING WARM AIR When your AC is blowing warm or even hot air, it usually means somethi..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Access Heating & Air Conditioning",
+                          "domain": "accessheating.com",
+                          "url": "https://accessheating.com/ac-blowing-warm-air-your-complete-troubleshooting-repair-guide/#:~:text=Examine%20the%20Outdoor%20Condenser%20Unit,can%20help%20you%20troubleshoot%20further.",
+                          "title": "AC Blowing Warm Air? Your Complete Troubleshooting & Repair ...",
+                          "text": "Jul 18, 2025 — Examine the Outdoor Condenser Unit Your outdoor condenser unit is like the lungs of your AC system – it needs to breat..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "alphaleteplumbing.com",
+                          "domain": "alphaleteplumbing.com",
+                          "url": "https://alphaleteplumbing.com/why-is-my-ac-blowing-warm-air-and-how-do-i-fix-it/#:~:text=Broken%20Contactor,contactor%20if%20it%20goes%20bad.",
+                          "title": "Why Is My AC Blowing Warm Air—and How Do I Fix It? | Alphalete",
+                          "text": "Jul 27, 2025 — Broken Contactor. The compressor and fan have a switch called a contactor that controls the flow of electricity to tho..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "servicechampions.net",
+                          "domain": "www.servicechampions.net",
+                          "url": "https://www.servicechampions.net/blog/air-conditioner-blowing-warm-air#:~:text=Adjust%20the%20thermostat,repairs%20from%20an%20HVAC%20technician.",
+                          "title": "Why Is My Air Conditioner Blowing Warm Air? - Service Champions",
+                          "text": "Nov 24, 2025 — Adjust the thermostat If your AC is blowing warm air, your thermostat may have accidentally switched to heat. Flip the..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Quora",
+                          "domain": "www.quora.com",
+                          "url": "https://www.quora.com/Why-is-my-air-conditioner-blowing-warm-air#:~:text=So%20if%20your%20air%20in,bad%20TXV%2C%20or%20another%20problem.",
+                          "title": "Why is my air conditioner blowing warm air? - Quora",
+                          "text": "Nov 30, 2024 — So if your air in is 80F and the air out is 70F, then you need to have it serviced. They might find a leak. If the air..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": null,
+                  "consideration_category": "Repair Costs",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Fixing an AC blowing warm air generally costs between $150 and $650 for common issues, with total repairs ranging from $100 to over $3,500 depending on the component. Common causes include low refrigerant ($200–$1,500), failed capacitors ($100–$400), or broken compressors ($1,200–$3,500+).",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Hyperion Auto Repair",
+                              "domain": "hyperionautorepair.com",
+                              "url": "https://hyperionautorepair.com/ac-repair-cost-los-angeles-expert-guide/#:~:text=Diagnostic%20inspection:%20$75-$150,(compressor%2C%20major%20component%20failure)",
+                              "title": "AC Repair Cost Los Angeles: Complete Guide to Expert Service ...",
+                              "text": "Apr 15, 2026 — Diagnostic inspection: $75-$150 (often waived if you proceed with repairs) Simple repairs: $150-$400 (filter replaceme..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "getparadisehvac.com",
+                              "domain": "getparadisehvac.com",
+                              "url": "https://getparadisehvac.com/how-much-is-standard-ac-repair/#:~:text=Average%20AC%20Repair%20Costs%20by,or%20replacement:%20$1%2C200%E2%80%93$3%2C500+",
+                              "title": "How Much Is Standard AC Repair? - Paradise Heating and Air",
+                              "text": "Apr 13, 2026 — Average AC Repair Costs by Type Different problems come with different price points. Here's a general breakdown: Therm..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Arthur Heating & Air",
+                              "domain": "www.callarthurair.com",
+                              "url": "https://www.callarthurair.com/ac-repair-cost/#:~:text=How%20Much%20Does%20AC%20Repair,respond%20outside%20normal%20working%20hours.",
+                              "title": "AC Repair Cost Guide: Common Repairs and Prices",
+                              "text": "Mar 14, 2026 — How Much Does AC Repair Cost? AC repair usually costs between $150 and $650 for the most common problems. The exact pr..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "callwisler.com",
+                              "domain": "callwisler.com",
+                              "url": "https://callwisler.com/getting-a-grip-on-ac-repair-costs-tips-and-insights-for-homeowners/#:~:text=Average%20Costs%20of%20Common%20AC,and%20capacity%20of%20the%20capacitor.",
+                              "title": "Getting a Grip on AC Repair Costs: Tips and Insights for Homeowners",
+                              "text": "Jun 28, 2023 — Average Costs of Common AC Repairs To give you a ballpark estimate, let's explore the average costs associated with so..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Common Repair Cost Examples",
+                          "text": "Refrigerant Recharge/Leak Repair : $200–$1,500 Capacitor Replacement : $100–$400 Compressor Replacement : $1,200–$3,500+ Fan Motor Replacement : $200–$1,500 Evaporator Coil Replacement : $650–$2,500+ Thermostat Replacement : $150–$350 Service Call/Diagnostic Fee : $75–$200",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Green City Heating and Air Conditioning",
+                              "domain": "greencityheatingandair.com",
+                              "url": "https://greencityheatingandair.com/blog/ac-repair-cost#:~:text=Why%20Understanding%20AC%20Repair%20Costs,service:%20$160%20%E2%80%93%20$250%20per%20hour",
+                              "title": "Don't Sweat It: Understanding Your AC Repair Bill",
+                              "text": "Why Understanding AC Repair Costs Matters for Your Budget. AC repair cost can catch homeowners off guard, especially during the pe..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "northeastmechanicalservices.com",
+                              "domain": "www.northeastmechanicalservices.com",
+                              "url": "https://www.northeastmechanicalservices.com/air-conditioner-repair-costs/#:~:text=Fan%20motor%20replacement%20cost,anywhere%20from%20$200%20to%20$1%2C500.",
+                              "title": "Understanding the True Cost of Air Conditioner Repairs",
+                              "text": "Apr 8, 2025 — Fan motor replacement cost Another common AC issue is a failed fan motor. Replacing a fan motor can run you anywhere fr..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "getparadisehvac.com",
+                              "domain": "getparadisehvac.com",
+                              "url": "https://getparadisehvac.com/how-much-is-standard-ac-repair/#:~:text=Average%20AC%20Repair%20Costs%20by,or%20replacement:%20$1%2C200%E2%80%93$3%2C500+",
+                              "title": "How Much Is Standard AC Repair? - Paradise Heating and Air",
+                              "text": "Apr 13, 2026 — Average AC Repair Costs by Type Different problems come with different price points. Here's a general breakdown: Therm..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Arthur Heating & Air",
+                              "domain": "www.callarthurair.com",
+                              "url": "https://www.callarthurair.com/ac-repair-cost/#:~:text=How%20Much%20Does%20AC%20Repair,respond%20outside%20normal%20working%20hours.",
+                              "title": "AC Repair Cost Guide: Common Repairs and Prices",
+                              "text": "Mar 14, 2026 — How Much Does AC Repair Cost? AC repair usually costs between $150 and $650 for the most common problems. The exact pr..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "callwisler.com",
+                              "domain": "callwisler.com",
+                              "url": "https://callwisler.com/getting-a-grip-on-ac-repair-costs-tips-and-insights-for-homeowners/#:~:text=Average%20Costs%20of%20Common%20AC,and%20capacity%20of%20the%20capacitor.",
+                              "title": "Getting a Grip on AC Repair Costs: Tips and Insights for Homeowners",
+                              "text": "Jun 28, 2023 — Average Costs of Common AC Repairs To give you a ballpark estimate, let's explore the average costs associated with so..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "HomeGuide",
+                              "domain": "homeguide.com",
+                              "url": "https://homeguide.com/costs/ac-repair-cost",
+                              "title": "How Much Does AC Repair Cost? (2026) - HomeGuide",
+                              "text": "Aug 22, 2025 —  *Including parts and labor. * AC freon leak repair. AC leak repair costs $200 to $1,500 to find and fix the leak and ..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Key Considerations",
+                          "text": "Emergency Service: After-hours or weekend repairs can significantly increase costs, with hourly rates sometimes exceeding $200. Age of Unit: If the repair cost multiplied by the age of the unit exceeds $5,000, replacing the system is often more economical. Minor vs. Major: Simple fixes like clearing a drain line or replacing a filter are inexpensive, while replacing major components like coils or compressors accounts for the highest costs.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Green City Heating and Air Conditioning",
+                              "domain": "greencityheatingandair.com",
+                              "url": "https://greencityheatingandair.com/blog/ac-repair-cost#:~:text=Why%20Understanding%20AC%20Repair%20Costs,service:%20$160%20%E2%80%93%20$250%20per%20hour",
+                              "title": "Don't Sweat It: Understanding Your AC Repair Bill",
+                              "text": "Why Understanding AC Repair Costs Matters for Your Budget. AC repair cost can catch homeowners off guard, especially during the pe..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Arthur Heating & Air",
+                              "domain": "www.callarthurair.com",
+                              "url": "https://www.callarthurair.com/ac-repair-cost/#:~:text=How%20Much%20Does%20AC%20Repair,respond%20outside%20normal%20working%20hours.",
+                              "title": "AC Repair Cost Guide: Common Repairs and Prices",
+                              "text": "Mar 14, 2026 — How Much Does AC Repair Cost? AC repair usually costs between $150 and $650 for the most common problems. The exact pr..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Picture Rocks Cooling Heating & Plumbing",
+                              "domain": "www.picturerockscooling.com",
+                              "url": "https://www.picturerockscooling.com/blog/air-conditioning-service/rule-5000-need-replace-ac/#:~:text=The%20Rule%20of%205000%20Rule,still%20be%20worth%20the%20investment.",
+                              "title": "The Rule of 5000: Do You Need to Replace Your AC?",
+                              "text": "May 5, 2025 — The Rule of 5000 Rule is simple: Multiply the cost of the needed repair by the age of your air conditioner. If the resu..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Lindstrom Air Conditioning & Plumbing",
+                              "domain": "www.lindstromair.com",
+                              "url": "https://www.lindstromair.com/articles/the-hidden-cost-of-repairing-an-ac-unit-vs-replacing-one/#:~:text=Frequent%20Repairs%20Add%20Up%20Quickly,of%20a%20full%20system%20replacement.",
+                              "title": "The Hidden Costs of Repairing an AC Unit vs. Replacing One",
+                              "text": "Apr 10, 2025 — Frequent Repairs Add Up Quickly If your AC system is over 10-15 years old, the cost of repairs can start to add up qui..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Synonyms/Related Terms for AC Repair Costs",
+                          "text": "AC maintenance fees HVAC repair expenses Freon recharge price Air conditioning service charges Compressor replacement cost HVAC technician labor rates",
+                          "images": null,
+                          "references": null
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Hyperion Auto Repair",
+                          "domain": "hyperionautorepair.com",
+                          "url": "https://hyperionautorepair.com/ac-repair-cost-los-angeles-expert-guide/#:~:text=Diagnostic%20inspection:%20$75-$150,(compressor%2C%20major%20component%20failure)",
+                          "title": "AC Repair Cost Los Angeles: Complete Guide to Expert Service ...",
+                          "text": "Apr 15, 2026 — Diagnostic inspection: $75-$150 (often waived if you proceed with repairs) Simple repairs: $150-$400 (filter replaceme..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Green City Heating and Air Conditioning",
+                          "domain": "greencityheatingandair.com",
+                          "url": "https://greencityheatingandair.com/blog/ac-repair-cost#:~:text=Why%20Understanding%20AC%20Repair%20Costs,service:%20$160%20%E2%80%93%20$250%20per%20hour",
+                          "title": "Don't Sweat It: Understanding Your AC Repair Bill",
+                          "text": "Why Understanding AC Repair Costs Matters for Your Budget. AC repair cost can catch homeowners off guard, especially during the pe..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "northeastmechanicalservices.com",
+                          "domain": "www.northeastmechanicalservices.com",
+                          "url": "https://www.northeastmechanicalservices.com/air-conditioner-repair-costs/#:~:text=Fan%20motor%20replacement%20cost,anywhere%20from%20$200%20to%20$1%2C500.",
+                          "title": "Understanding the True Cost of Air Conditioner Repairs",
+                          "text": "Apr 8, 2025 — Fan motor replacement cost Another common AC issue is a failed fan motor. Replacing a fan motor can run you anywhere fr..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "getparadisehvac.com",
+                          "domain": "getparadisehvac.com",
+                          "url": "https://getparadisehvac.com/how-much-is-standard-ac-repair/#:~:text=Average%20AC%20Repair%20Costs%20by,or%20replacement:%20$1%2C200%E2%80%93$3%2C500+",
+                          "title": "How Much Is Standard AC Repair? - Paradise Heating and Air",
+                          "text": "Apr 13, 2026 — Average AC Repair Costs by Type Different problems come with different price points. Here's a general breakdown: Therm..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Arthur Heating & Air",
+                          "domain": "www.callarthurair.com",
+                          "url": "https://www.callarthurair.com/ac-repair-cost/#:~:text=How%20Much%20Does%20AC%20Repair,respond%20outside%20normal%20working%20hours.",
+                          "title": "AC Repair Cost Guide: Common Repairs and Prices",
+                          "text": "Mar 14, 2026 — How Much Does AC Repair Cost? AC repair usually costs between $150 and $650 for the most common problems. The exact pr..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Lindstrom Air Conditioning & Plumbing",
+                          "domain": "www.lindstromair.com",
+                          "url": "https://www.lindstromair.com/articles/the-hidden-cost-of-repairing-an-ac-unit-vs-replacing-one/#:~:text=Frequent%20Repairs%20Add%20Up%20Quickly,of%20a%20full%20system%20replacement.",
+                          "title": "The Hidden Costs of Repairing an AC Unit vs. Replacing One",
+                          "text": "Apr 10, 2025 — Frequent Repairs Add Up Quickly If your AC system is over 10-15 years old, the cost of repairs can start to add up qui..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "callwisler.com",
+                          "domain": "callwisler.com",
+                          "url": "https://callwisler.com/getting-a-grip-on-ac-repair-costs-tips-and-insights-for-homeowners/#:~:text=Average%20Costs%20of%20Common%20AC,and%20capacity%20of%20the%20capacitor.",
+                          "title": "Getting a Grip on AC Repair Costs: Tips and Insights for Homeowners",
+                          "text": "Jun 28, 2023 — Average Costs of Common AC Repairs To give you a ballpark estimate, let's explore the average costs associated with so..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "HomeGuide",
+                          "domain": "homeguide.com",
+                          "url": "https://homeguide.com/costs/ac-repair-cost",
+                          "title": "How Much Does AC Repair Cost? (2026) - HomeGuide",
+                          "text": "Aug 22, 2025 —  *Including parts and labor. * AC freon leak repair. AC leak repair costs $200 to $1,500 to find and fix the leak and ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Picture Rocks Cooling Heating & Plumbing",
+                          "domain": "www.picturerockscooling.com",
+                          "url": "https://www.picturerockscooling.com/blog/air-conditioning-service/rule-5000-need-replace-ac/#:~:text=The%20Rule%20of%205000%20Rule,still%20be%20worth%20the%20investment.",
+                          "title": "The Rule of 5000: Do You Need to Replace Your AC?",
+                          "text": "May 5, 2025 — The Rule of 5000 Rule is simple: Multiply the cost of the needed repair by the age of your air conditioner. If the resu..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": null,
+                  "consideration_category": "Maintenance",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "To prevent an air conditioner from blowing warm air, regularly replace or clean the air filter every 1–3 months, keep the outdoor unit clear of debris (leaves, dirt), and ensure indoor vents are not obstructed. Schedule professional annual maintenance to check refrigerant levels, clean coils, and inspect components.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Carrier",
+                              "domain": "www.carrier.com",
+                              "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/#:~:text=Preventing%20AC%20from%20Blowing%20Hot,when%20you%20need%20it%20most.",
+                              "title": "Why Is MY AC Blowing Hot Air - Carrier",
+                              "text": "Preventing AC from Blowing Hot Air in the Future. To prevent your air conditioner from blowing warm air, regular AC maintenance is..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Parker & Sons",
+                              "domain": "www.parkerandsons.com",
+                              "url": "https://www.parkerandsons.com/blog/why-is-my-air-conditioner-blowing-warm-air#:~:text=Clearing%20Obstructions%20from%20Vents%20and,efficiency%20and%20prevent%20further%20clogging.",
+                              "title": "Air Conditioner Blowing Warm Air? - Parker & Sons",
+                              "text": "Clearing Obstructions from Vents and Units Aside from dirty air filters, obstructions around your vents and units can also affect ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Down East Heating & Air Conditioning",
+                              "domain": "downeastheating.com",
+                              "url": "https://downeastheating.com/blog/ac-blowing-warm-air-heres-what-to-do#:~:text=Replacing%20filters%20every%201%E2%80%933,ENERGY%20STAR%20HVAC%20maintenance%20checklist",
+                              "title": "AC Blowing Warm Air? Here's What to Do",
+                              "text": "Oct 10, 2025 — Replacing filters every 1–3 months. Keeping the outdoor unit free of debris. Scheduling seasonal tune-ups before summe..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Home Comfort Experts",
+                              "domain": "www.homecomfortexpertsinc.com",
+                              "url": "https://www.homecomfortexpertsinc.com/blog/how-do-i-fix-my-ac-blowing-warm-air/",
+                              "title": "How Do I Fix My AC Blowing Warm Air? - Home Comfort Experts",
+                              "text": "Jun 19, 2025 —  Preventing the Problem: Tips to Keep Your AC Running Cold * Change your air filter(s) regularly. * Schedule annual ai..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Carrier",
+                              "domain": "www.carrier.com",
+                              "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/#:~:text=2.,constant%20fan%20for%20air%20circulation",
+                              "title": "5 Air Conditioner (AC) Maintenance Tips You Should Know - Carrier",
+                              "text": "2. Replace the Filter. One of the easiest air conditioner preventative maintenance tasks you can perform yourself is to clean or r..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Chud Company",
+                              "domain": "chudcompany.com",
+                              "url": "https://chudcompany.com/blog/why-is-my-ac-blowing-warm-air-common-causes-and-fixes/#:~:text=Preventative%20AC%20Maintenance%20Tips%20to,re%20away%20without%20compromising%20comfort.",
+                              "title": "Why Is My AC Blowing Warm Air? Common Causes And Fixes",
+                              "text": "Preventative AC Maintenance Tips to Avoid Warm Air Issues Preventative maintenance is key to prolonging the life of your air condi..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Department of Energy (.gov)",
+                              "domain": "www.energy.gov",
+                              "url": "https://www.energy.gov/energysaver/air-conditioner-maintenance#:~:text=Replacing%20or%20cleaning%20your%20air,cause%20it%20to%20fail%20prematurely.",
+                              "title": "Air Conditioner Maintenance | Department of Energy",
+                              "text": "Replacing or cleaning your air conditioner filters regularly is crucial. Dirty, clogged filters reduce airflow and system efficien..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Key Maintenance Tips:",
+                          "text": "Replace/Clean Air Filters: Dirty filters restrict airflow, causing the evaporator coil to freeze or overheat. Clean Outdoor Unit (Condenser): Clear leaves, grass, and dirt from around the unit to ensure proper airflow, ensuring at least two feet of clearance. Clean Coils: Clean both the indoor evaporator coils and outdoor condenser coils to improve heat transfer. Check/Clear Drainage: Ensure the drain line is not clogged with algae or debris, which can trigger a safety switch and stop cooling. Check Thermostat Settings: Ensure the fan is set to \"AUTO,\" not \"ON,\" and the mode is set to \"COOL\". Schedule Annual Professional Service: A technician will check for leaks, inspect electrical components, and check refrigerant levels. Check for Blocked Vents: Ensure return and supply vents are not blocked by furniture or curtains.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Carrier",
+                              "domain": "www.carrier.com",
+                              "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/#:~:text=Preventing%20AC%20from%20Blowing%20Hot,when%20you%20need%20it%20most.",
+                              "title": "Why Is MY AC Blowing Hot Air - Carrier",
+                              "text": "Preventing AC from Blowing Hot Air in the Future. To prevent your air conditioner from blowing warm air, regular AC maintenance is..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Carrier",
+                              "domain": "www.carrier.com",
+                              "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/#:~:text=2.,constant%20fan%20for%20air%20circulation",
+                              "title": "5 Air Conditioner (AC) Maintenance Tips You Should Know - Carrier",
+                              "text": "2. Replace the Filter. One of the easiest air conditioner preventative maintenance tasks you can perform yourself is to clean or r..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Department of Energy (.gov)",
+                              "domain": "www.energy.gov",
+                              "url": "https://www.energy.gov/energysaver/air-conditioner-maintenance#:~:text=Replacing%20or%20cleaning%20your%20air,cause%20it%20to%20fail%20prematurely.",
+                              "title": "Air Conditioner Maintenance | Department of Energy",
+                              "text": "Replacing or cleaning your air conditioner filters regularly is crucial. Dirty, clogged filters reduce airflow and system efficien..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Parker & Sons",
+                              "domain": "www.parkerandsons.com",
+                              "url": "https://www.parkerandsons.com/blog/why-is-my-air-conditioner-blowing-warm-air#:~:text=Clearing%20Obstructions%20from%20Vents%20and,efficiency%20and%20prevent%20further%20clogging.",
+                              "title": "Air Conditioner Blowing Warm Air? - Parker & Sons",
+                              "text": "Clearing Obstructions from Vents and Units Aside from dirty air filters, obstructions around your vents and units can also affect ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Home Comfort Experts",
+                              "domain": "www.homecomfortexpertsinc.com",
+                              "url": "https://www.homecomfortexpertsinc.com/blog/how-do-i-fix-my-ac-blowing-warm-air/",
+                              "title": "How Do I Fix My AC Blowing Warm Air? - Home Comfort Experts",
+                              "text": "Jun 19, 2025 —  Preventing the Problem: Tips to Keep Your AC Running Cold * Change your air filter(s) regularly. * Schedule annual ai..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "American Home Shield",
+                              "domain": "www.ahs.com",
+                              "url": "https://www.ahs.com/home-matters/quick-tips/what-to-do-when-your-ac-is-blowing-warm-air/#:~:text=Once%20you've%20finished%20cleaning,restore%20power%20to%20the%20unit.",
+                              "title": "Here's What to Do When Your AC Unit Is Blowing Warm Air",
+                              "text": "Once you've finished cleaning the outside of the air conditioning unit, unscrew the top of the unit and gently lift out the fan. D..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Pruett Air Conditioning",
+                              "domain": "pruettac.com",
+                              "url": "https://pruettac.com/blog/top-5-reasons-your-ac-is-blowing-warm-air-and-how-to-fix-it/",
+                              "title": "Top 5 Reasons Your AC Is Blowing Warm Air (And How to Fix It)",
+                              "text": "May 2, 2025"
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=gWRqIRa5600#:~:text=Check%20for%20a%20clogged%20drain%2C%20bad%20capacitor%2C,if%20your%20AC%20is%20blowing%20hot%20air.",
+                              "title": "Air Conditioner Blowing HOT Air? Here's How To Fix It!",
+                              "text": "Oct 17, 2024 — Check for a clogged drain, bad capacitor, ants in the condenser, or a bad condenser fan motor if your AC is blowing ho..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Mr. Breeze Heating and Cooling",
+                              "domain": "mrbreezehvac.com",
+                              "url": "https://mrbreezehvac.com/blog/why-is-my-ac-blowing-warm-air#:~:text=Always%20keep%20your%20thermostat%20set,system%20only%20runs%20when%20necessary.",
+                              "title": "Why Is My AC Blowing Warm Air? Top 5 Fixes - Mr. Breeze HVAC",
+                              "text": "Always keep your thermostat set to Auto. Also, double-check that the mode hasn't been bumped to \"Heat\" or \"Fan Only.\" If you have ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Chud Company",
+                              "domain": "chudcompany.com",
+                              "url": "https://chudcompany.com/blog/why-is-my-ac-blowing-warm-air-common-causes-and-fixes/#:~:text=Preventative%20AC%20Maintenance%20Tips%20to,re%20away%20without%20compromising%20comfort.",
+                              "title": "Why Is My AC Blowing Warm Air? Common Causes And Fixes",
+                              "text": "Preventative AC Maintenance Tips to Avoid Warm Air Issues Preventative maintenance is key to prolonging the life of your air condi..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "CARE Heating and Cooling",
+                              "domain": "www.careheatingcooling.com",
+                              "url": "https://www.careheatingcooling.com/ac-not-cooling-guide/#:~:text=We%20recommend%20checking%20your%20filter,check%20often%20solves%20the%20problem.",
+                              "title": "AC Blowing Warm Air? Essential Fixes Guide (2025)",
+                              "text": "We recommend checking your filter monthly, especially during summer. Most systems need a new filter every one to three months, but..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "By performing these, you can prevent the most common causes of warm air: restricted airflow, low refrigerant levels, or a frozen coil.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Carrier",
+                              "domain": "www.carrier.com",
+                              "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/#:~:text=Preventing%20AC%20from%20Blowing%20Hot,when%20you%20need%20it%20most.",
+                              "title": "Why Is MY AC Blowing Hot Air - Carrier",
+                              "text": "Preventing AC from Blowing Hot Air in the Future. To prevent your air conditioner from blowing warm air, regular AC maintenance is..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Home Comfort Experts",
+                              "domain": "www.homecomfortexpertsinc.com",
+                              "url": "https://www.homecomfortexpertsinc.com/blog/how-do-i-fix-my-ac-blowing-warm-air/",
+                              "title": "How Do I Fix My AC Blowing Warm Air? - Home Comfort Experts",
+                              "text": "Jun 19, 2025 —  Preventing the Problem: Tips to Keep Your AC Running Cold * Change your air filter(s) regularly. * Schedule annual ai..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Department of Energy (.gov)",
+                              "domain": "www.energy.gov",
+                              "url": "https://www.energy.gov/energysaver/air-conditioner-maintenance#:~:text=Replacing%20or%20cleaning%20your%20air,cause%20it%20to%20fail%20prematurely.",
+                              "title": "Air Conditioner Maintenance | Department of Energy",
+                              "text": "Replacing or cleaning your air conditioner filters regularly is crucial. Dirty, clogged filters reduce airflow and system efficien..."
+                            }
+                          ]
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Carrier",
+                          "domain": "www.carrier.com",
+                          "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/#:~:text=Preventing%20AC%20from%20Blowing%20Hot,when%20you%20need%20it%20most.",
+                          "title": "Why Is MY AC Blowing Hot Air - Carrier",
+                          "text": "Preventing AC from Blowing Hot Air in the Future. To prevent your air conditioner from blowing warm air, regular AC maintenance is..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Parker & Sons",
+                          "domain": "www.parkerandsons.com",
+                          "url": "https://www.parkerandsons.com/blog/why-is-my-air-conditioner-blowing-warm-air#:~:text=Clearing%20Obstructions%20from%20Vents%20and,efficiency%20and%20prevent%20further%20clogging.",
+                          "title": "Air Conditioner Blowing Warm Air? - Parker & Sons",
+                          "text": "Clearing Obstructions from Vents and Units Aside from dirty air filters, obstructions around your vents and units can also affect ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Down East Heating & Air Conditioning",
+                          "domain": "downeastheating.com",
+                          "url": "https://downeastheating.com/blog/ac-blowing-warm-air-heres-what-to-do#:~:text=Replacing%20filters%20every%201%E2%80%933,ENERGY%20STAR%20HVAC%20maintenance%20checklist",
+                          "title": "AC Blowing Warm Air? Here's What to Do",
+                          "text": "Oct 10, 2025 — Replacing filters every 1–3 months. Keeping the outdoor unit free of debris. Scheduling seasonal tune-ups before summe..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "CARE Heating and Cooling",
+                          "domain": "www.careheatingcooling.com",
+                          "url": "https://www.careheatingcooling.com/ac-not-cooling-guide/#:~:text=We%20recommend%20checking%20your%20filter,check%20often%20solves%20the%20problem.",
+                          "title": "AC Blowing Warm Air? Essential Fixes Guide (2025)",
+                          "text": "We recommend checking your filter monthly, especially during summer. Most systems need a new filter every one to three months, but..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "YouTube ·",
+                          "domain": "www.youtube.com",
+                          "url": "https://www.youtube.com/watch?v=gWRqIRa5600#:~:text=Check%20for%20a%20clogged%20drain%2C%20bad%20capacitor%2C,if%20your%20AC%20is%20blowing%20hot%20air.",
+                          "title": "Air Conditioner Blowing HOT Air? Here's How To Fix It!",
+                          "text": "Oct 17, 2024 — Check for a clogged drain, bad capacitor, ants in the condenser, or a bad condenser fan motor if your AC is blowing ho..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Mr. Breeze Heating and Cooling",
+                          "domain": "mrbreezehvac.com",
+                          "url": "https://mrbreezehvac.com/blog/why-is-my-ac-blowing-warm-air#:~:text=Always%20keep%20your%20thermostat%20set,system%20only%20runs%20when%20necessary.",
+                          "title": "Why Is My AC Blowing Warm Air? Top 5 Fixes - Mr. Breeze HVAC",
+                          "text": "Always keep your thermostat set to Auto. Also, double-check that the mode hasn't been bumped to \"Heat\" or \"Fan Only.\" If you have ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Home Comfort Experts",
+                          "domain": "www.homecomfortexpertsinc.com",
+                          "url": "https://www.homecomfortexpertsinc.com/blog/how-do-i-fix-my-ac-blowing-warm-air/",
+                          "title": "How Do I Fix My AC Blowing Warm Air? - Home Comfort Experts",
+                          "text": "Jun 19, 2025 —  Preventing the Problem: Tips to Keep Your AC Running Cold * Change your air filter(s) regularly. * Schedule annual ai..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Carrier",
+                          "domain": "www.carrier.com",
+                          "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/#:~:text=2.,constant%20fan%20for%20air%20circulation",
+                          "title": "5 Air Conditioner (AC) Maintenance Tips You Should Know - Carrier",
+                          "text": "2. Replace the Filter. One of the easiest air conditioner preventative maintenance tasks you can perform yourself is to clean or r..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Chud Company",
+                          "domain": "chudcompany.com",
+                          "url": "https://chudcompany.com/blog/why-is-my-ac-blowing-warm-air-common-causes-and-fixes/#:~:text=Preventative%20AC%20Maintenance%20Tips%20to,re%20away%20without%20compromising%20comfort.",
+                          "title": "Why Is My AC Blowing Warm Air? Common Causes And Fixes",
+                          "text": "Preventative AC Maintenance Tips to Avoid Warm Air Issues Preventative maintenance is key to prolonging the life of your air condi..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "American Home Shield",
+                          "domain": "www.ahs.com",
+                          "url": "https://www.ahs.com/home-matters/quick-tips/what-to-do-when-your-ac-is-blowing-warm-air/#:~:text=Once%20you've%20finished%20cleaning,restore%20power%20to%20the%20unit.",
+                          "title": "Here's What to Do When Your AC Unit Is Blowing Warm Air",
+                          "text": "Once you've finished cleaning the outside of the air conditioning unit, unscrew the top of the unit and gently lift out the fan. D..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Pruett Air Conditioning",
+                          "domain": "pruettac.com",
+                          "url": "https://pruettac.com/blog/top-5-reasons-your-ac-is-blowing-warm-air-and-how-to-fix-it/",
+                          "title": "Top 5 Reasons Your AC Is Blowing Warm Air (And How to Fix It)",
+                          "text": "May 2, 2025"
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Department of Energy (.gov)",
+                          "domain": "www.energy.gov",
+                          "url": "https://www.energy.gov/energysaver/air-conditioner-maintenance#:~:text=Replacing%20or%20cleaning%20your%20air,cause%20it%20to%20fail%20prematurely.",
+                          "title": "Air Conditioner Maintenance | Department of Energy",
+                          "text": "Replacing or cleaning your air conditioner filters regularly is crucial. Dirty, clogged filters reduce airflow and system efficien..."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 3,
+              "rank_absolute": 9,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[15]/div[1]/div[1]",
+              "domain": "www.carrier.com",
+              "title": "Why Is MY AC Blowing Hot Air",
+              "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.carrier.com › ... › Products › Air Conditioners",
+              "website_name": "Carrier",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Six Possible Reasons For An Air Conditioner Blowing Warm Air · 1. Dirty air filters · 2. Refrigerant leak · 3. Thermostat issues · 4. Electrical Problems · 5. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "1. Dirty air filters"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 4,
+              "rank_absolute": 10,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[17]/div[1]/div[1]",
+              "domain": "mechanicalone.com",
+              "title": "Why Is My AC Blowing Hot Air? Troubleshooting Tips",
+              "url": "https://mechanicalone.com/blog/why-is-my-air-conditioner-blowing-hot-air/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://mechanicalone.com › Mechanical One Blog",
+              "website_name": "Mechanical One",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Jun 30, 2025 — There are a few reasons this could happen, restricted air flow, low refrigerant, your thermostat was set too low for too long, blower fan issues ... Read more",
+              "pre_snippet": "06/30/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "restricted air flow, low refrigerant"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-06-30 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 5,
+              "rank_absolute": 11,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[19]/div[1]/div[1]",
+              "domain": "www.autozone.com",
+              "title": "Why Is My Car AC Blowing Hot Air? Here's How to Fix It",
+              "url": "https://www.autozone.com/diy/climate-control/car-ac-blowing-hot-air",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.autozone.com › ... › AC & Climate Control",
+              "website_name": "AutoZone.com",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "There could be a multitude of root causes with common ones being a plugged cabin air filter, bad compressor, clogged expansion valve, or low refrigerant level. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "plugged cabin air filter, bad compressor, clogged expansion valve, or low refrigerant level"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 6,
+              "rank_absolute": 12,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[21]/div[1]/div[1]",
+              "domain": "calldreamteam.com",
+              "title": "Why is Your Ac Blowing Warm Air? 6 Reasons and Fixes",
+              "url": "https://calldreamteam.com/blog/why-is-my-ac-blowing-warm-air/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://calldreamteam.com › Cooling",
+              "website_name": "Dream Team Heating & Air",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "6 CAUSES OF AN AC BLOWING WARM AIR · 1. CLOGGED AIR FILTERS OF THE AIR CONDITIONER · 2. YOUR THERMOSTAT SETTINGS ARE INCORRECTLY · 3. THE OUTDOOR AC UNIT IS TOO ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "1. CLOGGED AIR FILTERS OF THE AIR CONDITIONER"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 7,
+              "rank_absolute": 13,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[23]/div[1]/div[1]",
+              "domain": "www.bryant.com",
+              "title": "Why Is My AC Blowing Hot Air? | Troubleshooting & Fixes",
+              "url": "https://www.bryant.com/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.bryant.com › ... › Products › Air Conditioners",
+              "website_name": "Bryant",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "If your air conditioner is blowing hot air, the most common causes are a dirty air filter, incorrect thermostat settings, a refrigerant leak, or a clogged drain ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "dirty air filter, incorrect thermostat settings, a refrigerant leak, or a clogged drain"
+              ],
+              "links": [
+                {
+                  "type": "link_element",
+                  "title": "How Can I Troubleshoot An Ac...",
+                  "description": null,
+                  "url": "https://www.bryant.com/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/",
+                  "domain": "www.bryant.com"
+                },
+                {
+                  "type": "link_element",
+                  "title": "How Can I Prevent My Ac From...",
+                  "description": null,
+                  "url": "https://www.bryant.com/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/",
+                  "domain": "www.bryant.com"
+                },
+                {
+                  "type": "link_element",
+                  "title": "Ac Blowing Hot Air Faqs",
+                  "description": null,
+                  "url": "https://www.bryant.com/en/us/products/air-conditioners/why-is-my-ac-blowing-hot-air/",
+                  "domain": "www.bryant.com"
+                }
+              ],
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 1,
+              "rank_absolute": 14,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[2]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Car ac blowing warm air",
+                "How to fix AC blowing hot air in car",
+                "AC blowing warm air but compressor is running",
+                "Central ac blowing warm air",
+                "AC blowing warm air in apartment",
+                "Outside ac blowing warm air",
+                "Window AC blowing warm air",
+                "Split ac blowing warm air"
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 8,
+              "rank_absolute": 15,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "domain": "www.quora.com",
+              "title": "Why does my AC blow warm air instead of cold air?",
+              "url": "https://www.quora.com/Why-does-my-AC-blow-warm-air-instead-of-cold-air",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "3 answers  ·  7 months ago",
+              "website_name": "Quora",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Could be a bad damper letting in hot air from the heater core, or problem with the control that operates the damper (which could be electrical ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Could be a bad damper letting in hot air from the heater core"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 9,
+              "rank_absolute": 16,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+              "domain": "downeastheating.com",
+              "title": "AC Blowing Warm Air? Here's What to Do",
+              "url": "https://downeastheating.com/blog/ac-blowing-warm-air-heres-what-to-do",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://downeastheating.com › Blogs",
+              "website_name": "Down East Heating & Air Conditioning",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Oct 10, 2025 — A clogged air filter can restrict airflow, reduce efficiency, and even cause the system to overheat, resulting in warm air blowing from your ... Read more",
+              "pre_snippet": "10/10/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "gged air filter can restrict airflow"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-10-10 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 10,
+              "rank_absolute": 17,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]",
+              "domain": "www.koch-white.com",
+              "title": "Why Is My AC Blowing Warm Air? 7 Possible Causes",
+              "url": "https://www.koch-white.com/blog/why-is-my-ac-blowing-warm-air/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.koch-white.com › blog › why-is-my-ac-bl...",
+              "website_name": "Koch & White Heating & Cooling",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Why Is My AC Blowing Warm Air? 7 Possible Causes · 1. Wrong Thermostat Setting · 2. Clogged Filter · 3. Low Refrigerant · 4. Condenser Unit Malfunction · 5. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "1. Wrong Thermostat Setting"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 11,
+              "rank_absolute": 18,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]",
+              "domain": "pruettac.com",
+              "title": "Top 5 Reasons Your AC Is Blowing Warm Air",
+              "url": "https://pruettac.com/blog/top-5-reasons-your-ac-is-blowing-warm-air-and-how-to-fix-it/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://pruettac.com › Blog",
+              "website_name": "Pruett Air Conditioning",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "May 2, 2025 — The 5 Main Reasons Your AC Might Blow Warm Air · 1. Your Air Filter Is Dirty or Clogged · 2. Thermostat Is Set Incorrectly or Malfunctioning · 3 ... Read more",
+              "pre_snippet": "05/02/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Your Air Filter Is Dirty or Clogged"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-05-02 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 12,
+              "rank_absolute": 19,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]",
+              "domain": "www.hutchbiz.com",
+              "title": "10 Reasons Why Your AC is Blowing Warm Air",
+              "url": "https://www.hutchbiz.com/blog/2023/04/24/10-reasons-why-your-ac-is-blowing-warm-air/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.hutchbiz.com › blog › 2023/04/24 › 10-re...",
+              "website_name": "hutchbiz.com",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Apr 24, 2023 — 10 Reasons Why Your AC Blowing Warm Air · 1. Low Refrigerant · 2. Clogged Air Filters · 3. Wrong Thermostat Setting · 4. Frozen Evaporator Coils. Read more",
+              "pre_snippet": "04/24/2023 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "1. Low Refrigerant"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2023-04-24 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 13,
+              "rank_absolute": 20,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+              "domain": "www.lennox.com",
+              "title": "Why is My AC Blowing Hot Air? Causes Explained",
+              "url": "https://www.lennox.com/residential/lennox-life/consumer/why-is-my-ac-blowing-hot-air",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.lennox.com › Home › Lennox Life",
+              "website_name": "Lennox",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Nov 19, 2025 — Warm air from an AC often means dirty filters, blocked coils, or thermostat errors. The page suggests easy homeowner checks before calling a ... Read more",
+              "pre_snippet": "11/19/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "dirty filters, blocked coils, or thermostat errors"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-11-19 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 14,
+              "rank_absolute": 21,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]/div[1]",
+              "domain": "www.valiantenergy.com",
+              "title": "AC Problems: Why is My Air Conditioner Blowing Warm Air?",
+              "url": "https://www.valiantenergy.com/blog/ac-problems-why-is-my-air-conditioner-blowing-warm-air/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.valiantenergy.com › blog › ac-problems-w...",
+              "website_name": "Valiant Home & Energy",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Mar 13, 2024 — A dirty or clogged air filter is another common yet easily overlooked culprit for your AC blowing warm air. When the filter accumulates too much ... Read more",
+              "pre_snippet": "03/13/2024 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "A dirty or clogged air filter"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2024-03-13 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 15,
+              "rank_absolute": 22,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]",
+              "domain": "www.supertechhvac.com",
+              "title": "Why Is My AC Blowing Hot Air? How to fix? [With Pictures]",
+              "url": "https://www.supertechhvac.com/ac-blowing-hot-air-warm-not-cold/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.supertechhvac.com › ac-blowing-hot-air-wa...",
+              "website_name": "SuperTech HVAC Services",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Your AC blowing warm air could be due to a refrigerant leak. We explained how the refrigerant, when put under pressure, gets hotter. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "due to a refrigerant leak"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 16,
+              "rank_absolute": 23,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+              "domain": "www.toyotaoforlando.com",
+              "title": "Why Is My Car AC Blowing Warm Air? A Beginner's Guide",
+              "url": "https://www.toyotaoforlando.com/blogs/6087/why-is-my-car-ac-blowing-warm-air",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.toyotaoforlando.com › blogs › why-is-my-...",
+              "website_name": "Toyota of Orlando",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Aug 28, 2025 — Why Is My Car AC Blowing Warm Air in the Afternoon? · 1. Low or leaking refrigerant. · 2. Dirty Cabin Air Filter · 3. Faulty or Failing ... Read more",
+              "pre_snippet": "08/28/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "1. Low or leaking refrigerant"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-08-28 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 17,
+              "rank_absolute": 24,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]/div[1]",
+              "domain": "www.cooltoday.com",
+              "title": "5 Causes of a Central AC Blowing Warm Air",
+              "url": "https://www.cooltoday.com/blog/5-causes-of-a-central-ac-blowing-warm-air",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.cooltoday.com › blog › 5-causes-of-a-cent...",
+              "website_name": "CoolToday",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Low refrigerant is another common reason for an AC to blow warm air. Losing refrigerant means losing your cool. However, you'll need an expert AC contractor to ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Low refrigerant is another common reason for an AC to blow warm air"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 2,
+              "rank_absolute": 25,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[3]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "Car ac blowing warm air",
+                "How to fix AC blowing hot air in car",
+                "AC blowing warm air but compressor is running",
+                "Central ac blowing warm air",
+                "AC blowing warm air in apartment",
+                "Outside ac blowing warm air",
+                "Window AC blowing warm air",
+                "Split ac blowing warm air"
+              ],
+              "rectangle": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

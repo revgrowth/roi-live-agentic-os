@@ -1,0 +1,2803 @@
+{
+  "version": "0.1.20260430",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "3.9004 sec.",
+  "cost": 0.0035,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "04302029-1032-0139-0000-c4ac343d7cac",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "3.7260 sec.",
+      "cost": 0.0035,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "serp",
+        "google",
+        "organic",
+        "live",
+        "advanced"
+      ],
+      "data": {
+        "api": "serp",
+        "function": "live",
+        "se": "google",
+        "se_type": "organic",
+        "keyword": "ac not cooling",
+        "location_code": 1025666,
+        "language_code": "en",
+        "device": "desktop",
+        "os": "windows",
+        "depth": 20,
+        "load_async_ai_overview": true
+      },
+      "result": [
+        {
+          "keyword": "ac not cooling",
+          "type": "organic",
+          "se_domain": "google.com",
+          "location_code": 1025666,
+          "language_code": "en",
+          "check_url": "https://www.google.com/search?q=ac%20not%20cooling&hl=en&gl=US&ie=UTF-8&uule=w+CAIQIFISCUvj5xPE9P6IEU9NBigjeSIB",
+          "datetime": "2026-04-30 17:29:46 +00:00",
+          "spell": null,
+          "refinement_chips": null,
+          "item_types": [
+            "ai_overview",
+            "organic",
+            "product_considerations",
+            "people_also_ask",
+            "video",
+            "people_also_search",
+            "discussions_and_forums",
+            "perspectives",
+            "paid",
+            "related_searches"
+          ],
+          "se_results_count": 2590000000,
+          "pages_count": 2,
+          "items_count": 27,
+          "items": [
+            {
+              "type": "ai_overview",
+              "rank_group": 1,
+              "rank_absolute": 1,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "asynchronous_ai_overview": true,
+              "markdown": "![7 Reasons Why Your AC Is Running But Not Cooling | Dugan Air](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:32)\n![Why Your AC is Running but Not Cooling Your Home | Nick&#39;s AC](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:33)\n![Air Conditioner Not Cooling? Try These DIY Fixes](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:34)\n\nIf your AC is running but not cooling, the most common causes are `a dirty air filter, restricted airflow to the outdoor unit, or a tripped circuit breaker` . Immediately check your thermostat settings, replace the air filter, and ensure the outdoor unit is clear of debris. If the air is warm, it may be a failed capacitor or a refrigerant leak.[[1]](https://www.reddit.com/r/ecobee/comments/wpu5jg/why_is_my_ac_suddenly_running_constantly_and_not/)[[2]](https://www.youtube.com/watch?v=qTFi8YE6QPY)[[3]](https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20running%20but%20not,compressor%2C%20frozen%20evaporator%20coils%2C%20or%20electrical%20issues.)[[4]](https://www.trane.com/residential/en/resources/troubleshooting/air-conditioners/ac-not-blowing-cold-air/)[[5]](https://www.bryant.com/en/ca/products/air-conditioners/ac-not-blowing-cold-air/)\n\nThis video provides a quick guide on three things to check when your AC is running but not cooling:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:35)\n02:03[![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:36)\n![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:37)\nAffordable Comfort YouTube• Mar 19, 2026](https://www.youtube.com/watch?v=SCBXGEEaqSY) \n\n**Common Reasons Your AC is Not Cooling:** \n\n- **Dirty Air Filter:** A clogged filter restricts airflow, causing the system to freeze up.\n- **Dirty Condenser Coils:** The outdoor unit (condenser) must be clean to release heat.\n- **Tripped Circuit Breaker:** Check your home's main electrical panel for tripped breakers.\n- **Faulty Capacitor:** A failed capacitor ($15-$20 part) often prevents the compressor from starting, say [Reddit users](https://www.reddit.com/r/ecobee/comments/wpu5jg/why_is_my_ac_suddenly_running_constantly_and_not/).\n- **Refrigerant Leak:** Low refrigerant, often due to a leak, stops the cooling process, notes A.B. May.[[1]](https://www.reddit.com/r/ecobee/comments/wpu5jg/why_is_my_ac_suddenly_running_constantly_and_not/)[[2]](https://www.trane.com/residential/en/resources/troubleshooting/air-conditioners/ac-not-blowing-cold-air/)[[3]](https://abmay.com/blog/ac-not-cooling-enough/)[[4]](https://www.youtube.com/watch?v=qTFi8YE6QPY)[[5]](https://www.homedepot.com/c/ah/how-to-fix-an-ac-not-blowing-cold-air/9ba683603be9fa5395fab90140a8b842)[[6]](https://www.youtube.com/watch?v=drb2fdVKZlk&t=69)\n\nYou can watch this video to learn more about the common causes of an AC not blowing cold air:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:38)\n53s[![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:39)\n![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:40)\nFix This House YouTube• Aug 11, 2024](https://www.youtube.com/watch?v=drb2fdVKZlk&t=276) **Troubleshooting Steps to Try Now:** \n\n1. **Check the Thermostat:** Ensure it is set to \"Cool\" and the temperature is lower than the current room temperature.\n2. **Check Airflow:** Make sure all vents inside the house are open and not blocked.\n3. **Inspect the Filter:** If it is dirty, replace it.\n4. **Reset the Breaker:** If the outside unit is silent, check your electrical panel for a tripped breaker.\n5. **Clean the Outside Unit:** Turn off the power, remove any debris, and gently spray the outside coils with a garden hose, suggests [this YouTube video](https://www.youtube.com/shorts/YSOxY0qgqkE).[[1]](https://www.townoilcompany.com/blog/why-is-my-ac-running-but-not-cooling)[[2]](https://www.bryant.com/en/ca/products/air-conditioners/ac-not-blowing-cold-air/)[[3]](https://www.homedepot.com/c/ah/how-to-fix-an-ac-not-blowing-cold-air/9ba683603be9fa5395fab90140a8b842)[[4]](https://www.trane.com/residential/en/resources/troubleshooting/air-conditioners/ac-not-blowing-cold-air/)[[5]](https://www.youtube.com/shorts/YSOxY0qgqkE)\n\nThis video demonstrates how to clean your outdoor AC unit:![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:41)\n![Related video thumbnail](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:42)\n00:58[![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:43)\n![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:44)\nThe Air Of Authority YouTube• Aug 3, 2023](https://www.youtube.com/shorts/YSOxY0qgqkE) If the system is still not cooling after these steps, it is recommended to contact a qualified HVAC technician, according to [Carrier](https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/) and [Bryant](https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/).[[1]](https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/#:~:text=Other%20causes%20include:%20*%20Low%20refrigerant%20levels,maintenance%20plans%20to%20help%20prevent%20future%20problems.)[[2]](https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20running%20but%20not,compressor%2C%20frozen%20evaporator%20coils%2C%20or%20electrical%20issues.)",
+              "items": [
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": null,
+                  "markdown": "![7 Reasons Why Your AC Is Running But Not Cooling | Dugan Air](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:16)\n![Why Your AC is Running but Not Cooling Your Home | Nick&#39;s AC](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:17)\n![Air Conditioner Not Cooling? Try These DIY Fixes](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:18)",
+                  "links": null,
+                  "images": [
+                    {
+                      "type": "images_element",
+                      "alt": "7 Reasons Why Your AC Is Running But Not Cooling | Dugan Air",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:19"
+                    },
+                    {
+                      "type": "images_element",
+                      "alt": "Why Your AC is Running but Not Cooling Your Home | Nick's AC",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:20"
+                    },
+                    {
+                      "type": "images_element",
+                      "alt": "Air Conditioner Not Cooling? Try These DIY Fixes",
+                      "url": null,
+                      "image_url": "https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:21"
+                    }
+                  ],
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "If your AC is running but not cooling, the most common causes are a dirty air filter, restricted airflow to the outdoor unit, or a tripped circuit breaker. Immediately check your thermostat settings, replace the air filter, and ensure the outdoor unit is clear of debris. If the air is warm, it may be a failed capacitor or a refrigerant leak. Reddit +4",
+                  "markdown": "If your AC is running but not cooling, the most common causes are `a dirty air filter, restricted airflow to the outdoor unit, or a tripped circuit breaker` . Immediately check your thermostat settings, replace the air filter, and ensure the outdoor unit is clear of debris. If the air is warm, it may be a failed capacitor or a refrigerant leak.[[1]](https://www.reddit.com/r/ecobee/comments/wpu5jg/why_is_my_ac_suddenly_running_constantly_and_not/)[[2]](https://www.youtube.com/watch?v=qTFi8YE6QPY)[[3]](https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20running%20but%20not,compressor%2C%20frozen%20evaporator%20coils%2C%20or%20electrical%20issues.)[[4]](https://www.trane.com/residential/en/resources/troubleshooting/air-conditioners/ac-not-blowing-cold-air/)[[5]](https://www.bryant.com/en/ca/products/air-conditioners/ac-not-blowing-cold-air/)",
+                  "links": null,
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Reddit",
+                      "domain": "www.reddit.com",
+                      "url": "https://www.reddit.com/r/ecobee/comments/wpu5jg/why_is_my_ac_suddenly_running_constantly_and_not/",
+                      "title": "Why is my AC suddenly running constantly and not cooling the house?",
+                      "text": "Check that the breaker for the outside unit is not tripped. Usually on the outside of the house near the unit. Otherwise something..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=qTFi8YE6QPY",
+                      "title": "Why is my A/C running, but not cooling?",
+                      "text": "One of the most frequent questions is why an air conditioner is running but not producing cold air. There are three main reasons f..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Carrier",
+                      "domain": "www.carrier.com",
+                      "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20running%20but%20not,compressor%2C%20frozen%20evaporator%20coils%2C%20or%20electrical%20issues.",
+                      "title": "Why is My AC Not Blowing Cold Air While Running? - Carrier",
+                      "text": "If your AC is running but not cooling, it could be due to a dirty air filter, incorrect thermostat settings, a malfunctioning ther..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Trane",
+                      "domain": "www.trane.com",
+                      "url": "https://www.trane.com/residential/en/resources/troubleshooting/air-conditioners/ac-not-blowing-cold-air/",
+                      "title": "AC Not Blowing Cold Air? Learn What to Do - Trane®",
+                      "text": "A clogged or dirty air filter can cause reduced airflow or even block airflow. This can cause the AC unit to work harder trying to..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Bryant",
+                      "domain": "www.bryant.com",
+                      "url": "https://www.bryant.com/en/ca/products/air-conditioners/ac-not-blowing-cold-air/",
+                      "title": "Why Is My AC Not Blowing Cold Air? | 7 Causes & Expert Fixes | Bryant",
+                      "text": "Blocked Outdoor Condenser Unit. A blocked outdoor condenser cannot release heat efficiently, forcing your system to blow warm air ..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "This video provides a quick guide on three things to check when your AC is running but not cooling: 02:03 Affordable Comfort YouTube• Mar 19, 2026",
+                  "markdown": "This video provides a quick guide on three things to check when your AC is running but not cooling:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:22)\n02:03[![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:23)\n![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:24)\nAffordable Comfort YouTube• Mar 19, 2026](https://www.youtube.com/watch?v=SCBXGEEaqSY)",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Common Reasons Your AC is Not Cooling:",
+                  "text": "Dirty Air Filter: A clogged filter restricts airflow, causing the system to freeze up. Dirty Condenser Coils: The outdoor unit (condenser) must be clean to release heat. Tripped Circuit Breaker: Check your home's main electrical panel for tripped breakers. Faulty Capacitor: A failed capacitor ($15-$20 part) often prevents the compressor from starting, say Reddit users. Refrigerant Leak: Low refrigerant, often due to a leak, stops the cooling process, notes A.B. May. A.B. May",
+                  "markdown": "- **Dirty Air Filter:** A clogged filter restricts airflow, causing the system to freeze up.\n- **Dirty Condenser Coils:** The outdoor unit (condenser) must be clean to release heat.\n- **Tripped Circuit Breaker:** Check your home's main electrical panel for tripped breakers.\n- **Faulty Capacitor:** A failed capacitor ($15-$20 part) often prevents the compressor from starting, say [Reddit users](https://www.reddit.com/r/ecobee/comments/wpu5jg/why_is_my_ac_suddenly_running_constantly_and_not/).\n- **Refrigerant Leak:** Low refrigerant, often due to a leak, stops the cooling process, notes A.B. May.[[1]](https://www.reddit.com/r/ecobee/comments/wpu5jg/why_is_my_ac_suddenly_running_constantly_and_not/)[[2]](https://www.trane.com/residential/en/resources/troubleshooting/air-conditioners/ac-not-blowing-cold-air/)[[3]](https://abmay.com/blog/ac-not-cooling-enough/)[[4]](https://www.youtube.com/watch?v=qTFi8YE6QPY)[[5]](https://www.homedepot.com/c/ah/how-to-fix-an-ac-not-blowing-cold-air/9ba683603be9fa5395fab90140a8b842)[[6]](https://www.youtube.com/watch?v=drb2fdVKZlk&t=69)",
+                  "links": [
+                    {
+                      "type": "link_element",
+                      "title": "Reddit users",
+                      "description": null,
+                      "url": "https://www.reddit.com/r/ecobee/comments/wpu5jg/why_is_my_ac_suddenly_running_constantly_and_not/",
+                      "domain": "www.reddit.com"
+                    }
+                  ],
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Reddit",
+                      "domain": "www.reddit.com",
+                      "url": "https://www.reddit.com/r/ecobee/comments/wpu5jg/why_is_my_ac_suddenly_running_constantly_and_not/",
+                      "title": "Why is my AC suddenly running constantly and not cooling the house?",
+                      "text": "Check that the breaker for the outside unit is not tripped. Usually on the outside of the house near the unit. Otherwise something..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Trane",
+                      "domain": "www.trane.com",
+                      "url": "https://www.trane.com/residential/en/resources/troubleshooting/air-conditioners/ac-not-blowing-cold-air/",
+                      "title": "AC Not Blowing Cold Air? Learn What to Do - Trane®",
+                      "text": "A clogged or dirty air filter can cause reduced airflow or even block airflow. This can cause the AC unit to work harder trying to..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "A.B. May",
+                      "domain": "abmay.com",
+                      "url": "https://abmay.com/blog/ac-not-cooling-enough/",
+                      "title": "Why Is My AC Not Cooling Enough? - A.B. May",
+                      "text": "Do You Have a Dirty Condenser? Your condenser brings outdoor air into your home and performs the heat exchange process that delive..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=qTFi8YE6QPY",
+                      "title": "Why is my A/C running, but not cooling?",
+                      "text": "One of the most frequent questions is why an air conditioner is running but not producing cold air. There are three main reasons f..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "The Home Depot",
+                      "domain": "www.homedepot.com",
+                      "url": "https://www.homedepot.com/c/ah/how-to-fix-an-ac-not-blowing-cold-air/9ba683603be9fa5395fab90140a8b842",
+                      "title": "How to Fix an AC Not Blowing Cold Air - The Home Depot",
+                      "text": "* Power Problems. During a power outage, if the power has gone off and on several times, you may need to reset the breaker that co..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "YouTube",
+                      "domain": "www.youtube.com",
+                      "url": "https://www.youtube.com/watch?v=drb2fdVKZlk&t=69",
+                      "title": "10 Reasons Why Your AC Is NOT Blowing Cold Air In Your Home! DIY ...",
+                      "text": "A bad capacitor can be a reason why an AC unit is not blowing cold air. The capacitor functions like a battery that provides the i..."
+                    }
+                  ]
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "You can watch this video to learn more about the common causes of an AC not blowing cold air: 53s Fix This House YouTube• Aug 11, 2024",
+                  "markdown": "You can watch this video to learn more about the common causes of an AC not blowing cold air:![Related video thumbnail](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:25)\n53s[![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:26)\n![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:27)\nFix This House YouTube• Aug 11, 2024](https://www.youtube.com/watch?v=drb2fdVKZlk&t=276)",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": "Troubleshooting Steps to Try Now:",
+                  "text": "This video demonstrates how to clean your outdoor AC unit: 00:58 The Air Of Authority YouTube• Aug 3, 2023",
+                  "markdown": "This video demonstrates how to clean your outdoor AC unit:![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:28)\n![Related video thumbnail](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:29)\n00:58[![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:30)\n![](https://api.dataforseo.com/cdn/i/04302029-1032-0139-0000-c4ac343d7cac:31)\nThe Air Of Authority YouTube• Aug 3, 2023](https://www.youtube.com/shorts/YSOxY0qgqkE)",
+                  "links": null,
+                  "images": null,
+                  "references": null
+                },
+                {
+                  "type": "ai_overview_element",
+                  "position": "left",
+                  "title": null,
+                  "text": "If the system is still not cooling after these steps, it is recommended to contact a qualified HVAC technician, according to Carrier and Bryant.",
+                  "markdown": "If the system is still not cooling after these steps, it is recommended to contact a qualified HVAC technician, according to [Carrier](https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/) and [Bryant](https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/).[[1]](https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/#:~:text=Other%20causes%20include:%20*%20Low%20refrigerant%20levels,maintenance%20plans%20to%20help%20prevent%20future%20problems.)[[2]](https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20running%20but%20not,compressor%2C%20frozen%20evaporator%20coils%2C%20or%20electrical%20issues.)",
+                  "links": [
+                    {
+                      "type": "link_element",
+                      "title": "Carrier",
+                      "description": null,
+                      "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/",
+                      "domain": "www.carrier.com"
+                    },
+                    {
+                      "type": "link_element",
+                      "title": "Bryant",
+                      "description": null,
+                      "url": "https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/",
+                      "domain": "www.bryant.com"
+                    }
+                  ],
+                  "images": null,
+                  "references": [
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Bryant",
+                      "domain": "www.bryant.com",
+                      "url": "https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/#:~:text=Other%20causes%20include:%20*%20Low%20refrigerant%20levels,maintenance%20plans%20to%20help%20prevent%20future%20problems.",
+                      "title": "Why Is My AC Not Blowing Cold Air? | 7 Causes & Expert Fixes | Bryant",
+                      "text": "Other causes include: * Low refrigerant levels * Frozen evaporator coils * Compressor issues * Electrical problems You can try the..."
+                    },
+                    {
+                      "type": "ai_overview_reference",
+                      "position": "left",
+                      "source": "Carrier",
+                      "domain": "www.carrier.com",
+                      "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20running%20but%20not,compressor%2C%20frozen%20evaporator%20coils%2C%20or%20electrical%20issues.",
+                      "title": "Why is My AC Not Blowing Cold Air While Running? - Carrier",
+                      "text": "If your AC is running but not cooling, it could be due to a dirty air filter, incorrect thermostat settings, a malfunctioning ther..."
+                    }
+                  ]
+                }
+              ],
+              "references": [
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Reddit",
+                  "domain": "www.reddit.com",
+                  "url": "https://www.reddit.com/r/ecobee/comments/wpu5jg/why_is_my_ac_suddenly_running_constantly_and_not/",
+                  "title": "Why is my AC suddenly running constantly and not cooling the house?",
+                  "text": "Check that the breaker for the outside unit is not tripped. Usually on the outside of the house near the unit. Otherwise something..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=drb2fdVKZlk&t=69",
+                  "title": "10 Reasons Why Your AC Is NOT Blowing Cold Air In Your Home! DIY ...",
+                  "text": "A bad capacitor can be a reason why an AC unit is not blowing cold air. The capacitor functions like a battery that provides the i..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Carrier",
+                  "domain": "www.carrier.com",
+                  "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20running%20but%20not,compressor%2C%20frozen%20evaporator%20coils%2C%20or%20electrical%20issues.",
+                  "title": "Why is My AC Not Blowing Cold Air While Running? - Carrier",
+                  "text": "If your AC is running but not cooling, it could be due to a dirty air filter, incorrect thermostat settings, a malfunctioning ther..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Bryant",
+                  "domain": "www.bryant.com",
+                  "url": "https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/#:~:text=Other%20causes%20include:%20*%20Low%20refrigerant%20levels,maintenance%20plans%20to%20help%20prevent%20future%20problems.",
+                  "title": "Why Is My AC Not Blowing Cold Air? | 7 Causes & Expert Fixes | Bryant",
+                  "text": "Other causes include: * Low refrigerant levels * Frozen evaporator coils * Compressor issues * Electrical problems You can try the..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/shorts/YSOxY0qgqkE",
+                  "title": "Air Conditioner Not Cooling Enough? Here's what YOU can do",
+                  "text": "When an air conditioner is not cooling sufficiently, ensuring a clean air filter is crucial as it significantly affects the unit's..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Bryant",
+                  "domain": "www.bryant.com",
+                  "url": "https://www.bryant.com/en/ca/products/air-conditioners/ac-not-blowing-cold-air/",
+                  "title": "Why Is My AC Not Blowing Cold Air? | 7 Causes & Expert Fixes | Bryant",
+                  "text": "Blocked Outdoor Condenser Unit. A blocked outdoor condenser cannot release heat efficiently, forcing your system to blow warm air ..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "YouTube",
+                  "domain": "www.youtube.com",
+                  "url": "https://www.youtube.com/watch?v=qTFi8YE6QPY",
+                  "title": "Why is my A/C running, but not cooling?",
+                  "text": "One of the most frequent questions is why an air conditioner is running but not producing cold air. There are three main reasons f..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Trane",
+                  "domain": "www.trane.com",
+                  "url": "https://www.trane.com/residential/en/resources/troubleshooting/air-conditioners/ac-not-blowing-cold-air/",
+                  "title": "AC Not Blowing Cold Air? Learn What to Do - Trane®",
+                  "text": "A clogged or dirty air filter can cause reduced airflow or even block airflow. This can cause the AC unit to work harder trying to..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "Town Oil",
+                  "domain": "www.townoilcompany.com",
+                  "url": "https://www.townoilcompany.com/blog/why-is-my-ac-running-but-not-cooling",
+                  "title": "Why Is My AC Running But Not Cooling? | AC Repair Near Me",
+                  "text": "Check the Settings: Make sure the thermostat is set to cool and the temperature is set lower than the current room temperature. Re..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "A.B. May",
+                  "domain": "abmay.com",
+                  "url": "https://abmay.com/blog/ac-not-cooling-enough/",
+                  "title": "Why Is My AC Not Cooling Enough? - A.B. May",
+                  "text": "Do You Have a Dirty Condenser? Your condenser brings outdoor air into your home and performs the heat exchange process that delive..."
+                },
+                {
+                  "type": "ai_overview_reference",
+                  "position": "right",
+                  "source": "The Home Depot",
+                  "domain": "www.homedepot.com",
+                  "url": "https://www.homedepot.com/c/ah/how-to-fix-an-ac-not-blowing-cold-air/9ba683603be9fa5395fab90140a8b842",
+                  "title": "How to Fix an AC Not Blowing Cold Air - The Home Depot",
+                  "text": "* Power Problems. During a power outage, if the power has gone off and on several times, you may need to reset the breaker that co..."
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 1,
+              "rank_absolute": 2,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]",
+              "domain": "www.reddit.com",
+              "title": "Why is my AC suddenly running constantly and not cooling ...",
+              "url": "https://www.reddit.com/r/ecobee/comments/wpu5jg/why_is_my_ac_suddenly_running_constantly_and_not/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "80+ comments  ·  3 years ago",
+              "website_name": "Reddit · r/ecobee",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Probably because it's old or poorly maintained. Maybe it's low on refrigerant or has a dirty filter. Could be a sign of a bigger problem, like a faulty ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "because it's old or poorly maintained"
+              ],
+              "links": [
+                {
+                  "type": "link_element",
+                  "title": "HVAC techs say my AC is fine, why is it not cooling ...",
+                  "description": null,
+                  "url": "https://www.reddit.com/r/hvacadvice/comments/1e47pal/hvac_techs_say_my_ac_is_fine_why_is_it_not/",
+                  "domain": "www.reddit.com"
+                },
+                {
+                  "type": "link_element",
+                  "title": "My A/C Is not cooling the house but everything seems ...",
+                  "description": null,
+                  "url": "https://www.reddit.com/r/HomeMaintenance/comments/1lfu9b9/my_ac_is_not_cooling_the_house_but_everything/",
+                  "domain": "www.reddit.com"
+                },
+                {
+                  "type": "link_element",
+                  "title": "More results from www.reddit.com",
+                  "description": null,
+                  "url": "https://www.google.com/search?q=ac+not+cooling+site:www.reddit.com&sca_esv=2063d717304705eb&hl=en&gl=US&sa=X&ved=2ahUKEwjinYn7jJaUAxX42AIHHZGoB3QQrQIoAnoECB4QAw",
+                  "domain": "www.google.com"
+                }
+              ],
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "product_considerations",
+              "rank_group": 1,
+              "rank_absolute": 3,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]",
+              "title": "Things to know",
+              "items": [
+                {
+                  "type": "product_considerations_element",
+                  "title": "What are the signs of a refrigerant leak in an AC?",
+                  "consideration_category": "Refrigerant Leak Signs",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Signs of an AC refrigerant leak include the system blowing warm air, hissing or bubbling noises from refrigerant lines, and ice buildup on the evaporator coil. Other indicators include higher electricity bills, poor cooling performance, oily residue on components, and a faint sweet or chemical smell.",
+                          "images": null,
+                          "references": null
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Common Signs of a Refrigerant Leak (Usage Examples/Scenarios)",
+                          "text": "Warm Air from Vents: Your AC is running constantly, but the air coming from the vents is warm or only mildly cool. Frozen Evaporator Coils: You open the cabinet to see ice forming on the metal coils or the copper pipes connecting the units. Hissing/Bubbling Sounds: A, distinct, often loud hissing sound occurs when the AC is running (gas escaping), or a bubbling sound if the leak is liquid. Oily Residue: A visible oil-like substance appears on the coils, refrigerant lines, or around the unit, often attracting dirt. High Energy Bills: The AC runs for longer cycles to compensate for low refrigerant, causing a sudden spike in utility costs. Reduced Cooling/Comfort: The house fails to reach the temperature set on the thermostat. Unusual Smell: A faint, sweetish, or chemical odor near the unit.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Albritton Service Co",
+                              "domain": "www.albrittonservice.com",
+                              "url": "https://www.albrittonservice.com/3-signs-of-an-ac-refrigerant-leak/#:~:text=The%20Home%20Isn't%20Getting,other%20issue%20with%20the%20AC.",
+                              "title": "3 Signs of an AC Refrigerant Leak - Albritton Service Co",
+                              "text": "Apr 17, 2024 — The Home Isn't Getting Cool Enough Another possible sign of a refrigerant leak is if the AC isn't cooling properly. Wa..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Florida Air Flow Heating & Air",
+                              "domain": "floridaairflow.com",
+                              "url": "https://floridaairflow.com/ac-leak-repair/#:~:text=Quick%20Answer:%20You%20cannot%20see,and%20what%20to%20do%20next.",
+                              "title": "How Do I Know If My AC Is Leaking Refrigerant? - Florida Air Flow",
+                              "text": "7 days ago — Quick Answer: You cannot see refrigerant with the naked eye, but a leak leaves behind clear clues: your home stops cooli..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Mountain West AC",
+                              "domain": "www.mountainwestac.com",
+                              "url": "https://www.mountainwestac.com/post/ac-refrigerant-leak-and-what-to-do-about-it-identifying-and-addressing-ac-cooling-issues#:~:text=for%20comfort...-,Is%20your%20air%20conditioner%20not%20cooling%20like%20it%20used%20to,refrigerant%20leak%20in%20your%20AC",
+                              "title": "AC Leak? Mountain West AC's Repair Guide",
+                              "text": "Is your air conditioner not cooling like it used to? As summer approaches, a properly functioning AC system becomes essential for ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Woods Comfort Systems",
+                              "domain": "woodscomfortsystems.com",
+                              "url": "https://woodscomfortsystems.com/signs-of-ac-refrigerant-leak-and-dangers/#:~:text=Hissing%20or%20Bubbling%20Sounds,that%20needs%20to%20be%20addressed.",
+                              "title": "AC Refrigerant Leak: Signs, Dangers & What to Do",
+                              "text": "Jul 23, 2025 — Hissing or Bubbling Sounds A refrigerant leak can create a hissing or bubbling noise as the refrigerant escapes under ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "American Comfort AC",
+                              "domain": "www.americancomfortac.com",
+                              "url": "https://www.americancomfortac.com/blog/air-conditioning-service/what-are-the-signs-of-an-ac-refrigerant-leak/#:~:text=3.,by%20a%20professional%20HVAC%20company.",
+                              "title": "What Are the Signs of an AC Refrigerant Leak? - American Comfort AC",
+                              "text": "Feb 23, 2026 — 3. Hissing or Bubbling Sounds. Often, refrigerant leaks are caused by pinhole leaks somewhere in the system. Depending..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Reddit ·",
+                              "domain": "www.reddit.com",
+                              "url": "https://www.reddit.com/r/HVAC/comments/g9zmmk/what_does_a_refrigerant_leak_look_like/#:~:text=Refrigerant%20Leak%20Appearance:%20Refrigerant%20leaks%20often%20manifest,the%20inability%20to%20hold%20a%20deep%20vacuum.",
+                              "title": "What does a refrigerant leak look like? : r/HVAC - Reddit",
+                              "text": "Apr 29, 2020 — Refrigerant Leak Appearance: Refrigerant leaks often manifest as oil residue, puddles, or oily streaks on components l..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Atlantic Refrigeration & Air Conditioning",
+                              "domain": "www.atlanticrefrigeration.com",
+                              "url": "https://www.atlanticrefrigeration.com/blog/air-conditioning-service/common-signs-that-point-to-a-refrigerant-leak/#:~:text=This%20is%20because%20with%20less,than%20continuing%20with%20temporary%20fixes.",
+                              "title": "Common Signs That Point to a Refrigerant Leak",
+                              "text": "Jun 3, 2024 — This is because with less refrigerant in the lines thanks to a leak, not as much heat can be absorbed to transfer outsi..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Arista Air",
+                              "domain": "aristair.com",
+                              "url": "https://aristair.com/what-are-the-signs-of-an-ac-refrigerant-leak/#:~:text=Are%20you%20are%20concerned%20because,and%20increasing%20your%20electric%20bills.",
+                              "title": "Don’t Ignore These 5 Signs of an AC Refrigerant Leak",
+                              "text": "Aug 15, 2023 — Are you are concerned because your place is not cooling off like it should? Perhaps you've noticed warm air or lower t..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Angie's List",
+                              "domain": "www.angi.com",
+                              "url": "https://www.angi.com/articles/does-freon-leak-mean-i-must-get-new-home-ac-unit-cant-i-just-get-leak-fixed.htm",
+                              "title": "4 Signs of a Refrigerant Leak | Angi",
+                              "text": "Mar 6, 2026 —  4 Signs of Refrigerant Leaks and What to Do About Them * A leak in your AC system causes higher utility bills because ..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Synonyms and Related Technical Terms",
+                          "text": "Freon leak: Often used interchangeably, though \"Freon\" refers specifically to older R-22 refrigerant. Low refrigerant/low charge: Refers to the resulting state of the system. Evaporator coil leak: A common, specific location for leaks. Refrigerant piping failure: Damage to the copper lines carrying the chemical.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Aire Serv",
+                              "domain": "www.aireserv.com",
+                              "url": "https://www.aireserv.com/harris/about/blog/how-to-identify-the-telltale-signs-of-a-freon-leak/#:~:text=You%20Notice%20Bubbling%20or%20Hissing,weird%20noises%20from%20the%20unit.",
+                              "title": "How to Identify the Telltale Signs of a Freon Leak - Aire Serv",
+                              "text": "Feb 10, 2026 — You Notice Bubbling or Hissing Sounds When the Ac Is Off If you hear any bubbling or hissing sounds when your AC is of..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Endless Energy",
+                              "domain": "goendlessenergy.com",
+                              "url": "https://goendlessenergy.com/blog/signs-of-ac-refrigerant-leak-and-dangers/",
+                              "title": "Signs of AC Refrigerant Leak and How Dangerous Is It?",
+                              "text": null
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Angie's List",
+                              "domain": "www.angi.com",
+                              "url": "https://www.angi.com/articles/does-freon-leak-mean-i-must-get-new-home-ac-unit-cant-i-just-get-leak-fixed.htm",
+                              "title": "4 Signs of a Refrigerant Leak | Angi",
+                              "text": "Mar 6, 2026 —  4 Signs of Refrigerant Leaks and What to Do About Them * A leak in your AC system causes higher utility bills because ..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Note: Refrigerant leaks are dangerous; if you suspect a leak, turn off the system immediately and call a professional.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Florida Air Flow Heating & Air",
+                              "domain": "floridaairflow.com",
+                              "url": "https://floridaairflow.com/ac-leak-repair/#:~:text=Quick%20Answer:%20You%20cannot%20see,and%20what%20to%20do%20next.",
+                              "title": "How Do I Know If My AC Is Leaking Refrigerant? - Florida Air Flow",
+                              "text": "7 days ago — Quick Answer: You cannot see refrigerant with the naked eye, but a leak leaves behind clear clues: your home stops cooli..."
+                            }
+                          ]
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Reddit ·",
+                          "domain": "www.reddit.com",
+                          "url": "https://www.reddit.com/r/HVAC/comments/g9zmmk/what_does_a_refrigerant_leak_look_like/#:~:text=Refrigerant%20Leak%20Appearance:%20Refrigerant%20leaks%20often%20manifest,the%20inability%20to%20hold%20a%20deep%20vacuum.",
+                          "title": "What does a refrigerant leak look like? : r/HVAC - Reddit",
+                          "text": "Apr 29, 2020 — Refrigerant Leak Appearance: Refrigerant leaks often manifest as oil residue, puddles, or oily streaks on components l..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Endless Energy",
+                          "domain": "goendlessenergy.com",
+                          "url": "https://goendlessenergy.com/blog/signs-of-ac-refrigerant-leak-and-dangers/",
+                          "title": "Signs of AC Refrigerant Leak and How Dangerous Is It?",
+                          "text": null
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Arista Air",
+                          "domain": "aristair.com",
+                          "url": "https://aristair.com/what-are-the-signs-of-an-ac-refrigerant-leak/#:~:text=Are%20you%20are%20concerned%20because,and%20increasing%20your%20electric%20bills.",
+                          "title": "Don’t Ignore These 5 Signs of an AC Refrigerant Leak",
+                          "text": "Aug 15, 2023 — Are you are concerned because your place is not cooling off like it should? Perhaps you've noticed warm air or lower t..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Woods Comfort Systems",
+                          "domain": "woodscomfortsystems.com",
+                          "url": "https://woodscomfortsystems.com/signs-of-ac-refrigerant-leak-and-dangers/#:~:text=Hissing%20or%20Bubbling%20Sounds,that%20needs%20to%20be%20addressed.",
+                          "title": "AC Refrigerant Leak: Signs, Dangers & What to Do",
+                          "text": "Jul 23, 2025 — Hissing or Bubbling Sounds A refrigerant leak can create a hissing or bubbling noise as the refrigerant escapes under ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Atlantic Refrigeration & Air Conditioning",
+                          "domain": "www.atlanticrefrigeration.com",
+                          "url": "https://www.atlanticrefrigeration.com/blog/air-conditioning-service/common-signs-that-point-to-a-refrigerant-leak/#:~:text=This%20is%20because%20with%20less,than%20continuing%20with%20temporary%20fixes.",
+                          "title": "Common Signs That Point to a Refrigerant Leak",
+                          "text": "Jun 3, 2024 — This is because with less refrigerant in the lines thanks to a leak, not as much heat can be absorbed to transfer outsi..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Julian Heat & Air",
+                          "domain": "julianheatandair.com",
+                          "url": "https://julianheatandair.com/ac-refrigerant-leak-signs-spot-dangers/#:~:text=AC%20Refrigerant%20Leak%20Signs:%20What,a%20professional%20technician%20right%20away.",
+                          "title": "Signs of AC Refrigerant Leak and Dangers - Julian Heat & Air",
+                          "text": "Jun 11, 2025 — AC Refrigerant Leak Signs: What Every Homeowner Should Know An AC refrigerant leak happens when the chemical that cool..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Angie's List",
+                          "domain": "www.angi.com",
+                          "url": "https://www.angi.com/articles/does-freon-leak-mean-i-must-get-new-home-ac-unit-cant-i-just-get-leak-fixed.htm",
+                          "title": "4 Signs of a Refrigerant Leak | Angi",
+                          "text": "Mar 6, 2026 —  4 Signs of Refrigerant Leaks and What to Do About Them * A leak in your AC system causes higher utility bills because ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Albritton Service Co",
+                          "domain": "www.albrittonservice.com",
+                          "url": "https://www.albrittonservice.com/3-signs-of-an-ac-refrigerant-leak/#:~:text=The%20Home%20Isn't%20Getting,other%20issue%20with%20the%20AC.",
+                          "title": "3 Signs of an AC Refrigerant Leak - Albritton Service Co",
+                          "text": "Apr 17, 2024 — The Home Isn't Getting Cool Enough Another possible sign of a refrigerant leak is if the AC isn't cooling properly. Wa..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "American Comfort AC",
+                          "domain": "www.americancomfortac.com",
+                          "url": "https://www.americancomfortac.com/blog/air-conditioning-service/what-are-the-signs-of-an-ac-refrigerant-leak/#:~:text=3.,by%20a%20professional%20HVAC%20company.",
+                          "title": "What Are the Signs of an AC Refrigerant Leak? - American Comfort AC",
+                          "text": "Feb 23, 2026 — 3. Hissing or Bubbling Sounds. Often, refrigerant leaks are caused by pinhole leaks somewhere in the system. Depending..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Aire Serv",
+                          "domain": "www.aireserv.com",
+                          "url": "https://www.aireserv.com/harris/about/blog/how-to-identify-the-telltale-signs-of-a-freon-leak/#:~:text=You%20Notice%20Bubbling%20or%20Hissing,weird%20noises%20from%20the%20unit.",
+                          "title": "How to Identify the Telltale Signs of a Freon Leak - Aire Serv",
+                          "text": "Feb 10, 2026 — You Notice Bubbling or Hissing Sounds When the Ac Is Off If you hear any bubbling or hissing sounds when your AC is of..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Mountain West AC",
+                          "domain": "www.mountainwestac.com",
+                          "url": "https://www.mountainwestac.com/post/ac-refrigerant-leak-and-what-to-do-about-it-identifying-and-addressing-ac-cooling-issues#:~:text=for%20comfort...-,Is%20your%20air%20conditioner%20not%20cooling%20like%20it%20used%20to,refrigerant%20leak%20in%20your%20AC",
+                          "title": "AC Leak? Mountain West AC's Repair Guide",
+                          "text": "Is your air conditioner not cooling like it used to? As summer approaches, a properly functioning AC system becomes essential for ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Florida Air Flow Heating & Air",
+                          "domain": "floridaairflow.com",
+                          "url": "https://floridaairflow.com/ac-leak-repair/#:~:text=Quick%20Answer:%20You%20cannot%20see,and%20what%20to%20do%20next.",
+                          "title": "How Do I Know If My AC Is Leaking Refrigerant? - Florida Air Flow",
+                          "text": "7 days ago — Quick Answer: You cannot see refrigerant with the naked eye, but a leak leaves behind clear clues: your home stops cooli..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": "What are the common reasons why an AC is not cooling?",
+                  "consideration_category": "Common Reasons",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Common reasons an AC fails to cool include dirty air filters, low refrigerant, dirty coils, or a broken thermostat. Other causes are blocked vents, tripped breakers, or a faulty compressor/capacitor. Symptoms include weak airflow or warm air, often requiring filter changes, cleaning, or professional repairs.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Bryant",
+                              "domain": "www.bryant.com",
+                              "url": "https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/#:~:text=Check%20the%20Thermostat:%20Ensure%20it,panel%20for%20a%20tripped%20switch.",
+                              "title": "Why Is My AC Not Blowing Cold Air? | 7 Causes & Expert Fixes - Bryant",
+                              "text": "Check the Thermostat: Ensure it is set to \"Cool\" and the fan is set to \"Auto.\" Inspect the Filter: If it looks gray or clogged, re..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=6jsm3tWmoPU&t=712",
+                              "title": "AC Unit Not Cooling House - 20 Reasons Why",
+                              "text": "Jul 25, 2020 — one is to look at the suction. line that's going to be the thicker copper line going to your unit. there's usually a t..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Carrier",
+                              "domain": "www.carrier.com",
+                              "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20running,root%20cause%20of%20the%20issue.",
+                              "title": "Why is My AC Not Blowing Cold Air While Running? - Carrier",
+                              "text": "If your AC is running but not cooling, it could be due to a dirty air filter, incorrect thermostat settings, a malfunctioning ther..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=MqiqyWc_mzg",
+                              "title": "Window AC Not Cooling Properly - Easy Fix",
+                              "text": "Jun 28, 2025 — hey guys Jay here with Word of Advice TV. recently I noticed that the window air conditioner in our room was starting ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "The Spruce",
+                              "domain": "www.thespruce.com",
+                              "url": "https://www.thespruce.com/ac-not-cooling-11754167#:~:text=Worn%20Out%20Capacitor,clean%20and%20free%20of%20ice.",
+                              "title": "9 Reasons Your AC Is Not Cooling Your Home (and How to Fix It Fast)",
+                              "text": "Jun 18, 2025 — Worn Out Capacitor. The capacitor is a necessary part for starting the compressor motor, so if the capacitor wears out..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=yCQKqh2neto&t=234",
+                              "title": "AC Not Blowing Cold Air? DO THIS FIRST!",
+                              "text": "Jun 9, 2025 — coil is going to be right there. okay if that's super dirty. um then that could be freezing up your unit. you have a co..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Here are the common reasons why an AC is not cooling:",
+                          "text": "Dirty Air Filter : Restricted airflow prevents the unit from cooling effectively and can cause evaporator coils to freeze. Low Refrigerant Level : A leak in the system prevents the AC from absorbing heat properly. The thick, insulated suction line will often be dry rather than sweaty. Dirty Condenser Coils : Dirt buildup on the outdoor unit prevents heat from being released. Frozen Evaporator Coil : Often caused by a dirty filter or low refrigerant, the indoor coil becomes coated in ice, blocking air circulation. Incorrect or Faulty Thermostat : Settings may be wrong, or the thermostat cannot accurately read the room temperature. Blocked Vents or Ducts : Obstructed airflow prevents cold air from reaching the rooms. Broken Capacitor or Compressor : A failing capacitor prevents the compressor (the heart of the system) from starting, causing the AC to stop cooling suddenly. Electrical Issues : Tripped breakers or faulty wiring. Improper System Maintenance : General lack of upkeep leading to component failure.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Reddit ·",
+                              "domain": "www.reddit.com",
+                              "url": "https://www.reddit.com/r/hvacadvice/comments/1e47pal/hvac_techs_say_my_ac_is_fine_why_is_it_not/#:~:text=Air%20Filter%20Impact:%20A%20dirty%20or%20overly,with%20pets%20or%20older%20windows%2C%20is%20crucial.",
+                              "title": "HVAC techs say my AC is fine, why is it not cooling my house? - Reddit",
+                              "text": "Jul 15, 2024 — Air Filter Impact: A dirty or overly restrictive air filter (like a high MERV rating in a 1-inch filter) can significa..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=MqiqyWc_mzg",
+                              "title": "Window AC Not Cooling Properly - Easy Fix",
+                              "text": "Jun 28, 2025 — hey guys Jay here with Word of Advice TV. recently I noticed that the window air conditioner in our room was starting ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=6jsm3tWmoPU&t=712",
+                              "title": "AC Unit Not Cooling House - 20 Reasons Why",
+                              "text": "Jul 25, 2020 — one is to look at the suction. line that's going to be the thicker copper line going to your unit. there's usually a t..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Charles Stone Mechanical",
+                              "domain": "www.charlesstonemechanical.com",
+                              "url": "https://www.charlesstonemechanical.com/blog/air-conditioner-not-cooling-causes-fixes/#:~:text=If%20a%20leak%20occurs%2C%20the,typically%20from%20a%20clogged%20filter.",
+                              "title": "10 Reasons Why Your AC Isn't Cooling or Blowing Cold Air",
+                              "text": "May 9, 2025 — If a leak occurs, the low amount of refrigerant cannot perform the heat exchange, leaving your AC running like normal b..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Carrier",
+                              "domain": "www.carrier.com",
+                              "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20running,root%20cause%20of%20the%20issue.",
+                              "title": "Why is My AC Not Blowing Cold Air While Running? - Carrier",
+                              "text": "If your AC is running but not cooling, it could be due to a dirty air filter, incorrect thermostat settings, a malfunctioning ther..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "The Spruce",
+                              "domain": "www.thespruce.com",
+                              "url": "https://www.thespruce.com/ac-not-cooling-11754167#:~:text=Worn%20Out%20Capacitor,clean%20and%20free%20of%20ice.",
+                              "title": "9 Reasons Your AC Is Not Cooling Your Home (and How to Fix It Fast)",
+                              "text": "Jun 18, 2025 — Worn Out Capacitor. The capacitor is a necessary part for starting the compressor motor, so if the capacitor wears out..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Department of Energy (.gov)",
+                              "domain": "www.energy.gov",
+                              "url": "https://www.energy.gov/energysaver/common-air-conditioner-problems#:~:text=Inadequate%20Maintenance,debris-free%20and%20operating%20properly.",
+                              "title": "Common Air Conditioner Problems | Department of Energy",
+                              "text": "7 days ago — Inadequate Maintenance. Dirty Filters and Coils: Can cause the system to malfunction and lead to premature compressor or..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=drb2fdVKZlk&t=438",
+                              "title": "10 Reasons Why Your AC Is NOT Blowing Cold Air In Your Home! DIY ...",
+                              "text": "Aug 11, 2024 — and it was in multiple areas that was actually leaking. so make sure you check for any possible leaks or any openings ..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Synonyms for \"AC is not cooling\" AC is blowing warm air, AC not producing cold air, AC unit not reducing home temperature, AC system is failing to cool, and AC has low cooling capacity.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Reddit ·",
+                              "domain": "www.reddit.com",
+                              "url": "https://www.reddit.com/r/hvacadvice/comments/1e47pal/hvac_techs_say_my_ac_is_fine_why_is_it_not/#:~:text=Air%20Filter%20Impact:%20A%20dirty%20or%20overly,with%20pets%20or%20older%20windows%2C%20is%20crucial.",
+                              "title": "HVAC techs say my AC is fine, why is it not cooling my house? - Reddit",
+                              "text": "Jul 15, 2024 — Air Filter Impact: A dirty or overly restrictive air filter (like a high MERV rating in a 1-inch filter) can significa..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Reddit ·",
+                              "domain": "www.reddit.com",
+                              "url": "https://www.reddit.com/r/hvacadvice/comments/1e47pal/hvac_techs_say_my_ac_is_fine_why_is_it_not/#:~:text=Other%20System%20Issues:%20Beyond%20common%20problems%20like,also%20cause%20the%20AC%20to%20perform%20poorly.",
+                              "title": "HVAC techs say my AC is fine, why is it not cooling my house? - Reddit",
+                              "text": "Jul 15, 2024 — Other System Issues: Beyond common problems like filters and coils, issues such as a failing blower motor not drawing ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=6jsm3tWmoPU&t=712",
+                              "title": "AC Unit Not Cooling House - 20 Reasons Why",
+                              "text": "Jul 25, 2020 — one is to look at the suction. line that's going to be the thicker copper line going to your unit. there's usually a t..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=MqiqyWc_mzg",
+                              "title": "Window AC Not Cooling Properly - Easy Fix",
+                              "text": "Jun 28, 2025 — hey guys Jay here with Word of Advice TV. recently I noticed that the window air conditioner in our room was starting ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "The Spruce",
+                              "domain": "www.thespruce.com",
+                              "url": "https://www.thespruce.com/ac-not-cooling-11754167#:~:text=Worn%20Out%20Capacitor,clean%20and%20free%20of%20ice.",
+                              "title": "9 Reasons Your AC Is Not Cooling Your Home (and How to Fix It Fast)",
+                              "text": "Jun 18, 2025 — Worn Out Capacitor. The capacitor is a necessary part for starting the compressor motor, so if the capacitor wears out..."
+                            }
+                          ]
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Reddit ·",
+                          "domain": "www.reddit.com",
+                          "url": "https://www.reddit.com/r/hvacadvice/comments/1e47pal/hvac_techs_say_my_ac_is_fine_why_is_it_not/#:~:text=Air%20Filter%20Impact:%20A%20dirty%20or%20overly,with%20pets%20or%20older%20windows%2C%20is%20crucial.",
+                          "title": "HVAC techs say my AC is fine, why is it not cooling my house? - Reddit",
+                          "text": "Jul 15, 2024 — Air Filter Impact: A dirty or overly restrictive air filter (like a high MERV rating in a 1-inch filter) can significa..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Reddit ·",
+                          "domain": "www.reddit.com",
+                          "url": "https://www.reddit.com/r/hvacadvice/comments/1e47pal/hvac_techs_say_my_ac_is_fine_why_is_it_not/#:~:text=Other%20System%20Issues:%20Beyond%20common%20problems%20like,also%20cause%20the%20AC%20to%20perform%20poorly.",
+                          "title": "HVAC techs say my AC is fine, why is it not cooling my house? - Reddit",
+                          "text": "Jul 15, 2024 — Other System Issues: Beyond common problems like filters and coils, issues such as a failing blower motor not drawing ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "YouTube ·",
+                          "domain": "www.youtube.com",
+                          "url": "https://www.youtube.com/watch?v=drb2fdVKZlk&t=438",
+                          "title": "10 Reasons Why Your AC Is NOT Blowing Cold Air In Your Home! DIY ...",
+                          "text": "Aug 11, 2024 — and it was in multiple areas that was actually leaking. so make sure you check for any possible leaks or any openings ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Bryant",
+                          "domain": "www.bryant.com",
+                          "url": "https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/#:~:text=Check%20the%20Thermostat:%20Ensure%20it,panel%20for%20a%20tripped%20switch.",
+                          "title": "Why Is My AC Not Blowing Cold Air? | 7 Causes & Expert Fixes - Bryant",
+                          "text": "Check the Thermostat: Ensure it is set to \"Cool\" and the fan is set to \"Auto.\" Inspect the Filter: If it looks gray or clogged, re..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "YouTube ·",
+                          "domain": "www.youtube.com",
+                          "url": "https://www.youtube.com/watch?v=6jsm3tWmoPU&t=712",
+                          "title": "AC Unit Not Cooling House - 20 Reasons Why",
+                          "text": "Jul 25, 2020 — one is to look at the suction. line that's going to be the thicker copper line going to your unit. there's usually a t..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Carrier",
+                          "domain": "www.carrier.com",
+                          "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20running,root%20cause%20of%20the%20issue.",
+                          "title": "Why is My AC Not Blowing Cold Air While Running? - Carrier",
+                          "text": "If your AC is running but not cooling, it could be due to a dirty air filter, incorrect thermostat settings, a malfunctioning ther..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "YouTube ·",
+                          "domain": "www.youtube.com",
+                          "url": "https://www.youtube.com/watch?v=MqiqyWc_mzg",
+                          "title": "Window AC Not Cooling Properly - Easy Fix",
+                          "text": "Jun 28, 2025 — hey guys Jay here with Word of Advice TV. recently I noticed that the window air conditioner in our room was starting ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "The Spruce",
+                          "domain": "www.thespruce.com",
+                          "url": "https://www.thespruce.com/ac-not-cooling-11754167#:~:text=Worn%20Out%20Capacitor,clean%20and%20free%20of%20ice.",
+                          "title": "9 Reasons Your AC Is Not Cooling Your Home (and How to Fix It Fast)",
+                          "text": "Jun 18, 2025 — Worn Out Capacitor. The capacitor is a necessary part for starting the compressor motor, so if the capacitor wears out..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "YouTube ·",
+                          "domain": "www.youtube.com",
+                          "url": "https://www.youtube.com/watch?v=yCQKqh2neto&t=234",
+                          "title": "AC Not Blowing Cold Air? DO THIS FIRST!",
+                          "text": "Jun 9, 2025 — coil is going to be right there. okay if that's super dirty. um then that could be freezing up your unit. you have a co..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Department of Energy (.gov)",
+                          "domain": "www.energy.gov",
+                          "url": "https://www.energy.gov/energysaver/common-air-conditioner-problems#:~:text=Inadequate%20Maintenance,debris-free%20and%20operating%20properly.",
+                          "title": "Common Air Conditioner Problems | Department of Energy",
+                          "text": "7 days ago — Inadequate Maintenance. Dirty Filters and Coils: Can cause the system to malfunction and lead to premature compressor or..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Charles Stone Mechanical",
+                          "domain": "www.charlesstonemechanical.com",
+                          "url": "https://www.charlesstonemechanical.com/blog/air-conditioner-not-cooling-causes-fixes/#:~:text=If%20a%20leak%20occurs%2C%20the,typically%20from%20a%20clogged%20filter.",
+                          "title": "10 Reasons Why Your AC Isn't Cooling or Blowing Cold Air",
+                          "text": "May 9, 2025 — If a leak occurs, the low amount of refrigerant cannot perform the heat exchange, leaving your AC running like normal b..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": "What is the ideal temperature setting for an AC?",
+                  "consideration_category": "Ideal Temperature",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "The ideal, energy-efficient AC temperature is 78°F ( 25.5 ° C 25.5 degrees cap C 2 5. 5 ° 𝐶 ) when you are home and awake, providing the best balance between comfort and cost. For better sleep, 67°F–70°F is recommended, while raising the setting to 85°F when away saves energy. Use ceiling fans to feel comfortable at warmer settings.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Reliant Energy",
+                              "domain": "www.reliant.com",
+                              "url": "https://www.reliant.com/en/blog/energy-efficiency-and-education/best-ac-temperature-for-summer#:~:text=What's%20the%20ideal%20summertime%20temperature,cool%20without%20overworking%20your%20AC.",
+                              "title": "The best AC temperature for summer energy savings",
+                              "text": "What's the ideal summertime temperature for my AC? While there's no one “best” temperature for every comfort level, setting your t..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "TUDI Mechanical Systems",
+                              "domain": "www.tudi.com",
+                              "url": "https://www.tudi.com/news/what-is-the-best-temperature-for-your-ac/#:~:text=FAQs%20for%20%E2%80%9CWhat%20Is%20the,Your%20personal%20preferences",
+                              "title": "What Is the Best Temperature for Your AC? - Tudi Mechanical Systems",
+                              "text": "Nov 15, 2023 — FAQs for “What Is the Best Temperature for Your AC?” Q: What is the ideal AC temperature for summer? The ideal AC temp..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Palmetto Solar",
+                              "domain": "palmetto.com",
+                              "url": "https://palmetto.com/home-electrification/ideal-summer-air-conditioner-temperature-settings#:~:text=Step%2001-,What%20is%20the%20Best%20Thermostat%20Setting%20for%20Summer%20Air%20Conditioner,if%20no%20one%20is%20home",
+                              "title": "Ideal Summer Air Conditioner Temperature And Settings - Palmetto",
+                              "text": "Aug 19, 2025 — What is the Best Thermostat Setting for Summer Air Conditioner Use? Energy Star recommends the following thermostat te..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Key Recommendations & Usage Examples:",
+                          "text": "Best Summer Setting: 78°F ( 25 ° C 25 degrees cap C 2 5 ° 𝐶 ) for a balance of comfort and energy efficiency. When Away or Asleep: Increase to 85°F ( 29 ° C 29 degrees cap C 2 9 ° 𝐶 ) to save on electricity. Optimal Sleeping Temp: 67°F–70°F ( 19 ° C 19 degrees cap C 1 9 ° 𝐶 – 21 ° C 21 degrees cap C 2 1 ° 𝐶 ). The 20-Degree Rule: Keep the indoor temperature no more than 20°F lower than the outdoor temperature to avoid overworking the unit. Energy-Saving Tip: Each degree set lower than 78°F can increase cooling costs by roughly 3%.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "TUDI Mechanical Systems",
+                              "domain": "www.tudi.com",
+                              "url": "https://www.tudi.com/news/what-is-the-best-temperature-for-your-ac/#:~:text=FAQs%20for%20%E2%80%9CWhat%20Is%20the,Your%20personal%20preferences",
+                              "title": "What Is the Best Temperature for Your AC? - Tudi Mechanical Systems",
+                              "text": "Nov 15, 2023 — FAQs for “What Is the Best Temperature for Your AC?” Q: What is the ideal AC temperature for summer? The ideal AC temp..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=svNJ1S1Yc_M",
+                              "title": "Managing the Thermostat: What is the right temperature for your air ...",
+                              "text": "Jun 30, 2025 — well rising temperatures mean air conditioners will be working overtime to keep all of us cool fox 26 business reporte..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=rdob12W8sHc&t=81",
+                              "title": "What temperature do you keep your AC on?: We asked some of our ...",
+                              "text": "Jun 19, 2024 — down uh we do have adequate energy to provide our customers though so if they you know are running air conditioners th..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Facebook",
+                              "domain": "www.facebook.com",
+                              "url": "https://www.facebook.com/newbraunfelsutilities/posts/did-you-know-about-the-2030-rule-follow-the-20-degree-rule-keep-your-thermostat-/1304710841668725/#:~:text=In%20short%2C%20the%2020-degree,no%20less%20than%2075%20degrees.",
+                              "title": "Did you know about the 20/30 rule? Follow the 20-degree rule: keep ...",
+                              "text": "Oct 13, 2025 — In short, the 20-degree rule of air conditioning states that you should always keep your AC unit at no more than 20 de..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "Synonyms/Related Terms: Optimal AC setting, Recommended thermostat setting, Energy-saving AC temperature, Comfortable room temperature, and Optimal cooling temperature.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "LG",
+                              "domain": "www.lg.com",
+                              "url": "https://www.lg.com/levant_en/air-conditioning/ideal-temperature-settings-for-your-ac#:~:text=Ideal%20room%20temperature%20during%20summer,to%20let%20in%20cool%20air.",
+                              "title": "Ideal temperature settings for your Air Conditioner | LG Levant",
+                              "text": "Ideal room temperature during summer During the summer, the ideal room temperature is between 22 and 26 degrees Celsius. This temp..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=FZd7y6zWH6U",
+                              "title": "Optimal Temperature Settings",
+                              "text": "Dec 6, 2022 — so right now we're going to talk about the best settings. and how to use your thermostat to maximize efficiency from yo..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Factors Affecting Ideal Temp:",
+                          "text": "Humidity: Higher humidity feels warmer, potentially requiring a lower temperature, but a dehumidifier can allow for higher, more efficient temperatures. Insulation & Size: Homes with poor insulation or larger areas may need different settings to feel comfortable.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Christian Heating, Cooling, Plumbing and Electrical",
+                              "domain": "www.christianhvac.com",
+                              "url": "https://www.christianhvac.com/blog/what-is-the-ideal-temperature-setting-for-the-ac/#:~:text=According%20to%20the%20U.S%20Department,and%20setting%20the%20thermostat%20higher.",
+                              "title": "What is the Ideal Temperature Setting for the AC?",
+                              "text": "According to the U.S Department of Energy, you should set your temperature to 78 degrees fahrenheit and leave it there. Keep in mi..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "TUDI Mechanical Systems",
+                              "domain": "www.tudi.com",
+                              "url": "https://www.tudi.com/news/what-is-the-best-temperature-for-your-ac/#:~:text=FAQs%20for%20%E2%80%9CWhat%20Is%20the,Your%20personal%20preferences",
+                              "title": "What Is the Best Temperature for Your AC? - Tudi Mechanical Systems",
+                              "text": "Nov 15, 2023 — FAQs for “What Is the Best Temperature for Your AC?” Q: What is the ideal AC temperature for summer? The ideal AC temp..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "For maximum energy savings without sacrificing comfort, consider a programmable thermostat.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Air Flow Designs Heating & Air Conditioning",
+                              "domain": "www.airflowdesigns.com",
+                              "url": "https://www.airflowdesigns.com/blog/recommended-temperature-settings-for-air-conditioners-in-florida-homes/",
+                              "title": "Recommended Temperature Settings for Air Conditioners in Florida Homes",
+                              "text": null
+                            }
+                          ]
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Reliant Energy",
+                          "domain": "www.reliant.com",
+                          "url": "https://www.reliant.com/en/blog/energy-efficiency-and-education/best-ac-temperature-for-summer#:~:text=What's%20the%20ideal%20summertime%20temperature,cool%20without%20overworking%20your%20AC.",
+                          "title": "The best AC temperature for summer energy savings",
+                          "text": "What's the ideal summertime temperature for my AC? While there's no one “best” temperature for every comfort level, setting your t..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Christian Heating, Cooling, Plumbing and Electrical",
+                          "domain": "www.christianhvac.com",
+                          "url": "https://www.christianhvac.com/blog/what-is-the-ideal-temperature-setting-for-the-ac/#:~:text=According%20to%20the%20U.S%20Department,and%20setting%20the%20thermostat%20higher.",
+                          "title": "What is the Ideal Temperature Setting for the AC?",
+                          "text": "According to the U.S Department of Energy, you should set your temperature to 78 degrees fahrenheit and leave it there. Keep in mi..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Air Flow Designs Heating & Air Conditioning",
+                          "domain": "www.airflowdesigns.com",
+                          "url": "https://www.airflowdesigns.com/blog/recommended-temperature-settings-for-air-conditioners-in-florida-homes/",
+                          "title": "Recommended Temperature Settings for Air Conditioners in Florida Homes",
+                          "text": null
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "TUDI Mechanical Systems",
+                          "domain": "www.tudi.com",
+                          "url": "https://www.tudi.com/news/what-is-the-best-temperature-for-your-ac/#:~:text=FAQs%20for%20%E2%80%9CWhat%20Is%20the,Your%20personal%20preferences",
+                          "title": "What Is the Best Temperature for Your AC? - Tudi Mechanical Systems",
+                          "text": "Nov 15, 2023 — FAQs for “What Is the Best Temperature for Your AC?” Q: What is the ideal AC temperature for summer? The ideal AC temp..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "LG",
+                          "domain": "www.lg.com",
+                          "url": "https://www.lg.com/levant_en/air-conditioning/ideal-temperature-settings-for-your-ac#:~:text=Ideal%20room%20temperature%20during%20summer,to%20let%20in%20cool%20air.",
+                          "title": "Ideal temperature settings for your Air Conditioner | LG Levant",
+                          "text": "Ideal room temperature during summer During the summer, the ideal room temperature is between 22 and 26 degrees Celsius. This temp..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Palmetto Solar",
+                          "domain": "palmetto.com",
+                          "url": "https://palmetto.com/home-electrification/ideal-summer-air-conditioner-temperature-settings#:~:text=Step%2001-,What%20is%20the%20Best%20Thermostat%20Setting%20for%20Summer%20Air%20Conditioner,if%20no%20one%20is%20home",
+                          "title": "Ideal Summer Air Conditioner Temperature And Settings - Palmetto",
+                          "text": "Aug 19, 2025 — What is the Best Thermostat Setting for Summer Air Conditioner Use? Energy Star recommends the following thermostat te..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "YouTube ·",
+                          "domain": "www.youtube.com",
+                          "url": "https://www.youtube.com/watch?v=rdob12W8sHc&t=81",
+                          "title": "What temperature do you keep your AC on?: We asked some of our ...",
+                          "text": "Jun 19, 2024 — down uh we do have adequate energy to provide our customers though so if they you know are running air conditioners th..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "YouTube ·",
+                          "domain": "www.youtube.com",
+                          "url": "https://www.youtube.com/watch?v=svNJ1S1Yc_M",
+                          "title": "Managing the Thermostat: What is the right temperature for your air ...",
+                          "text": "Jun 30, 2025 — well rising temperatures mean air conditioners will be working overtime to keep all of us cool fox 26 business reporte..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Facebook",
+                          "domain": "www.facebook.com",
+                          "url": "https://www.facebook.com/newbraunfelsutilities/posts/did-you-know-about-the-2030-rule-follow-the-20-degree-rule-keep-your-thermostat-/1304710841668725/#:~:text=In%20short%2C%20the%2020-degree,no%20less%20than%2075%20degrees.",
+                          "title": "Did you know about the 20/30 rule? Follow the 20-degree rule: keep ...",
+                          "text": "Oct 13, 2025 — In short, the 20-degree rule of air conditioning states that you should always keep your AC unit at no more than 20 de..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "YouTube ·",
+                          "domain": "www.youtube.com",
+                          "url": "https://www.youtube.com/watch?v=FZd7y6zWH6U",
+                          "title": "Optimal Temperature Settings",
+                          "text": "Dec 6, 2022 — so right now we're going to talk about the best settings. and how to use your thermostat to maximize efficiency from yo..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": "How to maintain an AC to prevent it from not cooling?",
+                  "consideration_category": "Maintenance",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "To prevent an AC from not cooling, consistently change air filters every 1–3 months, clean the outdoor condenser coils annually, and keep a 2-foot clearance around the unit from plants and debris. Schedule professional annual maintenance to check refrigerant levels and electrical components, ensuring peak efficiency.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Department of Energy (.gov)",
+                              "domain": "www.energy.gov",
+                              "url": "https://www.energy.gov/energysaver/air-conditioner-maintenance",
+                              "title": "Air Conditioner Maintenance | Department of Energy",
+                              "text": null
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Yelp",
+                              "domain": "www.yelp.com",
+                              "url": "https://www.yelp.com/article/11-reasons-ac-not-cooling-the-house#:~:text=Stay%20consistent%20with%20AC%20maintenance,visit%20typically%20costs%20$80%E2%80%93120.",
+                              "title": "11 reasons your AC is not cooling the house - Yelp",
+                              "text": "Stay consistent with AC maintenance An AC unit requires regular, routine maintenance to run at peak performance. Here are three th..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "ARS/Rescue Rooter",
+                              "domain": "www.ars.com",
+                              "url": "https://www.ars.com/blog/ac-not-blowing-cold-air#:~:text=Prevent%20AC%20Problems%20with%20Regular,above%20before%20they%20become%20problems.",
+                              "title": "AC Not Blowing Cold Air: Common Causes & How To Fix",
+                              "text": "Oct 1, 2023 — Prevent AC Problems with Regular Maintenance Most AC breakdowns are preventable. Scheduling annual HVAC maintenance hel..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Gulf Coast Air Systems",
+                              "domain": "gulfcoastairsystems.com",
+                              "url": "https://gulfcoastairsystems.com/5-ways-to-keep-your-ac-from-overheating/#:~:text=A%20dirty%20filter%20can%20cause,call%20813-689-2082!",
+                              "title": "5 Ways to Keep Your Air Conditioner from Overheating",
+                              "text": "A dirty filter can cause blocked airflow and result in the overheating of your air conditioner. 2.) Clean condenser coils – The he..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Home Improvement Stack Exchange",
+                              "domain": "diy.stackexchange.com",
+                              "url": "https://diy.stackexchange.com/questions/421/what-type-of-regular-maintenance-should-i-be-doing-on-my-central-air-conditionin#:~:text=Most%20local%20HVAC%20service%20companies,replace%20the%20air%20filters%2C%20etc.",
+                              "title": "What type of regular maintenance should I be doing on my central air ...",
+                              "text": "Jul 23, 2010 — Most local HVAC service companies offer an annual service plan where they come out once a year (twice a year for a hea..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Key AC Maintenance Steps:",
+                          "text": "Replace Filters Regularly: Clogged filters are the #1 cause of poor airflow and frozen coils. Check them monthly and replace them every 1–3 months. Clean the Outdoor Condenser Unit: Remove leaves, grass, and debris from the unit. Use a garden hose to gently rinse dirt from the fins, which helps the system breathe. Clear 2-Foot Clearance: Maintain a clear, 2-foot zone around the exterior unit to ensure proper airflow. Clean Evaporator Coils: Dirt on indoor coils restricts heat transfer. Clean or have these cleaned annually. Check Thermostat Settings: Ensure the unit is set to \"cool\" and that the temperature is lower than the room temperature. Inspect Ductwork: Seal any leaks in your ductwork to ensure cold air reaches your rooms, not wasted in the attic or crawlspace. Professional Annual Maintenance: Hire a professional to check for refrigerant leaks, clean coils, and lubricate motors, which prevents surprise breakdowns during summer.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Bryant",
+                              "domain": "www.bryant.com",
+                              "url": "https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20not,home's%20energy%20efficiency%20and%20comfort.",
+                              "title": "Why Is My AC Not Blowing Cold Air? | 7 Causes & Expert Fixes - Bryant",
+                              "text": "If your AC is not blowing cold air, the most common culprits are a clogged air filter, incorrect thermostat settings, or a blocked..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "totalcomfortcooling.com",
+                              "domain": "totalcomfortcooling.com",
+                              "url": "https://totalcomfortcooling.com/reasons-your-air-conditioner-is-not-cooling-properly/",
+                              "title": "Reasons Your Air Conditioner Is Not Cooling Properly",
+                              "text": "Aug 1, 2025 —  Key Takeaways * Check your thermostat settings first; incorrect settings are a common reason for poor cooling. * Dirty..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Yelp",
+                              "domain": "www.yelp.com",
+                              "url": "https://www.yelp.com/article/11-reasons-ac-not-cooling-the-house#:~:text=Stay%20consistent%20with%20AC%20maintenance,visit%20typically%20costs%20$80%E2%80%93120.",
+                              "title": "11 reasons your AC is not cooling the house - Yelp",
+                              "text": "Stay consistent with AC maintenance An AC unit requires regular, routine maintenance to run at peak performance. Here are three th..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Precision Comfort Systems",
+                              "domain": "precisioncomfort.com",
+                              "url": "https://precisioncomfort.com/ac-not-keeping-up/#:~:text=If%20your%20air%20conditioner%20is,most%20your%20system%20can%20reach.",
+                              "title": "AC Not Keeping Up? Here’s Why—and What to Do About It",
+                              "text": "If your air conditioner is not keeping up with the thermostat, try these quick adjustments first. They might restore comfort witho..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Goettl Air Conditioning and Plumbing",
+                              "domain": "www.goettl.com",
+                              "url": "https://www.goettl.com/expert-center/air-conditioning/what-you-can-do-to-prevent-ac-problems/#:~:text=Clear%20the%20Surrounding%20Area:%20Ensure,efficiency%20of%20your%20air%20conditioner.",
+                              "title": "What You Can Do to Prevent AC Problems | Goettl Air Conditioning",
+                              "text": "Clear the Surrounding Area: Ensure there is no debris around the unit, such as leaves or yard waste. It allows proper airflow and ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Department of Energy (.gov)",
+                              "domain": "www.energy.gov",
+                              "url": "https://www.energy.gov/energysaver/air-conditioner-maintenance",
+                              "title": "Air Conditioner Maintenance | Department of Energy",
+                              "text": null
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Gulf Coast Air Systems",
+                              "domain": "gulfcoastairsystems.com",
+                              "url": "https://gulfcoastairsystems.com/5-ways-to-keep-your-ac-from-overheating/#:~:text=A%20dirty%20filter%20can%20cause,call%20813-689-2082!",
+                              "title": "5 Ways to Keep Your Air Conditioner from Overheating",
+                              "text": "A dirty filter can cause blocked airflow and result in the overheating of your air conditioner. 2.) Clean condenser coils – The he..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Carrier",
+                              "domain": "www.carrier.com",
+                              "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/#:~:text=Inspect%20and%20clean%20the%20condenser,functioning%20correctly%2C%20providing%20safe%20operation.",
+                              "title": "5 Air Conditioner (AC) Maintenance Tips You Should Know - Carrier",
+                              "text": "Inspect and clean the condenser coils to ensure they are not hindering the system's efficiency. Check refrigerant levels, check fo..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "ARS/Rescue Rooter",
+                              "domain": "www.ars.com",
+                              "url": "https://www.ars.com/blog/ac-not-blowing-cold-air#:~:text=Prevent%20AC%20Problems%20with%20Regular,above%20before%20they%20become%20problems.",
+                              "title": "AC Not Blowing Cold Air: Common Causes & How To Fix",
+                              "text": "Oct 1, 2023 — Prevent AC Problems with Regular Maintenance Most AC breakdowns are preventable. Scheduling annual HVAC maintenance hel..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "This video shows how to clean your AC's condenser coils:",
+                          "images": null,
+                          "references": null
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Common Causes of Poor Cooling to Watch For:",
+                          "text": "Low Refrigerant: A sign of a leak, causing the system to run constantly without cooling. Frozen Coils: Usually caused by poor airflow (dirty filter) or low refrigerant. Dirty Coils: Dirt buildup blocks heat transfer, reducing efficiency.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Bryant",
+                              "domain": "www.bryant.com",
+                              "url": "https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20not,home's%20energy%20efficiency%20and%20comfort.",
+                              "title": "Why Is My AC Not Blowing Cold Air? | 7 Causes & Expert Fixes - Bryant",
+                              "text": "If your AC is not blowing cold air, the most common culprits are a clogged air filter, incorrect thermostat settings, or a blocked..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Gulf Coast Air Systems",
+                              "domain": "gulfcoastairsystems.com",
+                              "url": "https://gulfcoastairsystems.com/5-ways-to-keep-your-ac-from-overheating/#:~:text=A%20dirty%20filter%20can%20cause,call%20813-689-2082!",
+                              "title": "5 Ways to Keep Your Air Conditioner from Overheating",
+                              "text": "A dirty filter can cause blocked airflow and result in the overheating of your air conditioner. 2.) Clean condenser coils – The he..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "By keeping the unit clean and ensuring proper airflow, you can prevent most common cooling failures.",
+                          "images": null,
+                          "references": null
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Bryant",
+                          "domain": "www.bryant.com",
+                          "url": "https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/#:~:text=If%20your%20AC%20is%20not,home's%20energy%20efficiency%20and%20comfort.",
+                          "title": "Why Is My AC Not Blowing Cold Air? | 7 Causes & Expert Fixes - Bryant",
+                          "text": "If your AC is not blowing cold air, the most common culprits are a clogged air filter, incorrect thermostat settings, or a blocked..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Department of Energy (.gov)",
+                          "domain": "www.energy.gov",
+                          "url": "https://www.energy.gov/energysaver/air-conditioner-maintenance",
+                          "title": "Air Conditioner Maintenance | Department of Energy",
+                          "text": null
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Precision Comfort Systems",
+                          "domain": "precisioncomfort.com",
+                          "url": "https://precisioncomfort.com/ac-not-keeping-up/#:~:text=If%20your%20air%20conditioner%20is,most%20your%20system%20can%20reach.",
+                          "title": "AC Not Keeping Up? Here’s Why—and What to Do About It",
+                          "text": "If your air conditioner is not keeping up with the thermostat, try these quick adjustments first. They might restore comfort witho..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Carrier",
+                          "domain": "www.carrier.com",
+                          "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/#:~:text=Inspect%20and%20clean%20the%20condenser,functioning%20correctly%2C%20providing%20safe%20operation.",
+                          "title": "5 Air Conditioner (AC) Maintenance Tips You Should Know - Carrier",
+                          "text": "Inspect and clean the condenser coils to ensure they are not hindering the system's efficiency. Check refrigerant levels, check fo..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "totalcomfortcooling.com",
+                          "domain": "totalcomfortcooling.com",
+                          "url": "https://totalcomfortcooling.com/reasons-your-air-conditioner-is-not-cooling-properly/",
+                          "title": "Reasons Your Air Conditioner Is Not Cooling Properly",
+                          "text": "Aug 1, 2025 —  Key Takeaways * Check your thermostat settings first; incorrect settings are a common reason for poor cooling. * Dirty..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Yelp",
+                          "domain": "www.yelp.com",
+                          "url": "https://www.yelp.com/article/11-reasons-ac-not-cooling-the-house#:~:text=Stay%20consistent%20with%20AC%20maintenance,visit%20typically%20costs%20$80%E2%80%93120.",
+                          "title": "11 reasons your AC is not cooling the house - Yelp",
+                          "text": "Stay consistent with AC maintenance An AC unit requires regular, routine maintenance to run at peak performance. Here are three th..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Goettl Air Conditioning and Plumbing",
+                          "domain": "www.goettl.com",
+                          "url": "https://www.goettl.com/expert-center/air-conditioning/what-you-can-do-to-prevent-ac-problems/#:~:text=Clear%20the%20Surrounding%20Area:%20Ensure,efficiency%20of%20your%20air%20conditioner.",
+                          "title": "What You Can Do to Prevent AC Problems | Goettl Air Conditioning",
+                          "text": "Clear the Surrounding Area: Ensure there is no debris around the unit, such as leaves or yard waste. It allows proper airflow and ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "ARS/Rescue Rooter",
+                          "domain": "www.ars.com",
+                          "url": "https://www.ars.com/blog/ac-not-blowing-cold-air#:~:text=Prevent%20AC%20Problems%20with%20Regular,above%20before%20they%20become%20problems.",
+                          "title": "AC Not Blowing Cold Air: Common Causes & How To Fix",
+                          "text": "Oct 1, 2023 — Prevent AC Problems with Regular Maintenance Most AC breakdowns are preventable. Scheduling annual HVAC maintenance hel..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Gulf Coast Air Systems",
+                          "domain": "gulfcoastairsystems.com",
+                          "url": "https://gulfcoastairsystems.com/5-ways-to-keep-your-ac-from-overheating/#:~:text=A%20dirty%20filter%20can%20cause,call%20813-689-2082!",
+                          "title": "5 Ways to Keep Your Air Conditioner from Overheating",
+                          "text": "A dirty filter can cause blocked airflow and result in the overheating of your air conditioner. 2.) Clean condenser coils – The he..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Home Improvement Stack Exchange",
+                          "domain": "diy.stackexchange.com",
+                          "url": "https://diy.stackexchange.com/questions/421/what-type-of-regular-maintenance-should-i-be-doing-on-my-central-air-conditionin#:~:text=Most%20local%20HVAC%20service%20companies,replace%20the%20air%20filters%2C%20etc.",
+                          "title": "What type of regular maintenance should I be doing on my central air ...",
+                          "text": "Jul 23, 2010 — Most local HVAC service companies offer an annual service plan where they come out once a year (twice a year for a hea..."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "product_considerations_element",
+                  "title": "How often should an AC filter be replaced?",
+                  "consideration_category": "Filter Replacement",
+                  "expanded_element": [
+                    {
+                      "type": "product_considerations_ai_overview_expanded_element",
+                      "items": [
+                        {
+                          "type": "ai_overview_element",
+                          "title": null,
+                          "text": "AC filters should generally be replaced every 30 to 90 days. For optimal performance, check them monthly, replacing sooner if dirty. Change monthly for homes with pets, allergies, or 1-inch filters, and every 3–6 months for 2–5 inch pleated filters.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=Hqk6pLUjJGo&t=106",
+                              "title": "How Often Should You Change Your HVAC Filter?",
+                              "text": "Feb 1, 2025 — system size and run time bigger homes or systems that run longer have more air cycling through meaning that the filter ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=-_edaiCU8MI&t=15",
+                              "title": "How Often to Change Your AC Filter",
+                              "text": "May 31, 2020 — what I want to talk to you about is a practical approach to assessing what you need to do in your home your property."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Air Flow Designs Heating & Air Conditioning",
+                              "domain": "www.airflowdesigns.com",
+                              "url": "https://www.airflowdesigns.com/blog/how-often-change-ac-filter/#:~:text=Recommended%20Frequency%20for%20Changing%20Your,warrant%20more%20frequent%20filter%20changes.",
+                              "title": "How Often Should I Change My AC Filter? - Air Flow Designs",
+                              "text": "Recommended Frequency for Changing Your Filters The frequency of changing your AC filter depends on various factors, including the..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Summers Plumbing Heating & Cooling",
+                              "domain": "summersphc.com",
+                              "url": "https://summersphc.com/kokomo/2025/02/how-often-should-you-change-your-hvac-filter-the-answer-might-surprise-you/#:~:text=It%20is%20generally%20recommended%20to,maintain%20good%20indoor%20air%20quality.",
+                              "title": "How Often Should You Change Your HVAC Filter? (The Answer Might ...",
+                              "text": "Feb 11, 2025 — It is generally recommended to change your HVAC filter every 90 days (approximately 3 months) for optimal performance."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Mountaineer Heating & Cooling",
+                              "domain": "www.mountaineerheatcool.com",
+                              "url": "https://www.mountaineerheatcool.com/ac-filters-how-often-should-you-really-replace-them/",
+                              "title": "AC Filters: How Often Should You REALLY Replace Them?",
+                              "text": "Aug 5, 2025 —  How Often to Replace Filters (And What Affects That Timeline) * Type of Filter You Use. Basic fiberglass filters might..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Filterbuy",
+                              "domain": "filterbuy.com",
+                              "url": "https://filterbuy.com/#:~:text=4.%20Change%20Frequency:%20Determine%20how%20often%20you,some%20can%20last%20up%20to%20six%20months.",
+                              "title": "Buy the Best HVAC & Furnace Air Filters for Sale Online",
+                              "text": "4. Change Frequency: Determine how often you need an air filter replacement. Most require changing every 1-3 months, though some c..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "accoastal.com",
+                              "domain": "www.accoastal.com",
+                              "url": "https://www.accoastal.com/how-often-should-you-change-your-hvac-filter/#:~:text=30%2C%2060%2C%20or%2090%20Days,vacation%20properties%20with%20lighter%20use.",
+                              "title": "How Often Should You Change Your HVAC Filter? (+ MERV Chart)",
+                              "text": "Mar 30, 2026 — 30, 60, or 90 Days? HVAC Filter Replacement Guide. In high-activity households, waiting 90 days can significantly redu..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Key Factors Affecting Filter Life",
+                          "text": "1-inch filters: Replace every 1–3 months. 4-inch+ filters: Replace every 6–12 months. Pets & Allergies: Change every 30–60 days to manage dander and particles. Heavy Usage/Vacation Homes: High-use homes need monthly changes; rarely used homes can go longer. Construction: If renovations are happening, check/replace every few days, as dust clogs filters quickly.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=-_edaiCU8MI&t=15",
+                              "title": "How Often to Change Your AC Filter",
+                              "text": "May 31, 2020 — what I want to talk to you about is a practical approach to assessing what you need to do in your home your property."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Air Flow Designs Heating & Air Conditioning",
+                              "domain": "www.airflowdesigns.com",
+                              "url": "https://www.airflowdesigns.com/blog/how-often-change-ac-filter/#:~:text=Recommended%20Frequency%20for%20Changing%20Your,warrant%20more%20frequent%20filter%20changes.",
+                              "title": "How Often Should I Change My AC Filter? - Air Flow Designs",
+                              "text": "Recommended Frequency for Changing Your Filters The frequency of changing your AC filter depends on various factors, including the..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "petro.com",
+                              "domain": "www.petro.com",
+                              "url": "https://www.petro.com/resource-center/how-often-should-you-change-your-ac-filters#:~:text=Older%20systems%20typically%20use%20fiberglass,45%20days%20for%20max%20efficiency.",
+                              "title": "How often should you change your AC filter? | Petro",
+                              "text": "Older systems typically use fiberglass air filters. You should replace these regularly, around every 30 days. Newer systems often ..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Summers Plumbing Heating & Cooling",
+                              "domain": "summersphc.com",
+                              "url": "https://summersphc.com/kokomo/2025/02/how-often-should-you-change-your-hvac-filter-the-answer-might-surprise-you/#:~:text=It%20is%20generally%20recommended%20to,maintain%20good%20indoor%20air%20quality.",
+                              "title": "How Often Should You Change Your HVAC Filter? (The Answer Might ...",
+                              "text": "Feb 11, 2025 — It is generally recommended to change your HVAC filter every 90 days (approximately 3 months) for optimal performance."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Mountaineer Heating & Cooling",
+                              "domain": "www.mountaineerheatcool.com",
+                              "url": "https://www.mountaineerheatcool.com/ac-filters-how-often-should-you-really-replace-them/",
+                              "title": "AC Filters: How Often Should You REALLY Replace Them?",
+                              "text": "Aug 5, 2025 —  How Often to Replace Filters (And What Affects That Timeline) * Type of Filter You Use. Basic fiberglass filters might..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "accoastal.com",
+                              "domain": "www.accoastal.com",
+                              "url": "https://www.accoastal.com/how-often-should-you-change-your-hvac-filter/#:~:text=30%2C%2060%2C%20or%2090%20Days,vacation%20properties%20with%20lighter%20use.",
+                              "title": "How Often Should You Change Your HVAC Filter? (+ MERV Chart)",
+                              "text": "Mar 30, 2026 — 30, 60, or 90 Days? HVAC Filter Replacement Guide. In high-activity households, waiting 90 days can significantly redu..."
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ai_overview_element",
+                          "title": "Signs It's Time to Change",
+                          "text": "Visual Inspection: Hold the filter up to light; if it's gray, dusty, or blocks light, change it. Reduced Airflow: Less air coming from vents indicates a clogged filter. Higher Energy Bills: A dirty filter forces your system to work harder. Musty Smells: Odors from vents suggest it is time to swap the filter.",
+                          "images": null,
+                          "references": [
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "The Home Depot",
+                              "domain": "www.homedepot.com",
+                              "url": "https://www.homedepot.com/c/ab/how-often-you-should-change-your-air-filter/9ba683603be9fa5395fab90cf4eb97a#:~:text=Children%20are%20more%20sensitive%20than,and%20needs%20to%20be%20changed.",
+                              "title": "How Often You Should Change Your Air Filter - The Home Depot",
+                              "text": "Jan 12, 2026 — Children are more sensitive than adults to indoor air pollutants like mold, dust mite debris, dander and pollen, so ma..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Filterbuy",
+                              "domain": "filterbuy.com",
+                              "url": "https://filterbuy.com/resources/air-filter-basics/how-often-do-i-really-need-to-change-my-hvac-filter/#:~:text=peak%20heating%20season.-,How%20can%20you%20tell%20if%20an%20HVAC%20air%20filter%20needs,or%20reduced%20airflow%20from%20vents.",
+                              "title": "How Often to Change and Replace the HVAC Air Filter in Your Home",
+                              "text": "How can you tell if an HVAC air filter needs to be changed? To check if your air filter is dirty, hold it up to a light source. If..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Reddit ·",
+                              "domain": "www.reddit.com",
+                              "url": "https://www.reddit.com/r/Frugal/comments/yleq29/how_often_do_you_change_your_air_filters/#:~:text=Once%20a%20year%20is%20horrible,is%20having%20to%20work%20harder.&text=The%20filters%20left%20by%20my,me%20to%20change%20the%20filter.",
+                              "title": "How often do you change your air filters? : r/Frugal - Reddit",
+                              "text": "Nov 3, 2022 — Once a year is horrible. They get clogged with dirt and dust then the AC/Heat isn't able to pull in air. It's really ba..."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "YouTube ·",
+                              "domain": "www.youtube.com",
+                              "url": "https://www.youtube.com/watch?v=-_edaiCU8MI&t=15",
+                              "title": "How Often to Change Your AC Filter",
+                              "text": "May 31, 2020 — what I want to talk to you about is a practical approach to assessing what you need to do in your home your property."
+                            },
+                            {
+                              "type": "ai_overview_reference",
+                              "source": "Mountaineer Heating & Cooling",
+                              "domain": "www.mountaineerheatcool.com",
+                              "url": "https://www.mountaineerheatcool.com/ac-filters-how-often-should-you-really-replace-them/",
+                              "title": "AC Filters: How Often Should You REALLY Replace Them?",
+                              "text": "Aug 5, 2025 —  How Often to Replace Filters (And What Affects That Timeline) * Type of Filter You Use. Basic fiberglass filters might..."
+                            }
+                          ]
+                        }
+                      ],
+                      "references": [
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Reddit ·",
+                          "domain": "www.reddit.com",
+                          "url": "https://www.reddit.com/r/Frugal/comments/yleq29/how_often_do_you_change_your_air_filters/#:~:text=Once%20a%20year%20is%20horrible,is%20having%20to%20work%20harder.&text=The%20filters%20left%20by%20my,me%20to%20change%20the%20filter.",
+                          "title": "How often do you change your air filters? : r/Frugal - Reddit",
+                          "text": "Nov 3, 2022 — Once a year is horrible. They get clogged with dirt and dust then the AC/Heat isn't able to pull in air. It's really ba..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "YouTube ·",
+                          "domain": "www.youtube.com",
+                          "url": "https://www.youtube.com/watch?v=Hqk6pLUjJGo&t=106",
+                          "title": "How Often Should You Change Your HVAC Filter?",
+                          "text": "Feb 1, 2025 — system size and run time bigger homes or systems that run longer have more air cycling through meaning that the filter ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "The Home Depot",
+                          "domain": "www.homedepot.com",
+                          "url": "https://www.homedepot.com/c/ab/how-often-you-should-change-your-air-filter/9ba683603be9fa5395fab90cf4eb97a#:~:text=Children%20are%20more%20sensitive%20than,and%20needs%20to%20be%20changed.",
+                          "title": "How Often You Should Change Your Air Filter - The Home Depot",
+                          "text": "Jan 12, 2026 — Children are more sensitive than adults to indoor air pollutants like mold, dust mite debris, dander and pollen, so ma..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "YouTube ·",
+                          "domain": "www.youtube.com",
+                          "url": "https://www.youtube.com/watch?v=-_edaiCU8MI&t=15",
+                          "title": "How Often to Change Your AC Filter",
+                          "text": "May 31, 2020 — what I want to talk to you about is a practical approach to assessing what you need to do in your home your property."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Air Flow Designs Heating & Air Conditioning",
+                          "domain": "www.airflowdesigns.com",
+                          "url": "https://www.airflowdesigns.com/blog/how-often-change-ac-filter/#:~:text=Recommended%20Frequency%20for%20Changing%20Your,warrant%20more%20frequent%20filter%20changes.",
+                          "title": "How Often Should I Change My AC Filter? - Air Flow Designs",
+                          "text": "Recommended Frequency for Changing Your Filters The frequency of changing your AC filter depends on various factors, including the..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Summers Plumbing Heating & Cooling",
+                          "domain": "summersphc.com",
+                          "url": "https://summersphc.com/kokomo/2025/02/how-often-should-you-change-your-hvac-filter-the-answer-might-surprise-you/#:~:text=It%20is%20generally%20recommended%20to,maintain%20good%20indoor%20air%20quality.",
+                          "title": "How Often Should You Change Your HVAC Filter? (The Answer Might ...",
+                          "text": "Feb 11, 2025 — It is generally recommended to change your HVAC filter every 90 days (approximately 3 months) for optimal performance."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "petro.com",
+                          "domain": "www.petro.com",
+                          "url": "https://www.petro.com/resource-center/how-often-should-you-change-your-ac-filters#:~:text=Older%20systems%20typically%20use%20fiberglass,45%20days%20for%20max%20efficiency.",
+                          "title": "How often should you change your AC filter? | Petro",
+                          "text": "Older systems typically use fiberglass air filters. You should replace these regularly, around every 30 days. Newer systems often ..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Mountaineer Heating & Cooling",
+                          "domain": "www.mountaineerheatcool.com",
+                          "url": "https://www.mountaineerheatcool.com/ac-filters-how-often-should-you-really-replace-them/",
+                          "title": "AC Filters: How Often Should You REALLY Replace Them?",
+                          "text": "Aug 5, 2025 —  How Often to Replace Filters (And What Affects That Timeline) * Type of Filter You Use. Basic fiberglass filters might..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Filterbuy",
+                          "domain": "filterbuy.com",
+                          "url": "https://filterbuy.com/resources/air-filter-basics/how-often-do-i-really-need-to-change-my-hvac-filter/#:~:text=peak%20heating%20season.-,How%20can%20you%20tell%20if%20an%20HVAC%20air%20filter%20needs,or%20reduced%20airflow%20from%20vents.",
+                          "title": "How Often to Change and Replace the HVAC Air Filter in Your Home",
+                          "text": "How can you tell if an HVAC air filter needs to be changed? To check if your air filter is dirty, hold it up to a light source. If..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "Filterbuy",
+                          "domain": "filterbuy.com",
+                          "url": "https://filterbuy.com/#:~:text=4.%20Change%20Frequency:%20Determine%20how%20often%20you,some%20can%20last%20up%20to%20six%20months.",
+                          "title": "Buy the Best HVAC & Furnace Air Filters for Sale Online",
+                          "text": "4. Change Frequency: Determine how often you need an air filter replacement. Most require changing every 1-3 months, though some c..."
+                        },
+                        {
+                          "type": "ai_overview_reference",
+                          "source": "accoastal.com",
+                          "domain": "www.accoastal.com",
+                          "url": "https://www.accoastal.com/how-often-should-you-change-your-hvac-filter/#:~:text=30%2C%2060%2C%20or%2090%20Days,vacation%20properties%20with%20lighter%20use.",
+                          "title": "How Often Should You Change Your HVAC Filter? (+ MERV Chart)",
+                          "text": "Mar 30, 2026 — 30, 60, or 90 Days? HVAC Filter Replacement Guide. In high-activity households, waiting 90 days can significantly redu..."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "people_also_ask",
+              "rank_group": 1,
+              "rank_absolute": 4,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[5]/div[1]/div[1]/div[1]",
+              "items": [
+                {
+                  "type": "people_also_ask_element",
+                  "title": "Why is my AC running but not cooling enough?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_ai_overview_expanded_element",
+                      "items": null,
+                      "references": null,
+                      "asynchronous_ai_overview": true
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "Should I turn the AC off if not cooling?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://www.precision-ac.com/should-you-turn-off-your-ac-if-its-not-cooling/",
+                      "domain": "www.precision-ac.com",
+                      "title": "Should You Turn Off Your AC If It's Not Cooling?",
+                      "description": "The short answer is yes; you should turn off your AC unit if it's not cooling. Leaving your AC unit on when it's not cooling can lead to further damage to the system, resulting in costly repairs or even replacement.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "Why is my 2014 RAV4 AC not working?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/div[3]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_ai_overview_expanded_element",
+                      "items": null,
+                      "references": null,
+                      "asynchronous_ai_overview": true
+                    }
+                  ]
+                },
+                {
+                  "type": "people_also_ask_element",
+                  "title": "What is the $5000 rule for AC?",
+                  "seed_question": null,
+                  "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/div[4]",
+                  "expanded_element": [
+                    {
+                      "type": "people_also_ask_expanded_element",
+                      "featured_title": null,
+                      "url": "https://www.trane.com/residential/en/resources/blog/trane-topics-should-you-repair-or-replace-your-heating-and-cooling-system/",
+                      "domain": "www.trane.com",
+                      "title": "Air Conditioning Replacement or Repair: What's Right for You? - Trane",
+                      "description": "The $5,000 rule is a rule of thumb in the HVAC industry to help homeowners decide whether HVAC repair or HVAC replacement makes more sense in the long run. The $5,000 rule: Multiply the age of your equipment by the estimated repair cost. If the number is more than $5,000, then you should consider replacing your unit.",
+                      "images": null,
+                      "timestamp": null,
+                      "table": null
+                    }
+                  ]
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "video",
+              "rank_group": 1,
+              "rank_absolute": 5,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[7]/div[1]",
+              "items": [
+                {
+                  "type": "video_element",
+                  "source": "YouTube · AC Service Tech LLC",
+                  "title": "Air Conditioner NOT Blowing Cold Air! Possible Problems ...",
+                  "timestamp": "2025-07-19 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=cJDRqWwlKug&vl=en"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Fix This House",
+                  "title": "10 Reasons Why Your AC Is NOT Blowing Cold Air In Your ...",
+                  "timestamp": "2024-08-11 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=drb2fdVKZlk"
+                },
+                {
+                  "type": "video_element",
+                  "source": "YouTube · Mechanics For Non Mechanics",
+                  "title": "AC Not Blowing Cold Air? DO THIS FIRST!",
+                  "timestamp": "2025-06-09 00:00:00 +00:00",
+                  "url": "https://www.youtube.com/watch?v=yCQKqh2neto"
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "people_also_search",
+              "rank_group": 1,
+              "rank_absolute": 6,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[8]/div[1]/div[1]/div[1]",
+              "title": "Find related products & services",
+              "items": [
+                "AC not cooling during the day",
+                "AC not cooling below 75",
+                "AC not blowing cold air reset",
+                "AC not blowing cold air in house"
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 2,
+              "rank_absolute": 7,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[9]/div[1]/div[1]",
+              "domain": "www.bryant.com",
+              "title": "Why Is My AC Not Blowing Cold Air?",
+              "url": "https://www.bryant.com/en/us/products/air-conditioners/ac-not-blowing-cold-air/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.bryant.com › ... › Products › Air Conditioners",
+              "website_name": "Bryant",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "If your AC is not blowing cold air, the most common culprits are a clogged air filter, incorrect thermostat settings, or a blocked outdoor condenser unit. More ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "clogged air filter, incorrect thermostat settings, or a blocked outdoor condenser unit"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 3,
+              "rank_absolute": 8,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[11]/div[1]/div[1]",
+              "domain": "www.coolray.com",
+              "title": "Why Is My Central Air Conditioner Not Cooling?",
+              "url": "https://www.coolray.com/help-guides/why-is-my-central-air-conditioner-not-cooling",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.coolray.com › help-guides › why-is-my-cen...",
+              "website_name": "Coolray Heating & Air Conditioning",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "AC problems that you can solve · Problem 1: Thermostat set to “ON” instead of “AUTO” · Problem 2: Dirty air filter · Problem 3: Dirty outside unit. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "AC"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "discussions_and_forums",
+              "rank_group": 1,
+              "rank_absolute": 9,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[13]/div[1]",
+              "title": "Discussions and forums",
+              "items": [
+                {
+                  "type": "discussions_and_forums_element",
+                  "title": "HVAC techs say my AC is fine, why is it not cooling my house?",
+                  "url": "https://www.reddit.com/r/hvacadvice/comments/1e47pal/hvac_techs_say_my_ac_is_fine_why_is_it_not/",
+                  "domain": "www.reddit.com",
+                  "source": "Reddit",
+                  "description": null,
+                  "timestamp": "2025-04-30 17:29:45 +00:00",
+                  "posts_count": 60
+                },
+                {
+                  "type": "discussions_and_forums_element",
+                  "title": "AC Running but air not cold",
+                  "url": "https://www.doityourself.com/forum/air-conditioning-cooling-systems/649257-ac-running-but-air-not-cold.html",
+                  "domain": "www.doityourself.com",
+                  "source": "DoItYourself.com",
+                  "description": null,
+                  "timestamp": "2025-04-30 17:29:45 +00:00",
+                  "posts_count": 1
+                },
+                {
+                  "type": "discussions_and_forums_element",
+                  "title": "Why is my air conditioner not working and not cooling?",
+                  "url": "https://www.quora.com/Why-is-my-air-conditioner-not-working-and-not-cooling",
+                  "domain": "www.quora.com",
+                  "source": "Quora",
+                  "description": null,
+                  "timestamp": "2026-01-30 17:29:45 +00:00",
+                  "posts_count": 3
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 4,
+              "rank_absolute": 10,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[15]/div[1]/div[1]",
+              "domain": "www.meineke.com",
+              "title": "9 Reasons Your Car AC Is Not Working Properly",
+              "url": "https://www.meineke.com/blog/9-reasons-your-car-ac-is-not-working-properly/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.meineke.com › Blog",
+              "website_name": "Meineke",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Feb 6, 2026 — What Causes the AC Not to Work in a Car? · Low refrigerant or a refrigerant leak · Clogged cabin air filter · Failing compressor or condenser ... Read more",
+              "pre_snippet": "02/06/2026 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Low refrigerant or a refrigerant leak"
+              ],
+              "links": [
+                {
+                  "type": "link_element",
+                  "title": "9 Common Ac Problems",
+                  "description": null,
+                  "url": "https://www.meineke.com/blog/9-reasons-your-car-ac-is-not-working-properly/",
+                  "domain": "www.meineke.com"
+                },
+                {
+                  "type": "link_element",
+                  "title": "5. Compressor Issues",
+                  "description": null,
+                  "url": "https://www.meineke.com/blog/9-reasons-your-car-ac-is-not-working-properly/",
+                  "domain": "www.meineke.com"
+                },
+                {
+                  "type": "link_element",
+                  "title": "How To Prevent Ac Problems",
+                  "description": null,
+                  "url": "https://www.meineke.com/blog/9-reasons-your-car-ac-is-not-working-properly/",
+                  "domain": "www.meineke.com"
+                }
+              ],
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2026-02-06 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "perspectives",
+              "rank_group": 1,
+              "rank_absolute": 11,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[17]/div[1]",
+              "title": "What people are saying",
+              "items": [
+                {
+                  "type": "perspectives_element",
+                  "title": "Ac not blowing very hard or cool",
+                  "description": null,
+                  "url": "https://www.reddit.com/r/hvacadvice/comments/1swthev/ac_not_blowing_very_hard_or_cool/",
+                  "domain": "www.reddit.com",
+                  "date": "3 days ago",
+                  "source": "r/hvacadvice",
+                  "timestamp": "2026-04-27 17:29:45 +00:00"
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "AC Not Cooling? Watch This Fix Before It's Too Late! #shorts",
+                  "description": null,
+                  "url": "https://www.youtube.com/shorts/bdbWE2sP7Tk",
+                  "domain": "www.youtube.com",
+                  "date": "1 day ago",
+                  "source": "Mikey Pipes",
+                  "timestamp": "2026-04-29 17:29:45 +00:00"
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "This $3 Can Will Make Your Car’s AC Blow Sub Zero When It's Hot Outside",
+                  "description": null,
+                  "url": "https://www.youtube.com/watch?v=Q2X7a11WTrg",
+                  "domain": "www.youtube.com",
+                  "date": "1 month ago",
+                  "source": "Scotty Kilmer",
+                  "timestamp": "2026-03-30 17:29:45 +00:00"
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Hey guys. My heat stopped blowing hard and hot in winter. So I used radiator heat. Well it's now getting warmer and I tried the AC. It's blowing, but not hard and not cold. Thermostat seems to be good. I turned off the breaker for a couple min to see if it would hel",
+                  "description": null,
+                  "url": "https://www.facebook.com/groups/4197483670294981/posts/26800643666218993/",
+                  "domain": "www.facebook.com",
+                  "date": "4 days ago",
+                  "source": "A/C Air Conditioning & Heating",
+                  "timestamp": "2026-04-26 17:29:45 +00:00"
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Your AC does not have a \"cool faster\" button. ❄️ \n\nSetting 16°C in 45°C traffic doesn't make the air colder — it just makes the compressor run non-stop. Same vent temperature, more wear, 5–10% lower mileage. The actual fix? 22–24°C with recirculation ON. Use HIGH blower for the first 2–3 minutes to flush out the hot air, then drop to medium so the evaporator can dehumidify properly.\n \nIf your cabin still isn't cooling, it's almost never the setting — it's a tired condenser, a clogged cabin filter, or low refrigerant. We stock all three for 35+ brands.\n \nSave this before the next afternoon drive. Tag the friend who's still running 16°C. \n\n#cartips #carmaintenance #summercare #indiancars #caractips #mythbuster \n#autoindia #carcareproducts #hyundaiindia #maruti #tatasierra2026 #mahindra #hyundaicreta #autodecode \n#sparepartsindia #meerutauto #delhicars #indianroads #dıy #carmechanic",
+                  "description": null,
+                  "url": "https://www.instagram.com/p/DXtTev2Ew4M/",
+                  "domain": "www.instagram.com",
+                  "date": "1 day ago",
+                  "source": "auto_decode_",
+                  "timestamp": "2026-04-29 17:29:45 +00:00"
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Why Your Air Conditioning Unit Fails to Cool Effectively: Three Potential Causes👇 Comment section",
+                  "description": null,
+                  "url": "https://www.facebook.com/groups/322031608411234/posts/2112886895992354/",
+                  "domain": "www.facebook.com",
+                  "date": "3 days ago",
+                  "source": "Followers of Bishop David Oyedepo Ministry",
+                  "timestamp": "2026-04-27 17:29:45 +00:00"
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Aire acondicionado no enfría. AC NOT COOLING",
+                  "description": null,
+                  "url": "https://www.youtube.com/watch?v=vXdE-CXAvDo",
+                  "domain": "www.youtube.com",
+                  "date": "1 month ago",
+                  "source": "FREEZE THE HEAT",
+                  "timestamp": "2026-03-30 17:29:45 +00:00"
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "AC not blowing COLD air",
+                  "description": null,
+                  "url": "https://www.reddit.com/r/AskMechanics/comments/1sneowy/ac_not_blowing_cold_air/",
+                  "domain": "www.reddit.com",
+                  "date": "2 weeks ago",
+                  "source": "r/AskMechanics",
+                  "timestamp": "2026-04-16 17:29:45 +00:00"
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "My air conditioning is not cooling down my house. Whi should I call",
+                  "description": null,
+                  "url": "https://www.facebook.com/groups/1607164392998079/posts/2700379257009915/",
+                  "domain": "www.facebook.com",
+                  "date": "1 week ago",
+                  "source": "Lake Wales Neighborhood News & Civil Discourse Group",
+                  "timestamp": "2026-04-23 17:29:45 +00:00"
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "A/C not blowing cold",
+                  "description": null,
+                  "url": "https://www.reddit.com/r/hondafit/comments/1sq9pkg/ac_not_blowing_cold/",
+                  "domain": "www.reddit.com",
+                  "date": "1 week ago",
+                  "source": "r/hondafit",
+                  "timestamp": "2026-04-23 17:29:45 +00:00"
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Why Your AC Stopped Working - Check This First!",
+                  "description": null,
+                  "url": "https://www.youtube.com/watch?v=jqZV7lBloIA",
+                  "domain": "www.youtube.com",
+                  "date": "1 month ago",
+                  "source": "HVAC GUY",
+                  "timestamp": "2026-03-30 17:29:45 +00:00"
+                },
+                {
+                  "type": "perspectives_element",
+                  "title": "Hey guys. My heat stopped blowing hard and hot in winter. So I used radiator heat. Well it's now getting warmer and I tried the AC. It's blowing, but not hard and not cold. Thermostat seems to be good. I turned off the breaker for a couple min to see if it would hel",
+                  "description": null,
+                  "url": "https://www.facebook.com/groups/363759619227720/posts/1301432622127077/",
+                  "domain": "www.facebook.com",
+                  "date": "5 days ago",
+                  "source": "HVAC-R AC/Heating Questions and Answers",
+                  "timestamp": "2026-04-25 17:29:45 +00:00"
+                }
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 5,
+              "rank_absolute": 12,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[19]/div[1]/div[1]",
+              "domain": "www.lennox.com",
+              "title": "What to do when your AC is not blowing cold air",
+              "url": "https://www.lennox.com/residential/lennox-life/consumer/ac-not-blowing-cold-air",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.lennox.com › Home › Lennox Life",
+              "website_name": "Lennox",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Apr 4, 2025 — Warm air from an AC often means dirty filters, blocked coils, or thermostat errors. The page suggests easy homeowner checks before calling a ... Read more",
+              "pre_snippet": "04/04/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "dirty filters, blocked coils, or thermostat errors"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-04-04 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 6,
+              "rank_absolute": 13,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[21]/div[1]/div[1]",
+              "domain": "www.carrier.com",
+              "title": "Why is My AC Not Blowing Cold Air While Running?",
+              "url": "https://www.carrier.com/residential/en/us/products/air-conditioners/air-conditioner-service/ac-not-blowing-cold-air/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.carrier.com › ... › Air Conditioner Service",
+              "website_name": "Carrier",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "If your AC is running but not cooling, it could be due to a dirty air filter, incorrect thermostat settings, a malfunctioning thermostat, a refrigerant leak ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "AC",
+                "not cooling"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 7,
+              "rank_absolute": 14,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[23]/div[1]/div[1]",
+              "domain": "www.quora.com",
+              "title": "Why is the AC running and blowing cool air but not ...",
+              "url": "https://www.quora.com/Why-is-the-AC-running-and-blowing-cool-air-but-not-cooling-the-house",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "6 answers  ·  1 year ago",
+              "website_name": "Quora",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "If the compressor and fans are operating but not cooling , it is refrigerant fluid circuit problem. You may have a leak and the system needs to ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "refrigerant fluid circuit problem"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "paid",
+              "rank_group": 1,
+              "rank_absolute": 15,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[24]/div[1]/div[1]/div[1]/div[5]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]",
+              "title": "$89 AC Tune-Up BOGO Special | Same Day AC Maintenance",
+              "domain": "www.gopreferred.com",
+              "website_name": "Preferred Home Services",
+              "breadcrumb": "https://www.gopreferred.com",
+              "is_image": false,
+              "is_video": false,
+              "images": null,
+              "url": "https://www.gopreferred.com/air-conditioning/ac-repair/",
+              "highlighted": null,
+              "extra": {
+                "ad_aclk": "DChsSEwj_8pD7jJaUAxVlgoMHHfVuNnAYACICCAIQABoCZWY"
+              },
+              "description": "Central AC Maintenance Throughout The Charleston Area, Call Now For Same Day Service! Trust Your Local Air Conditioning Maintenance Experts, Call Preferred Home Services Today. Upfront Pricing. 60k+ Jobs Completed. Expertly Trained Techs. 100% Satisfaction. Financing Available.",
+              "description_rows": null,
+              "links": [
+                {
+                  "type": "ad_link_element",
+                  "title": "AC Repairs",
+                  "description": null,
+                  "url": "https://www.gopreferred.com/air-conditioning/ac-repair/?",
+                  "domain": null,
+                  "ad_aclk": "DChsSEwj_8pD7jJaUAxVlgoMHHfVuNnAYACICCAIQARoCZWY"
+                },
+                {
+                  "type": "ad_link_element",
+                  "title": "Special Offers",
+                  "description": null,
+                  "url": "https://www.gopreferred.com/about-us/special-offers/?",
+                  "domain": null,
+                  "ad_aclk": "DChsSEwj_8pD7jJaUAxVlgoMHHfVuNnAYACICCAIQAhoCZWY"
+                },
+                {
+                  "type": "ad_link_element",
+                  "title": "Contact Us",
+                  "description": null,
+                  "url": "https://www.gopreferred.com/contact-us/?",
+                  "domain": null,
+                  "ad_aclk": "DChsSEwj_8pD7jJaUAxVlgoMHHfVuNnAYACICCAIQAxoCZWY"
+                },
+                {
+                  "type": "ad_link_element",
+                  "title": "AC Tune-Ups",
+                  "description": null,
+                  "url": "https://www.gopreferred.com/air-conditioning/ac-repair/?",
+                  "domain": null,
+                  "ad_aclk": "DChsSEwj_8pD7jJaUAxVlgoMHHfVuNnAYACICCAIQBBoCZWY"
+                },
+                {
+                  "type": "ad_link_element",
+                  "title": "AC Installs",
+                  "description": null,
+                  "url": "https://www.gopreferred.com/air-conditioning/ac-installation/?",
+                  "domain": null,
+                  "ad_aclk": "DChsSEwj_8pD7jJaUAxVlgoMHHfVuNnAYACICCAIQBRoCZWY"
+                },
+                {
+                  "type": "ad_link_element",
+                  "title": "About Us",
+                  "description": null,
+                  "url": "https://www.gopreferred.com/about-us/?",
+                  "domain": null,
+                  "ad_aclk": "DChsSEwj_8pD7jJaUAxVlgoMHHfVuNnAYACICCAIQBhoCZWY"
+                }
+              ],
+              "price": null,
+              "rating": null,
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 1,
+              "rank_absolute": 16,
+              "page": 1,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[2]/div[2]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "AC compressor",
+                "Car ac not cooling",
+                "Ac not cooling but fan is running",
+                "AC not cooling but fan is running in car",
+                "AC not cooling remote setting",
+                "Air conditioner not blowing cold air but running",
+                "Window ac not cooling",
+                "Central ac not cooling"
+              ],
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 8,
+              "rank_absolute": 17,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+              "domain": "www.townoilcompany.com",
+              "title": "Why Is My AC Running But Not Cooling?",
+              "url": "https://www.townoilcompany.com/blog/why-is-my-ac-running-but-not-cooling",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.townoilcompany.com › blog › why-is-my-...",
+              "website_name": "Town Oil",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "A clogged air filter is one of the most common (and easily overlooked) reasons an air conditioning system runs without cooling properly. Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "A clogged air filter"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 9,
+              "rank_absolute": 18,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+              "domain": "access.nyc.gov",
+              "title": "Cooling Assistance Benefit – ACCESS NYC",
+              "url": "https://access.nyc.gov/programs/cooling-assistance-benefit/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://access.nyc.gov › programs › cooling-assistance-...",
+              "website_name": "ACCESS NYC (.gov)",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Apr 15, 2026 — Applications for 2026 HEAP Summer Cooling Assistance are now open. Up to $800 for a window, portable air conditioner, or fan; Up to $1,000 for ... Read more",
+              "pre_snippet": "04/15/2026 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Up to $800 for a window, portable air conditioner, or fan"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2026-04-15 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 10,
+              "rank_absolute": 19,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]",
+              "domain": "www.daikinmea.com",
+              "title": "Air conditioner not cooling house: reasons and solutions",
+              "url": "https://www.daikinmea.com/en_us/knowledge-center/air-conditioner-not-cooling-house-reasons-and-solutions.html",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.daikinmea.com › en_us › knowledge-center",
+              "website_name": "Daikin Middle East and Africa",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Inspect the air filters. If they're dirty, your AC will have difficulty circulating cool air. Check the AC condensate drain line and drain pan for clogs, ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Inspect the air filters"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 11,
+              "rank_absolute": 20,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[4]/div[1]/div[1]",
+              "domain": "www.quora.com",
+              "title": "Why my airconditioner is blowing cool air but it is not ...",
+              "url": "https://www.quora.com/Why-my-airconditioner-is-blowing-cool-air-but-it-is-not-cooling-the-room-I-have-checked-the-filters-are-clean-but-still-room-isnt-cooling-without-use-of-fan-Why-is-this-happening",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "8 answers  ·  5 years ago",
+              "website_name": "Quora",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "If all aspects of the system (or unit) are working, such as blower and compressor, and the unit is blowing air that is the same as the ...",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "working"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 12,
+              "rank_absolute": 21,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]",
+              "domain": "ssbhc.com",
+              "title": "When You Should Shut Off Your AC If It's Not Cooling",
+              "url": "https://ssbhc.com/news/when-you-should-shut-off-your-ac-if-it-s-not-cooling",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://ssbhc.com › news › when-you-should-shut-off-yo...",
+              "website_name": "SS&B Heating & Cooling",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Jul 1, 2023 — If your AC unit is not cooling at all, it may indicate a malfunction within the system that could worsen if the unit continues to run. By ... Read more",
+              "pre_snippet": "07/01/2023 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "may indicate a malfunction within the system"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2023-07-01 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 13,
+              "rank_absolute": 22,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[6]/div[1]/div[1]",
+              "domain": "www.ars.com",
+              "title": "AC Not Blowing Cold Air: Common Causes & How To Fix",
+              "url": "https://www.ars.com/blog/ac-not-blowing-cold-air",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.ars.com › Blog",
+              "website_name": "ARS/Rescue Rooter",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Oct 1, 2023 — Quick Answer: The most common reasons your AC isn't blowing cold air are a dirty air filter, low refrigerant, or a frozen evaporator coil. Read more",
+              "pre_snippet": "10/01/2023 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "dirty air filter, low refrigerant, or a frozen evaporator coil"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2023-10-01 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 14,
+              "rank_absolute": 23,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[7]/div[1]/div[1]",
+              "domain": "www.ac-heatingconnect.com",
+              "title": "Central AC Not Blowing Cold Air? Here's What to Do",
+              "url": "https://www.ac-heatingconnect.com/homeowners/central-ac-not-blowing-cold-air-heres-what-to-do/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://www.ac-heatingconnect.com › Homeowners",
+              "website_name": "ac-heatingconnect.com",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Aug 27, 2021 — Thermostat Check. One of the simplest reasons for AC to run without cooling off your home may be that the thermostat is set incorrectly. · Dirty ... Read more",
+              "pre_snippet": "08/27/2021 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "Thermostat Check"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2021-08-27 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 15,
+              "rank_absolute": 24,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]",
+              "domain": "terrysacandheating.com",
+              "title": "Why is my air conditioner not cooling the house",
+              "url": "https://terrysacandheating.com/why-is-my-air-conditioner-not-cooling-the-house/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://terrysacandheating.com › Cooling",
+              "website_name": "Terry's A/C & Heating",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Nov 21, 2025 — 1. The Filters Are Clogged. Perhaps the most common cause of AC issues is clogged filters. Dirt, pet hair, pollen and dust can clog your filters. Read more",
+              "pre_snippet": "11/21/2025 00:00:00",
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "clogged filters"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": "2025-11-21 00:00:00 +00:00",
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 16,
+              "rank_absolute": 25,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+              "domain": "goduganair.com",
+              "title": "7 Reasons Why Your AC Is Running But Not Cooling",
+              "url": "https://goduganair.com/blog/7-reasons-why-your-ac-is-running-but-not-cooling/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "https://goduganair.com › blog › 7-reasons-why-your-ac-...",
+              "website_name": "Dugan Air",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "7 Reasons Why Your AC Is Running But Not Cooling · 1. Clogged Air Filter · 2. Thermostat Settings Are Incorrect · 3. Refrigerant Leak or Low Levels · 4. Frozen ... Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": {
+                "rating_type": "Max5",
+                "value": 4.9,
+                "votes_count": 760,
+                "rating_max": 5
+              },
+              "price": null,
+              "highlighted": [
+                "1. Clogged Air Filter"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "organic",
+              "rank_group": 17,
+              "rank_absolute": 26,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[10]/div[1]/div[1]",
+              "domain": "www.facebook.com",
+              "title": "Hi. My AC is not working as good as before!! I contacted the ...",
+              "url": "https://www.facebook.com/groups/allthingsthewoodlands/posts/956060607433037/",
+              "cache_url": null,
+              "related_search_url": null,
+              "breadcrumb": "40+ comments  ·  9 months ago",
+              "website_name": "Facebook · All Things The Woodlands (except Politics)",
+              "is_image": false,
+              "is_video": false,
+              "is_featured_snippet": false,
+              "is_malicious": false,
+              "is_web_story": false,
+              "description": "Why is my air conditioning unit not cooling my house to the set temperature? Tita Dominguez-Baca ▻ Ask Boca! Read more",
+              "pre_snippet": null,
+              "extended_snippet": null,
+              "images": null,
+              "amp_version": false,
+              "rating": null,
+              "price": null,
+              "highlighted": [
+                "air conditioning",
+                "not cooling"
+              ],
+              "links": null,
+              "faq": null,
+              "extended_people_also_search": null,
+              "about_this_result": null,
+              "related_result": null,
+              "timestamp": null,
+              "rectangle": null
+            },
+            {
+              "type": "related_searches",
+              "rank_group": 2,
+              "rank_absolute": 27,
+              "page": 2,
+              "position": "left",
+              "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[3]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[2]",
+              "items": [
+                "AC compressor",
+                "Car ac not cooling",
+                "Ac not cooling but fan is running",
+                "AC not cooling but fan is running in car",
+                "AC not cooling remote setting",
+                "Air conditioner not blowing cold air but running",
+                "Window ac not cooling",
+                "Central ac not cooling"
+              ],
+              "rectangle": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
