@@ -41,6 +41,16 @@ Every SOP below inherits from this. Read first, always.
 | Case study | `sops/ROI-LIVE-Agency-Case-Study-Page-SOP-v1.md` |
 | Collection page | `sops/ROI-LIVE-Agency-Collection-Page-SOP-v1.md` |
 
+## Cross-cutting SOPs — apply on top of the page-type SOP
+
+These SOPs are not page-type specific. They apply alongside whatever page-type SOP is in play, on every engagement that produces content matching the SOP's scope.
+
+| When this applies | Load this SOP |
+|---|---|
+| Any content with factual claims, statistics, study references, or external attributions | `sops/ROI-LIVE-Agency-Citation-Discipline-SOP-v1.md` |
+
+The Citation Discipline SOP is mandatory for all client work that includes data claims. Per-client editorial overlays inherit from it and fill in tier mapping, review chain names, and incident catalogs. Reference implementation: `clients/green-llama-clean/brand_context/sops/GL_Editorial_Overlay_v1.md`.
+
 ## Client setup
 
 **`sops/ROI-LIVE-Client-Parameter-Sheet-Template-v*.md`**
