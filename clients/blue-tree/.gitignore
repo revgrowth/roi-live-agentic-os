@@ -1,0 +1,8 @@
+# Python build artifacts (from Phase 2A MD5 hashing)
+__pycache__/
+*.pyc
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini

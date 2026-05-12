@@ -18,12 +18,32 @@ function withQuietWindowsOptions(options: SpawnOptions = {}): SpawnOptions {
   };
 }
 
+// Node's spawn with { shell: true } on Windows does NOT escape args — it just
+// concatenates command + args with spaces, so any arg containing whitespace is
+// split into multiple tokens by cmd.exe. Build the full command line ourselves
+// with cmd-safe quoting and pass it as a single string.
+function quoteCmdArg(arg: string): string {
+  if (arg.length === 0) return '""';
+  if (!/[\s"&|<>()^%!]/.test(arg)) return arg;
+  return `"${arg.replace(/"/g, '""')}"`;
+}
+
+function buildWindowsShellCommand(command: string, args: readonly string[]): string {
+  const quotedCommand = /\s/.test(command) ? `"${command}"` : command;
+  if (args.length === 0) return quotedCommand;
+  return `${quotedCommand} ${args.map(quoteCmdArg).join(" ")}`;
+}
+
 export function spawnUiProcess(
   command: string,
   args: readonly string[],
   options: SpawnOptions = {},
 ): ChildProcess {
-  return spawn(command, [...args], { ...withQuietWindowsOptions(options), shell: isWindows });
+  const quietOptions = withQuietWindowsOptions(options);
+  if (isWindows) {
+    return spawn(buildWindowsShellCommand(command, args), { ...quietOptions, shell: true });
+  }
+  return spawn(command, [...args], quietOptions);
 }
 
 export function spawnManagedTaskProcess(
@@ -35,7 +55,7 @@ export function spawnManagedTaskProcess(
 
   if (isWindows) {
     const { detached: _ignored, ...rest } = quietOptions;
-    return spawn(command, [...args], { ...rest, shell: true });
+    return spawn(buildWindowsShellCommand(command, args), { ...rest, shell: true });
   }
 
   return spawn(command, [...args], {
