@@ -108,3 +108,117 @@ Total paid spend: **$0.0253**.
 - Service Page SOP v1.1: `agency/sops/ROI-LIVE-Agency-Service-Page-SOP-v1.1.md`
 - Citation Discipline SOP v1.0: `agency/sops/ROI-LIVE-Agency-Citation-Discipline-SOP-v1.md`
 - Core Standards v1.1: `agency/sops/ROI-LIVE-Agency-Core-Standards-v1.1.md`
+
+---
+
+# Symptom spokes batch 2 (4 spokes) — 2026-05-11
+
+**Session date:** 2026-05-11
+**Operator:** Jordan
+**Branch:** `jordan/coastal-air-plus/spokes-batch-2-symptom-2026-04`
+**Mode:** audit-and-fix in-place (legacy spoke URLs preserved, no 301s)
+
+## Session goal
+
+Draft batch-2 symptom spokes (AC won't turn on, AC frozen evaporator coil, AC leaking water inside, AC short cycling) as paste-ready Elementor widget deliverables. Apply zero-fabrication / zero-flags rule: remove unsourceable specifics rather than insert STAT NEEDED placeholders.
+
+## Scope-discovery finding
+
+All four target spokes already exist as live blog posts on coastalcarolinahvac.com under their cluster-strategy slugs (with the exception of `/blog/ac-frozen-evaporator-coil/`, which differs slightly from the strategy doc's `ac-frozen` slug). The cluster strategy doc dated 2026-04-30 treats these as net-new builds, but they've been live since at least 2026-03-17 (Derrick Hall byline, ROI.LIVE-era timestamps). This planning gap was surfaced as CHECKPOINT 1.5 in-session; Jordan directed Path 1 — audit-and-fix the live posts in place rather than draft over them at new slugs.
+
+## Files created this session
+
+### `spokes/` (16 files — 4 spokes × 4 files each)
+
+- `ac-wont-turn-on/`
+  - `elementor-html-widget-1.html` — H1, Quick Answer, 7-step diagnostic, when-to-call rules, safety note, qualitative repair scope, Lowcountry framing
+  - `elementor-html-widget-2.html` — hub-link block, 3 sibling cards, 6-FAQ, JSON-LD (Article + HowTo + FAQPage + BreadcrumbList)
+  - `removed-claims.md` — 27 unsourceable specifics dropped
+  - `self-audit.md` — full SOP audit
+- `ac-frozen-evaporator-coil/` — same 4-file structure
+- `ac-leaking-water-inside/` — same 4-file structure (only spoke with prior comprehensive live content; smallest delta)
+- `ac-short-cycling/` — same 4-file structure (transactional intent, heaviest CTA emphasis)
+
+### `audits/` (1 script + 6 snapshots)
+
+- `_fetch-live-spokes.mjs` — Firecrawl scraper, patterned on Phase 1's `_fetch-hubs.mjs`
+- `live-spoke-snapshots/ac-not-cooling-fetched-2026-05-11.md` (4,222 words — reference pattern)
+- `live-spoke-snapshots/ac-blowing-warm-air-fetched-2026-05-11.md` (1,449 words — flagged as also-thin, vs the original assumption it was a comprehensive published reference)
+- `live-spoke-snapshots/ac-wont-turn-on-fetched-2026-05-11.md` (1,443 words — legacy stub)
+- `live-spoke-snapshots/ac-frozen-evaporator-coil-fetched-2026-05-11.md` (1,419 words — legacy stub)
+- `live-spoke-snapshots/ac-leaking-water-inside-fetched-2026-05-11.md` (3,557 words — comprehensive legacy)
+- `live-spoke-snapshots/ac-short-cycling-fetched-2026-05-11.md` (1,455 words — legacy stub)
+
+### `research/`
+
+- `intent-verification-summary.md` — appended a batch-2 addendum documenting the DataForSEO credential gap and the intent-by-proxy reasoning used to proceed without paid verification.
+
+## Page-type SOP choice (all four spokes)
+
+**Blog Article SOP v1.1** as primary, **Citation Discipline SOP v1.0** cross-cutting. Rationale: informational intent per cluster strategy + Phase 1 SERP intent verification + the live posts already classify as blog articles. Spoke 4 layered the Service Page SOP §5.1 CTA cadence rule on top (transactional intent demands ≥5 CTA placements).
+
+Service Page SOP was rejected as primary — the spokes are not commercial pages.
+Signal Article SOP v2.0 was rejected — ROI.LIVE-specific (Bebas Neue typography, Jason Spencer expert entity, ROI.LIVE brand density rules); none of it inherits to a Coastal Carolina Comfort blog post.
+
+## API spend this session
+
+| Call | Endpoint | Volume | Cost |
+|---|---|---|---|
+| Firecrawl `/v2/scrape` | n/a | 6 page calls | ~6 credits, free tier |
+| DataForSEO SERP advanced (spokes 3+4) | n/a | not executed — credential gap | **$0.00** |
+
+**Total paid spend: $0.00.**
+
+The Phase 1 NOTES.md projected ~$0.012 for the batch-2 SERP verification. That spend didn't happen because `DATAFORSEO_LOGIN` and `DATAFORSEO_PASSWORD` are no longer present in `.env`. Documented in the intent-verification addendum.
+
+## Consolidated removed-claims list — the polish-session roadmap
+
+Total quantified claims dropped across the four spokes: **75 unique claims** + **11 retained claims flagged for inline-citation polish** = 86 polish-session targets.
+
+### By category, across all four spokes
+
+| Category | Claims dropped | Polish source path |
+|---|---|---|
+| Cost / pricing (dollar ranges, diagnostic fees, parts cost) | 23 | Coastal flat-rate sheet + brand-matched parts catalogs |
+| Component lifespan (capacitor, contactor, pump, motor, pan service life) | 12 | Manufacturer reliability data + Coastal internal MTBF |
+| Climate / regional quantified (gallons/day, humidity, pollen days, cooling degree-days) | 18 | NOAA NCEI station data + National Allergy Bureau + psychrometric calc |
+| Industry-benchmark stats (% of calls resolving at step N, capacitor failure rates, mold onset time) | 12 | ACCA member surveys + IICRC S500 + EPA mold guidance |
+| Response time / SLA (same-day window, parts lead time, single-visit completion rate) | 7 | Coastal published SLA + Coastal CRM data |
+| Credential / authority (NATE count, years, license numbers, dealer status, EPA Section 608 count) | 17 | Coastal HR / corporate records + dealer agreements |
+
+(The 75/86 count above tracks unique claims after deduplicating overlap between spokes — e.g., "Coastal years in business" was considered in 3 spokes but is one underlying claim.)
+
+### Retained claims that need inline-citation polish (sourceable, not yet sourced)
+
+| Claim | Spoke | Polish source |
+|---|---|---|
+| Manufacturer brand-matched parts shipping lead time "24 to 48 hours" | 1 | Carrier / Trane / Lennox distributor SLAs |
+| EPA Section 608 refrigerant handling reference | 2, 4 | epa.gov |
+| R-22 phaseout for new equipment reference | 2, 4 | EPA Office of Air and Radiation publications |
+| R-410A / R-454B current-refrigerant identifiers | 2, 4 | Manufacturer documentation |
+| Outdoor temperature lockout threshold "below 60°F" for AC operation | 2 | Manufacturer service manual citation |
+| Bleach vs vinegar in septic-system drain lines | 1, 3 | EPA / local health department septic guidance |
+| Lowcountry pollen season timing (late Feb–May + fall) | 2, 3 | National Allergy Bureau / SCDNR |
+| Mold onset 24-hour threshold | 3 | IICRC S500 or EPA mold guidance |
+| Healthy cycle length "15 to 20 minutes" | 4 | ACCA Manual S / RSES technical guidance |
+| Short-cycle threshold "5 to 10 minutes" | 4 | Same source path |
+| Manual J as ACCA-standard load calculation method | 4 | ACCA Manual J reference |
+
+## Process gaps surfaced this session
+
+1. **DataForSEO credentials missing from `.env`.** Phase 1 ran with them; they were removed between Phase 1 (2026-04-30) and this session (2026-05-11). Restore credentials before the polish session or before any future cluster work. Cost to restore: trivial. Cost of not having them: forced intent-by-proxy reasoning that's defensible but less rigorous than verified SERP data.
+
+2. **Cluster strategy doc dated 2026-04-30 treats all four batch-2 spokes as net-new builds.** They've been live on coastalcarolinahvac.com since at least 2026-03-17 (per the AC Leaking Water Inside legacy publish date). Provenance unclear — pre-ROI.LIVE legacy content vs. an unrecorded earlier ROI.LIVE session that shipped them. **Action item: Jordan to clarify with Mike whether these are legacy content (replace freely) or earlier-ROI.LIVE-era work (preserve where appropriate).** This session proceeded on the assumption that the 3 stub spokes are legacy and that AC Leaking Water Inside is recent comprehensive work worth preserving as much as possible.
+
+3. **NAP inconsistency across coastalcarolinahvac.com is unresolved.** Five different phone numbers in the wild (Summerville hub visible 252-0880, Charleston hub visible 256-6257, legacy spokes visible 256-6476, session-spec tel: 708-8735, session-spec schema 238-3838). This session's spokes use the session-spec values consistently within the deliverables, but the site-wide NAP cleanup remains a pre-publish blocker. Phase 1 hub gap report called this out. **Action item: resolve before any spoke ships.**
+
+4. **Author E-E-A-T gap.** Existing pages credit `Person: Derrick Hall → /author/revgrowth/` (CMS admin tag, not a real bio page). Phase 1 hub audit flagged this. No real credentialed-bio page exists for any Coastal technician. This session's spokes use Organization-as-author in schema and `[AUTHOR — Coastal Carolina Comfort technician, credentials TBD]` placeholder in visible byline. **Action item: polish session builds named-technician bio page(s), upgrades author schema to Person with @id referencing the new bio page URL.**
+
+5. **`llms.txt` status for coastalcarolinahvac.com is unverified.** Blog Article SOP §11.4 requires every published article to be added to the client's `llms.txt`. Phase 1 NOTES.md flagged this; not verified this session. **Action item: pull `https://coastalcarolinahvac.com/llms.txt` pre-publish and confirm the four batch-2 spokes get added.**
+
+## Open questions
+
+1. **Phone number canonicalization.** Which of the 5 in-wild phone numbers is canonical for tel: links? For schema? Should they match site-wide, or is call-tracking variance intentional and documented somewhere?
+2. **Bundle delivery decision.** Paste-over in place (overwrite the existing posts at the live URLs) vs. unpublish-then-publish? The deliverable HTML is structured for paste-over; Mike's WordPress workflow determines the actual sequence.
+3. **AC Blowing Warm Air status.** Found also-thin (1,449 words, 1 H2) — same shell-stub profile as the four target spokes. Was Phase 1's identification of it as one of the "two published comprehensive reference spokes" based on a different version, or has it been thinned since? Worth a follow-up audit.
+4. **AC Not Cooling as reference.** Confirmed comprehensive (4,222 words, 13 H2s, 10 H3s, 6 schema blocks). Served as the structural template for the four batch-2 deliverables.
