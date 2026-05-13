@@ -72,7 +72,13 @@ No `STATUS.md` or `clients/README.md` exists in the repo. The Claude.ai project 
 
 **Action:** Out of scope for GLC onboarding. Flagged for next agency-infrastructure session.
 
-### A2. Scaffold contamination across other clients
+### A2. Scaffold contamination across other clients ✅ RESOLVED
+
+**Resolved via `chore/scaffold-template-cleanup` (2026-05-13).** Root-as-seed antipattern eliminated; `templates/client-learnings.md` is now the canonical source; six client folders rebuilt (5 untouched-scaffold wipes — eastside-microblading, rage-create, tailgate-fix, thp-homes, training — plus coastal-air-plus, gh-yellow-jacket-oil, and french-broad-chocolates). GLC and roi-live left alone as already-clean. alvara and blue-tree already-clean (hand-rebuilt). the-rfp-success-company excluded from scope — mid-migration on a separate workstream. Process learning: scaffold templates must live in a dedicated `templates/` folder, never in active working files at the root.
+
+---
+
+**Original item (pre-resolution):**
 
 Discovered during this onboarding: `clients/green-llama-clean/context/learnings.md` contained ROI.LIVE-flavored learnings before this session replaced them. Likely contamination from the `add-client.sh` scaffold step.
 

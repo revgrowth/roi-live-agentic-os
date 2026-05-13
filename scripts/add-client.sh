@@ -239,23 +239,24 @@ echo "  Created client AGENTS.md"
 create_client_claude_wrapper "${CLIENT_DIR}/CLAUDE.md"
 echo "  Created client CLAUDE.md wrapper"
 
-# Seed learnings from root (so clients start with accumulated knowledge)
-if [[ -f "${PROJECT_DIR}/context/learnings.md" ]]; then
-  cp "${PROJECT_DIR}/context/learnings.md" "${CLIENT_DIR}/context/learnings.md"
-  echo "  Seeded learnings.md from root (will diverge per-client from here)"
+# Seed learnings.md from the canonical client template.
+# Never copy from root/context/learnings.md — that file accumulates root-level
+# and cross-client entries that would contaminate the new client folder.
+if [[ -f "${PROJECT_DIR}/templates/client-learnings.md" ]]; then
+  cp "${PROJECT_DIR}/templates/client-learnings.md" "${CLIENT_DIR}/context/learnings.md"
+  echo "  Seeded learnings.md from templates/client-learnings.md"
 else
   cat > "${CLIENT_DIR}/context/learnings.md" <<LEARNINGS
-# Learnings
+# Learnings Journal
 
-## General
+# General
+## What works well
 
-### What works well
+## What doesn't work well
 
-### What doesn't work well
-
-## Individual Skills
+# Individual Skills
 LEARNINGS
-  echo "  Created learnings.md"
+  echo "  Created minimal learnings.md (templates/client-learnings.md missing)"
 fi
 
 # Create .gitkeep files to preserve empty directories

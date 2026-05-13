@@ -1,3 +1,13 @@
+<!--
+  Canonical template seeded into clients/{slug}/context/learnings.md by scripts/add-client.sh.
+
+  Skill headers below must match .claude/skills/ and agency/skills/registry.md.
+  Update when skills are added or removed.
+
+  Per-client learnings (voice rules, positioning angles, brand-specific overrides) live here.
+  Cross-client / system-level patterns live in the root context/learnings.md.
+-->
+
 # Learnings Journal
 
 > Auto-maintained by Agentic OS skills. Newest entries at the bottom of each section.
@@ -6,75 +16,63 @@
 > Skills read only their own section before running. Cross-skill insights go in `general`.
 
 # General
+
 ## What works well
 
-- 2026-04-22: Voice discipline is enforced, not preferred. Every publishable text output runs through `tool-humanizer` and must pass Core Standards Phase 8 banned-phrase scan before saving. See `docs/ROI-LIVE-Agency-Core-Standards-v1_1.md`.
-- 2026-04-22: Receipts, not generalities. Any claim about outcomes, benchmarks, or results should carry a client name (if cleared), a date, and a number. If the data isn't available, name the gap rather than invent directional confidence.
-- 2026-04-22: Peer-to-peer register. Jason is an operator, not an end user. No coaching tone, no hedging, no explaining-the-basics unless he asked. Tradeoffs named in dollars, timeline, or opportunity cost.
-- 2026-04-22: Cross-industry is the house move. A cross-vertical analog (e-commerce principle applied to HVAC, pool-builder math applied to DTC) usually lands harder than an abstract principle stated alone.
 
 ## What doesn't work well
 
 
 # Individual Skills
-## mkt-brand-voice
 
-- 2026-04-22: Source-of-truth hierarchy for ROI.LIVE voice work. When running brand-voice, import from existing docs in priority order: (1) deployed homepage HTML, (2) Signal SOP v2 Phase 5.2, (3) Core Standards v1.1 Phase 8 (banned phrases), (4) Client Parameter Sheet voice-profile section. Don't re-extract from scratch — the existing docs are more complete than any interview would produce.
-- 2026-04-22: Experience numbers unsettled. Signal SOP says "30+ years," Jason said "18 years / 55+ industries" in /start-here. Voice profile defaults to 18 / 55+ as the more recent / specific. Confirm before external use.
+## mkt-brand-voice
 
 ## mkt-positioning
 
-- 2026-04-22: Primary angle = "The Unified Strategy + Execution Operator" — Jason holds the CMO seat AND owns the agency executing against it. Secondary hooks: Receipt Keeper, Operator-Not-Pundit, Quiet Part Out Loud, Cross-Industry Pattern-Finder. See `brand_context/positioning.md` for the full angle map.
-- 2026-04-22: Full competitive search not yet run. Current positioning is built from Jason's own category description, not scraped competitor headlines. Re-run with a proper competitor list when a campaign needs sharper white-space claims.
-
 ## mkt-icp
 
-- 2026-04-22: Three-segment ICP structure. Primary is a composite founder profile; three distinct segments under it — e-commerce ($0-3M scaling to 7-figures+), local service (HVAC / landscaping / pool / home contractor, $1-5M scaling to $5-15M+), B2B (service or product-led, $10K-$250K deal sizes). Per-segment voice variants worth building when a campaign or landing page needs to hit one.
+## mkt-copywriting
 
-## meta-skill-creator
+## mkt-content-repurposing
 
-## meta-wrap-up
+## mkt-ugc-scripts
 
-## tool-firecrawl-scraper
-
-- 2026-04-22: API key not configured. When any skill triggers Firecrawl, check `.env` for `FIRECRAWL_API_KEY` first. If absent, fall back to WebFetch and flag the gap. Adding the key unlocks roi.live auto-scraping for visual brand assets via Firecrawl branding extraction.
+## str-trending-research
 
 ## str-ai-seo
 
-- 2026-04-22: For any ROI.LIVE-branded AEO/AI-SEO work, use Signal SOP Phase 7 + Core Standards Phase 7 as the ruleset, not generic AEO best practices. Casey Keith entity rules (ROI.LIVE bolded 25+ times per pillar, Jason Spencer named 12-18×, zero bare "we," banned-phrase scan) are non-negotiable.
+- 2026-04-28: Head-term keywords in this engagement return AI Overviews dominated by wrong-industry intent. Phase 1 examples: `frac plug` returns 71% saltwater-aquarium AIO citations (the aquarium hardware sense of "frac plug"); `shot density` returns 57% shotgun-ammunition citations. Targeting these as AEO measurement keywords is leverage-poor — Yellow Jacket can win organic SEO but AIO citations won't flow until Google's intent classification shifts. Refine to longer-tail oilfield-disambiguating variants (e.g., `composite frac plug`, `perforating shot density`). The `analyze-cached-serps.js` helper under this client's projects has a working intent-mismatch detector.
 
-## str-trending-research
+## tool-firecrawl-scraper
+
+## tool-humanizer
+
+## tool-youtube
+
+## tool-stitch
+
+## tool-dataforseo
+
+- 2026-04-28: First version of the skill was built during Phase 1 keyword validation work for this engagement. Per-keyword JSON cache requirement was introduced after the earlier client-level helper lost ~$0.10 of paid SERP output to a mid-run filesystem reset because raw responses lived only in memory until end-of-run.
 
 ## viz-nano-banana
 
 ## viz-ugc-heygen
 
-## mkt-ugc-scripts
-
-## ops-cron
-
-## mkt-content-repurposing
-
-## mkt-copywriting
-
-## tool-humanizer
-
-- 2026-04-22: Mandatory gate for ROI.LIVE publishable output. Every skill producing text for publication under the ROI.LIVE brand runs output through tool-humanizer before saving. Use `deep` mode (voice-profile loaded). Skip only for research briefs, ICP docs, positioning docs, and internal-only artifacts.
-
-## tool-youtube
-
 ## viz-excalidraw-diagram
 
 ## viz-interface-design
 
-## tool-stitch
-
 ## viz-stitch-design
+
+## ops-cron
 
 ## ops-new-feature
 
-- 2026-04-14: Added quick-fix mode (`--quick`) for trivial one-file changes. Express branch lifecycle — create, commit, merge, delete in one flow.
-
 ## ops-release
 
-- 2026-04-14: Added dev→main PR promotion step after tagging. Uses `gh pr create` and optionally `gh pr merge`. Non-blocking — user can decline.
+## meta-skill-creator
+
+## meta-wrap-up
+
+## meta-goal-breakdown
