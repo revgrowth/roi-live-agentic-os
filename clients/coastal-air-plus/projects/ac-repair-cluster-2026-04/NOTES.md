@@ -222,3 +222,121 @@ Total quantified claims dropped across the four spokes: **75 unique claims** + *
 2. **Bundle delivery decision.** Paste-over in place (overwrite the existing posts at the live URLs) vs. unpublish-then-publish? The deliverable HTML is structured for paste-over; Mike's WordPress workflow determines the actual sequence.
 3. **AC Blowing Warm Air status.** Found also-thin (1,449 words, 1 H2) — same shell-stub profile as the four target spokes. Was Phase 1's identification of it as one of the "two published comprehensive reference spokes" based on a different version, or has it been thinned since? Worth a follow-up audit.
 4. **AC Not Cooling as reference.** Confirmed comprehensive (4,222 words, 13 H2s, 10 H3s, 6 schema blocks). Served as the structural template for the four batch-2 deliverables.
+
+---
+
+# Symptom spokes batch 3 final (2 spokes) — 2026-05-12
+
+**Session date:** 2026-05-12
+**Operator:** Jordan
+**Branch:** `jordan/coastal-air-plus/spokes-batch-3-symptom-final-2026-04`
+**Mode:** Path 1 audit-and-fix for spoke 1; draft fresh for spoke 2.
+
+## Session goal
+
+Draft the final 2 symptom spokes (AC making strange noises + AC running but no air from vents) to complete the 8-spoke symptom cohort defined in the cluster strategy. Apply the same zero-fabrication / zero-flags rule from batch 2.
+
+## Canonical phrasing decisions and rationale
+
+| Target spoke | Canonical slug | Source of decision |
+|---|---|---|
+| AC making strange noises | `/blog/ac-making-noise/` (legacy URL preserved) | Live stub already exists; proxy reasoning replaces paid `keyword_suggestions` (DataForSEO credential gap, same as batch 2). |
+| AC running but no air from vents | `/blog/ac-not-blowing-air/` (new slug) | No live post at any candidate slug (`/ac-not-blowing-air/`, `/no-air-from-vents/` both 404). `ac-not-blowing-air` chosen for keyword-first slug clarity. Distinct symptom from `/blog/ac-running-not-cooling/` which covers the warm-air overlap. |
+
+## Live post audit outcomes per spoke
+
+| Spoke | Live state | Path |
+|---|---|---|
+| ac-making-noise | 1,437-word legacy shell (image-alt-text H1, broken canonical `/ac-making-noise/ac-making-noise/`, BlogPosting + Trustindex Organization schema only — same profile as batch-2 ac-wont-turn-on / ac-frozen / ac-short-cycling) | **Path 1 audit-and-fix** (full replacement at existing slug) |
+| ac-not-blowing-air | 404 — does not exist | **Draft fresh** |
+
+## Files created this session
+
+### `spokes/` (6 files — 2 spokes × 3 files each)
+
+- `ac-making-noise/`
+  - `elementor-html-widget-1.html` — H1, Quick Answer, sound-by-sound diagnostic (9 sounds: grinding, buzzing, hissing, banging, squealing, screaming, clicking, rattling, whistling), safety blocks, qualitative repair scope, Lowcountry framing.
+  - `elementor-html-widget-2.html` — hub links, 3 sibling spokes (ac-wont-turn-on, ac-short-cycling, ac-frozen-evaporator-coil), 6-FAQ, JSON-LD (Article + FAQPage + BreadcrumbList — no HowTo, taxonomy not procedure).
+  - `self-audit.md` — 24 removed claims + 5 retained-but-flagged.
+- `ac-not-blowing-air/`
+  - `elementor-html-widget-1.html` — H1, Quick Answer, distinction paragraph (vs `/ac-running-not-cooling/`), 7-step linear diagnostic (thermostat fan → filter → frozen coil → registers → blower motor → ducts → stop+call), safety block, qualitative repair scope, Lowcountry framing.
+  - `elementor-html-widget-2.html` — hub links, 3 sibling spokes (ac-frozen-evaporator-coil, ac-making-noise, ac-wont-turn-on), 6-FAQ, JSON-LD (Article + **HowTo** + FAQPage + BreadcrumbList — HowTo included, procedural diagnostic).
+  - `self-audit.md` — 19 removed claims + 3 retained-but-flagged.
+
+### `audits/`
+
+- `_fetch-live-spokes-batch3.mjs` — Firecrawl scraper for the 2 candidate URLs (patterned on batch-2's _fetch-live-spokes.mjs).
+- `live-spoke-snapshots/ac-making-noise-fetched-2026-05-12.md` (1,437-word legacy stub)
+- `live-spoke-snapshots/ac-running-not-cooling-fetched-2026-05-12.md` (3,710-word comprehensive — NOT the targeted symptom; captured for reference only since the slug came up during canonical-phrasing investigation)
+
+## Page-type SOP choice (both spokes)
+
+**Blog Article SOP v1.1** primary, **Citation Discipline SOP v1.0** cross-cutting. Same rationale as batch 2.
+
+## API spend this session
+
+| Call | Endpoint | Volume | Cost |
+|---|---|---|---|
+| Firecrawl `/v2/scrape` | n/a | 2 page calls | ~2 credits, free tier |
+| DataForSEO `keyword_suggestions/live` (Pass A) | n/a | not executed — credential gap (Path B) | **$0.00** |
+| DataForSEO `serp/google/organic/live/advanced` (Pass B) | n/a | not executed — credential gap (Path B) | **$0.00** |
+
+**Total paid spend: $0.00.** Same DataForSEO credential gap as batch 2 — `DATAFORSEO_LOGIN` and `DATAFORSEO_PASSWORD` still not loaded in `.env`. Intent verification proceeded by proxy (live-post existence for spoke 1; clear unambiguous keyword for spoke 2).
+
+## Consolidated removed-claims list across both spokes
+
+Total: **43 unique claims removed** + **8 retained claims flagged for inline-citation polish** = 51 polish-session targets for batch 3.
+
+| Category | Spoke 1 (noises) | Spoke 2 (no airflow) | Total |
+|---|---|---|---|
+| Cost / pricing | 7 | 6 | 13 |
+| Component lifespan | 4 | 3 | 7 |
+| Climate / regional quantified | 3 | 3 | 6 |
+| Industry-benchmark stats | 3 | 3 | 6 |
+| Response time / SLA | 2 | 3 | 5 |
+| Credential / authority | 5 | 3 | 8 |
+
+Retained-but-flagged (sourceable, need inline citation hooks in polish):
+- EPA Section 608 refrigerant handling (both spokes reference it)
+- R-22 phaseout reference (spoke 1)
+- R-410A / R-454B current-refrigerant identifiers (spoke 1)
+- ECM vs PSC blower motor categorization (both spokes)
+- Lowcountry pollen season timing (both spokes — National Allergy Bureau / SCDNR)
+- Healthy static pressure range (spoke 2 — ACCA Manual D)
+- Older single-stage vs newer variable-speed dB ratings (spoke 1 — manufacturer documentation)
+
+## Symptom-spoke cohort status: COMPLETE
+
+8 of 8 symptom spokes drafted/refreshed across the cluster:
+
+| # | Spoke | Slug | First shipped |
+|---|---|---|---|
+| 1 | AC not cooling | `/blog/ac-not-cooling/` | Pre-ROI.LIVE-era (live since at least March 2026; comprehensive 4,222 words, structural reference for the cluster) |
+| 2 | AC blowing warm air | `/blog/ac-blowing-warm-air/` | Pre-ROI.LIVE-era (live, but thin — flagged for polish-session refresh) |
+| 3 | AC won't turn on | `/blog/ac-wont-turn-on/` | Batch 2 (PR #14, merged 2026-05-11) |
+| 4 | AC frozen evaporator coil | `/blog/ac-frozen-evaporator-coil/` | Batch 2 |
+| 5 | AC leaking water inside | `/blog/ac-leaking-water-inside/` | Batch 2 |
+| 6 | AC short cycling | `/blog/ac-short-cycling/` | Batch 2 |
+| 7 | AC making strange noises | `/blog/ac-making-noise/` | Batch 3 (this session) |
+| 8 | AC not blowing air | `/blog/ac-not-blowing-air/` | Batch 3 (this session) |
+
+Next cluster categories per the strategy doc:
+- Component spokes (capacitor, compressor, refrigerant leak, condenser fan, evaporator coil cleaning vs replacement, thermostat, blower motor) — 7 spokes
+- Decision / cost spokes — 6 spokes
+- Brand spokes (Trane, Carrier, Goodman, Lennox, Rheem, York) — 6 spokes
+- Process / urgency spokes — 3 spokes
+- Neighborhood spokes (Summerville 7, Charleston 6) — 13 spokes
+
+## Open questions (carry-forward from batch 2)
+
+1. **DataForSEO credentials** still not in `.env`. The polish session and any future paid SERP work needs these restored. Two batches now have run with paid passes skipped — the cost of restoring is trivial; the cost of continued reliance on proxy reasoning compounds.
+2. **NAP cleanup** unresolved (5 phones in the wild). Pre-publish blocker for all spokes; batch 2's spokes shipped without it being resolved at the site level — Mike may have a call-tracking variance explanation.
+3. **Author bio page** still doesn't exist for any Coastal technician. Schema author resolves to `Organization: Coastal Carolina Comfort` across all 6 ROI.LIVE-era spokes. Polish-session item.
+4. **`llms.txt` status** unverified for the now-8 ROI.LIVE-era symptom spokes. Should be a single post-merge audit.
+5. **AC Blowing Warm Air thin-state.** Phase 1 listed it as one of the "two published comprehensive reference spokes" but the live page is 1,449 words / 1 H2 / image-alt-text H1 — same shell profile as the batch-2 stubs were. Worth a polish-session refresh on the same pattern.
+6. **Live `/blog/ac-running-not-cooling/` (3,710 words, post-batch-2 publish)** appeared in this session's blog-index check. Mike or someone shipped it independently. Coverage overlaps with `/blog/ac-blowing-warm-air/`. Cannibalization risk if both remain live targeting similar warm-air intent — Phase 1 hub gap report flagged 5+ ranking URLs already in the cannibalization set. Action item: clarify which version of the warm-air symptom is canonical and consolidate / 301 the other.
+
+## Process gaps surfaced this session
+
+1. **Cluster strategy doc continues to under-track which spokes already exist live.** Phase 1 doc treated batch-2 spokes as net-new builds (they were live legacy stubs). This batch's targeted "ac running but no air from vents" wasn't listed against the already-live `/blog/ac-running-not-cooling/` post that covers an adjacent but distinct symptom. **Action item:** before the component spoke batch starts, run a one-pass blog-index audit to map every live post to its cluster slot, so subsequent sessions don't keep rediscovering the same gap.
+2. **`spokes/ac-not-cooling/` doesn't exist in repo** — only as a Firecrawl snapshot from batch 2. The cluster strategy and session prompts both reference it as a "published spoke folder" for read-only reference, but it never got committed as in-repo project files. The structural reference still works via the snapshot, but if future sessions want it as a project-folder reference (e.g., for delta audits), it should be created.
