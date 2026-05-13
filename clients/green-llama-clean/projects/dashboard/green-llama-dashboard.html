@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Green Llama Clean · April 2026 Final Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --forest:#163825;--deep:#1F4D34;--sage:#3A7454;--moss:#5A9B6E;
+  --lime:#8DC63F;--lightlime:#C5E1A5;--cream:#F4EFE4;--warm:#FAFAF5;
+  --gold:#C9A34A;--violet:#6B4ECC;--muted:#6B7280;--border:#E5E0D8;
+  --text:#1A1A1A;--red:#E53935;--orange:#F57C00;
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh}
+
+.header{background:linear-gradient(145deg,var(--forest) 0%,var(--deep) 55%,var(--sage) 100%);padding:24px 36px 0;position:relative;overflow:hidden}
+.header-blob{position:absolute;top:-60px;right:-80px;width:340px;height:340px;border-radius:60% 40% 50% 70%/50% 60% 40% 50%;background:rgba(141,198,63,.10);pointer-events:none}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:38px;border-radius:8px;background:rgba(255,255,255,.12);padding:4px 8px;object-fit:contain}
+.brand-name{font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:#fff;line-height:1}
+.brand-sub{font-size:10px;color:var(--lightlime);margin-top:3px;letter-spacing:.10em;text-transform:uppercase}
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(141,198,63,.25);border:1px solid rgba(141,198,63,.4);border-radius:20px;padding:3px 10px;font-size:10px;color:var(--lightlime);font-weight:600;letter-spacing:.06em;margin-top:6px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--lime);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.8)}}
+
+.header-right{text-align:right}
+.header-total-label{font-size:9px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em}
+.header-total-val{font-family:'Fraunces',serif;font-size:38px;font-weight:700;color:var(--lightlime);line-height:1.05}
+.header-total-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px}
+
+.kpi-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:20px}
+.kpi-tile{background:rgba(255,255,255,.10);backdrop-filter:blur(10px);border-radius:12px;padding:12px 14px;border:1px solid rgba(255,255,255,.15)}
+.kpi-tile.accent{background:rgba(141,198,63,.18);border-color:rgba(141,198,63,.35)}
+.kpi-label{font-size:9px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.kpi-val{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:#fff}
+.kpi-sub{font-size:9px;color:var(--lightlime);margin-top:2px;font-weight:600}
+
+.tab-nav{display:flex;gap:3px}
+.tab-btn{padding:9px 18px;font-size:11px;font-weight:600;text-transform:capitalize;letter-spacing:.04em;background:transparent;color:rgba(255,255,255,.65);border:none;border-radius:10px 10px 0 0;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s}
+.tab-btn.active{background:var(--cream);color:var(--forest)}
+.tab-btn:hover:not(.active){color:#fff}
+
+.content{padding:28px 36px 48px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.st{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--forest);line-height:1.2}
+.ss{font-size:11px;color:var(--muted);margin:3px 0 16px}
+
+.card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 2px 18px rgba(22,56,37,.06)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.mb20{margin-bottom:20px}
+.chart-wrap{position:relative}
+
+/* KPI pills */
+.kpill{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 1px 10px rgba(22,56,37,.07);border-top:3px solid var(--lime)}
+.kpill-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.kpill-val{font-family:'Fraunces',serif;font-size:24px;font-weight:700;color:var(--forest);line-height:1}
+.kpill-trend{font-size:10px;font-weight:600;margin-top:4px;color:var(--lime)}
+
+/* Projection bar */
+.proj-container{margin-bottom:20px}
+.proj-row{margin-bottom:16px}
+.proj-label-row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin-bottom:6px}
+.proj-metric{font-weight:700;color:var(--forest)}
+.proj-values{display:flex;gap:12px;align-items:center;font-size:11px;color:var(--muted)}
+.proj-bar-track{background:#EEE9DE;border-radius:99px;height:12px;overflow:visible;position:relative}
+.proj-bar-actual{height:100%;border-radius:99px 0 0 99px;background:var(--lime);position:absolute;top:0;left:0;transition:width .8s ease}
+.proj-bar-proj{height:100%;border-radius:0 99px 99px 0;background:rgba(141,198,63,.35);position:absolute;top:0}
+.proj-bar-line{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--forest);border-radius:1px}
+
+/* Channel bar */
+.chan-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12px}
+.chan-label{width:110px;color:var(--muted);flex-shrink:0}
+.chan-track{flex:1;background:#EEE9DE;border-radius:99px;height:7px;overflow:hidden}
+.chan-bar{height:100%;border-radius:99px}
+.chan-val{width:60px;text-align:right;font-weight:700;color:var(--forest);font-size:11px}
+.chan-pct{width:38px;text-align:right;font-size:10px;color:var(--muted)}
+
+/* Progress */
+.prog-row{margin-bottom:12px}
+.prog-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.prog-labels span:last-child{font-weight:700;color:var(--forest)}
+.prog-track{background:#EEE9DE;border-radius:99px;height:6px;overflow:hidden}
+.prog-bar{height:100%;border-radius:99px}
+
+/* Rank pills */
+.rank-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.rank-card{background:var(--cream);border-radius:12px;padding:16px;text-align:center}
+.rank-num{font-family:'Fraunces',serif;font-size:42px;font-weight:700;line-height:1}
+.rank-label{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* Metric row */
+.metric-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.metric-row:last-child{border:none}
+.metric-name{color:var(--muted)}
+.metric-val{font-weight:700;color:var(--forest);font-family:'Fraunces',serif;font-size:14px}
+
+/* Klaviyo email rows */
+.email-row{background:var(--cream);border-radius:10px;padding:12px 16px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto auto auto auto;gap:16px;align-items:center;font-size:11px}
+.email-name{font-weight:600;color:var(--forest)}
+.email-stat{text-align:center}
+.email-stat-val{font-weight:700;color:var(--forest);font-size:13px;display:block}
+.email-stat-label{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.06em}
+
+/* Segment pills */
+.seg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.seg-pill{background:var(--cream);border-radius:10px;padding:12px;text-align:center;border-left:3px solid var(--lime)}
+.seg-val{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--forest)}
+.seg-name{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* Projection callout */
+.proj-callout{background:linear-gradient(135deg,var(--forest),var(--deep));border-radius:16px;padding:20px 24px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden}
+.proj-callout::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(141,198,63,.15)}
+.proj-headline{font-family:'Fraunces',serif;font-size:13px;color:var(--lightlime);margin-bottom:4px;font-weight:400;text-transform:uppercase;letter-spacing:.08em}
+.proj-big{font-family:'Fraunces',serif;font-size:52px;font-weight:700;color:#fff;line-height:1}
+.proj-note{font-size:11px;color:rgba(255,255,255,.55);margin-top:4px}
+.proj-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.15)}
+.proj-stat-val{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:#fff}
+.proj-stat-label{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.proj-stat-yoy{font-size:11px;color:var(--lightlime);font-weight:600}
+
+/* Good/Fair/Poor tags */
+.tag{display:inline-block;padding:2px 7px;border-radius:99px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.tag-good{background:rgba(141,198,63,.15);color:var(--sage)}
+.tag-fair{background:rgba(201,163,74,.15);color:var(--gold)}
+.tag-poor{background:rgba(229,57,53,.1);color:var(--red)}
+.tag-exc{background:rgba(90,155,110,.15);color:var(--moss)}
+
+.footer{background:var(--forest);color:rgba(255,255,255,.4);text-align:center;font-size:10px;padding:14px 36px;letter-spacing:.05em}
+
+/* Query table */
+.q-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:11px}
+.q-row:last-child{border:none}
+.q-pos{width:28px;text-align:center;font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--lime);flex-shrink:0}
+.q-term{flex:1;color:var(--forest);font-weight:500}
+.q-vol{width:60px;text-align:right;color:var(--muted)}
+.q-clicks{width:50px;text-align:right;font-weight:700;color:var(--forest)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-blob"></div>
+  <div class="header-top">
+    <div>
+      <div class="brand">
+        <img src="https://greenllamaclean.com/cdn/shop/files/Green_Llama_Logo_green_rectangle_standard_branding.png?v=1747347353&width=250" alt="Green Llama Clean" onerror="this.style.display='none'"/>
+        <div>
+          <div class="brand-name">Green Llama Clean</div>
+          <div class="brand-sub">Marketing Performance Dashboard</div>
+          <div class="live-badge"><span class="live-dot"></span> Last updated: April 30, 2026 · Month-End Final</div>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div style="display:flex;gap:28px;align-items:flex-end">
+        <div>
+          <div class="header-total-label">2025 Shopify Revenue</div>
+          <div class="header-total-val" style="font-size:32px;color:rgba(255,255,255,.65)">$82,107</div>
+          <div class="header-total-sub">+151.9% YoY</div>
+        </div>
+        <div style="border-left:1px solid rgba(255,255,255,.15);padding-left:28px">
+          <div class="header-total-label">2026 Projected Full Year</div>
+          <div class="header-total-val">~$149,488</div>
+          <div class="header-total-sub">+82% vs 2025 · $12,457/mo YTD pace × 12 · Powered by ROI Live</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-strip">
+    <div class="kpi-tile accent">
+      <div class="kpi-label">April Revenue (Final)</div>
+      <div class="kpi-val">$13,654</div>
+      <div class="kpi-sub">vs $5,965 Apr '25 · +128.9% YoY</div>
+    </div>
+    <div class="kpi-tile accent">
+      <div class="kpi-label">April Orders (Final)</div>
+      <div class="kpi-val">364</div>
+      <div class="kpi-sub">vs 167 Apr '25 · +118.0% YoY</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">YTD Revenue (Jan 1–Apr 30)</div>
+      <div class="kpi-val">$49,829</div>
+      <div class="kpi-sub">vs $22,521 · +121.3% YoY</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">April Klaviyo (Final)</div>
+      <div class="kpi-val">$6,150</div>
+      <div class="kpi-sub">45.0% of revenue · 71/29 camp/flow</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">Organic Search (Apr)</div>
+      <div class="kpi-val">33.8%</div>
+      <div class="kpi-sub">3,744 sessions · +29.6% YoY · $2,160 rev (-23.8% YoY)</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">Keywords at #1</div>
+      <div class="kpi-val">32</div>
+      <div class="kpi-sub">87 in top 10 of 265 · -16 MoM, declined April</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">Active Subscriptions</div>
+      <div class="kpi-val">138</div>
+      <div class="kpi-sub">+10.7% active growth · 7.7% active churn · 42 paused</div>
+    </div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('april','april')">🟢 April Final</button>
+    <button class="tab-btn" onclick="showTab('overview','overview')">Overview</button>
+    <button class="tab-btn" onclick="showTab('seo','seo')">SEO</button>
+    <button class="tab-btn" onclick="showTab('email','email')">Email & SMS</button>
+    <button class="tab-btn" onclick="showTab('orders','orders')">Orders</button>
+    <button class="tab-btn" onclick="showTab('strategy','strategy')" style="background:rgba(201,163,74,.2);color:#F9E4A0;border:1px solid rgba(201,163,74,.35);border-radius:10px 10px 0 0">⚡ $30K Strategy</button>
+    <button class="tab-btn" onclick="showTab('benchmarks','benchmarks')">📊 Benchmarks</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ══ APRIL FINAL ══ -->
+<div class="tab-panel active" id="tab-april">
+
+  <div class="proj-callout">
+    <div class="proj-headline">April 2026 Final · Apr 1–30, 2026 (closed)</div>
+    <div style="display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap">
+      <div>
+        <div class="proj-big">$13,654</div>
+        <div class="proj-note">April 2026 total sales (final) · vs $5,965 Apr 2025 = +128.9% YoY</div>
+      </div>
+      <div style="margin-left:auto;text-align:right;flex-shrink:0">
+        <div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em">Gross Sales</div>
+        <div style="font-family:'Fraunces',serif;font-size:28px;color:rgba(255,255,255,.8)">$15,360</div>
+      </div>
+    </div>
+    <div class="proj-stats">
+      <div><div class="proj-stat-val">364</div><div class="proj-stat-label">Orders</div><div class="proj-stat-yoy">vs 167 Apr '25 · +118.0% YoY</div></div>
+      <div><div class="proj-stat-val">$35.90</div><div class="proj-stat-label">AOV</div><div class="proj-stat-yoy">+7.7% YoY · $33.32 Apr '25</div></div>
+      <div><div class="proj-stat-val">$6,150</div><div class="proj-stat-label">Klaviyo (Final)</div><div class="proj-stat-yoy">45.0% of rev · 71/29 camp/flow</div></div>
+      <div><div class="proj-stat-val">50.57%</div><div class="proj-stat-label">Returning Rate</div><div class="proj-stat-yoy">+7.6 pts YoY · 42.94% Apr '25</div></div>
+    </div>
+  </div>
+
+  <!-- April vs prior year comparison bars -->
+  <div class="card mb20">
+    <div class="st">April 2026 vs April 2025 — Closed Month Comparison</div>
+    <div class="ss">Independent pulls from Shopify · Apr 1–30 2026 (solid) vs Apr 1–30 2025 (marker) · YoY computed by hand per SOP §6.2</div>
+    <div id="proj-bars"></div>
+  </div>
+
+  <!-- YTD vs Prior Year -->
+  <div class="g2">
+    <div class="card">
+      <div class="st">YTD Performance (Jan 1 – Apr 30)</div>
+      <div class="ss">Year-to-date 2026 vs same period 2025</div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:0 0 6px;border-bottom:2px solid var(--border);margin-bottom:4px">
+        <span>Metric</span><span style="text-align:right">2025</span><span style="text-align:right">2026</span><span style="text-align:right">YoY</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">Total Revenue</span><span style="text-align:right;color:var(--muted)">$22,521</span><span style="text-align:right;font-weight:700;color:var(--forest)">$49,829</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+121.3%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">Gross Sales</span><span style="text-align:right;color:var(--muted)">$22,271</span><span style="text-align:right;font-weight:700;color:var(--forest)">$53,036</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+138.1%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">Orders</span><span style="text-align:right;color:var(--muted)">603</span><span style="text-align:right;font-weight:700;color:var(--forest)">1,301</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+115.8%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">Sessions (Shopify)</span><span style="text-align:right;color:var(--muted)">19,897</span><span style="text-align:right;font-weight:700;color:var(--forest)">48,881</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+145.7%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">CVR</span><span style="text-align:right;color:var(--muted)">2.16%</span><span style="text-align:right;font-weight:700;color:var(--forest)">1.71%</span><span style="text-align:right;font-weight:700;color:var(--red);font-size:10px">−20.8%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">AOV</span><span style="text-align:right;color:var(--muted)">$35.22</span><span style="text-align:right;font-weight:700;color:var(--forest)">$36.62</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+4.0%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;font-size:12px">
+        <span style="color:var(--muted)">Returning Customer Rate <span style="font-size:9px;color:var(--muted)">(order-level)</span></span><span style="text-align:right;color:var(--muted)">34.95%</span><span style="text-align:right;font-weight:700;color:var(--forest)">40.62%</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+5.67 pts</span>
+      </div>
+      <div style="margin-top:8px;font-size:9px;font-style:italic;color:var(--muted)">YoY = same period: Jan 1–Apr 30, 2026 vs Jan 1–Apr 30, 2025 (Shopify, independent pulls)</div>
+    </div>
+
+    <div class="card">
+      <div class="st">April 2026 vs April 2025 (Final)</div>
+      <div class="ss">Apr 1–30, 2026 vs Apr 1–30, 2025 · closed-month comparison</div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:0 0 6px;border-bottom:2px solid var(--border);margin-bottom:4px">
+        <span>Metric</span><span style="text-align:right">Apr '25</span><span style="text-align:right">Apr '26</span><span style="text-align:right">YoY</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">Total Revenue</span><span style="text-align:right;color:var(--muted)">$5,965</span><span style="text-align:right;font-weight:700;color:var(--forest)">$13,654</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+128.9%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">Gross Sales</span><span style="text-align:right;color:var(--muted)">$5,985</span><span style="text-align:right;font-weight:700;color:var(--forest)">$15,360</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+156.6%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">Orders</span><span style="text-align:right;color:var(--muted)">167</span><span style="text-align:right;font-weight:700;color:var(--forest)">364</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+118.0%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">Sessions (Shopify)</span><span style="text-align:right;color:var(--muted)">5,136</span><span style="text-align:right;font-weight:700;color:var(--forest)">15,227</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+196.5%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">CVR</span><span style="text-align:right;color:var(--muted)">2.31%</span><span style="text-align:right;font-weight:700;color:var(--forest)">1.58%</span><span style="text-align:right;font-weight:700;color:var(--red);font-size:10px">−31.6%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--muted)">AOV</span><span style="text-align:right;color:var(--muted)">$33.32</span><span style="text-align:right;font-weight:700;color:var(--forest)">$35.90</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+7.7%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 16px;align-items:center;padding:7px 0;font-size:12px">
+        <span style="color:var(--muted)">Returning Customer Rate <span style="font-size:9px;color:var(--muted)">(order-level)</span></span><span style="text-align:right;color:var(--muted)">42.94%</span><span style="text-align:right;font-weight:700;color:var(--forest)">50.57%</span><span style="text-align:right;font-weight:700;color:var(--lime);font-size:10px">+7.63 pts</span>
+      </div>
+      <div style="margin-top:8px;font-size:9px;font-style:italic;color:var(--muted)">YoY = same period: Apr 1–30, 2026 vs Apr 1–30, 2025 (Shopify, independent pulls per SOP §6.2)</div>
+    </div>
+  </div>
+
+  <!-- April channel breakdown -->
+  <div class="g2">
+    <div class="card">
+      <div class="st">April Traffic by Channel</div>
+      <div class="ss">Google Analytics · Apr 1–30, 2026 · 11,092 total sessions · $8,034 GA4 attributed · Paid Social bot traffic still present (⚠️ 2,248 / $0 rev)</div>
+      <div class="chan-row"><span class="chan-label">Organic Search</span><div class="chan-track"><div class="chan-bar" style="width:100%;background:var(--lime)"></div></div><span class="chan-val">3,744</span><span class="chan-pct">33.8%</span></div>
+      <div class="chan-row"><span class="chan-label">⚠️ Paid Social (bots)</span><div class="chan-track"><div class="chan-bar" style="width:60%;background:var(--red)"></div></div><span class="chan-val">2,248</span><span class="chan-pct">20.3%</span></div>
+      <div class="chan-row"><span class="chan-label">Direct</span><div class="chan-track"><div class="chan-bar" style="width:51%;background:var(--sage)"></div></div><span class="chan-val">1,906</span><span class="chan-pct">17.2%</span></div>
+      <div class="chan-row"><span class="chan-label">Unassigned</span><div class="chan-track"><div class="chan-bar" style="width:39%;background:var(--moss)"></div></div><span class="chan-val">1,453</span><span class="chan-pct">13.1%</span></div>
+      <div class="chan-row"><span class="chan-label">Cross-network</span><div class="chan-track"><div class="chan-bar" style="width:29%;background:var(--gold)"></div></div><span class="chan-val">1,102</span><span class="chan-pct">9.9%</span></div>
+      <div class="chan-row"><span class="chan-label">Email</span><div class="chan-track"><div class="chan-bar" style="width:7%;background:var(--violet)"></div></div><span class="chan-val">262</span><span class="chan-pct">2.4%</span></div>
+      <div class="chan-row"><span class="chan-label">Referral</span><div class="chan-track"><div class="chan-bar" style="width:5%;background:var(--moss)"></div></div><span class="chan-val">203</span><span class="chan-pct">1.8%</span></div>
+      <div class="chan-row"><span class="chan-label">Paid Search</span><div class="chan-track"><div class="chan-bar" style="width:3%;background:var(--gold)"></div></div><span class="chan-val">105</span><span class="chan-pct">0.9%</span></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Revenue by channel (GA4 attributed) · Total $8,034.02</div>
+        <div class="chan-row"><span class="chan-label">Cross-network</span><div class="chan-track"><div class="chan-bar" style="width:100%;background:var(--gold)"></div></div><span class="chan-val">$2,227</span><span class="chan-pct">27.7%</span></div>
+        <div class="chan-row"><span class="chan-label">Organic Search</span><div class="chan-track"><div class="chan-bar" style="width:97%;background:var(--lime)"></div></div><span class="chan-val">$2,160</span><span class="chan-pct">26.9%</span></div>
+        <div class="chan-row"><span class="chan-label">Email</span><div class="chan-track"><div class="chan-bar" style="width:79%;background:var(--violet)"></div></div><span class="chan-val">$1,770</span><span class="chan-pct">22.0%</span></div>
+        <div class="chan-row"><span class="chan-label">Direct</span><div class="chan-track"><div class="chan-bar" style="width:44%;background:var(--sage)"></div></div><span class="chan-val">$989</span><span class="chan-pct">12.3%</span></div>
+        <div class="chan-row"><span class="chan-label">Paid Search</span><div class="chan-track"><div class="chan-bar" style="width:11%;background:var(--gold)"></div></div><span class="chan-val">$247</span><span class="chan-pct">3.1%</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);font-style:italic">Note: Shopify Total Sales $13,654 is canonical for revenue. GA4 attributes $8,034 (59% of Shopify) — typical attribution gap from cookie consent / sampling. Paid Social 2,248 sessions delivered $0 — confirmed bot traffic, not real channel.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="st">April Top Products (Final)</div>
+      <div class="ss">Shopify · Apr 1–30, 2026 · sell-through rate by product</div>
+      <div class="metric-row"><span class="metric-name">Starter Home Cleaner Kit</span><span class="metric-val">100% sell-through</span></div>
+      <div class="metric-row"><span class="metric-name">Expert Home Cleaner Kit</span><span class="metric-val">100% sell-through</span></div>
+      <div class="metric-row"><span class="metric-name">Powerful Fragrance Free Laundry Det. (60 Loads)</span><span class="metric-val">96.0%</span></div>
+      <div class="metric-row"><span class="metric-name">Solid Coconut Soap Dish Bar</span><span class="metric-val">95.3%</span></div>
+      <div class="metric-row"><span class="metric-name">Fragrance-Free APC Refill</span><span class="metric-val">77.2%</span></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Sales channel split · $13,654 Final</div>
+        <div class="metric-row"><span class="metric-name">Online Store</span><span class="metric-val">~$11,200</span></div>
+        <div class="metric-row"><span class="metric-name">Seal Subscriptions</span><span class="metric-val">~$1,600</span></div>
+        <div class="metric-row"><span class="metric-name">Modern Dropshipping</span><span class="metric-val">$453</span></div>
+        <div class="metric-row"><span class="metric-name">Collective: Supplier</span><span class="metric-val">$312</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /april -->
+
+<!-- ══ OVERVIEW ══ -->
+<div class="tab-panel" id="tab-overview">
+  <div class="g4">
+    <div class="kpill"><div class="kpill-label">2025 Revenue</div><div class="kpill-val">$82,107</div><div class="kpill-trend">↑ 151.9% YoY</div></div>
+    <div class="kpill" style="border-top-color:var(--moss)"><div class="kpill-label">YTD '26 Revenue</div><div class="kpill-val">$49,829</div><div class="kpill-trend" style="color:var(--moss)">↑ 121.3% YoY · Jan 1–Apr 30</div></div>
+    <div class="kpill" style="border-top-color:var(--sage)"><div class="kpill-label">Apr '26 Revenue</div><div class="kpill-val">$13,654</div><div class="kpill-trend" style="color:var(--sage)">↑ 128.9% YoY · Closed month</div></div>
+    <div class="kpill" style="border-top-color:var(--gold)"><div class="kpill-label">~2026 Projected FY</div><div class="kpill-val">~$149,488</div><div class="kpill-trend" style="color:var(--gold)">~ derived from YTD pace × 12</div></div>
+  </div>
+
+  <div class="card mb20">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+      <div><div class="st">Revenue Growth Trajectory</div><div class="ss">Monthly Shopify revenue · Sep 2024 – Apr 2026 · vs prior year</div></div>
+      <div style="display:flex;gap:14px;font-size:10px;align-items:center">
+        <span><span style="width:10px;height:10px;border-radius:2px;background:#8DC63F;display:inline-block;margin-right:4px"></span>Total</span>
+        <span><span style="width:10px;height:10px;border-radius:2px;background:#5A9B6E;display:inline-block;margin-right:4px"></span>Organic</span>
+        <span><span style="width:10px;height:10px;border-radius:2px;background:#CBD5E1;display:inline-block;margin-right:4px"></span>Prior Year</span>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:260px"><canvas id="c-revenue"></canvas></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="st">YoY Growth %</div><div class="ss">Revenue growth month over month</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="c-yoy"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="st">Marketing Efficiency Ratio (MER)*</div><div class="ss">Revenue per $1 of marketing spend · 3× target</div>
+      <div style="display:flex;gap:20px;align-items:center">
+        <div style="text-align:center;padding:0 8px">
+          <div style="font-family:'Fraunces',serif;font-size:56px;font-weight:700;color:var(--muted);line-height:1">—</div>
+          <div style="font-size:12px;color:var(--muted)">Apr '26 MER* (pending)</div>
+          <div style="font-size:11px;color:var(--gold);font-weight:600;margin-top:4px">Peak (historical): 7.35× (Nov '25)</div>
+          <div style="margin-top:8px;font-size:9px;font-style:italic;color:var(--muted);line-height:1.5">*Ad spend data not uploaded for April 2026 close. Cannot compute MER this run. Historical chart preserved for reference. Provide expense data on next refresh.</div>
+        </div>
+        <div style="flex:1;height:160px"><canvas id="c-mer"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SEO ══ -->
+<div class="tab-panel" id="tab-seo">
+  <div class="g4">
+    <div class="kpill"><div class="kpill-label">GSC Clicks (YTD '26)</div><div class="kpill-val">15,374</div><div class="kpill-trend">↑ 44.5% YoY · 8.4M impressions</div></div>
+    <div class="kpill" style="border-top-color:var(--moss)"><div class="kpill-label">April GSC Clicks (Final)</div><div class="kpill-val">3,049</div><div class="kpill-trend" style="color:var(--moss)">↑ 20.5% YoY · 1.26M impressions</div></div>
+    <div class="kpill" style="border-top-color:var(--sage)"><div class="kpill-label">Keywords Ranking #1</div><div class="kpill-val">32</div><div class="kpill-trend" style="color:var(--red)">57 top-3 · 87 top-10 · ↓ -16 MoM</div></div>
+    <div class="kpill" style="border-top-color:var(--gold)"><div class="kpill-label">April Organic Sessions</div><div class="kpill-val">3,744</div><div class="kpill-trend" style="color:var(--gold)">GA4 · 33.8% of sessions · +29.6% YoY · $2,160 attributed (-23.8% YoY)</div></div>
+  </div>
+
+  <!-- April organic comparison -->
+  <div class="card mb20" style="background:linear-gradient(135deg,rgba(22,56,37,.04),rgba(141,198,63,.04));border:1px solid rgba(141,198,63,.2)">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-items:center">
+      <div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Apr 2025 Organic Sessions (GA4)</div>
+        <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:var(--forest)">2,889</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">60.06% of 4,810 total · $2,835 organic rev</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:24px;color:var(--lime);font-weight:700">+29.6%</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">YoY organic sessions growth</div>
+        <div style="background:rgba(229,57,53,.08);border-radius:8px;padding:6px 10px;font-size:10px;color:var(--red);margin-top:6px">⚠️ Organic GA4 revenue −23.8% YoY ($2,835 → $2,160) · Channel mix shifted (organic share 60% → 34%) due to bot Paid Social + Cross-network surge</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Apr 2026 Organic Sessions (GA4)</div>
+        <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:var(--lime)">3,744</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">33.75% of 11,092 total · $2,160 organic rev</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(141,198,63,.2);font-size:11px;color:var(--muted)">
+      <strong>Note:</strong> Organic sessions grew +29.6% YoY but organic-attributed GA4 revenue declined −23.8% — same channel, fewer conversions per session. GSC visibility metrics improved separately: clicks +20.5% YoY (3,049 vs 2,530), avg position 5.62 vs 19.68 (-14.06 pts better), impressions +220.7% (1.26M vs 391K).
+    </div>
+  </div>
+
+  <!-- Traffic trend + SEO % -->
+  <div class="g2">
+    <div class="card">
+      <div class="st">Organic Traffic — 19-Month Trend</div>
+      <div class="ss">Monthly organic sessions (GA4) · Sep 2024 – Apr 2026 · vs prior year</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="c-gsc-monthly"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="st">Organic Revenue vs. Total + SEO %</div>
+      <div class="ss">Bars = revenue · Line = organic share of total</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="c-orgvstotal"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Keywords + Landing Pages -->
+  <div class="g2">
+    <div class="card">
+      <div class="st">Top Non-Brand Keywords</div>
+      <div class="ss">GSC · Jan 2025 – Apr 30 2026 16-month aggregate · excluding brand terms</div>
+      <div class="q-row" style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;padding-bottom:4px;border-bottom:2px solid var(--border)">
+        <span class="q-pos">Pos</span><span class="q-term">Keyword</span><span class="q-vol">Impressions</span><span class="q-clicks">Clicks</span>
+      </div>
+      <div class="q-row"><span class="q-pos" style="color:var(--lime)">2.6</span><span class="q-term" style="font-weight:600">eco friendly cleaning products</span><span class="q-vol">5.68M</span><span class="q-clicks">528</span></div>
+      <div class="q-row"><span class="q-pos" style="color:var(--lime)">1.6</span><span class="q-term" style="font-weight:600">saponified coconut oil</span><span class="q-vol">5,034</span><span class="q-clicks">385</span></div>
+      <div class="q-row"><span class="q-pos">6.5</span><span class="q-term">bamboo brush for cleaning</span><span class="q-vol">1,663</span><span class="q-clicks">209</span></div>
+      <div class="q-row"><span class="q-pos">4.9</span><span class="q-term">bamboo brush for dish</span><span class="q-vol">1,560</span><span class="q-clicks">209</span></div>
+      <div class="q-row"><span class="q-pos">3.2</span><span class="q-term">ecogeek dishwasher powder</span><span class="q-vol">1,997</span><span class="q-clicks">201</span></div>
+      <div class="q-row"><span class="q-pos">7.5</span><span class="q-term">sodium carbonate</span><span class="q-vol">253,092</span><span class="q-clicks">199</span></div>
+      <div class="q-row"><span class="q-pos">8.2</span><span class="q-term">bamboo dish brush</span><span class="q-vol">11,647</span><span class="q-clicks">181</span></div>
+      <div class="q-row"><span class="q-pos">7.0</span><span class="q-term">dish soap bar</span><span class="q-vol">13,938</span><span class="q-clicks">175</span></div>
+      <div class="q-row"><span class="q-pos">12.0</span><span class="q-term">green cleaning products</span><span class="q-vol">23,476</span><span class="q-clicks">153</span></div>
+      <div class="q-row"><span class="q-pos">3.7</span><span class="q-term">bamboo cleaning brush scrub</span><span class="q-vol">1,231</span><span class="q-clicks">145</span></div>
+      <div class="q-row"><span class="q-pos">3.5</span><span class="q-term">dish brush with bamboo handle</span><span class="q-vol">984</span><span class="q-clicks">138</span></div>
+      <div class="q-row"><span class="q-pos">10.7</span><span class="q-term">sodium citrate</span><span class="q-vol">61,552</span><span class="q-clicks">133</span></div>
+      <div style="margin-top:8px;font-size:10px;color:var(--muted);padding-top:8px;border-top:1px solid var(--border)">🟢 Bold = top-3 average position. "eco friendly cleaning products" 5.7M impressions @ pos 2.6 is the SERP-feature anchor — CTR depressed (0.01%) due to ad/feature dominance.</div>
+    </div>
+    <div class="card">
+      <div class="st">Top Landing Pages by Clicks</div>
+      <div class="ss">GSC · Jan 2025 – Apr 30 2026 16-month aggregate · organic entry points</div>
+      <div class="q-row" style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;padding-bottom:4px;border-bottom:2px solid var(--border)">
+        <span class="q-pos">—</span><span class="q-term">Page</span><span class="q-vol">Impressions</span><span class="q-clicks">Clicks</span>
+      </div>
+      <div class="q-row"><span class="q-pos">—</span><span class="q-term">/ Homepage</span><span class="q-vol">963K</span><span class="q-clicks">10,798</span></div>
+      <div class="q-row"><span class="q-pos">—</span><span class="q-term" style="font-size:10px;font-weight:600">/collections/shop-ecofriendly…</span><span class="q-vol">6.96M</span><span class="q-clicks">4,050</span></div>
+      <div class="q-row"><span class="q-pos">—</span><span class="q-term" style="font-size:10px">/pages/power-of-dishwasher-powder</span><span class="q-vol">38,941</span><span class="q-clicks">3,578</span></div>
+      <div class="q-row"><span class="q-pos">—</span><span class="q-term" style="font-size:10px">/products/fragrance-pva-free-dish-tabs</span><span class="q-vol">302K</span><span class="q-clicks">3,266</span></div>
+      <div class="q-row"><span class="q-pos">—</span><span class="q-term" style="font-size:10px">/collections/dish-washing-hygine</span><span class="q-vol">296K</span><span class="q-clicks">1,981</span></div>
+      <div class="q-row"><span class="q-pos">—</span><span class="q-term" style="font-size:10px">/products/bamboo-dish-scrub-brush</span><span class="q-vol">139K</span><span class="q-clicks">1,909</span></div>
+      <div class="q-row"><span class="q-pos">—</span><span class="q-term" style="font-size:10px">/products/green-llama-laundry-detergent</span><span class="q-vol">292K</span><span class="q-clicks">1,639</span></div>
+      <div class="q-row"><span class="q-pos">—</span><span class="q-term" style="font-size:10px">/pages/sodium-citrate-overview</span><span class="q-vol">411K</span><span class="q-clicks">1,458</span></div>
+      <div class="q-row"><span class="q-pos">—</span><span class="q-term" style="font-size:10px">/pages/saponified-coconut-oil</span><span class="q-vol">64,886</span><span class="q-clicks">1,151</span></div>
+      <div class="q-row"><span class="q-pos">—</span><span class="q-term" style="font-size:10px">/collections/laundry</span><span class="q-vol">101K</span><span class="q-clicks">961</span></div>
+      <div style="margin-top:8px;font-size:10px;color:var(--muted);padding-top:8px;border-top:1px solid var(--border)">🟢 Collections eco-friendly page is dominant entry — 4,050 clicks on 6.96M impressions. Pillar/spoke article cluster published in April targets non-toxic gap (next 30–60d for measurable lift).</div>
+    </div>
+  </div>
+
+  <!-- Rankings summary -->
+  <div class="g2">
+    <div class="card">
+      <div class="st">Rankings Summary</div>
+      <div class="ss">SE Ranking · 265 tracked keywords · April 30, 2026 close · April was a decline month, not a recovery</div>
+      <div class="rank-grid">
+        <div class="rank-card"><div class="rank-num" style="color:var(--red)">32</div><div class="rank-label">Ranking #1 <span style="font-size:9px;color:var(--muted)">(48 Mar 30 · -16 MoM)</span></div></div>
+        <div class="rank-card"><div class="rank-num" style="color:var(--gold)">57</div><div class="rank-label">Top 3 <span style="font-size:9px;color:var(--muted)">(68 Mar 30 · -11 MoM)</span></div></div>
+        <div class="rank-card"><div class="rank-num" style="color:var(--gold)">87</div><div class="rank-label">Top 10 <span style="font-size:9px;color:var(--muted)">(116 Mar 30 · -29 MoM)</span></div></div>
+      </div>
+      <div class="prog-row"><div class="prog-labels"><span>#1 Keywords</span><span>32 / 265</span></div><div class="prog-track"><div class="prog-bar" style="width:12.1%;background:var(--lime)"></div></div></div>
+      <div class="prog-row"><div class="prog-labels"><span>Top 3</span><span>57 / 265</span></div><div class="prog-track"><div class="prog-bar" style="width:21.5%;background:var(--moss)"></div></div></div>
+      <div class="prog-row"><div class="prog-labels"><span>Top 10</span><span>87 / 265</span></div><div class="prog-track"><div class="prog-bar" style="width:32.8%;background:var(--sage)"></div></div></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);background:rgba(229,57,53,.05);border-radius:8px;padding:10px 12px">
+        <div style="font-size:11px;color:var(--forest);font-weight:600;margin-bottom:4px">⚠️ Material visibility decline through April</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.5">28 keywords improved · <strong style="color:var(--red)">105 declined</strong> · 48 unchanged · 14 new · 14 lost. Mid-month "recovering from Apr 2 dip" narrative did not hold — Apr 30 ended at the lowest #1 count of the month. <strong>Eco-Friendly cluster still strong (15 #1s on volume terms 1,900/mo); Non-Toxic cluster is the gap (pillar/spoke published April).</strong></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="st">GSC Monthly Clicks Detail</div>
+      <div class="ss">Jul 2025 – Apr 2026 from Search Console · April closed at 3,049 (+20.5% YoY)</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+        <div class="metric-row"><span class="metric-name">Jul 2025</span><span class="metric-val">1,809</span></div>
+        <div class="metric-row"><span class="metric-name">Aug 2025</span><span class="metric-val">1,995</span></div>
+        <div class="metric-row"><span class="metric-name">Sep 2025</span><span class="metric-val">2,154</span></div>
+        <div class="metric-row"><span class="metric-name">Oct 2025</span><span class="metric-val">1,879</span></div>
+        <div class="metric-row" style="background:rgba(141,198,63,.06);border-radius:6px;padding:4px 0"><span class="metric-name" style="font-weight:600;color:var(--forest)">Nov 2025 🚀</span><span class="metric-val" style="color:var(--lime)">8,938</span></div>
+        <div class="metric-row"><span class="metric-name">Dec 2025</span><span class="metric-val">3,135</span></div>
+        <div class="metric-row"><span class="metric-name">Jan 2026</span><span class="metric-val">3,861</span></div>
+        <div class="metric-row"><span class="metric-name">Feb 2026</span><span class="metric-val">4,273</span></div>
+        <div class="metric-row"><span class="metric-name">Mar 2026</span><span class="metric-val">4,191</span></div>
+        <div class="metric-row" style="background:rgba(141,198,63,.06);border-radius:6px;padding:4px 0"><span class="metric-name" style="font-weight:600;color:var(--forest)">Apr 2026</span><span class="metric-val" style="color:var(--lime)">3,049</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyword Gainers -->
+  <div class="g2">
+    <div class="card">
+      <div class="st">Campaign Gainers — Aug 2025 → Apr 2026</div>
+      <div class="ss">Keywords that entered rankings or gained significantly since SEO engagement · Weighted by search volume × position gain</div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:0 0 6px;border-bottom:2px solid var(--border);margin-bottom:4px">
+        <span>Keyword</span><span style="text-align:right">Vol</span><span style="text-align:center">Aug → Apr</span><span style="text-align:right">Gain</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;background:rgba(141,198,63,.04);border-radius:4px;padding-left:6px">
+        <span style="font-weight:600;color:var(--forest)">non toxic cleaning products</span><span style="text-align:right;color:var(--muted)">10,800</span><span style="text-align:center;color:var(--muted)">61 → <strong style="color:var(--forest)">13</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+48</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;background:rgba(141,198,63,.04);border-radius:4px;padding-left:6px">
+        <span style="font-weight:600;color:var(--forest)">non toxic cleaning</span><span style="text-align:right;color:var(--muted)">4,400</span><span style="text-align:center;color:var(--muted)">61 → <strong style="color:var(--forest)">35</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+26</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">EWG Verified</span><span style="text-align:right;color:var(--muted)">2,400</span><span style="text-align:center;color:var(--muted)">N/R → <strong style="color:var(--forest)">17</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">new</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">Eco-Friendly Dish Soap</span><span style="text-align:right;color:var(--muted)">1,900</span><span style="text-align:center;color:var(--muted)">N/R → <strong style="color:var(--lime)">1</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">new #1</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">eco-friendly sponges</span><span style="text-align:right;color:var(--muted)">880</span><span style="text-align:center;color:var(--muted)">N/R → <strong style="color:var(--forest)">9</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">new</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">sustainable cleaning products</span><span style="text-align:right;color:var(--muted)">590</span><span style="text-align:center;color:var(--muted)">N/R → <strong style="color:var(--lime)">2</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">new</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">eco friendly detergent</span><span style="text-align:right;color:var(--muted)">590</span><span style="text-align:center;color:var(--muted)">N/R → <strong style="color:var(--forest)">12</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">new</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">eco friendly laundry detergent</span><span style="text-align:right;color:var(--muted)">590</span><span style="text-align:center;color:var(--muted)">N/R → <strong style="color:var(--forest)">15</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">new</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">Eco-Friendly Laundry Detergent</span><span style="text-align:right;color:var(--muted)">500</span><span style="text-align:center;color:var(--muted)">N/R → <strong style="color:var(--forest)">7</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">new</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">refillable cleaning products</span><span style="text-align:right;color:var(--muted)">480</span><span style="text-align:center;color:var(--muted)">N/R → <strong style="color:var(--lime)">3</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">new</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">alpaca dryer balls</span><span style="text-align:right;color:var(--muted)">480</span><span style="text-align:center;color:var(--muted)">N/R → <strong style="color:var(--lime)">3</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">new</span>
+      </div>
+      <div style="margin-top:10px;font-size:10px;color:var(--muted);padding-top:8px;border-top:1px solid var(--border)">96 of 265 tracked keywords gained positions since campaign start. 82 keywords that were not ranking in Aug 2025 now hold positions. Highlighted rows = 10K+ monthly search volume.</div>
+    </div>
+
+    <div class="card">
+      <div class="st">YTD Movers — Jan 1 → Apr 30, 2026</div>
+      <div class="ss">Keywords with meaningful position improvements YTD · Weighted by search volume × position gain · 189 keywords had positions on both dates</div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:0 0 6px;border-bottom:2px solid var(--border);margin-bottom:4px">
+        <span>Keyword</span><span style="text-align:right">Vol</span><span style="text-align:center">Jan → Apr</span><span style="text-align:right">Gain</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;background:rgba(141,198,63,.04);border-radius:4px;padding-left:6px">
+        <span style="font-weight:600;color:var(--forest)">Eco-Friendly Laundry Detergents</span><span style="text-align:right;color:var(--muted)">22,200</span><span style="text-align:center;color:var(--muted)">33 → <strong style="color:var(--forest)">25</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+8</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;background:rgba(141,198,63,.04);border-radius:4px;padding-left:6px">
+        <span style="font-weight:600;color:var(--forest)">green cleaner</span><span style="text-align:right;color:var(--muted)">18,100</span><span style="text-align:center;color:var(--muted)">47 → <strong style="color:var(--forest)">41</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+6</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">EWG Verified</span><span style="text-align:right;color:var(--muted)">2,400</span><span style="text-align:center;color:var(--muted)">27 → <strong style="color:var(--forest)">18</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+9</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">Non-Toxic Toilet Cleaner</span><span style="text-align:right;color:var(--muted)">1,300</span><span style="text-align:center;color:var(--muted)">33 → <strong style="color:var(--forest)">27</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+6</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">eco-friendly sponges</span><span style="text-align:right;color:var(--muted)">880</span><span style="text-align:center;color:var(--muted)">13 → <strong style="color:var(--lime)">9</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+4</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">fragrance free cleaning products</span><span style="text-align:right;color:var(--muted)">590</span><span style="text-align:center;color:var(--muted)">23 → <strong style="color:var(--forest)">14</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+9</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">zero waste laundry detergent</span><span style="text-align:right;color:var(--muted)">480</span><span style="text-align:center;color:var(--muted)">56 → <strong style="color:var(--forest)">41</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+15</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">alpaca dryer balls</span><span style="text-align:right;color:var(--muted)">480</span><span style="text-align:center;color:var(--muted)">22 → <strong style="color:var(--lime)">9</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+13</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">refillable cleaning products</span><span style="text-align:right;color:var(--muted)">480</span><span style="text-align:center;color:var(--muted)">16 → <strong style="color:var(--lime)">6</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+10</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">eco friendly laundry detergents</span><span style="text-align:right;color:var(--muted)">480</span><span style="text-align:center;color:var(--muted)">34 → <strong style="color:var(--forest)">26</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+8</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">zero waste dish soap</span><span style="text-align:right;color:var(--muted)">210</span><span style="text-align:center;color:var(--muted)">14 → <strong style="color:var(--lime)">3</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+11</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2.5fr auto auto auto;gap:4px 12px;align-items:center;padding:6px 0;font-size:11px">
+        <span style="font-weight:600;color:var(--forest)">environmentally friendly laundry detergent</span><span style="text-align:right;color:var(--muted)">100</span><span style="text-align:center;color:var(--muted)">31 → <strong style="color:var(--forest)">11</strong></span><span style="text-align:right;font-weight:700;color:var(--lime)">+20</span>
+      </div>
+      <div style="margin-top:10px;font-size:10px;color:var(--muted);padding-top:8px;border-top:1px solid var(--border)"><strong style="color:var(--forest)">73 of 189 keywords improved YTD</strong> (Jan 1 → Apr 30 close). Highlighted rows = 10K+ monthly volume. <strong style="color:var(--red)">Notable declines:</strong> "non toxic cleaning products" (10.8K vol) 15 → 64; "cleaning products non toxic" (440 vol) 48 → 72; "eco friendly detergent" (590 vol) 32 → 45. The Non-Toxic cluster lost ground on competitive head terms — pillar/spoke published April targets exactly these (measure 30–60 days post-publish for cluster recovery).</div>
+    </div>
+  </div>
+
+  <!-- SEO ROI Card -->
+  <div style="background:linear-gradient(135deg,var(--forest) 0%,var(--deep) 55%,#2d5a3d 100%);border-radius:18px;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-30px;right:-30px;width:180px;height:180px;border-radius:50%;background:rgba(141,198,63,.1)"></div>
+    <div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px">SEO Investment ROI · Aug 2025 – Apr 2026 (9 months) · GSC: 3,049 April clicks</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:24px;position:relative">
+      <div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:4px">Total SEO Investment</div>
+        <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:#fff;line-height:1">$9,000</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:3px">$1,000/mo × 9 months</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:4px">Organic Revenue Generated</div>
+        <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:var(--lightlime);line-height:1">$31,541</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:3px">$29,381 prior + $2,160 Apr (GA4 direct)</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:4px">Net Return</div>
+        <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:var(--lightlime);line-height:1">$22,541</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:3px">250% ROI on SEO investment</div>
+      </div>
+      <div style="background:rgba(141,198,63,.2);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,.6);margin-bottom:4px">Simple ROI Multiple</div>
+        <div style="font-family:'Fraunces',serif;font-size:52px;font-weight:700;color:var(--lightlime);line-height:1">3.50×</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:3px">Organic rev ÷ investment</div>
+      </div>
+    </div>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.12)">
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em">YoY Organic Revenue Lift by Month</div>
+      <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:8px">
+        <div style="text-align:center"><div style="font-size:9px;color:rgba(255,255,255,.4)">Aug '25</div><div style="font-size:12px;font-weight:700;color:var(--lightlime)">+20%</div><div style="font-size:9px;color:rgba(255,255,255,.35)">$1,916</div></div>
+        <div style="text-align:center"><div style="font-size:9px;color:rgba(255,255,255,.4)">Sep '25</div><div style="font-size:12px;font-weight:700;color:var(--lightlime)">+66%</div><div style="font-size:9px;color:rgba(255,255,255,.35)">$2,237</div></div>
+        <div style="text-align:center"><div style="font-size:9px;color:rgba(255,255,255,.4)">Oct '25</div><div style="font-size:12px;font-weight:700;color:var(--lightlime)">+30%</div><div style="font-size:9px;color:rgba(255,255,255,.35)">$1,570</div></div>
+        <div style="text-align:center;background:rgba(141,198,63,.2);border-radius:8px;padding:4px 0"><div style="font-size:9px;color:rgba(255,255,255,.5)">Nov '25</div><div style="font-size:12px;font-weight:700;color:var(--lightlime)">+344%</div><div style="font-size:9px;color:rgba(255,255,255,.45)">$6,275</div></div>
+        <div style="text-align:center"><div style="font-size:9px;color:rgba(255,255,255,.4)">Dec '25</div><div style="font-size:12px;font-weight:700;color:var(--lightlime)">+160%</div><div style="font-size:9px;color:rgba(255,255,255,.35)">$3,793</div></div>
+        <div style="text-align:center"><div style="font-size:9px;color:rgba(255,255,255,.4)">Jan '26</div><div style="font-size:12px;font-weight:700;color:var(--lightlime)">+112%</div><div style="font-size:9px;color:rgba(255,255,255,.35)">$4,935</div></div>
+        <div style="text-align:center"><div style="font-size:9px;color:rgba(255,255,255,.4)">Feb '26</div><div style="font-size:12px;font-weight:700;color:var(--lightlime)">+113%</div><div style="font-size:9px;color:rgba(255,255,255,.35)">$4,419</div></div>
+        <div style="text-align:center"><div style="font-size:9px;color:rgba(255,255,255,.4)">Mar '26</div><div style="font-size:12px;font-weight:700;color:var(--lightlime)">+39%</div><div style="font-size:9px;color:rgba(255,255,255,.35)">$4,235</div></div>
+        <div style="text-align:center;background:rgba(229,57,53,.15);border-radius:8px;padding:4px 0"><div style="font-size:9px;color:rgba(255,255,255,.5)">Apr '26</div><div style="font-size:12px;font-weight:700;color:#FFB4B0">−24%</div><div style="font-size:9px;color:rgba(255,255,255,.45)">$2,160</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EMAIL ══ -->
+<div class="tab-panel" id="tab-email">
+
+  <div class="g4">
+    <div class="kpill" style="border-top-color:var(--violet)"><div class="kpill-label">April Klaviyo (Final)</div><div class="kpill-val">$6,150</div><div class="kpill-trend" style="color:var(--violet)">45.0% of April rev · YTD $14,544 (29.2%)</div></div>
+    <div class="kpill" style="border-top-color:#9B70E0"><div class="kpill-label">April Campaigns</div><div class="kpill-val">$4,372</div><div class="kpill-trend" style="color:#9B70E0">71% · 31,631 email + 624 SMS recip · 18 emails</div></div>
+    <div class="kpill" style="border-top-color:var(--moss)"><div class="kpill-label">April Flows</div><div class="kpill-val">$1,777</div><div class="kpill-trend" style="color:var(--moss)">29% · 1,753 email + 84 SMS recip</div></div>
+    <div class="kpill" style="border-top-color:var(--gold)"><div class="kpill-label">Active Subscriptions</div><div class="kpill-val">138</div><div class="kpill-trend" style="color:var(--gold)">+10.7%/mo active growth · 264 all-time · 64 cancelled</div></div>
+  </div>
+
+  <!-- April Campaign Detail -->
+  <div class="card mb20">
+    <div class="st">April Campaign Performance Detail (Final)</div>
+    <div class="ss">Klaviyo · Apr 1–30, 2026 · 18 emails + 3 SMS sent · Sorted by attributed revenue</div>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:0 16px 8px;border-bottom:1px solid var(--border)">
+      <span>Campaign</span><span style="text-align:center">Sent</span><span style="text-align:center">Recipients</span><span style="text-align:center">Open Rate</span><span style="text-align:center">Click Rate</span><span style="text-align:center">Revenue</span>
+    </div>
+    <!-- Top revenue performers -->
+    <div style="padding:6px 16px;font-size:10px;font-weight:700;color:var(--lime);text-transform:uppercase;letter-spacing:.07em;margin-top:4px">Top Revenue Performers</div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Last Chance Reminder</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 24</span><span style="text-align:center"><span class="email-stat-val">2,540</span></span><span style="text-align:center"><span class="email-stat-val">27.88%</span></span><span style="text-align:center"><span class="email-stat-val">0.67%</span></span><span style="text-align:center"><span class="email-stat-val" style="color:var(--lime)">$640.64</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Earth Day Announcement</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 22</span><span style="text-align:center"><span class="email-stat-val">2,561</span></span><span style="text-align:center"><span class="email-stat-val">28.64%</span></span><span style="text-align:center"><span class="email-stat-val">0.90%</span></span><span style="text-align:center"><span class="email-stat-val" style="color:var(--lime)">$560.58</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Tennessee Story</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 20</span><span style="text-align:center"><span class="email-stat-val">1,043</span></span><span style="text-align:center"><span class="email-stat-val">31.64%</span></span><span style="text-align:center"><span class="email-stat-val">0.43%</span></span><span style="text-align:center"><span class="email-stat-val" style="color:var(--lime)">$351.07</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Mother's Day Hype</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 30</span><span style="text-align:center"><span class="email-stat-val">1,177</span></span><span style="text-align:center"><span class="email-stat-val">32.82%</span></span><span style="text-align:center"><span class="email-stat-val">0.77%</span></span><span style="text-align:center"><span class="email-stat-val" style="color:var(--lime)">$342.40</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">VIP Sale Announcement</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 21</span><span style="text-align:center"><span class="email-stat-val">454</span></span><span style="text-align:center"><span class="email-stat-val">38.95%</span></span><span style="text-align:center"><span class="email-stat-val">1.39%</span></span><span style="text-align:center"><span class="email-stat-val" style="color:var(--lime)">$276.14</span></span></div>
+    <!-- Mid-tier campaigns -->
+    <div style="padding:6px 16px;font-size:10px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:.07em;margin-top:8px">Mid-Tier Performers</div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Impact Update (VIP/ACT)</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 8</span><span style="text-align:center"><span class="email-stat-val">5</span></span><span style="text-align:center"><span class="email-stat-val">38.54%</span></span><span style="text-align:center"><span class="email-stat-val">0.27%</span></span><span style="text-align:center"><span class="email-stat-val">$257.06</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Re-engage (Risk + Lap)</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 7</span><span style="text-align:center"><span class="email-stat-val">200</span></span><span style="text-align:center"><span class="email-stat-val" style="color:var(--lime)">42.92%</span></span><span style="text-align:center"><span class="email-stat-val">0.75%</span></span><span style="text-align:center"><span class="email-stat-val">$241.46</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Earth Month Kick Off</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 4</span><span style="text-align:center"><span class="email-stat-val">6</span></span><span style="text-align:center"><span class="email-stat-val">36.95%</span></span><span style="text-align:center"><span class="email-stat-val">0.59%</span></span><span style="text-align:center"><span class="email-stat-val">$234.44</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Dr. Matt's Insights</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 6</span><span style="text-align:center"><span class="email-stat-val">5</span></span><span style="text-align:center"><span class="email-stat-val" style="color:var(--lime)">43.93%</span></span><span style="text-align:center"><span class="email-stat-val">0.79%</span></span><span style="text-align:center"><span class="email-stat-val">$228.55</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Bundle Builder</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 16</span><span style="text-align:center"><span class="email-stat-val">6</span></span><span style="text-align:center"><span class="email-stat-val">25.10%</span></span><span style="text-align:center"><span class="email-stat-val">0.85%</span></span><span style="text-align:center"><span class="email-stat-val">$196.81</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Sale Reminder 1</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 23</span><span style="text-align:center"><span class="email-stat-val">723</span></span><span style="text-align:center"><span class="email-stat-val">28.75%</span></span><span style="text-align:center"><span class="email-stat-val">0.68%</span></span><span style="text-align:center"><span class="email-stat-val">$172.30</span></span></div>
+    <!-- Re-engagement / hygiene -->
+    <div style="padding:6px 16px;font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin-top:8px">Re-Engagement & Hygiene</div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Email 1 (Risk + Lap follow-up)</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 14</span><span style="text-align:center"><span class="email-stat-val">1,980</span></span><span style="text-align:center"><span class="email-stat-val">27.84%</span></span><span style="text-align:center"><span class="email-stat-val">0.65%</span></span><span style="text-align:center"><span class="email-stat-val">$117.05</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Green Switch (Hot/Warm/ACT)</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 10</span><span style="text-align:center"><span class="email-stat-val">655</span></span><span style="text-align:center"><span class="email-stat-val" style="color:var(--lime)">41.71%</span></span><span style="text-align:center"><span class="email-stat-val">0.26%</span></span><span style="text-align:center"><span class="email-stat-val">$116.33</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">Hidden Costs of Cleaning</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 12</span><span style="text-align:center"><span class="email-stat-val">600</span></span><span style="text-align:center"><span class="email-stat-val" style="color:var(--lime)">42.27%</span></span><span style="text-align:center"><span class="email-stat-val">0.51%</span></span><span style="text-align:center"><span class="email-stat-val">$100.22</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr"><span class="email-name">5 Swaps (SMS List + Subs)</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 14</span><span style="text-align:center"><span class="email-stat-val">740</span></span><span style="text-align:center"><span class="email-stat-val">29.31%</span></span><span style="text-align:center"><span class="email-stat-val">0.67%</span></span><span style="text-align:center"><span class="email-stat-val">$51.18</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;background:rgba(229,57,53,.04)"><span class="email-name">Sunset Followup (Cold)</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 17</span><span style="text-align:center"><span class="email-stat-val">96</span></span><span style="text-align:center"><span class="email-stat-val" style="color:var(--red)">8.42%</span></span><span style="text-align:center"><span class="email-stat-val">1.05%</span></span><span style="text-align:center"><span class="email-stat-val">$59.80</span></span></div>
+    <!-- SMS campaigns -->
+    <div style="padding:6px 16px;font-size:10px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.07em;margin-top:8px">SMS Campaigns</div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;background:rgba(107,78,204,.04)"><span class="email-name">Text Message 1</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 22</span><span style="text-align:center"><span class="email-stat-val">259</span></span><span style="text-align:center">—</span><span style="text-align:center"><span class="email-stat-val" style="color:var(--lime)">2.72%</span></span><span style="text-align:center"><span class="email-stat-val">$186.79</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;background:rgba(107,78,204,.04)"><span class="email-name">Final Text</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 24</span><span style="text-align:center"><span class="email-stat-val">258</span></span><span style="text-align:center">—</span><span style="text-align:center"><span class="email-stat-val">1.95%</span></span><span style="text-align:center"><span class="email-stat-val">$155.15</span></span></div>
+    <div class="email-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;background:rgba(107,78,204,.04)"><span class="email-name">Follow Up Text | Re-engage</span><span style="font-size:10px;color:var(--muted);text-align:center">Apr 14</span><span style="text-align:center"><span class="email-stat-val">107</span></span><span style="text-align:center">—</span><span style="text-align:center"><span class="email-stat-val" style="color:var(--lime)">2.80%</span></span><span style="text-align:center"><span class="email-stat-val">$85.85</span></span></div>
+    <div style="margin-top:12px;background:rgba(107,78,204,.06);border-radius:10px;padding:10px 16px;font-size:11px">
+      <strong style="color:var(--violet)">April average campaign performance:</strong> Email 32.89% open rate (Poor) · 0.80% click rate (Fair) · 0.31% placed order (Excellent) · $0.12 rev/recipient (Excellent) · SMS 2.42% click (Fair) · 1.13% placed order (Excellent). <strong style="color:var(--gold)">YTD trend: open rate 31.97% (Poor), click 0.67% (Fair) — open rate is the priority lever per Klaviyo bottom-performer flag.</strong>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="st">Flow Performance – April (Final)</div>
+      <div class="ss">Klaviyo automated flows · Apr 1–30, 2026</div>
+      <div class="metric-row"><span class="metric-name">Total Flow Revenue (April)</span><span class="metric-val" style="color:var(--violet)">$1,777.54</span></div>
+      <div class="metric-row"><span class="metric-name">Email Flow Recipients</span><span class="metric-val">1,753</span></div>
+      <div class="metric-row"><span class="metric-name">Email Open Rate</span><span><span class="tag tag-fair">Fair</span> <span class="metric-val">44.15%</span></span></div>
+      <div class="metric-row"><span class="metric-name">Email Click Rate</span><span><span class="tag tag-poor">Poor</span> <span class="metric-val">2.29%</span></span></div>
+      <div class="metric-row"><span class="metric-name">Placed Order Rate</span><span><span class="tag tag-exc">Excellent</span> <span class="metric-val">2.24%</span></span></div>
+      <div class="metric-row"><span class="metric-name">SMS Click Rate</span><span><span class="metric-val">5.95%</span></span></div>
+      <div class="metric-row"><span class="metric-name">Bounce Rate (deliverability)</span><span><span class="tag tag-exc">Excellent</span> <span class="metric-val">0.34%</span></span></div>
+      <div class="metric-row"><span class="metric-name">Spam Rate</span><span><span class="tag tag-exc">Excellent</span> <span class="metric-val">0.01%</span></span></div>
+      <div class="metric-row"><span class="metric-name">Unsubscribe Rate</span><span><span class="tag tag-poor">Poor</span> <span class="metric-val">0.75%</span></span></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Active flows in April</div>
+        <div class="metric-row"><span class="metric-name">Customer Thank You — New vs Returning</span><span class="metric-val">285 recip · 59.15% open · 0.70% click</span></div>
+        <div class="metric-row"><span class="metric-name">Browse Abandonment — Standard</span><span class="metric-val">112 recip · 57.14% open · 2.68% click</span></div>
+        <div class="metric-row"><span class="metric-name">Abandoned Cart Reminder (Email)</span><span class="metric-val">160 recip · 46.88% open · 3.75% click</span></div>
+        <div class="metric-row"><span class="metric-name">Welcome Flow Green Llama (SMS)</span><span class="metric-val">42 recip · 4.76% click</span></div>
+        <div class="metric-row"><span class="metric-name">Abandoned Cart Reminder (SMS)</span><span class="metric-val">42 recip · 7.14% click</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="st">Audience Segments</div>
+      <div class="ss">Klaviyo · live counts as of April 30, 2026</div>
+      <div class="seg-grid">
+        <div class="seg-pill" style="border-left-color:var(--lime)"><div class="seg-val">3,591</div><div class="seg-name">Cold Segment</div></div>
+        <div class="seg-pill" style="border-left-color:var(--lime)"><div class="seg-val">3,076</div><div class="seg-name">Subscribers</div></div>
+        <div class="seg-pill" style="border-left-color:var(--red)"><div class="seg-val" style="color:var(--muted)">2,945</div><div class="seg-name">Email Excl.</div></div>
+        <div class="seg-pill" style="border-left-color:var(--gold)"><div class="seg-val">2,220</div><div class="seg-name">Lap Segment</div></div>
+        <div class="seg-pill" style="border-left-color:var(--violet)"><div class="seg-val">1,502</div><div class="seg-name">Risk Segment</div></div>
+        <div class="seg-pill" style="border-left-color:var(--violet)"><div class="seg-val">1,415</div><div class="seg-name">XRay Leads</div></div>
+        <div class="seg-pill" style="border-left-color:var(--gold)"><div class="seg-val">1,277</div><div class="seg-name">ACT Segment</div></div>
+        <div class="seg-pill" style="border-left-color:var(--lime)"><div class="seg-val">1,087</div><div class="seg-name">HOT Segment</div></div>
+        <div class="seg-pill" style="border-left-color:var(--moss)"><div class="seg-val">736</div><div class="seg-name">Warm Segment</div></div>
+        <div class="seg-pill" style="border-left-color:var(--violet)"><div class="seg-val">438</div><div class="seg-name">VIP Customers</div></div>
+        <div class="seg-pill" style="border-left-color:var(--red)"><div class="seg-val" style="color:var(--muted)">373</div><div class="seg-name">SMS List</div></div>
+        <div class="seg-pill" style="border-left-color:var(--sage)"><div class="seg-val">120</div><div class="seg-name">EARTH25 Buyers</div></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Seal Subscriptions Data -->
+  <div class="card" style="margin-top:0">
+    <div class="st">Seal Subscriptions — Live Data</div>
+    <div class="ss">As of April 30, 2026 · Source: Seal Subscriptions Analytics (Last 30 days view)</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+      <div style="background:var(--cream);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Active</div>
+        <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:var(--lime)">138</div>
+        <div style="font-size:10px;color:var(--muted)">+10.7% active growth/mo</div>
+      </div>
+      <div style="background:var(--cream);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Paused</div>
+        <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:var(--gold)">42</div>
+        <div style="font-size:10px;color:var(--muted)">Win-back opportunity</div>
+      </div>
+      <div style="background:var(--cream);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">All-Time Total</div>
+        <div style="font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:var(--forest)">264</div>
+        <div style="font-size:10px;color:var(--muted)">64 cancelled</div>
+      </div>
+      <div style="background:var(--cream);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Total Renewal Rev</div>
+        <div style="font-family:'Fraunces',serif;font-size:30px;font-weight:700;color:var(--violet)">$14,297</div>
+        <div style="font-size:10px;color:var(--muted)">All-time renewals (excl. initial)</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px">
+      <div style="background:rgba(229,57,53,.06);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(229,57,53,.15)">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Active Churn/Mo</div>
+        <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--red)">7.7%</div>
+        <div style="font-size:9px;color:var(--muted)">12 cancelled of 156</div>
+      </div>
+      <div style="background:rgba(141,198,63,.08);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Active Growth/Mo</div>
+        <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--lime)">+10.7%</div>
+        <div style="font-size:9px;color:var(--muted)">15 new active of 140</div>
+      </div>
+      <div style="background:rgba(141,198,63,.08);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Avg Retention</div>
+        <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--forest)">218 days</div>
+        <div style="font-size:9px;color:var(--muted)">7.2 months</div>
+      </div>
+      <div style="background:rgba(141,198,63,.08);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Avg Rev/Customer</div>
+        <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--moss)">$88.80</div>
+        <div style="font-size:9px;color:var(--muted)">renewals only</div>
+      </div>
+      <div style="background:rgba(141,198,63,.08);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Max Rev/Customer</div>
+        <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--gold)">$1,191</div>
+        <div style="font-size:9px;color:var(--muted)">top subscriber</div>
+      </div>
+      <div style="background:rgba(229,57,53,.06);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(229,57,53,.15)">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Failed Payments</div>
+        <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--red)">3.15%</div>
+        <div style="font-size:9px;color:var(--muted)">recovery rate: 0% ⚠️</div>
+      </div>
+    </div>
+    <div style="background:rgba(229,57,53,.06);border-radius:10px;padding:12px 16px;font-size:11px;border-left:3px solid var(--red)">
+      <strong>⚠️ Failed Payment Recovery dropped to 0%.</strong> Mid-month showed 50% recovery; April closed with 0%. 12 cancellations in window vs ~6–8 failed payments — none recovered. This is the #1 actionable fix for the next sprint. At Seal's $1.6K April channel revenue and 218-day avg retention, every 1 recovered failed payment ≈ $89 LTV.
+    </div>
+    <div style="margin-top:12px;background:rgba(141,198,63,.06);border-radius:10px;padding:12px 16px;font-size:11px">
+      <strong>Subscription growth trajectory at current +10.7% active net/month:</strong> 138 active today → ~177 in 90 days → ~200 in 5 months. Upcoming potential renewal revenue: $291.95 next 7 days, $1,281.60 next 30 days. <strong>The paused 42 subscribers are the fastest conversion opportunity — a single "we miss you" campaign could recover 30–50% of them.</strong>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ ORDERS ══ -->
+<div class="tab-panel" id="tab-orders">
+  <div class="g4">
+    <div class="kpill"><div class="kpill-label">2025 Total Orders</div><div class="kpill-val">973</div><div class="kpill-trend">↑ 147.6% YoY</div></div>
+    <div class="kpill" style="border-top-color:var(--moss)"><div class="kpill-label">April Orders (Final)</div><div class="kpill-val">364</div><div class="kpill-trend" style="color:var(--moss)">↑ 118.0% YoY · vs 167 Apr '25</div></div>
+    <div class="kpill" style="border-top-color:var(--gold)"><div class="kpill-label">April AOV</div><div class="kpill-val">$35.90</div><div class="kpill-trend" style="color:var(--gold)">+7.7% YoY vs $33.32 Apr '25</div></div>
+    <div class="kpill" style="border-top-color:var(--sage)"><div class="kpill-label">YTD Orders (Jan 1–Apr 30)</div><div class="kpill-val">1,301</div><div class="kpill-trend" style="color:var(--sage)">+115.8% YoY · YTD AOV $36.62</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="st">Order Volume Trend</div><div class="ss">May 2025 – Apr 2026 · 12-month rolling · prior year where available</div>
+      <div class="chart-wrap" style="height:230px"><canvas id="c-orders"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="st">Average Order Value</div><div class="ss">AOV trend by month</div>
+      <div class="chart-wrap" style="height:230px"><canvas id="c-aov"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="st">Customer Retention & Cohort Highlights</div>
+    <div class="ss">Shopify customer cohort analysis · Order-level returning rate · Jul 2025 – Apr 2026</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+      <div style="background:var(--cream);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:700;color:var(--lime)">50.57%</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">Returning Rate (Apr Final, order-level)</div>
+      </div>
+      <div style="background:var(--cream);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:700;color:var(--moss)">40.62%</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">YTD Returning Rate (Jan 1–Apr 30)</div>
+      </div>
+      <div style="background:var(--cream);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:700;color:var(--sage)">+5.67 pts</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">YTD Returning Rate YoY (vs 34.95% '25)</div>
+      </div>
+      <div style="background:var(--cream);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:700;color:var(--gold)">+7.63 pts</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">April Returning Rate YoY (vs 42.94% '25)</div>
+      </div>
+      <div style="background:var(--cream);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:700;color:var(--violet)">438</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">VIP Customers (Klaviyo segment, Apr 30)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ STRATEGY ══ -->
+<div class="tab-panel" id="tab-strategy">
+  <div style="background:linear-gradient(135deg,#1a1a2e 0%,var(--forest) 60%,#2d5a3d 100%);border-radius:18px;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(201,163,74,.08)"></div>
+    <div style="position:relative">
+      <div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Fractional CMO Assessment · April 30, 2026 (Month-End Final)</div>
+      <div style="display:flex;align-items:flex-end;gap:32px;flex-wrap:wrap;margin-bottom:20px">
+        <div><div style="font-family:'Fraunces',serif;font-size:13px;color:rgba(255,255,255,.6)">Current trajectory <span style="font-size:9px">(YTD pace)</span></div><div style="font-family:'Fraunces',serif;font-size:44px;font-weight:700;color:#fff;line-height:1">~$12.5K<span style="font-size:20px;color:rgba(255,255,255,.5)">/mo</span></div></div>
+        <div style="font-family:'Fraunces',serif;font-size:32px;color:rgba(255,255,255,.3);padding-bottom:8px">→</div>
+        <div><div style="font-family:'Fraunces',serif;font-size:13px;color:var(--lightlime)">Target</div><div style="font-family:'Fraunces',serif;font-size:44px;font-weight:700;color:var(--lightlime);line-height:1">$30K<span style="font-size:20px;color:rgba(196,225,165,.6)">/mo</span></div></div>
+        <div style="margin-left:auto;text-align:right;padding-bottom:4px"><div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em">Gap to close</div><div style="font-family:'Fraunces',serif;font-size:28px;font-weight:700;color:var(--gold)">$16,346</div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">+119.7% from April actual</div></div>
+      </div>
+      <div style="background:rgba(255,255,255,.1);border-radius:99px;height:10px;overflow:hidden;margin-bottom:8px"><div style="width:45.5%;height:100%;background:linear-gradient(90deg,var(--lime),var(--moss));border-radius:99px"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.4)"><span>$0</span><span style="color:var(--lightlime);font-weight:600">April Final: $13,654 (45.5% of $30K goal)</span><span>$30,000</span></div>
+    </div>
+  </div>
+
+  <!-- Revenue Trajectory Chart -->
+  <div class="card mb20" style="margin-top:0">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+      <div>
+        <div class="st">Revenue Trajectory to $30K</div>
+        <div class="ss">Modeled from current run rate · Apr 2026 – Apr 2027 · Each scenario adds on the previous · Anchored on April 2026 actual ($13,654)</div>
+      </div>
+      <div style="text-align:right;font-size:11px;color:var(--muted)">
+        <div style="font-weight:700;color:var(--forest)">Without changes:</div>
+        <div>Organic alone never reaches $30K/mo</div>
+        <div style="margin-top:4px;font-weight:700;color:var(--lime)">Full stack activated:</div>
+        <div>$30K reached ~April 2027</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:8px">
+      <svg width="100%" viewBox="0 0 860 300" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
+    <line x1="58" y1="236.2" x2="844" y2="236.2" stroke="#EEE9DE" stroke-width="1"/>
+    <text x="53" y="240.2" text-anchor="end" font-size="9" fill="#9CA3AF">$12K</text>
+    <line x1="58" y1="192.5" x2="844" y2="192.5" stroke="#EEE9DE" stroke-width="1"/>
+    <text x="53" y="196.5" text-anchor="end" font-size="9" fill="#9CA3AF">$16K</text>
+    <line x1="58" y1="148.9" x2="844" y2="148.9" stroke="#EEE9DE" stroke-width="1"/>
+    <text x="53" y="152.9" text-anchor="end" font-size="9" fill="#9CA3AF">$20K</text>
+    <line x1="58" y1="105.3" x2="844" y2="105.3" stroke="#EEE9DE" stroke-width="1"/>
+    <text x="53" y="109.3" text-anchor="end" font-size="9" fill="#9CA3AF">$24K</text>
+    <line x1="58" y1="61.6" x2="844" y2="61.6" stroke="#EEE9DE" stroke-width="1"/>
+    <text x="53" y="65.6" text-anchor="end" font-size="9" fill="#9CA3AF">$28K</text>
+    <line x1="58" y1="39.8" x2="844" y2="39.8" stroke="rgba(220,50,50,0.2)" stroke-width="1"/>
+    <text x="53" y="43.8" text-anchor="end" font-size="9" fill="rgba(220,50,50,0.6)">$30K</text>
+    <line x1="58" y1="18.0" x2="844" y2="18.0" stroke="#EEE9DE" stroke-width="1"/>
+    <text x="53" y="22.0" text-anchor="end" font-size="9" fill="#9CA3AF">$32K</text>
+    <line x1="844.0" y1="18" x2="844.0" y2="258" stroke="rgba(141,198,63,0.25)" stroke-width="1" stroke-dasharray="3 2"/>
+    <path d="M 58.0,233.9 C 88.2,233.9 88.2,191.5 118.5,191.5 C 148.7,191.5 148.7,147.0 178.9,147.0 C 209.2,147.0 209.2,120.3 239.4,120.3 C 269.6,120.3 269.6,100.0 299.8,100.0 C 330.1,100.0 330.1,91.3 360.3,91.3 C 390.5,91.3 390.5,82.3 420.8,82.3 C 451.0,82.3 451.0,72.9 481.2,72.9 C 511.5,72.9 511.5,65.3 541.7,65.3 C 571.9,65.3 571.9,57.2 602.2,57.2 C 632.4,57.2 632.4,51.4 662.6,51.4 C 692.8,51.4 692.8,47.2 723.1,47.2 C 753.3,47.2 753.3,42.8 783.5,42.8 C 813.8,42.8 813.8,38.3 844.0,38.3 L 844.0,258.0 L 58.0,258.0 Z" fill="rgba(141,198,63,0.07)" stroke="none"/>
+    <path d="M 58.0,233.9 C 88.2,233.9 88.2,230.5 118.5,230.5 C 148.7,230.5 148.7,227.1 178.9,227.1 C 209.2,227.1 209.2,223.6 239.4,223.6 C 269.6,223.6 269.6,220.0 299.8,220.0 C 330.1,220.0 330.1,216.3 360.3,216.3 C 390.5,216.3 390.5,212.6 420.8,212.6 C 451.0,212.6 451.0,208.7 481.2,208.7 C 511.5,208.7 511.5,204.8 541.7,204.8 C 571.9,204.8 571.9,200.7 602.2,200.7 C 632.4,200.7 632.4,196.5 662.6,196.5 C 692.8,196.5 692.8,192.3 723.1,192.3 C 753.3,192.3 753.3,187.9 783.5,187.9 C 813.8,187.9 813.8,183.4 844.0,183.4" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="5 3"/>
+    <path d="M 58.0,233.9 C 88.2,233.9 88.2,193.4 118.5,193.4 C 148.7,193.4 148.7,178.0 178.9,178.0 C 209.2,178.0 209.2,174.5 239.4,174.5 C 269.6,174.5 269.6,170.9 299.8,170.9 C 330.1,170.9 330.1,167.3 360.3,167.3 C 390.5,167.3 390.5,163.5 420.8,163.5 C 451.0,163.5 451.0,159.6 481.2,159.6 C 511.5,159.6 511.5,155.7 541.7,155.7 C 571.9,155.7 571.9,151.6 602.2,151.6 C 632.4,151.6 632.4,147.4 662.6,147.4 C 692.8,147.4 692.8,143.2 723.1,143.2 C 753.3,143.2 753.3,138.8 783.5,138.8 C 813.8,138.8 813.8,134.3 844.0,134.3" fill="none" stroke="#6B4ECC" stroke-width="1.5"/>
+    <path d="M 58.0,233.9 C 88.2,233.9 88.2,193.4 118.5,193.4 C 148.7,193.4 148.7,151.0 178.9,151.0 C 209.2,151.0 209.2,126.5 239.4,126.5 C 269.6,126.5 269.6,110.9 299.8,110.9 C 330.1,110.9 330.1,107.3 360.3,107.3 C 390.5,107.3 390.5,103.5 420.8,103.5 C 451.0,103.5 451.0,99.6 481.2,99.6 C 511.5,99.6 511.5,95.7 541.7,95.7 C 571.9,95.7 571.9,91.6 602.2,91.6 C 632.4,91.6 632.4,87.4 662.6,87.4 C 692.8,87.4 692.8,83.2 723.1,83.2 C 753.3,83.2 753.3,78.8 783.5,78.8 C 813.8,78.8 813.8,74.3 844.0,74.3" fill="none" stroke="#C9A34A" stroke-width="2"/>
+    <path d="M 58.0,233.9 C 88.2,233.9 88.2,191.5 118.5,191.5 C 148.7,191.5 148.7,147.0 178.9,147.0 C 209.2,147.0 209.2,120.3 239.4,120.3 C 269.6,120.3 269.6,102.1 299.8,102.1 C 330.1,102.1 330.1,95.7 360.3,95.7 C 390.5,95.7 390.5,88.9 420.8,88.9 C 451.0,88.9 451.0,81.7 481.2,81.7 C 511.5,81.7 511.5,74.0 541.7,74.0 C 571.9,74.0 571.9,65.9 602.2,65.9 C 632.4,65.9 632.4,60.2 662.6,60.2 C 692.8,60.2 692.8,55.9 723.1,55.9 C 753.3,55.9 753.3,51.5 783.5,51.5 C 813.8,51.5 813.8,47.1 844.0,47.1" fill="none" stroke="#5A9B6E" stroke-width="2"/>
+    <path d="M 58.0,233.9 C 88.2,233.9 88.2,191.5 118.5,191.5 C 148.7,191.5 148.7,147.0 178.9,147.0 C 209.2,147.0 209.2,120.3 239.4,120.3 C 269.6,120.3 269.6,100.0 299.8,100.0 C 330.1,100.0 330.1,91.3 360.3,91.3 C 390.5,91.3 390.5,82.3 420.8,82.3 C 451.0,82.3 451.0,72.9 481.2,72.9 C 511.5,72.9 511.5,65.3 541.7,65.3 C 571.9,65.3 571.9,57.2 602.2,57.2 C 632.4,57.2 632.4,51.4 662.6,51.4 C 692.8,51.4 692.8,47.2 723.1,47.2 C 753.3,47.2 753.3,42.8 783.5,42.8 C 813.8,42.8 813.8,38.3 844.0,38.3" fill="none" stroke="#8DC63F" stroke-width="3"/>
+    <line x1="58" y1="39.8" x2="844" y2="39.8" stroke="rgba(220,50,50,0.4)" stroke-width="1.5" stroke-dasharray="6 3"/>
+    <circle cx="844.0" cy="38.3" r="5" fill="#8DC63F" stroke="white" stroke-width="2.5"/>
+    <text x="836.0" y="28.3" text-anchor="end" font-size="10" font-weight="700" fill="#3A7454">$30K ✓ Apr '27</text>
+    <text x="58.0" y="292" text-anchor="middle" font-size="9" fill="#9CA3AF">Mar '26</text>
+    <text x="178.9" y="292" text-anchor="middle" font-size="9" fill="#9CA3AF">May</text>
+    <text x="299.8" y="292" text-anchor="middle" font-size="9" fill="#9CA3AF">Jul</text>
+    <text x="420.8" y="292" text-anchor="middle" font-size="9" fill="#9CA3AF">Sep</text>
+    <text x="541.7" y="292" text-anchor="middle" font-size="9" fill="#9CA3AF">Nov</text>
+    <text x="662.6" y="292" text-anchor="middle" font-size="9" fill="#9CA3AF">Jan '27</text>
+    <text x="783.5" y="292" text-anchor="middle" font-size="9" fill="#9CA3AF">Mar</text>
+    <text x="844.0" y="292" text-anchor="middle" font-size="9" fill="#9CA3AF">Apr</text>
+  </svg>
+    </div>
+
+    <!-- Legend + lever prompts -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:4px">
+      <div style="border-radius:10px;padding:12px;background:#F4EFE4;border-top:3px solid #CBD5E1;cursor:default">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+          <span style="width:22px;height:3px;background:#CBD5E1;border-radius:2px;display:inline-block"></span>
+          <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Organic Only</span>
+        </div>
+        <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--muted)">Never</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">2.5%/mo growth plateau. $30K requires channel expansion.</div>
+      </div>
+      <div style="border-radius:10px;padding:12px;background:#F4EFE4;border-top:3px solid var(--violet);cursor:default">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+          <span style="width:22px;height:3px;background:var(--violet);border-radius:2px;display:inline-block"></span>
+          <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--violet)">+ Email + AOV</span>
+        </div>
+        <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--forest)">~$21K peak</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">Consistent Klaviyo cadence + bundle strategy. No paid needed.</div>
+      </div>
+      <div style="border-radius:10px;padding:12px;background:#F4EFE4;border-top:3px solid var(--gold);cursor:default">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+          <span style="width:22px;height:3px;background:var(--gold);border-radius:2px;display:inline-block"></span>
+          <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gold)">+ Paid Ads</span>
+        </div>
+        <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--forest)">~$26K plateau</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">Google + Meta unlocks $5,500/mo by month 4. Gets close.</div>
+      </div>
+      <div style="border-radius:10px;padding:12px;background:#F4EFE4;border-top:3px solid var(--moss);cursor:default">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+          <span style="width:22px;height:3px;background:var(--moss);border-radius:2px;display:inline-block"></span>
+          <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--moss)">+ Subscriptions</span>
+        </div>
+        <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--forest)">~$29K by Dec</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">Subscription MRR compounds at +10%/mo. Converging on target.</div>
+      </div>
+      <div style="border-radius:10px;padding:12px;background:rgba(141,198,63,.08);border-top:3px solid var(--lime);cursor:default">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+          <span style="width:22px;height:3px;background:var(--lime);border-radius:2px;display:inline-block"></span>
+          <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--sage)">+ SKIO + Retention</span>
+        </div>
+        <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--lime)">Apr 2027 ✓</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">Churn reduction + payment recovery tips the model over $30K.</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:10px;font-style:italic;color:var(--muted);padding:8px 12px;background:rgba(0,0,0,.02);border-radius:8px">
+      Model assumptions: 2.5%/mo organic growth; Email +$2,300/mo from month 1; AOV/CVR +$2,200 ramping over 2 months; Paid ads ramping to $5,500/mo by month 4; Subscription MRR compounding +10%/mo from 135 active; SKIO churn + recovery adding ~$800/mo from month 4. Levers are additive and non-compounding. Actual results will vary.
+    </div>
+  </div>
+
+
+  <!-- MARCH DATA INSIGHTS — NEW -->
+  <div class="card mb20" style="border:2px solid var(--gold);background:linear-gradient(135deg,rgba(201,163,74,.03),rgba(255,255,255,1))">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <span style="background:var(--gold);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:99px;letter-spacing:.06em">NEW · MARCH END-OF-MONTH INSIGHTS</span>
+      <span style="font-size:10px;color:var(--muted)">Patterns from full-month data that change or sharpen the $30K strategy</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+      <!-- Insight 1: Dishwasher Tabs -->
+      <div style="background:#fff;border-radius:12px;padding:16px;border-left:4px solid var(--lime)">
+        <div style="font-size:10px;color:var(--lime);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:6px">1 · Hero Product Identified</div>
+        <div style="font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:8px">Dishwasher Tabs = #1 Product (33% of March, Leading April)</div>
+        <div style="font-size:11px;color:var(--text);line-height:1.7;margin-bottom:8px">$4,500 from one SKU. Up 486% YoY. EWG Verified, PVA-free, and the blog content driving organic traffic (/power-of-dishwasher-powder = 238 GSC clicks in March alone). This product has clear product-market fit and should be the lead in every paid ad, email campaign, and landing page test.</div>
+        <div style="font-size:10px;background:rgba(141,198,63,.1);border-radius:6px;padding:8px 10px;color:var(--sage);font-weight:600">Action: Build a dedicated Dishwasher Tabs comparison page (vs Cascade, Finish, Blueland). Lead paid ads with this SKU. Create a "Dishwasher Tabs + Laundry Powder" hero bundle at $38–42.</div>
+      </div>
+
+      <!-- Insight 2: Bot traffic still present -->
+      <div style="background:#fff;border-radius:12px;padding:16px;border-left:4px solid var(--red)">
+        <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:6px">2 · Paid Social Bot Traffic Still Inflating Sessions</div>
+        <div style="font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:8px">~2,248 Paid Social Bot Sessions in April Final</div>
+        <div style="font-size:11px;color:var(--text);line-height:1.7;margin-bottom:8px">GA4 recorded 11,092 total sessions in April with $8,034 attributed revenue. Of those, 2,248 (20.3%) are "Paid Social" with 16.4% engagement rate and $0.00 revenue — same bot pattern flagged in mid-month. Cleaned of bot traffic, real GA4 sessions ≈ 8,844, putting Organic Search's true share closer to 42%. Shopify shows 15,227 sessions for the same period (typical attribution gap; Shopify is canonical for storefront).</div>
+        <div style="font-size:10px;background:rgba(229,57,53,.06);border-radius:6px;padding:8px 10px;color:var(--red);font-weight:600">Action: Investigate the "Paid Social" source-medium in GA4 — identify the referring domain. Add a filter or segment to exclude this bot channel from headline reporting. Use GA4-minus-Paid-Social as the clean session baseline (8,844 in April).</div>
+      </div>
+
+      <!-- Insight 3: Flows performance -->
+      <div style="background:#fff;border-radius:12px;padding:16px;border-left:4px solid var(--violet)">
+        <div style="font-size:10px;color:var(--violet);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:6px">3 · Flow Stack Producing — Post Purchase Still in Draft</div>
+        <div style="font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:8px">$1,777 Total Flow Revenue in April · 4 Live Flows Driving</div>
+        <div style="font-size:11px;color:var(--text);line-height:1.7;margin-bottom:8px">Customer Thank You — New vs Returning is the top-performing flow at 285 recipients, 59.15% open, 0.70% click. Browse Abandonment (Standard) Live: 112 recipients, 57.14% open, 2.68% click. Abandoned Cart Reminder (email): 160 recipients, 46.88% open, 3.75% click — strongest CTR of the stack. SMS side: Welcome Flow Green Llama (42, 4.76%) and Abandoned Cart SMS (42, 7.14%). Post Purchase remains in Draft with 0 recipients.</div>
+        <div style="font-size:10px;background:rgba(107,78,204,.08);border-radius:6px;padding:8px 10px;color:var(--violet);font-weight:600">Action: Activate Post Purchase flow — cross-sell Dishwasher Tabs to laundry buyers, laundry powder to dish tab buyers. Lift the SMS Welcome series past Welcome Flow Green Llama threshold. Both zero-cost automated revenue.</div>
+      </div>
+
+      <!-- Insight 4: AI referral traffic -->
+      <div style="background:#fff;border-radius:12px;padding:16px;border-left:4px solid var(--moss)">
+        <div style="font-size:10px;color:var(--moss);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:6px">4 · AI Referral Traffic Is Converting</div>
+        <div style="font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:8px">ChatGPT: $90 Revenue from Referrals</div>
+        <div style="font-size:11px;color:var(--text);line-height:1.7;margin-bottom:8px">chatgpt.com generated $89.95 in attributed revenue this month. Brave search contributed $358, DuckDuckGo $628 (↑291% YoY). These alternative discovery channels are growing because Green Llama's content follows the exact pattern AI models prefer: factual claims with sources, structured data, clear product information. The blog writing guidelines and content accuracy rules are functioning as an unintentional GEO (Generative Engine Optimization) strategy.</div>
+        <div style="font-size:10px;background:rgba(90,155,110,.1);border-radius:6px;padding:8px 10px;color:var(--moss);font-weight:600">Action: No immediate change needed — the content standards are working. Monitor chatgpt.com + perplexity + brave as a combined "AI referral" channel. If this exceeds $500/mo, consider structured data markup optimization for AI retrieval.</div>
+      </div>
+
+      <!-- Insight 5: April calendar executed -->
+      <div style="background:#fff;border-radius:12px;padding:16px;border-left:4px solid var(--forest)">
+        <div style="font-size:10px;color:var(--forest);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:6px">5 · April Calendar Executed — Earth Day + Mother's Day Wins</div>
+        <div style="font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:8px">18 Emails + 3 SMS Sent → $4,372 Campaign Rev</div>
+        <div style="font-size:11px;color:var(--text);line-height:1.7;margin-bottom:8px">April closed with 18 email campaigns and 3 SMS sends. Top revenue: Last Chance Reminder $640.64 (Apr 24), Earth Day Announcement $560.58 (Apr 22), Tennessee Story $351.07 (Apr 20), Mother's Day Hype $342.40 (Apr 30). Re-engagement worked: Re-engage to Risk + Lap pulled $241.46 from 200 recipients at 42.92% open. Sunset campaigns to Cold were modest ($60). The Earth Day window (Apr 21–24) was the highest-leverage send window — three of the top five revenue drivers landed in that 4-day stretch.</div>
+        <div style="font-size:10px;background:rgba(22,56,37,.06);border-radius:6px;padding:8px 10px;color:var(--forest);font-weight:600">Action: Replicate the Earth Day pattern (multi-touch sequence + tentpole anchor) for Memorial Day and 4th of July. The Mother's Day Hype on Apr 30 is the lead-in for May Mother's Day SMS sequence — roll it out by May 5.</div>
+      </div>
+
+    </div>
+
+    <!-- Ranking strategy note -->
+    <div style="background:var(--cream);border-radius:10px;padding:14px 16px;font-size:11px;line-height:1.7">
+      <strong style="color:var(--forest)">On the April rankings decline (48 → 32 #1 keywords MoM):</strong> 105 keywords declined, only 28 improved over the 30-day window. The Eco-Friendly cluster held at 15 keywords at #1 (1,900/mo terms still defended). The Non-Toxic cluster is the gap — top target "non-toxic laundry detergent" (18,100/mo) sits at position 18, "non toxic cleaning products" (10,800/mo) at position 64, "non toxic dishwasher detergent" (5,400/mo) not ranking. The pillar/spoke article cluster at <code>/blogs/news/non-toxic-laundry-detergent-pillar</code> and <code>/blogs/news/eco-friendly-laundry-detergent-spoke</code> was published in April — the 30–60 day window after publish (May–June 2026) is the measurement period for cluster recovery. <strong>The April decline is the moment to tighten the topical authority play, not to chase head-term defense.</strong>
+    </div>
+  </div>
+
+  <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--forest);margin-bottom:4px">Five Levers to $30K</div>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:20px">Ranked by speed-to-impact. Activating all five puts $30K in reach within 90–120 days.</div>
+
+  <!-- LEVER 1 -->
+  <div class="card mb20" style="border-left:4px solid var(--gold)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="background:var(--gold);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px">LEVER 1 · HIGHEST URGENCY</span><span style="font-size:10px;color:var(--muted)">Start immediately</span></div><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--forest)">Launch Paid Advertising — Google &amp; Meta</div></div>
+      <div style="text-align:right;flex-shrink:0"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Revenue upside</div><div style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--gold)">+$5,500–$11,000</div><div style="font-size:10px;color:var(--muted)">/mo at $2,500 ad spend</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:14px">Every month without paid ads is a month competitors capture buyers searching for exactly what Green Llama sells. The organic foundation is proven — historical peak MER 7.35× (Nov '25) with <strong>zero paid spend</strong>. Blended LTV at current $35.90 AOV + 50.57% returning rate + 218-day Seal retention = ~$181 conservative. Acquiring a new customer at $35–$55 via Google or Meta pays back before the second order. <strong>April spend data not uploaded this run — MER recalc pending next refresh.</strong></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+      <div style="background:var(--cream);border-radius:10px;padding:14px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px">Google Shopping + Search</div><div style="font-size:11px;line-height:1.7">Bottom-of-funnel keywords already converting organically. You rank #1 on them — owning the paid slot above doubles your capture rate on the same query.</div></div>
+      <div style="background:var(--cream);border-radius:10px;padding:14px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px">Meta Retargeting (Warm)</div><div style="font-size:11px;line-height:1.7">45,000+ organic visitors who didn't buy. Retargeting warm audiences costs 40–60% less than cold. Expected CAC: $20–$35. Against $181 LTV, the highest-leverage paid play available today.</div></div>
+      <div style="background:var(--cream);border-radius:10px;padding:14px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px">Lookalike Audiences</div><div style="font-size:11px;line-height:1.7">3,076 subscribers + 438 VIPs + 138 active subscription members = rich seed audience. 50.57% April returning customer rate means lookalikes built from this base have above-average return probability baked in.</div></div>
+    </div>
+    <div style="background:rgba(201,163,74,.08);border-radius:10px;padding:12px 16px;font-size:11px;border-left:3px solid var(--gold)"><strong>Action:</strong> Authorize $2,500/mo initial ad spend. Split: $1,200 Google Shopping + Search, $800 Meta retargeting warm, $500 Meta cold prospecting. 30-day ramp → 60-day optimize → 90-day full performance review.</div>
+  </div>
+
+  <!-- LEVER 2 -->
+  <div class="card mb20" style="border-left:4px solid var(--violet)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="background:var(--violet);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px">LEVER 2 · QUICK WIN</span><span style="font-size:10px;color:var(--muted)">This week</span></div><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--forest)">Lock In the Klaviyo Cadence — 8–12 Emails + 4 SMS Per Month</div></div>
+      <div style="text-align:right;flex-shrink:0"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Revenue upside</div><div style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--violet)">+$2,300–$4,200</div><div style="font-size:10px;color:var(--muted)">/mo above current avg</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:14px">The data proves it works when the cadence holds. April closed at $6,150 Klaviyo-attributed (45.0% of revenue) on 18 emails + 3 SMS — a sharp uplift from prior months. YTD attribution is 29.2% ($14,544). 3,076 subscribers + 10,413 segmented engagement contacts are a revenue asset that compounds when cadence is consistent. Every unsent email to a warm, opted-in list is cash left on the table — and Klaviyo's bottom-performer flag for April is "Open Rate (Email) All Campaigns: Poor." That's the lever.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+      <div style="background:var(--cream);border-radius:10px;padding:12px;text-align:center"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Campaign RPR (Apr)</div><div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--forest)">$0.12</div><div style="font-size:10px;color:var(--muted)">per recipient · Excellent</div></div>
+      <div style="background:var(--cream);border-radius:10px;padding:12px;text-align:center"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Flow RPR (Apr)</div><div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--violet)">~$1.01</div><div style="font-size:10px;color:var(--muted)">per recipient · 1,753 recip</div></div>
+      <div style="background:var(--cream);border-radius:10px;padding:12px;text-align:center"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">April Klaviyo Total</div><div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--lime)">$6,150</div><div style="font-size:10px;color:var(--muted)">45.0% of revenue</div></div>
+    </div>
+    <div style="background:rgba(107,78,204,.07);border-radius:10px;padding:12px 16px;font-size:11px;border-left:3px solid var(--violet)"><strong>Action:</strong> Open rate at 32.89% (Poor) is the priority lever. Subject-line testing on the engaged base (Hot 1,087 + Warm 736 + ACT 1,277) before broader sends. SMS list at 373 is underused — campaign SMS hit 2.42% click in April; growing the list is high-leverage.</div>
+  </div>
+
+  <!-- LEVER 3 -->
+  <div class="card mb20" style="border-left:4px solid var(--lime)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="background:var(--lime);color:var(--forest);font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px">LEVER 3 · COMPOUNDING</span><span style="font-size:10px;color:var(--muted)">30–60 days</span></div><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--forest)">Convert Passive Subscribers → Active Recurring Revenue</div></div>
+      <div style="text-align:right;flex-shrink:0"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Revenue upside</div><div style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--lime)">+$3,200–$5,000</div><div style="font-size:10px;color:var(--muted)">/mo at 200 active subs</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:14px">There are 138 active subscribers today, growing at +10.7%/mo (15 new active vs 12 cancelled) with 7.7% monthly active churn — net +1.9%/month. At current growth, Green Llama reaches ~177 active subscribers in 90 days. <strong>42 subs are currently paused</strong> and <strong>failed-payment recovery dropped to 0%</strong> in April (was 50% mid-month). The single fastest subscription revenue available is twofold: (1) recover the 6–8 monthly failed payments via dunning, and (2) win-back email to the 42 paused contacts.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div style="background:var(--cream);border-radius:10px;padding:14px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:5px">Subscription conversion plays</div><div style="font-size:11px;line-height:1.8">→ Post-purchase: "Switch to Subscribe &amp; Save — lock your price"<br>→ VIP flow: exclusive sub-only discount for 438 VIP buyers<br>→ Paid ad campaign targeting sub offer to warm/LAL audiences<br>→ Product page UX: subscription as default selected option</div></div>
+      <div style="background:var(--cream);border-radius:10px;padding:14px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:5px">The math (real Seal data)</div><div style="font-size:11px;line-height:1.8">138 active today · 218-day avg retention.<br>177 active in 90 days → ~$2,266/mo MRR.<br>200 active → ~$2,560/mo recurring.<br>Subscriber avg revenue: $88.80 (renewals only).<br>Failed payment recovery: 0% ⚠️ — fix this first.<br>42 PAUSED subs = fastest win → 1 email, no CAC.</div></div>
+    </div>
+    <div style="background:rgba(229,57,53,.1);border-radius:10px;padding:12px 16px;font-size:11px;border-left:3px solid var(--red)"><strong>Action:</strong> Failed-payment recovery is the #1 subscription fix this sprint — at 0% recovery, every silent cancellation is a -$89 LTV event. Build a dunning sequence in Klaviyo triggered on Seal failed-payment webhook. Then send a "we miss you" to the 42 paused subscribers. Skio recommendation status unchanged this run.</div>
+  </div>
+
+  <!-- LEVER 4 -->
+  <div class="card mb20" style="border-left:4px solid var(--sage)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="background:var(--sage);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px">LEVER 4 · CONVERSION</span><span style="font-size:10px;color:var(--muted)">30–60 days</span></div><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--forest)">AOV + CVR — Bundle Strategy and Checkout Leak Fix</div></div>
+      <div style="text-align:right;flex-shrink:0"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Revenue upside</div><div style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--sage)">+$2,200–$4,000</div><div style="font-size:10px;color:var(--muted)">/mo combined CVR + AOV lift</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:14px">CVR is 1.45%. Moving to 2.0% on projected monthly sessions of ~12,000 adds ~$2,200/mo. A 15% AOV lift (to ~$46) from strategic bundling adds ~$1,800/mo. These compound — more orders at higher value. The conversion funnel shows 3.64% add-to-cart → 2.46% checkout reached → 1.45% completed. That cart-to-checkout drop is the biggest single leak.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div style="background:var(--cream);border-radius:10px;padding:14px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:5px">AOV plays</div><div style="font-size:11px;line-height:1.8">→ Build 3–4 "starter bundles" at $55–$75 price points<br>→ "Frequently bought together" on high-traffic PDPs<br>→ Upsell refill packs at cart<br>→ Free shipping threshold encourages add-ons</div></div>
+      <div style="background:var(--cream);border-radius:10px;padding:14px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:5px">CVR plays — fix the checkout leak</div><div style="font-size:11px;line-height:1.8">3.64% add-to-cart → 2.46% checkout → 1.45% purchase. The cart-to-checkout drop costs ~$2K/mo. Add trust badges + reduce fields + test one-click for returning customers. Reviews above the fold on top PDPs.</div></div>
+    </div>
+    <div style="background:rgba(58,116,84,.08);border-radius:10px;padding:12px 16px;font-size:11px;border-left:3px solid var(--sage)"><strong>Action:</strong> Install a post-add-to-cart upsell app (Reconvert or similar). Build two bundle SKUs. Audit checkout for friction — reduce fields, add trust badges, test one-click for returning customers.</div>
+  </div>
+
+  <!-- Revenue stack table -->
+  <div class="card mb20">
+    <div class="st">Path to $30K — Conservative Revenue Stack</div>
+    <div class="ss">All five levers stacked · 90–120 day horizon</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr style="border-bottom:2px solid var(--border)">
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Revenue Source</th>
+          <th style="text-align:right;padding:8px 12px;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Current</th>
+          <th style="text-align:right;padding:8px 12px;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Conservative Add</th>
+          <th style="text-align:right;padding:8px 12px;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Running Total</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">When</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 12px;font-weight:600;color:var(--forest)">Organic baseline (Mar actual)</td><td style="padding:9px 12px;text-align:right;color:var(--muted)">$13,690</td><td style="padding:9px 12px;text-align:right;color:var(--lime);font-weight:700">+$800</td><td style="padding:9px 12px;text-align:right;font-weight:700;color:var(--forest)">$14,490</td><td style="padding:9px 12px;color:var(--muted)">Ongoing</td></tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(201,163,74,.04)"><td style="padding:9px 12px;font-weight:600;color:var(--forest)">+ Google Ads</td><td style="padding:9px 12px;text-align:right;color:var(--muted)">$0</td><td style="padding:9px 12px;text-align:right;color:var(--lime);font-weight:700">+$3,500</td><td style="padding:9px 12px;text-align:right;font-weight:700;color:var(--forest)">$17,990</td><td style="padding:9px 12px;color:var(--muted)">Month 2–3</td></tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(201,163,74,.04)"><td style="padding:9px 12px;font-weight:600;color:var(--forest)">+ Meta Ads</td><td style="padding:9px 12px;text-align:right;color:var(--muted)">$0</td><td style="padding:9px 12px;text-align:right;color:var(--lime);font-weight:700">+$2,000</td><td style="padding:9px 12px;text-align:right;font-weight:700;color:var(--forest)">$19,990</td><td style="padding:9px 12px;color:var(--muted)">Month 2–3</td></tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(107,78,204,.04)"><td style="padding:9px 12px;font-weight:600;color:var(--forest)">+ Klaviyo consistent cadence</td><td style="padding:9px 12px;text-align:right;color:var(--muted)">~$4,886 proj</td><td style="padding:9px 12px;text-align:right;color:var(--lime);font-weight:700">+$2,309</td><td style="padding:9px 12px;text-align:right;font-weight:700;color:var(--forest)">$22,299</td><td style="padding:9px 12px;color:var(--muted)">This month</td></tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(141,198,63,.04)"><td style="padding:9px 12px;font-weight:600;color:var(--forest)">+ Subscription growth (200 active)</td><td style="padding:9px 12px;text-align:right;color:var(--muted)">~$1,640</td><td style="padding:9px 12px;text-align:right;color:var(--lime);font-weight:700">+$2,390</td><td style="padding:9px 12px;text-align:right;font-weight:700;color:var(--forest)">$24,689</td><td style="padding:9px 12px;color:var(--muted)">Month 2–4</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 12px;font-weight:600;color:var(--forest)">+ AOV + CVR improvement</td><td style="padding:9px 12px;text-align:right;color:var(--muted)">baseline</td><td style="padding:9px 12px;text-align:right;color:var(--lime);font-weight:700">+$2,200</td><td style="padding:9px 12px;text-align:right;font-weight:700;color:var(--forest)">$26,889</td><td style="padding:9px 12px;color:var(--muted)">Month 1–2</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 12px;font-weight:600;color:var(--forest)">+ CTR / SEO impression unlock</td><td style="padding:9px 12px;text-align:right;color:var(--muted)">baseline</td><td style="padding:9px 12px;text-align:right;color:var(--lime);font-weight:700">+$1,800</td><td style="padding:9px 12px;text-align:right;font-weight:700;color:var(--forest)">$28,689</td><td style="padding:9px 12px;color:var(--muted)">Month 2–3</td></tr>
+          <tr style="background:linear-gradient(90deg,rgba(22,56,37,.06),transparent)"><td style="padding:12px;font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--forest)">Conservative Total Stack</td><td style="padding:12px;text-align:right;color:var(--muted)">$13,690</td><td style="padding:12px;text-align:right;font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--lime)">+$14,999</td><td style="padding:12px;text-align:right;font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--forest)">$28,689</td><td style="padding:12px;color:var(--muted);font-weight:600">90–120 days</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px;background:rgba(141,198,63,.08);border-radius:10px;padding:12px 16px;font-size:11px">Conservative stack lands at <strong>$28,689</strong>. Moderate execution reaches <strong>$30K+</strong> within 90–120 days. Levers compound: paid traffic grows the Klaviyo list, improving email revenue at no additional list-building cost.</div>
+  </div>
+
+  <!-- LTV + Data checklist -->
+  <div class="g2">
+    <div class="card">
+      <div class="st">Updated LTV Model — April 2026</div>
+      <div class="ss">AOV $35.22 · VIP rate 58.2% · Active subs 141 · Source: Seal Subscriptions live data</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:6px 8px;color:var(--muted);font-size:9px;text-transform:uppercase">Segment</th><th style="text-align:right;padding:6px 8px;color:var(--muted);font-size:9px;text-transform:uppercase">LTV</th><th style="text-align:right;padding:6px 8px;color:var(--muted);font-size:9px;text-transform:uppercase">% Buyers</th><th style="text-align:right;padding:6px 8px;color:var(--muted);font-size:9px;text-transform:uppercase">Max CAC @4:1</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">One-time buyer</td><td style="padding:8px;text-align:right;font-weight:700">$40</td><td style="padding:8px;text-align:right;color:var(--muted)">~15%</td><td style="padding:8px;text-align:right;color:var(--muted)">$10</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">2-order buyer</td><td style="padding:8px;text-align:right;font-weight:700">$81</td><td style="padding:8px;text-align:right;color:var(--muted)">~28%</td><td style="padding:8px;text-align:right;color:var(--muted)">$20</td></tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(141,198,63,.05)"><td style="padding:8px;font-weight:600;color:var(--forest)">VIP buyer (3+ orders)</td><td style="padding:8px;text-align:right;font-weight:700;color:var(--lime)">$181</td><td style="padding:8px;text-align:right;font-weight:600">56.7%</td><td style="padding:8px;text-align:right;font-weight:600;color:var(--lime)">$45</td></tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(107,78,204,.05)">
+            <td style="padding:8px;font-weight:600;color:var(--forest)">Active subscriber</td>
+            <td style="padding:8px;text-align:right">
+              <div style="font-weight:700;color:var(--violet)">$131 actual*</div>
+              <div style="font-size:9px;color:var(--muted)">$273 projected†</div>
+            </td>
+            <td style="padding:8px;text-align:right;color:var(--muted)">19%</td>
+            <td style="padding:8px;text-align:right;font-weight:600;color:var(--violet)">$33 / $68</td>
+          </tr>
+          <tr style="background:rgba(22,56,37,.04)">
+            <td style="padding:9px;font-weight:700;color:var(--forest);font-family:'Fraunces',serif;font-size:13px">Blended average</td>
+            <td style="padding:9px;text-align:right">
+              <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--forest)">$122–$149</div>
+              <div style="font-size:9px;color:var(--muted)">actual→projected</div>
+            </td>
+            <td style="padding:9px;text-align:right;font-weight:600">100%</td>
+            <td style="padding:9px;text-align:right;font-weight:700;color:var(--lime)">$30–$37</td>
+          </tr>
+          <tr><td colspan="4" style="padding:8px 10px;font-size:9px;color:var(--muted);line-height:1.6">* Actual: Seal Subscriptions avg renewal rev ($88.80) + initial order ($35.90 AOV) ≈ $124.70. Avg retention 218 days. † Projected: at 7.7% active churn = ~13-month avg lifetime for currently active subscribers (April reading; recovered failed-payment dunning would extend this materially).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    
+
+  </div>
+
+  <!-- Priority actions -->
+  <div class="card">
+    <div class="st">90-Day Action Priorities</div>
+    <div class="ss">Ordered by speed-to-revenue impact</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:700">Do This Week</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:10px;align-items:flex-start;font-size:11px;background:var(--cream);border-radius:8px;padding:10px 12px"><span style="background:var(--gold);color:#fff;width:20px;height:20px;min-width:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">1</span><span>Build the April Klaviyo calendar. 8+ emails, 4 SMS, mapped to specific segments. No more ad-hoc sending.</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start;font-size:11px;background:var(--cream);border-radius:8px;padding:10px 12px"><span style="background:var(--gold);color:#fff;width:20px;height:20px;min-width:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">2</span><span>Authorize paid ad budget and schedule Google + Meta campaign kick-off. Every week of delay costs ~$1,375 in projected revenue.</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--moss);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:700">Do This Month</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:10px;align-items:flex-start;font-size:11px;background:var(--cream);border-radius:8px;padding:10px 12px"><span style="background:var(--moss);color:#fff;width:20px;height:20px;min-width:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">3</span><span>Install post-purchase upsell app + build two bundle SKUs at $55–$75. Targets the cart-to-checkout conversion gap (3.64% → 2.46%).</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start;font-size:11px;background:var(--cream);border-radius:8px;padding:10px 12px"><span style="background:var(--moss);color:#fff;width:20px;height:20px;min-width:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">4</span><span>Send a subscription re-engagement email to the <strong>"All Subscription Product Buyers"</strong> segment (1,712 contacts), <em>excluding current active subscribers</em>. This targets people who have previously subscribed but are no longer active — customers who already said yes once and need a reason to come back. Goal: reactivate lapsed subscribers and convert past one-time buyers into recurring subscriptions.</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start;font-size:11px;background:var(--cream);border-radius:8px;padding:10px 12px"><span style="background:var(--moss);color:#fff;width:20px;height:20px;min-width:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">5</span><span>Send win-back to "Last purchase &gt;90 days" segment (222 subscribers). Highest ROI email in the database — zero acquisition cost.</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start;font-size:11px;background:var(--cream);border-radius:8px;padding:10px 12px"><span style="background:var(--moss);color:#fff;width:20px;height:20px;min-width:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">6</span><span>Audit top 5 product pages: add reviews above fold, add trust badges to checkout, test subscription as default selected option.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- SKIO Recommendation -->
+  <div class="card mb20" style="border-left:4px solid #6366F1">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <span style="background:#6366F1;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;letter-spacing:.06em">FRACTIONAL CMO · PLATFORM RECOMMENDATION</span>
+          <span style="font-size:10px;color:var(--muted)">Evaluate in 3–4 months · Migrate at ~200+ active subscribers</span>
+        </div>
+        <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--forest)">Upgrade to SKIO — The Subscription Platform Green Llama Will Graduate To</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;margin-left:16px">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">LTV-basis ROI</div>
+        <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:#6366F1">3.4×</div>
+        <div style="font-size:10px;color:var(--muted)">$2,102/mo LTV impact vs $625 cost</div>
+      </div>
+    </div>
+
+    <!-- Current state alert -->
+    <div style="background:rgba(229,57,53,.06);border-radius:10px;padding:12px 16px;font-size:11px;border-left:3px solid var(--red);margin-bottom:16px">
+      <strong style="color:var(--lime)">Seal Subscriptions: Two of three problems resolved.</strong> (1) <strong>50% failed payment recovery</strong> — up from 0%. Failed rate dropped from 3.85% to 1.8%. (2) <strong>Active churn dropped to 1.35%</strong> — down from 5.5%, with only 2 cancellations in the last 30 days. Still outstanding: (3) <strong>39 paused subscribers</strong> with no automated reactivation journey, and <strong>no multi-step cancel flow</strong> (customers still get a one-click cancel).
+    </div>
+
+    <!-- What SKIO does -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+      <div style="background:var(--cream);border-radius:10px;padding:14px">
+        <div style="font-size:10px;color:#6366F1;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:6px">Multi-Step Cancel Flows</div>
+        <div style="font-size:11px;color:var(--text);line-height:1.7">When a subscriber clicks cancel, SKIO shows a sequence: skip option → pause option → discount offer → swap product → then cancel. Brands using these flows report 20–25% save rates vs 4–15% with single-step popups. One brand dropped churn from ~10% to ~1%.</div>
+      </div>
+      <div style="background:var(--cream);border-radius:10px;padding:14px">
+        <div style="font-size:10px;color:#6366F1;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:6px">Smart Dunning — 14-Day Retry Cycle</div>
+        <div style="font-size:11px;color:var(--text);line-height:1.7">Currently Green Llama recovers 0% of failed payments. SKIO's automated retry cycle runs daily for 14 days with escalating logic — retry → discount incentive → SMS/email. Industry recovery rate: 40–60%. One case study: 10x more revenue recovered vs prior platform.</div>
+      </div>
+      <div style="background:var(--cream);border-radius:10px;padding:14px">
+        <div style="font-size:10px;color:#6366F1;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:6px">Passwordless Login (Magic Links)</div>
+        <div style="font-size:11px;color:var(--text);line-height:1.7">Subscribers manage their account via a magic link — no password required. This is SKIO's most recognized feature. One DTC brand cut support tickets 80% in 45 days. Customers who can self-serve (skip, pause, swap) cancel less. Voluntary churn dropped 18% for one brand after adding skip/pause alone.</div>
+      </div>
+      <div style="background:var(--cream);border-radius:10px;padding:14px">
+        <div style="font-size:10px;color:#6366F1;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:6px">Automated Journeys + Klaviyo</div>
+        <div style="font-size:11px;color:var(--text);line-height:1.7">Native Klaviyo integration sends subscriber-specific flows — win-backs for paused accounts, pre-cancel offers, upsell nudges at renewal. Combined with Green Llama's existing Klaviyo setup, this creates a retention engine that runs automatically. Also: deep cohort analytics that Seal doesn't provide.</div>
+      </div>
+    </div>
+
+    <!-- Financial model -->
+    <div style="font-size:11px;font-weight:700;color:var(--forest);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Revenue Impact Model — Green Llama Actuals</div>
+    <div style="overflow-x:auto;margin-bottom:16px">
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border)">
+            <th style="text-align:left;padding:7px 10px;color:var(--muted);font-size:9px;text-transform:uppercase">Impact Driver</th>
+            <th style="text-align:center;padding:7px 10px;color:var(--muted);font-size:9px;text-transform:uppercase">Current (Seal)</th>
+            <th style="text-align:center;padding:7px 10px;color:var(--muted);font-size:9px;text-transform:uppercase">With SKIO</th>
+            <th style="text-align:right;padding:7px 10px;color:var(--muted);font-size:9px;text-transform:uppercase">Monthly LTV Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:8px 10px;font-weight:600;color:var(--forest)">Churn rate (active)</td>
+            <td style="padding:8px 10px;text-align:center;color:var(--red)">5.5% · 8 cancelled last 30 days</td>
+            <td style="padding:8px 10px;text-align:center;color:var(--sage)">~3.5% (cancel flows + pause/skip)</td>
+            <td style="padding:8px 10px;text-align:right;font-weight:700;color:#6366F1">+$737/mo LTV saved</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(229,57,53,.03)">
+            <td style="padding:8px 10px;font-weight:600;color:var(--forest)">Failed payment recovery</td>
+            <td style="padding:8px 10px;text-align:center;color:var(--red)">0% · 5.2 failures/mo unrecovered</td>
+            <td style="padding:8px 10px;text-align:center;color:var(--sage)">~40% recovery (14-day dunning)</td>
+            <td style="padding:8px 10px;text-align:right;font-weight:700;color:#6366F1">+$573/mo LTV saved</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:8px 10px;font-weight:600;color:var(--forest)">Subscription conversion rate</td>
+            <td style="padding:8px 10px;text-align:center;color:var(--muted)">~0.38% of sessions</td>
+            <td style="padding:8px 10px;text-align:center;color:var(--sage)">+20% lift (native checkout + UX)</td>
+            <td style="padding:8px 10px;text-align:right;font-weight:700;color:#6366F1">+$792/mo LTV gained</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(141,198,63,.04)">
+            <td style="padding:8px 10px;font-weight:600;color:var(--forest)">39 paused subscribers (one-time)</td>
+            <td style="padding:8px 10px;text-align:center;color:var(--muted)">No reactivation journey</td>
+            <td style="padding:8px 10px;text-align:center;color:var(--sage)">Automated win-back → ~25% recover</td>
+            <td style="padding:8px 10px;text-align:right;font-weight:700;color:#6366F1">+$2,457 one-time LTV</td>
+          </tr>
+          <tr style="background:linear-gradient(90deg,rgba(99,102,241,.06),transparent)">
+            <td style="padding:9px 10px;font-family:'Fraunces',serif;font-size:13px;font-weight:700;color:var(--forest)">Total recurring LTV impact</td>
+            <td colspan="2" style="padding:9px 10px;text-align:center;color:var(--muted);font-size:11px">At 141 active subscribers</td>
+            <td style="padding:9px 10px;text-align:right;font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:#6366F1">$2,102/mo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Honest cost analysis -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div style="background:var(--cream);border-radius:12px;padding:16px">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:700">Cost Comparison</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">Seal Subscriptions (current)</span>
+            <span style="font-weight:700;color:var(--forest)">$87.60/mo</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">SKIO (monthly billing)</span>
+            <span style="font-weight:700;color:var(--forest)">$625/mo</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">SKIO (annual billing — save 17%)</span>
+            <span style="font-weight:700;color:#6366F1">$525/mo</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0">
+            <span style="color:var(--muted)">Incremental cost (annual)</span>
+            <span style="font-weight:700;color:var(--forest)">+$437/mo</span>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--muted);font-style:italic">SKIO includes free migration from Seal. No developer cost required.</div>
+      </div>
+      <div style="background:var(--cream);border-radius:12px;padding:16px">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:700">Honest Assessment: Is It Worth It Today?</div>
+        <div style="font-size:11px;color:var(--text);line-height:1.8">
+          At 135 subscribers, SKIO costs <strong>36% of subscription MRR</strong> — well above the 10% healthy spend benchmark. The immediate cash ROI is negative.<br><br>
+          The LTV-basis ROI is 3.4× — but that assumes the projections hold. <strong>The honest window is 3–4 months from now</strong>, when paid ads are driving traffic and the subscriber base is approaching 200–250 active. At that point, SKIO's UX advantage compounds on a larger volume of new visitors and the cost-to-MRR ratio improves to a viable range.
+        </div>
+      </div>
+    </div>
+
+    <!-- Timing roadmap -->
+    <div style="background:rgba(99,102,241,.06);border-radius:10px;padding:14px 16px;font-size:11px;border-left:3px solid #6366F1">
+      <div style="font-weight:700;color:var(--forest);margin-bottom:8px">Recommended Phased Approach:</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:baseline">
+        <span style="background:#E53935;color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap">DO NOW · FREE</span>
+        <span>Turn on Seal's cancel flow and dunning retries today. These features exist in Seal — they're just not activated. Every month of 0% payment recovery is money gone.</span>
+        <span style="background:var(--gold);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap">3–4 MONTHS</span>
+        <span>Revisit SKIO when active subscribers reach 200+. Request a demo and get a migration quote. Timing coincides with paid ads being fully ramped, which will accelerate subscription volume.</span>
+        <span style="background:#6366F1;color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap">MIGRATE</span>
+        <span>At ~300 active subscribers, SKIO costs 16% of subscription MRR — approaching viable. At 500, it's 10%. Annual billing at $499/mo + 1% transaction fee. SKIO migrates subscribers for free with full data integrity. Better to migrate during growth than during scale when support bandwidth shrinks.</span>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:10px;font-style:italic;color:var(--muted)">Sources: SKIO Shopify App Store ($599/mo · 5.0★ · 234 reviews), SKIO case studies (Gains In Bulk, Bev, Heights), industry dunning benchmarks. Churn reduction estimates are conservative (2%) vs documented case studies showing 5–10% improvements.</div>
+  </div>
+
+
+</div><!-- /strategy -->
+
+
+<!-- ══ BENCHMARKS ══ -->
+<div class="tab-panel" id="tab-benchmarks">
+
+
+  <!-- KPI columns: all-time / 2025 / 2026 YTD -->
+  <div class="card mb20">
+    <div class="st">Green Llama Performance — All-Time vs 2025 vs 2026 YTD</div>
+    <div class="ss">Sep 2024–Apr 2026 all-time · Full year 2025 · Jan 1–Apr 30, 2026 YTD · vs industry benchmarks</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border)">
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;font-size:9px;text-transform:uppercase;min-width:140px">Metric</th>
+            <th style="text-align:center;padding:8px 12px;color:var(--muted);font-weight:600;font-size:9px;text-transform:uppercase;background:rgba(22,56,37,.03);border-radius:8px 8px 0 0">All-Time<br><span style="font-weight:400">Sep '24–Apr '26</span></th>
+            <th style="text-align:center;padding:8px 12px;color:var(--muted);font-weight:600;font-size:9px;text-transform:uppercase">Full Year 2025</th>
+            <th style="text-align:center;padding:8px 12px;color:var(--muted);font-weight:600;font-size:9px;text-transform:uppercase;background:rgba(141,198,63,.05);border-radius:8px 8px 0 0">2026 YTD<br><span style="font-weight:400">Jan 1–Apr 30</span></th>
+            <th style="text-align:center;padding:8px 12px;color:var(--muted);font-weight:600;font-size:9px;text-transform:uppercase">E-Comm &lt;$5M</th>
+            <th style="text-align:center;padding:8px 12px;color:var(--muted);font-weight:600;font-size:9px;text-transform:uppercase">Cleaning DTC</th>
+            <th style="text-align:center;padding:8px 12px;color:var(--muted);font-weight:600;font-size:9px;text-transform:uppercase">vs Industry</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">Total Revenue</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02);font-weight:700">$109,824</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700">$82,107</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;background:rgba(141,198,63,.04)">$49,829</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">—</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">—</td>
+            <td style="padding:9px 12px;text-align:center">—</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(0,0,0,.01)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">Avg Monthly Revenue</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02);font-weight:700">$5,491</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700">$6,842</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;background:rgba(141,198,63,.04)">$12,457</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">—</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">—</td>
+            <td style="padding:9px 12px;text-align:center">—</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">Conversion Rate</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02)">—</td>
+            <td style="padding:9px 12px;text-align:center">~1.8%</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;background:rgba(141,198,63,.04)">1.71%</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">1.5–2.0%</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">1.2–1.8%</td>
+            <td style="padding:9px 12px;text-align:center"><span class="tag tag-fair">On Par</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(0,0,0,.01)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">Average Order Value</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02)">$39.74</td>
+            <td style="padding:9px 12px;text-align:center">$40.08</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;background:rgba(141,198,63,.04)">$36.62</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">$45–$65</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">$30–$50</td>
+            <td style="padding:9px 12px;text-align:center"><span class="tag tag-good">Good</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">Returning Customer Rate <span style="font-size:9px;color:var(--muted)">(order-level)</span></td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02)">—</td>
+            <td style="padding:9px 12px;text-align:center">~45%</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;color:var(--lime);background:rgba(141,198,63,.04)">40.62%</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">25–35%</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">35–45%</td>
+            <td style="padding:9px 12px;text-align:center"><span class="tag tag-exc">Exceptional</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(0,0,0,.01)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">VIP Customers (3+ orders)</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02)">—</td>
+            <td style="padding:9px 12px;text-align:center">—</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;color:var(--lime);background:rgba(141,198,63,.04)">438 (Klaviyo segment)</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">20–30%</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">30–40%</td>
+            <td style="padding:9px 12px;text-align:center"><span class="tag tag-exc">Exceptional</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">Organic Traffic % of Sessions</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02)">~50%</td>
+            <td style="padding:9px 12px;text-align:center">38.2%</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;color:var(--lime);background:rgba(141,198,63,.04)">33.8% Apr · +29.6% YoY org sessions</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">20–35%</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">25–40%</td>
+            <td style="padding:9px 12px;text-align:center"><span class="tag tag-exc">Exceptional</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(0,0,0,.01)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">Klaviyo % of Revenue</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02)">~10%</td>
+            <td style="padding:9px 12px;text-align:center">~11%</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;background:rgba(141,198,63,.04)">29.2% YTD · 45.0% Apr</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">15–25%</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">18–30%</td>
+            <td style="padding:9px 12px;text-align:center"><span class="tag tag-exc">Exceptional</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">Email Campaign Open Rate</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02)">~29%</td>
+            <td style="padding:9px 12px;text-align:center">~29%</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;background:rgba(141,198,63,.04)">31.97% YTD · 32.89% Apr</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">35–42%</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">32–40%</td>
+            <td style="padding:9px 12px;text-align:center"><span class="tag tag-poor">Below Avg</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:rgba(0,0,0,.01)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">Email Click Rate</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02)">~0.60%</td>
+            <td style="padding:9px 12px;text-align:center">~0.60%</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;background:rgba(141,198,63,.04)">0.67% YTD · 0.80% Apr</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">1.0–2.5%</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">0.8–2.0%</td>
+            <td style="padding:9px 12px;text-align:center"><span class="tag tag-fair">On Par (Apr)</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">MER (Marketing Efficiency)*</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02)">—</td>
+            <td style="padding:9px 12px;text-align:center">3.69×</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;color:var(--muted);background:rgba(141,198,63,.04)">— pending spend data</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">2.5–3.5×</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">3.0–4.0×</td>
+            <td style="padding:9px 12px;text-align:center"><span class="tag tag-fair">N/A</span></td>
+          </tr>
+          <tr style="background:rgba(0,0,0,.01)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">YoY Revenue Growth</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02)">159.4% avg</td>
+            <td style="padding:9px 12px;text-align:center">151.9%</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;color:var(--lime);background:rgba(141,198,63,.04)">+121.3% YTD · +128.9% Apr</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">15–30%</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">20–40%</td>
+            <td style="padding:9px 12px;text-align:center"><span class="tag tag-exc">Exceptional</span></td>
+          </tr>
+          <tr style="border-top:2px solid var(--border);background:rgba(141,198,63,.02)">
+            <td style="padding:9px 12px;font-weight:600;color:var(--forest)">SEO ROI Multiple†</td>
+            <td style="padding:9px 12px;text-align:center;background:rgba(22,56,37,.02)">—</td>
+            <td style="padding:9px 12px;text-align:center">—</td>
+            <td style="padding:9px 12px;text-align:center;font-weight:700;color:var(--lime);background:rgba(141,198,63,.04)">~4.23× (Aug '25–Apr '26)</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">2.0–4.0×</td>
+            <td style="padding:9px 12px;text-align:center;color:var(--muted)">2.5–5.0×</td>
+            <td style="padding:9px 12px;text-align:center"><span class="tag tag-good">Above Avg</span></td>
+          </tr>
+        </tbody>
+      </table>
+    <div style="margin-top:10px;font-size:10px;font-style:italic;color:var(--muted);padding:8px 12px;border-top:1px solid var(--border)">*MER calculated using ROI Live management fees, SEO services, and Klaviyo license only ($2,087.60/mo tracked). Internal labor, other agency/partner fees, and additional platform costs not included. Provide remaining expense data for true blended MER.</div>
+    </div>
+    <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="background:rgba(141,198,63,.06);border-radius:10px;padding:12px 16px;font-size:11px">
+        <strong style="color:var(--forest)">Consistently exceptional:</strong> Returning customer rate, VIP rate, organic %, MER, YoY growth — these are structural advantages that get stronger as the brand scales. The email % of revenue improvement in 2026 (+26.7%) signals the Klaviyo channel is finally being worked.
+      </div>
+      <div style="background:rgba(229,57,53,.04);border-radius:10px;padding:12px 16px;font-size:11px;border-left:3px solid rgba(229,57,53,.2)">
+        <strong style="color:var(--forest)">Consistent opportunity:</strong> Email open rate and click rate have been below industry average across all three periods. This is the same signal across 18 months — a segmentation and subject line issue, not a list quality issue. The engaged segment (1,793) should be the primary campaign audience.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- /content -->
+
+<div class="footer">
+  Green Llama Clean · Meeting Edition · Prepared by ROI Live · Data: Shopify + Klaviyo + GA4 + GSC + SE Ranking + Seal · Last updated: April 30, 2026 · Month-End Final · The Power of Positive Cleaning™
+</div>
+
+<script>
+Chart.defaults.font.family="'Plus Jakarta Sans',sans-serif";
+Chart.defaults.font.size=10;
+Chart.defaults.color='#6B7280';
+const LIME='#8DC63F',MOSS='#5A9B6E',SAGE='#3A7454',GOLD='#C9A34A',VIOLET='#6B4ECC',SLATE='#CBD5E1';
+function gc(c){return{color:'#EEE9DE',drawBorder:false,borderDash:[3,3]}}
+function tc(){return{maxRotation:0,color:'#6B7280'}}
+function mkChart(id,cfg){const c=document.getElementById(id);if(!c)return;if(c._chart)c._chart.destroy();c._chart=new Chart(c,cfg)}
+
+// ── DATA ──
+const allMonths=['Sep\'24','Oct\'24','Nov\'24','Dec\'24','Jan\'25','Feb\'25','Mar\'25','Apr\'25','May\'25','Jun\'25','Jul\'25','Aug\'25','Sep\'25','Oct\'25','Nov\'25','Dec\'25','Jan\'26','Feb\'26','Mar\'26','Apr\'26'];
+const rev=[2908,3225,3896,4033,5359,4877,6321,5965,5259,4924,5357,5479,6240,5698,15340,11288,11324,11161,13690,13654];
+const org=[1350,1204,1415,1460,2326,2073,3039,2835,1583,1671,2060,1916,2237,1570,6275,3793,4935,4419,4235,2160];
+// org[7] Apr'25 = $2,835 verified from GA4 screenshot (Apr 2025 Organic Search row · Total revenue col) 2026-05-01
+// org[19] Apr'26 = $2,160 verified from GA4 screenshot (Apr 2026 Organic Search row · Total revenue col) 2026-05-01
+const ly =[695,893,1276,1622,1465,1666,2299,2427,2512,2239,2576,3343,2908,3225,3896,4033,5359,4877,6321,5965];
+const yoy=[318,261,205,149,266,193,175,146,109,120,108,64,115,77,294,180,111,129,117,129];
+const merM=['Aug\'25','Sep\'25','Oct\'25','Nov\'25','Dec\'25','Jan\'26','Feb\'26','Mar\'26'];
+const merV=[2.62,2.99,2.73,7.35,5.41,5.42,5.35,6.56];
+const months6=['Nov\'25','Dec\'25','Jan\'26','Feb\'26','Mar\'26','Apr\'26'];
+const rev6=[15340,11288,11324,11161,13690,13654];
+const org6=[6275,3793,4935,4419,4235,2160];
+const orders6=[363,284,298,305,334,364];
+const lyOrders=[109,113,136,128,172,167];
+const aov6=[42.26,39.75,38.00,36.59,39.24,35.90];
+
+// GSC monthly clicks (10-month rolling)
+const gscDays=['Jul \'25','Aug \'25','Sep \'25','Oct \'25','Nov \'25','Dec \'25','Jan \'26','Feb \'26','Mar \'26','Apr \'26'];
+const gscClicks=[1809,1995,2154,1879,8938,3135,3861,4273,4191,3049];
+
+let initialized={};
+function initTab(name){
+  if(initialized[name])return;
+  initialized[name]=true;
+  if(name==='overview'){
+    mkChart('c-revenue',{type:'line',data:{labels:allMonths,datasets:[
+      {label:'Prior Year',data:ly,borderColor:SLATE,borderWidth:1.5,pointRadius:0,fill:false,borderDash:[4,2],tension:.3},
+      {label:'Organic',data:org,borderColor:MOSS,borderWidth:2,pointRadius:0,fill:'origin',backgroundColor:'rgba(90,155,110,.12)',tension:.3},
+      {label:'Revenue',data:rev,borderColor:LIME,borderWidth:2.5,pointRadius:(ctx)=>ctx.dataIndex===19?5:0,pointBackgroundColor:LIME,fill:'origin',backgroundColor:'rgba(141,198,63,.12)',tension:.3},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:gc(),ticks:tc()},y:{grid:gc(),ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+    mkChart('c-yoy',{type:'bar',data:{labels:allMonths.slice(0,-1),datasets:[{label:'YoY %',data:yoy.slice(0,-1),backgroundColor:yoy.slice(0,-1).map(v=>v>=150?LIME:v>=100?MOSS:'#BECFB8'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:tc()},y:{grid:gc(),ticks:{callback:v=>v+'%'}}}}});
+    mkChart('c-mer',{type:'line',data:{labels:merM,datasets:[
+      {label:'Target 3×',data:merM.map(()=>3),borderColor:SLATE,borderWidth:1,pointRadius:0,borderDash:[4,3],fill:false},
+      {label:'MER',data:merV,borderColor:LIME,borderWidth:3,pointRadius:4,pointBackgroundColor:LIME,pointBorderColor:'#fff',pointBorderWidth:2,fill:'origin',backgroundColor:'rgba(141,198,63,.1)',tension:.4},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:tc()},y:{grid:gc(),min:0,max:8}}}});
+  }
+  if(name==='seo'){
+    // 19-month SEO traffic trend
+    const seoMonths=['Sep\'24','Oct\'24','Nov\'24','Dec\'24','Jan\'25','Feb\'25','Mar\'25','Apr\'25','May\'25','Jun\'25','Jul\'25','Aug\'25','Sep\'25','Oct\'25','Nov\'25','Dec\'25','Jan\'26','Feb\'26','Mar\'26','Apr\'26'];
+    const seoTraffic=[1652,1447,1667,1866,2592,2680,3885,2889,2452,2130,1839,1889,1906,3789,9079,3513,4381,4847,4669,3744];
+    // Apr '25 GA4 organic: 2,889 sessions / $2,835.25 revenue (Total 4,810 / $4,355.49 — verified scr 114745)
+    // Apr '26 GA4 organic: 3,744 sessions / $2,160.11 revenue (Total 11,092 / $8,034.02 — verified scr 114533)
+    const lyTrafficFull=[484,438,460,368,474,585,999,935,873,1091,1266,1585,1652,1447,1667,1866,2592,2680,null,2889];
+    mkChart('c-gsc-monthly',{type:'line',data:{labels:seoMonths,datasets:[
+      {label:'Prior Year',data:lyTrafficFull,borderColor:'#CBD5E1',borderWidth:1.5,pointRadius:0,fill:false,borderDash:[4,2],tension:.3},
+      {label:'Organic Sessions',data:seoTraffic,borderColor:LIME,borderWidth:2.5,pointRadius:(ctx)=>ctx.dataIndex===19?5:0,pointBackgroundColor:LIME,fill:'origin',backgroundColor:'rgba(141,198,63,.1)',tension:.3},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:8,font:{size:10}}}},scales:{x:{grid:gc(),ticks:{...tc(),maxRotation:45}},y:{grid:gc()}}}});
+    // SEO revenue vs total + % line
+    const orgPct=[40.90,33.60,43.58,39.59,30.93,15.82];
+    mkChart('c-orgvstotal',{type:'bar',data:{labels:months6,datasets:[
+      {label:'Total Revenue',data:rev6,backgroundColor:'#EEE9DE',borderRadius:5,yAxisID:'y'},
+      {label:'Organic Revenue',data:org6,backgroundColor:LIME,borderRadius:5,yAxisID:'y'},
+      {type:'line',label:'Organic %',data:orgPct,borderColor:MOSS,borderWidth:2.5,pointRadius:4,pointBackgroundColor:MOSS,pointBorderColor:'#fff',pointBorderWidth:2,fill:false,tension:.3,yAxisID:'y2'},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:8,font:{size:10}}}},scales:{
+      x:{grid:{display:false},ticks:tc()},
+      y:{grid:gc(),ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'K'},position:'left'},
+      y2:{grid:{display:false},ticks:{callback:v=>v+'%'},position:'right',min:0,max:60}
+    }}});
+  }
+  if(name==='orders'){
+    const months12=['May\'25','Jun\'25','Jul\'25','Aug\'25','Sep\'25','Oct\'25','Nov\'25','Dec\'25','Jan\'26','Feb\'26','Mar\'26','Apr\'26'];
+    const orders12=[43,51,57,62,53,41,137,87,117,108,334,364];
+    const lyOrders12=[null,null,null,null,77,94,109,113,136,128,172,167];
+    mkChart('c-orders',{type:'bar',data:{labels:months12,datasets:[
+      {label:'Prior Year',data:lyOrders12,backgroundColor:'#D4E8CC',borderRadius:3},
+      {label:'Orders',data:orders12,backgroundColor:LIME,borderRadius:3},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:8,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:tc()},y:{grid:gc()}}}});
+    mkChart('c-aov',{type:'line',data:{labels:months6,datasets:[{label:'AOV',data:aov6,borderColor:GOLD,borderWidth:3,pointRadius:4,pointBackgroundColor:GOLD,pointBorderColor:'#fff',pointBorderWidth:2,fill:false,tension:.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:tc()},y:{grid:gc(),ticks:{callback:v=>'$'+v},min:28,max:48}}}});
+  }
+}
+
+// ── APRIL FINAL VS APRIL 2025 COMPARISON BARS ──
+function buildProjectionBars(){
+  const data=[
+    {label:'Revenue',actual:13654,prior:5965,fmt:v=>'$'+Math.round(v).toLocaleString()},
+    {label:'Orders',actual:364,prior:167,fmt:v=>Math.round(v).toLocaleString()},
+    {label:'Sessions (Shopify)',actual:15227,prior:5136,fmt:v=>Math.round(v).toLocaleString()},
+    {label:'Klaviyo Revenue',actual:6150,prior:null,fmt:v=>'$'+Math.round(v).toLocaleString()},
+  ];
+  const container=document.getElementById('proj-bars');
+  if(!container)return;
+  container.innerHTML=data.map(d=>{
+    const max=Math.max(d.actual,(d.prior||0))*1.1;
+    const actualPct=Math.round((d.actual/max)*100);
+    const priorPct=d.prior?Math.round((d.prior/max)*100):0;
+    const yoy=d.prior?Math.round((d.actual/d.prior-1)*100):null;
+    return `<div style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin-bottom:8px">
+        <span style="font-weight:600;color:var(--forest)">${d.label}</span>
+        <span style="display:flex;gap:16px;align-items:center;font-size:11px">
+          <span style="color:var(--lime);font-weight:700">Apr '26: ${d.fmt(d.actual)}</span>
+          ${d.prior?`<span style="color:var(--muted)">Apr '25: ${d.fmt(d.prior)}</span><span style="background:rgba(141,198,63,.15);color:var(--sage);padding:1px 6px;border-radius:99px;font-weight:700;font-size:10px">+${yoy}% YoY</span>`:'<span style="background:rgba(107,78,204,.15);color:var(--violet);padding:1px 6px;border-radius:99px;font-weight:700;font-size:10px">No PY data</span>'}
+        </span>
+      </div>
+      <div style="position:relative;height:14px;background:#EEE9DE;border-radius:99px;overflow:visible">
+        <div style="position:absolute;top:0;left:0;height:100%;width:${actualPct}%;background:var(--lime);border-radius:99px;z-index:2"></div>
+        ${d.prior?`<div style="position:absolute;top:-5px;bottom:-5px;left:${priorPct}%;width:2px;background:var(--forest);border-radius:1px;z-index:3"></div><div style="position:absolute;top:-20px;left:${priorPct}%;transform:translateX(-50%);font-size:8px;color:var(--forest);font-weight:600;white-space:nowrap">Apr '25</div>`:''}
+      </div>
+      <div style="display:flex;gap:12px;margin-top:6px;font-size:9px">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:4px;background:var(--lime);border-radius:99px;display:inline-block"></span>April 2026 Final</span>
+        ${d.prior?`<span style="display:flex;align-items:center;gap:4px"><span style="width:2px;height:10px;background:var(--forest);display:inline-block"></span>April 2025 Actual</span>`:'<span style="color:var(--muted)">PY benchmark not available for Klaviyo this run</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+  // strategy tab uses inline SVG chart — no Chart.js needed
+  if(false && name==='strategy_disabled'){
+    const tLabels=["Mar '26","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan '27","Feb","Mar","Apr"];
+    const tBaseline=[12213,12518,12831,13152,13481,13818,14163,14517,14880,15252,15634,16025,16425,16836];
+    const tEmailAov=[12213,15918,17331,17652,17981,18318,18663,19017,19380,19752,20134,20525,20925,21336];
+    const tWithPaid=[12213,15918,19806,22052,23481,23818,24163,24517,24880,25252,25634,26025,26425,26836];
+    const tAllLevers=[12213,16092,20171,22627,24287,24878,25503,26164,26866,27610,28134,28525,28925,29336];
+    const tFullStack=[12213,16092,20171,22627,24487,25278,26103,26964,27666,28410,28934,29325,29725,30136];
+    const tTarget=tLabels.map(()=>30000);
+    mkChart('c-trajectory',{type:'line',data:{labels:tLabels,datasets:[
+      {label:'Organic Only',data:tBaseline,borderColor:'#CBD5E1',borderWidth:1.5,pointRadius:0,fill:false,tension:.4,borderDash:[4,3]},
+      {label:'+ Email + AOV',data:tEmailAov,borderColor:'#6B4ECC',borderWidth:1.5,pointRadius:0,fill:false,tension:.4},
+      {label:'+ Paid Ads',data:tWithPaid,borderColor:'#C9A34A',borderWidth:2,pointRadius:0,fill:false,tension:.4},
+      {label:'+ Subscriptions',data:tAllLevers,borderColor:'#5A9B6E',borderWidth:2,pointRadius:0,fill:false,tension:.4},
+      {label:'+ SKIO / Retention',data:tFullStack,borderColor:'#8DC63F',borderWidth:3,pointRadius:(ctx)=>ctx.dataIndex===13?6:0,pointBackgroundColor:'#8DC63F',pointBorderColor:'#fff',pointBorderWidth:2,fill:'origin',backgroundColor:'rgba(141,198,63,.06)',tension:.4},
+      {label:'$30K Target',data:tTarget,borderColor:'rgba(229,57,53,.5)',borderWidth:1.5,pointRadius:0,fill:false,borderDash:[6,3]},
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:(c)=>(c.dataset.label||'')+': $'+Math.round(c.parsed.y).toLocaleString()}}},
+      scales:{
+        x:{grid:{color:'#EEE9DE',borderDash:[3,3]},ticks:{color:'#6B7280',font:{size:10}}},
+        y:{grid:{color:'#EEE9DE',borderDash:[3,3]},ticks:{color:'#6B7280',font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'K'},min:10000,max:32000}
+      }
+    }});
+  }
+
+// ── TAB SWITCHING ──
+function showTab(name){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+  setTimeout(()=>initTab(name),50);
+}
+
+// ── INIT ──
+window.addEventListener('load',()=>{
+  buildProjectionBars();
+  initTab('april');
+});
+</script>
+</body>
+</html>
