@@ -105,26 +105,45 @@ When the user asks to add a client:
 
 ### Branching Policy
 
-Three zones control how changes flow through the dev/main branching model.
+This repository uses Obsidian Sync as the real-time sync mechanism between team members and a nightly auto-backup script that captures all changes to Github. Daily editorial work happens directly on `main` without feature branches.
 
-| Zone | Paths | On `dev` | On `feature/*` |
-|------|-------|----------|----------------|
-| **Content** | `projects/`, `brand_context/`, `context/`, `cron/jobs/`, `clients/*/` | Commit directly | Commit directly |
-| **Config** | `.claude/skills/*/SKILL.md`, `AGENTS.md`, `CLAUDE.md`, `.env.example`, `scripts/*.sh` | Advisory: consider feature branch | Commit directly |
-| **Code** | `command-centre/src/**`, `.claude/hooks/*.js`, runtime JS/TS | Strong nudge: use `/new-feature` | Commit directly |
+**Default rule:** Edit on `main`. Don't pull, don't push, don't commit, don't create feature branches. The Obsidian Sync + auto-backup system handles versioning.
 
-**`main` is always protected:**
-- Requires a PR to merge (no direct push)
-- CI status checks must pass
-- No force pushes, no deletions
+**Exception zones requiring feature branches + PR:**
 
-**`dev` is the working branch.** Content changes go directly here. Config and code changes should use feature branches that merge back to `dev`.
+| Zone | Paths | Why |
+|------|-------|-----|
+| **Application code** | `command-centre/src/**`, `command-centre/scripts/**`, `.claude/hooks/*.js`, runtime JS/TS | Code changes can break the running application; PR review prevents broken deploys |
+| **Agency SOPs** | `agency/sops/*` | Changes propagate to every client via inheritance; mistakes affect all client work |
+| **Root instruction files** | `AGENTS.md`, `CLAUDE.md`, `AGENTIC-OS-CONTEXT.md` | Changes affect every Claude Code session; deserve review |
+| **Scripts** | `scripts/*.sh`, `scripts/*.ps1`, `scripts/lib/**` | Scripts affect tooling for everyone; need testing before merge |
 
-**Release flow:** Tag on `dev` with `/release`, then promote to `main` via PR. CI runs automatically on the PR.
+For everything else (`projects/`, `brand_context/`, `context/`, `inputs/`, `clients/*/`, `docs/`, `cron/jobs/`), edit directly on `main`. Obsidian Sync propagates the change to teammates in real time. The auto-backup script at `scripts/auto-backup.sh` commits and pushes to Github nightly at 11pm.
 
-**Solo defaults:** No PR approval required, auto-merge available on release PRs. Teams can tighten by requiring 1 approval on `main` PRs and disabling auto-merge.
+**`main` is the working branch.** No `dev` branch in the new model.
 
-**Quick fixes:** Use `/new-feature --quick` for trivial one-file fixes — creates a branch, makes the change, merges, and cleans up in one flow.
+**Feature-branch workflow (for exception zones above):**
+
+1. Start: `git checkout -b feature/{description}` or `git checkout -b chore/{description}`
+2. Make changes, commit normally
+3. Push: `git push origin {branch-name}`
+4. Open PR on Github, review, merge
+5. After merge: `git checkout main && git pull origin main`
+
+**Quick fixes** to exception zones (one-line typo, trivial config update): may go directly to main at the operator's discretion.
+
+**Auto-backup script behavior:**
+- Runs nightly via Windows Task Scheduler (or cron equivalent on other OS)
+- Stages all changes (`git add -A`), commits with message `Auto-backup {ISO timestamp}`, pushes to `origin main`
+- Logs to `scripts/auto-backup.log` (gitignored)
+- Skips commit if working directory is clean
+- If push fails (auth/network), logs failure and exits — does not silently lose work
+
+**Important for Claude Code sessions:**
+
+When working in this repo, do NOT proactively suggest committing, creating feature branches, pulling, or pushing for editorial work. The default assumption is the user is editing on main with Obsidian Sync handling propagation. Only suggest git operations for the exception zones above, or when the user explicitly asks for git help.
+
+If a Claude Code session needs to modify files in an exception zone, it should ask the user before creating a branch, not automatically default to feature-branch creation.
 
 ### Before Major Deliverables
 
