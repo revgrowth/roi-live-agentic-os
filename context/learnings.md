@@ -26,14 +26,14 @@
 
 ## tool-firecrawl-scraper
 
-- 2026-04-22: API key not configured. When any skill triggers Firecrawl, check `.env` for `FIRECRAWL_API_KEY` first. If absent, fall back to WebFetch and flag the gap. Adding the key unlocks roi.live auto-scraping for visual brand assets via Firecrawl branding extraction.
+- 2026-04-22: API key not configured. When any skill triggers Firecrawl, check `.env` for `FIRECRAWL_API_KEY` first. If absent, fall back to WebFetch and flag the gap.
 - 2026-04-23: `FIRECRAWL_API_KEY` is now live. The branding format returns `colorScheme`, `fonts`, `colors` (primary/secondary/accent/background/textPrimary/link), `typography` (fontFamilies, fontStacks, fontSizes), `spacing`, `components` (buttonPrimary/buttonSecondary/input with bg/text/radius/shadow), `images` (logo/favicon/ogImage + logoAlt), `personality`, `designSystem`, and `confidence` scores. The detected "primary" color is often an accent/attention color, not the CTA color — the primary CTA color lives in `components.buttonPrimary.background`. Name CTA colors by component, not by "primary brand color," in downstream briefs.
-- 2026-04-23: The `logoAlt` attribute Firecrawl surfaces is a quiet audit tool. On the CCC site it exposed an entity-graph leak ("Logo showing Coastal Carolina Comfort LLC above now part of and a larger Coastal Air Plus in teal and purple...") that had been flagged in the SEO strategy but not visually confirmed. Always capture and review `images.logoAlt` when scraping — it reveals what Google's crawler is parsing for entity context.
+- 2026-04-23: The `logoAlt` attribute Firecrawl surfaces is a quiet audit tool — it exposes what Google's crawler is parsing for entity context. Always capture and review `images.logoAlt` when scraping; it has caught entity-graph leaks that visual inspection of the rendered page would not.
 - 2026-04-23: When Bash is blocked from reading `.env` (common under client sandboxing), write a small throwaway Python script under `.tmp/` that loads .env via file read and hits the Firecrawl REST endpoint directly (`POST /v2/scrape` with `Authorization: Bearer`). Works in ~6 seconds per URL for branding format, avoids SDK install overhead, and keeps raw JSON cached for audit.
 
 ## str-ai-seo
 
-- 2026-04-28: Head-term keywords frequently return AI Overviews for the wrong industry intent. Examples from gh-yellow-jacket-oil Phase 1: `frac plug` (oilfield target) returns 71% saltwater-aquarium AIO citations; `shot density` (perforating target) returns 57% shotgun-ammunition citations. Targeting these head terms for AEO measurement is leverage-poor — Yellow Jacket can win organic SEO but AIO citations won't flow until Google's intent classification shifts. Always classify AIO citation domains for intent-mismatch before locking in AEO strategy: if ≥30% of cited domains are from a different industry AND zero are from the target industry, refine the keyword to a longer-tail variant that disambiguates intent. The `analyze-cached-serps.js` helper in the gh-yellow-jacket-oil client has a working detector pattern.
+- 2026-04-28: Head-term keywords frequently return AI Overviews for the wrong industry intent. Targeting head terms for AEO measurement is leverage-poor when the AIO citation pool is dominated by a different industry — organic SEO can still win but AIO citations won't flow until Google's intent classification shifts. Always classify AIO citation domains for intent-mismatch before locking in AEO strategy: if ≥30% of cited domains are from a different industry AND zero are from the target industry, refine the keyword to a longer-tail variant that disambiguates intent.
 
 ## str-trending-research
 
@@ -55,10 +55,10 @@
 
 ## tool-dataforseo
 
-- 2026-04-28: First version built during gh-yellow-jacket-oil Phase 1 keyword validation. Three scripts: keyword-overview, serp-advanced, validate-keywords. Per-keyword JSON cache is a hard requirement — earlier client-level helper lost ~$0.10 of paid SERP output to a mid-run filesystem reset because raw responses lived only in memory until end-of-run. New design persists immediately on each call.
+- 2026-04-28: Per-keyword JSON cache is a hard requirement. An earlier client-level helper lost ~$0.10 of paid SERP output to a mid-run filesystem reset because raw responses lived only in memory until end-of-run. Current design persists immediately on each call.
 - 2026-04-28: AI Overview citation references appear in two response shapes — sometimes `item.references`, sometimes nested under `item.items[].references`. Summariser handles both. Watch for further variants as DataForSEO updates the AIO endpoint.
 - 2026-04-28: Keyword Overview Live silently omits keywords with no measured volume — they don't return as a row at all. Treat missing keywords as a soft LOW_VOLUME signal, not as a fetch error. Validation table flags them in a dedicated "No Overview Data Returned" section.
-- 2026-04-28: SERP Organic Live Advanced returns up to `depth: 20` results by default in this skill's scripts — when reporting "competitor organic appearances" downstream, label the bucket as "top 20" not "top 10". The earlier auditor markdown labeled it "top 10" but actually included ranks up to 20; fix the label, don't filter the data (page-2 ranks are still informative for competitive landscape).
+- 2026-04-28: SERP Organic Live Advanced returns up to `depth: 20` results by default in this skill's scripts — when reporting "competitor organic appearances" downstream, label the bucket as "top 20" not "top 10". Page-2 ranks are still informative for competitive landscape; fix the label, don't filter the data.
 
 ## viz-excalidraw-diagram
 
