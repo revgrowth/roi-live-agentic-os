@@ -137,8 +137,8 @@ For any decision that depends on workstream state, read `engagement-status.md` b
 |---|---|---|---|
 | Maureen Mattiola | Office Manager (on staff since 2016) | Blue Tree | Primary day-to-day contact for client input, approvals, asset retrieval |
 | Jérôme Besnard | Sales Manager | Blue Tree | Sitemap architecture, sales process input, voice review |
-| Jeff Mattiola | Founder / President / Sole Owner | Blue Tree | Final owner sign-off, brand-voice authority, founder voice samples |
-| Chad Ochnich | Co-Owner | Blue Tree | Hardscape division authority, ICPI certification holder |
+| Jeff Mattiola | Founder / President / Co-Owner | Blue Tree | Final owner sign-off, brand-voice authority, founder voice samples. Partners with Chad since 1995. |
+| Chad Ochnich | Vice President / Co-Owner | Blue Tree | Hardscape division authority, ICPI certification holder. Partners with Jeff since 1995. |
 | Raja Sheryar | Designer | ROI.LIVE | Design system, Figma templates, brand assets |
 | Jason Spencer | Founder | ROI.LIVE | Full-stack growth lead, FCMO, account owner |
 
