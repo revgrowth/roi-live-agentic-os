@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "installed_at": "2026-05-12T04:01:43.996Z",
+  "installer_version": "2.0.0",
+  "files": {
+    "CHANGELOG.md": "sha256:a244a7545b0b544c9955ac6e4255421794ec56e634e939248533bad48d856db6",
+    "README.md": "sha256:d52b212305ffc4430c0cd6c43009dbce4e1d7b6daa753da913b3d9c1003b2c03",
+    "SKILL.md": "sha256:b0fcf2206aab721b6460771685b9cd62bddbc3f37a3316f93ce1c8a3b42603fa",
+    "references/onboarding.md": "sha256:d144c45b463ab8f71edbcbf727ad0c293e30936582b3fc3dfc24cb9a0d4096e6",
+    "skill-pack/config-schema.yaml": "sha256:5bd6cb6588a945464fd0eecfc4b659080b458493d54552a27c7ecc69525cbb28",
+    "skill-pack/config/sys-config.md": "sha256:5d66106fda094dffb3a907a077d683caba2bb66704a6c451d71d65d1032ca307",
+    "skill-pack/templates/.env.example": "sha256:7c76c4af3de6e7bf3a77c272d1d5a3a9f8b0bc47002609ae724b364c500fee7c"
+  }
+}

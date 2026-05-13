@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "installed_at": "2026-05-12T04:01:43.997Z",
+  "installer_version": "2.0.0",
+  "files": {
+    "CHANGELOG.md": "sha256:1e41ee3bab504be1f8295bffd2468ff9831b59a89ca23b99ae4f8952c0cda549",
+    "SKILL.md": "sha256:fc7553595094f28c7c1f6639752e83decfd16667fa0ba823881a3411cb4e2633",
+    "references/design-principles.md": "sha256:e48dbb147de94f49cda5c0f79e8007ef34542e5ed78068373249df5db6d2e49c",
+    "references/style-presets.md": "sha256:e011c8e56056b3fb31b6088de493e8219125101468a545cd04820c43a1bcd683",
+    "skill-pack/config/sys-config.md": "sha256:f0bcfaa0ee7ad6ab482dee0d93b7353ce9f3d92e4755145292bf8cfab0440fe1"
+  }
+}

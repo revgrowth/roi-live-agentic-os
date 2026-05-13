@@ -1,0 +1,12 @@
+{
+  "version": "1.0.1",
+  "installed_at": "2026-05-12T04:02:45.924Z",
+  "installer_version": "2.0.0",
+  "files": {
+    "CHANGELOG.md": "sha256:20c128208fee3a7cadc183e422885e7540c9eb3dab2d701006571746e97470f5",
+    "SKILL.md": "sha256:7c94c4b82e984002fa7dcf2ea9ba72b00c31b2bdc237e182edfb86658ae17ba9",
+    "config/platforms.md": "sha256:4847bfe9cbf5712b569c4cb5167d5fad20709d2ba05bb64e4f43a1431d2a7f43",
+    "scripts/slides_to_pdf.py": "sha256:a3db66707ee0eea4b73500684531722820df78b3397198c070c3a292588e5ade",
+    "skill-pack/config/sys-config.md": "sha256:51730add0a4684bd3aa8ccc3830fcff0289d730bd4545456453e10c2396066df"
+  }
+}

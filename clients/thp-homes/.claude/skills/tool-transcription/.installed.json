@@ -1,0 +1,12 @@
+{
+  "version": "1.1.0",
+  "installed_at": "2026-05-12T04:01:43.544Z",
+  "installer_version": "2.0.0",
+  "files": {
+    "CHANGELOG.md": "sha256:ef54e0648b51fff227f4794998dc40e658fa40540ca2cf4a3a769c4335d3384a",
+    "SKILL.md": "sha256:b224cf9ca1b96713af35bc667e9019a7eea53822e9164edfab76114b1d4dec9a",
+    "scripts/setup.sh": "sha256:caa0666d196b374905edb01943209b493009d07043519dcb27ef5498b1844b2a",
+    "scripts/transcribe.py": "sha256:2a7f6de169ef4fb3d0aff10d7d59d2c56c0355ed6ccab97e86a3e729567464a6",
+    "skill-pack/config/sys-config.md": "sha256:9d9738efd053e829f23aa165a6462b7c7d93a33febebc7581d4e04f674116094"
+  }
+}

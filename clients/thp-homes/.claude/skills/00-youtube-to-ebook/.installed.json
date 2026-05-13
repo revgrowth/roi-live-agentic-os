@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "installed_at": "2026-05-12T04:02:46.987Z",
+  "installer_version": "2.0.0",
+  "files": {
+    "CHANGELOG.md": "sha256:6f74177a50094bb42dd1cb2f29a896c3069e544112924b312dd267a7f2e1b32e",
+    "README.md": "sha256:c062bc601812f1337c4d50c399fd10f8a15a4d64978dc4bbde27d48e3f6d5143",
+    "SKILL.md": "sha256:fddfdd696fa03a21a793fdb17da0ce5780c94cefaf8b09be4dd540511beb125a",
+    "references/onboarding.md": "sha256:a8d5a008f615dcd6da190feb9af61fcad4f68123b43f697a2a068aefec5c67cf",
+    "references/pipeline-phases.md": "sha256:1fdd42f4fa7bd1b32816b20f984197f5fae32fd86b6db79509151ef43162ff96",
+    "skill-pack/config-schema.yaml": "sha256:6622833c8df04848353c1802c128dfdd9188e5946d746cd1f9ae96b22eec0bc2",
+    "skill-pack/config/sys-config.md": "sha256:81d02d1b01cb5cad8e0bbdf72b4f81d941ff9e167d1bb1d94adcc3758f6e3a0d",
+    "skill-pack/templates/.env.example": "sha256:62fab8bac042b13b9df6f096d776290fa5787254471e733f566afb7a4c716238",
+    "skill-pack/tools/md_to_pdf.py": "sha256:661b78214d05ffb1e119704663d2f95e0f1c426cfd4778db6206dcff9afcf8b1",
+    "skill-pack/tools/pdf_theme_from_tokens.py": "sha256:25c1cdd6060121e675de35210b821ec2ea5a26af9d41ecffe074ca47ca19d35e"
+  }
+}
