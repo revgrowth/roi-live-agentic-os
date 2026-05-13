@@ -1,0 +1,19 @@
+{
+  "version": "1.0.1",
+  "installed_at": "2026-05-12T04:02:45.915Z",
+  "installer_version": "2.0.0",
+  "files": {
+    "CHANGELOG.md": "sha256:efdf45ae37df3ecf5315ae0d679ff4a25edf0ce04d9c712723c7f6f876e08f47",
+    "README.md": "sha256:56ec610e1d352c455a6c1a3f8c2046c279a0f4e034882a28da6af61a5f360fc0",
+    "SKILL.md": "sha256:f6c4e5a233fe2e73e9e9a3c9d1ac3127de6dd5d5f025ee72525a79de733d9d68",
+    "references/onboarding.md": "sha256:6e0f10899157a2c55ce3cc77078b0ecbb2ba8d0cefdd528ca1c1ee34864aca9a",
+    "references/pipeline-phases.md": "sha256:96b5fb40b1507864d0ca7958fa5893d0377351a31c3cf3947a16f1024d059445",
+    "skill-pack/config-schema.yaml": "sha256:57af6a70973efc3979b02bd97ae20807790af9b5e9c8f6ca14498e8700bc0ca2",
+    "skill-pack/config/pipeline.config.yaml": "sha256:751b9cac6759c38ff19f576d9636aed8918b4576883cc53a7c0fa5190083ce5a",
+    "skill-pack/config/sys-config.md": "sha256:0d155aedeede3207b8ac39e5fe078a0ab7b4223d72f7a073257b4702914b547d",
+    "skill-pack/templates/.env.example": "sha256:31393cf26dad793038729fd9a0ff30e309c1c2a645a430a14da5921919c007f4",
+    "skill-pack/templates/.gitignore.template": "sha256:f5dac6235be03128d6d8929e6e735e04f93b1d73c56c327f47af6e8400858841",
+    "skill-pack/templates/.mcp.example.json": "sha256:6a89ac03bd39f06309a09aefeecdbecaad8632becdab45b31440128f572b294a",
+    "skill-pack/templates/pipeline.config.yaml.template": "sha256:96cab4362b9882177346b6930f58b490b3d411f97bcbab16ccc246211890b3a2"
+  }
+}
