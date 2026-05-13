@@ -59,3 +59,5 @@ clients/*/.claude/hooks_info/ccnotify.log.*
 # Obsidian
 .obsidian/
 .trash/
+# Auto-backup log
+scripts/auto-backup.log
