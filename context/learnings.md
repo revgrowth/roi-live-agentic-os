@@ -60,6 +60,7 @@
 ## tool-tempo-efficiency
 
 - 2026-09-21: Tempo owns gate/kill/JSONL + post-`llm_escalate` tiers. Import DF `router_outcome` only — do not fork `tool-polaris-df` or add a second pack catalog. Prod classify pin is `jev-1.13.0`. `BOT_EXEC` stays OFF. Cost-cap dollars are null until Jason sets them; hop limit (max 2) still enforces.
+- 2026-09-21: Polaris review — do not unify COO 0.95 vs DF ~0.85 auto bands. Accept `route` or `router_outcome` (prefer `route`). Shared DF confidence is min(choice/score) or noul extremity; never invent DF safety. Keyword/purity T1; audit T1 (T3 if client-facing); QA/AEO/GEO T3; YMYL/claim human only.
 
 ## tool-dataforseo
 
