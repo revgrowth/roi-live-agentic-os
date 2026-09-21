@@ -105,6 +105,13 @@ jobs:
             [ -f "$f" ] && node --check "$f"
           done
 
+      - name: Polaris Decision Fabric tests (mock)
+        env:
+          PYTHONPATH: .claude/skills/tool-polaris-df
+        run: |
+          python3 -m unittest discover -s .claude/skills/tool-polaris-df/tests -p 'test_*.py'
+          python3 -m polaris_df --dry-run --no-log eval --fail-under 0.7
+
       - name: Validate SKILL.md frontmatter
         run: |
           EXIT_CODE=0

@@ -113,6 +113,13 @@
       "requires_services": [],
       "dependencies": [],
       "mcp_servers": []
+    },
+    "tool-polaris-df": {
+      "category": "utility",
+      "description": "Typed Jev judgments for Search Command, audit, keyword, and QA",
+      "requires_services": ["TYPESAFE_API_KEY"],
+      "dependencies": [],
+      "mcp_servers": []
     }
   }
 }
