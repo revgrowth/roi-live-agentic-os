@@ -22,11 +22,14 @@ bash scripts/polaris-df --help
 pip install -e .claude/skills/tool-polaris-df
 ```
 
-`str-search-command` is not in this repo snapshot. Call the adapter from that skill when it lands:
+`str-search-command` is not in this repo snapshot. Call the portable shim (or the adapter) from that skill when it lands:
 
 ```python
-from polaris_df.adapters.search_command import judge_purity_row, classify_serp_shape
+from integrations.str_search_command_soft_gates import classify_serp_shape, run_gate
+# or: from polaris_df.adapters.search_command import judge_purity_row, classify_serp_shape
 ```
+
+See `INTEGRATION_SEARCH_COMMAND.md`.
 
 ## Environment
 
@@ -36,6 +39,8 @@ from polaris_df.adapters.search_command import judge_purity_row, classify_serp_s
 | `TYPESAFE_BASE_URL` | Default `https://api.typesafe.ai` |
 | `POLARIS_JEV_MODEL` or `TYPESAFE_DEFAULT_MODEL` | Pin. Prod default `jev-1.13.0`. |
 | `POLARIS_DF_LOG` | Optional JSONL path override |
+| `POLARIS_DF_SOFT_GATES` | Search Command kill switch. Default on. `0`/`off` no-ops the shim. |
+| `POLARIS_DF_LIVE` | Search Command live switch. Default off → dry_run. |
 
 If the key is missing, every command uses mock mode. `--dry-run` forces mock even when a key exists. `--live` refuses to run without a key.
 

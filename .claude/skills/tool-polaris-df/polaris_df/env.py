@@ -10,6 +10,10 @@ BASE_URL_ENV = "TYPESAFE_BASE_URL"
 DEFAULT_MODEL_ENV = "TYPESAFE_DEFAULT_MODEL"
 POLARIS_MODEL_ENV = "POLARIS_JEV_MODEL"
 POLARIS_LOG_ENV = "POLARIS_DF_LOG"
+SOFT_GATES_ENV = "POLARIS_DF_SOFT_GATES"
+LIVE_ENV = "POLARIS_DF_LIVE"
+_FALSEY = {"0", "off", "false", "no", "disabled"}
+_TRUEY = {"1", "on", "true", "yes", "enabled"}
 DEFAULT_BASE_URL = "https://api.typesafe.ai"
 DEFAULT_PROD_MODEL = "jev-1.13.0"
 DEFAULT_DEV_MODEL = "jev-latest"
@@ -79,3 +83,25 @@ def default_model(*, dry_run: bool = False) -> str:
 
 def has_live_credentials() -> bool:
     return api_key() is not None
+
+
+def _env_flag(name: str, *, default: bool) -> bool:
+    raw = os.environ.get(name)
+    if raw is None or not str(raw).strip():
+        return default
+    value = str(raw).strip().lower()
+    if value in _FALSEY:
+        return False
+    if value in _TRUEY:
+        return True
+    return default
+
+
+def soft_gates_enabled() -> bool:
+    """Search Command kill switch. Default on. Set 0/off/false to no-op."""
+    return _env_flag(SOFT_GATES_ENV, default=True)
+
+
+def live_requested() -> bool:
+    """Search Command live switch. Default off → dry_run."""
+    return _env_flag(LIVE_ENV, default=False)
