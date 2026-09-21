@@ -1,8 +1,8 @@
-# Model Router Policy Draft (Design Only — Not Approved to Build)
+# Model Router Policy (Approved to Build — 2026-09-21)
 
 **Owner:** Tempo (Jason Spencer / ROI.LIVE efficiency architect)  
-**Status:** **APPROVED TO BUILD** (Jason Spencer, 2026-09-21) for the post-`llm_escalate` tier ladder, hop limit, and `$` cap *structure*. Cost-cap dollar amounts remain placeholders (`null` / TODO) until Jason sets numbers. `BOT_EXEC` remains OFF.  
-**Authority:** COO for intake buckets; Polaris DF for confidence router (`auto` / `llm_escalate` / `human`). Tempo maps work-model tiers after escalate — does **not** fork `.claude/skills/tool-polaris-df/`.  
+**Status:** **APPROVED TO BUILD** by Jason Spencer (2026-09-21). Cost-cap dollar amounts still placeholders. `BOT_EXEC` remains OFF.  
+**Authority:** COO for intake buckets; Polaris DF for confidence router (`auto` / `llm_escalate` / `human`). Tempo proposes work-model mapping after escalate — does **not** fork `.claude/skills/tool-polaris-df/`.  
 **Companion:** [`joint-confidence-kill-schema.md`](./joint-confidence-kill-schema.md), [`kill-switch-sop-noise-archive.md`](./kill-switch-sop-noise-archive.md)  
 **Date:** 2026-09-21 (ET)
 
@@ -12,7 +12,7 @@
 
 | Constraint | Value |
 |------------|--------|
-| This doc | Tier ladder + hop limit **approved to build**. `$` caps are structure-only until Jason sets numbers |
+| This doc | **Approved to build** (Jason 2026-09-21); $ cost caps still placeholders |
 | `BOT_EXEC` | **Still OFF** — bucket→work model map is speculative for a future when handoff/exec is allowed |
 | Classify / route | **Jev only**, prod pin **`jev-1.13.0`** (Typesafe `POST https://api.typesafe.ai/v1/systemone`) |
 | Polaris DF | Shipped; confidence outcomes already defined. Tempo maps **post-`llm_escalate`** model tiers only |
@@ -34,11 +34,11 @@ Item/claim
 |-------|----------|------------|
 | A Classify | COO intake + Jev | Pin version; log model id |
 | B Confidence | Polaris DF (`tool-polaris-df`, `scripts/polaris-df`) | Import joint thresholds; no fork |
-| C Work model | **PROPOSAL** — Jason approve before build | Draft map below |
+| C Work model | **Approved to build** (Jason 2026-09-21); $ caps still placeholders | Map below + Polaris lane defaults |
 
 If Layer B = `human` → stop; no work model.  
 If Layer B = `auto` → only actions already allowed by lane policy (e.g. COO NOISE archive); **not** free-form BOT_EXEC.  
-If Layer B = `llm_escalate` → pick work model from §3 (**PROPOSAL**).
+If Layer B = `llm_escalate` → pick work model from §3.
 
 ---
 
@@ -81,6 +81,16 @@ Do not substitute Claude/Codex/Kimi/GLM for classify. Escalate *after* Jev+DF, n
 | T1 Cheap | Kimi K3, GLM 5.3 | BRIEF_ONLY, CLARIFY, routine |
 | T2 Code | Codex / Claude Code | A6 builds, agentic code |
 | T3 Strong | Top Claude / ChatGPT | CLIENT_HUMAN, SECURITY_FINANCE, YMYL assist drafts |
+
+
+### Polaris lane defaults (Polaris confirm 2026-09-21)
+
+| DF escalate context | Work tier |
+|---------------------|-----------|
+| Keyword / purity / non-claim triage mid-band | T1 (Kimi/GLM) |
+| Audit priority mid-band | T1 default; bump T3 if client-facing $ impact |
+| Content QA / AEO·GEO fitness / claim-adjacent | T3 (or human) |
+| YMYL / claim packs | human only; T3 draft only if Jason later allows assist — never auto-send |
 
 ---
 

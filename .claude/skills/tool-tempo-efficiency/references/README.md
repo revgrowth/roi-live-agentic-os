@@ -1,7 +1,7 @@
 # Tempo efficiency layer
 
 **Owner:** Tempo (Jason Spencer / ROI.LIVE efficiency architect)  
-**vs COO / Polaris:** Tempo owns packaging — gate/audit/kill conventions, joint schema, and the post-`llm_escalate` model router. **COO** owns intake ops judgment (noise archive hard rules, re-enable). **Polaris** owns Decision Fabric (`.claude/skills/tool-polaris-df/`, `scripts/polaris-df`) — Tempo does **not** fork it or ship a second pack catalog.
+**vs COO / Polaris:** Tempo owns packaging — gate/audit/kill conventions, joint schema, and the post-`llm_escalate` model router. **COO** owns intake ops judgment (noise archive hard rules, re-enable). **Polaris** owns Decision Fabric (`.claude/skills/tool-polaris-df/`, `scripts/polaris-df`) — Tempo does **not** fork it or ship a second pack catalog. COO 0.95 and DF ~0.85 auto bands coexist on purpose.
 
 **Date:** 2026-09-21 (ET)
 
@@ -10,7 +10,7 @@
 | File | What |
 |------|------|
 | [`kill-switch-sop-noise-archive.md`](./kill-switch-sop-noise-archive.md) | ENABLED.on / dry-run→apply / audit / kill SOP for COO Jev noise archive, aligned with Polaris DF |
-| [`model-router-policy-draft.md`](./model-router-policy-draft.md) | Post-`llm_escalate` tier ladder (T0–T3). Jason approved the build. `BOT_EXEC` still OFF. Cost-cap dollars are placeholders. |
+| [`model-router-policy-draft.md`](./model-router-policy-draft.md) | Model map (Jev classify → DF confidence → work tier). **Approved to build** (Jason 2026-09-21). `BOT_EXEC` still OFF; $ caps placeholders. |
 | [`joint-confidence-kill-schema.md`](./joint-confidence-kill-schema.md) | Shared threshold table + JSONL field contract both lanes import |
 
 ## Runtime (this skill)

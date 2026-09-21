@@ -31,6 +31,10 @@ COO_FLAGS = frozenset({"VAULT_WRITE", "CALENDAR", "HANDOFF_SPECIALIST", "WAITING
 
 NEVER_DOWNGRADE_BUCKETS = frozenset({"SECURITY_FINANCE", "CLIENT_HUMAN"})
 
+# safety / phase / gate / kill_reason: required COO noise-archive apply; optional polaris_df.
+POLARIS_OPTIONAL_FIELDS: tuple[str, ...] = ("safety", "phase", "gate", "kill_reason")
+COO_APPLY_REQUIRED_FIELDS: tuple[str, ...] = ("safety", "phase", "gate")
+
 SHARED_JSONL_FIELDS: tuple[str, ...] = (
     "timestamp",
     "lane",
@@ -40,6 +44,7 @@ SHARED_JSONL_FIELDS: tuple[str, ...] = (
     "confidence",
     "bucket_confidence",
     "safety",
+    "route",
     "router_outcome",
     "phase",
     "action",
@@ -129,6 +134,7 @@ class RouterRecommendation:
     def to_dict(self) -> dict[str, Any]:
         return {
             "jev_model": self.jev_model,
+            "route": self.router_outcome,
             "router_outcome": self.router_outcome,
             "effective_outcome": self.effective_outcome,
             "work_tier": self.work_tier,

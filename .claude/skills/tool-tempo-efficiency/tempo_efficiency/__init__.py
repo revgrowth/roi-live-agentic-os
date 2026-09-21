@@ -1,6 +1,7 @@
 """Tempo shared efficiency layer. Does not fork Polaris Decision Fabric."""
 
 from tempo_efficiency.audit import AuditWriter, emit_record
+from tempo_efficiency.confidence import shared_confidence_from_df_answers
 from tempo_efficiency.config import BOT_EXEC_ENABLED, PROD_CLASSIFY_MODEL, THRESHOLDS
 from tempo_efficiency.gate import apply_path_permitted, resolve_gate
 from tempo_efficiency.kill import apply_kill, evaluate_kill_conditions
@@ -17,6 +18,7 @@ __all__ = [
     "apply_path_permitted",
     "emit_record",
     "evaluate_kill_conditions",
+    "shared_confidence_from_df_answers",
     "resolve_gate",
     "resolve_recommendation",
     "__version__",

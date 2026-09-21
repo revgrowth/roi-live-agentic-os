@@ -81,12 +81,62 @@ class RouterTests(unittest.TestCase):
         rec = resolve_recommendation(bucket="QA", router_outcome="auto", ymyl=True)
         self.assertEqual(rec.effective_outcome, "human")
         self.assertTrue(rec.for_human_approve_only)
+        self.assertIsNone(rec.work_tier)
+
+    def test_ymyl_assist_draft_only_when_jason_allows(self):
+        rec = resolve_recommendation(
+            bucket="QA",
+            router_outcome="llm_escalate",
+            ymyl=True,
+            allow_ymyl_assist=True,
+        )
+        self.assertEqual(rec.effective_outcome, "human")
         self.assertEqual(rec.work_tier, "T3")
+        self.assertTrue(rec.for_human_approve_only)
 
     def test_claim_pack_flag(self):
         rec = resolve_recommendation(bucket="claim", router_outcome="llm_escalate", claim_pack=True)
         self.assertEqual(rec.effective_outcome, "human")
         self.assertTrue(rec.for_human_approve_only)
+        self.assertIsNone(rec.work_tier)
+
+    def test_prefer_route_over_router_outcome(self):
+        rec = resolve_recommendation(
+            bucket="CLARIFY",
+            route="human",
+            router_outcome="llm_escalate",
+        )
+        self.assertEqual(rec.router_outcome, "human")
+        self.assertEqual(rec.effective_outcome, "human")
+
+    def test_df_keyword_purity_midband_t1(self):
+        rec = resolve_recommendation(
+            route="llm_escalate",
+            pack_id="G3.purity.v1",
+        )
+        self.assertEqual(rec.work_tier, "T1")
+
+    def test_df_keyword_pack_t1(self):
+        rec = resolve_recommendation(route="llm_escalate", pack_id="KW.intent.v1")
+        self.assertEqual(rec.work_tier, "T1")
+
+    def test_df_audit_t1_unless_client_facing(self):
+        rec = resolve_recommendation(route="llm_escalate", pack_id="AUDIT.finding_priority.v1")
+        self.assertEqual(rec.work_tier, "T1")
+        rec = resolve_recommendation(
+            route="llm_escalate",
+            pack_id="AUDIT.finding_priority.v1",
+            client_facing=True,
+        )
+        self.assertEqual(rec.work_tier, "T3")
+
+    def test_df_qa_aeo_geo_t3(self):
+        rec = resolve_recommendation(route="llm_escalate", pack_id="QA.brief_compliance.v1")
+        self.assertEqual(rec.work_tier, "T3")
+        rec = resolve_recommendation(route="llm_escalate", pack_id="KW.aeo_question.v1")
+        self.assertEqual(rec.work_tier, "T3")
+        rec = resolve_recommendation(route="llm_escalate", pack_id="AUDIT.geo_citation.v1")
+        self.assertEqual(rec.work_tier, "T3")
 
     def test_hop_limit_forces_human(self):
         rec = resolve_recommendation(

@@ -75,6 +75,8 @@ bash scripts/tempo-router thresholds
 
 If Layer B is `human` → stop. If `auto` → lane-allowed action only (COO: NOISE archive under joint mins). If `llm_escalate` → pick a tier. YMYL / claim packs never auto-approve.
 
+COO auto (0.95/0.70) and DF auto (~0.85 choice) are **not** unified. DF emits `route`; consumers accept `route` or `router_outcome` (prefer `route`). Do not invent a DF `safety` score.
+
 ## Hard pins
 
 - Prod classify: **`jev-1.13.0`** (not floating `jev-latest`)

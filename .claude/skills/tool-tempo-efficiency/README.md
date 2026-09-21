@@ -52,8 +52,10 @@ tempo-router thresholds
 |-----|--------|
 | Classify | `jev-1.13.0` |
 | `BOT_EXEC` | OFF (not configurable here) |
-| YMYL / claim packs | never auto |
+| YMYL / claim packs | never auto; T3 assist draft only if Jason later allows |
 | Escalate hops | max 2 per `decision_id`, then `human` |
+| Auto bands | COO 0.95/0.70 vs DF ~0.85 — not unified |
+| JSONL | accept `route` or `router_outcome` (prefer `route`) |
 | Cost caps | `null` placeholders until Jason sets `$` |
 
 ## Tests

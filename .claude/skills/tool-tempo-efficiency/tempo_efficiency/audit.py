@@ -11,8 +11,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, TextIO
 
+from tempo_efficiency.adapters.polaris_df import normalize_router_outcome
 from tempo_efficiency.config import BOT_EXEC_ENABLED, PROD_CLASSIFY_MODEL
-from tempo_efficiency.types import ROUTER_JSONL_FIELDS, SHARED_JSONL_FIELDS
+from tempo_efficiency.types import (
+    COO_APPLY_REQUIRED_FIELDS,
+    POLARIS_OPTIONAL_FIELDS,
+    ROUTER_JSONL_FIELDS,
+    SHARED_JSONL_FIELDS,
+)
 
 
 def utc_now() -> str:
@@ -34,6 +40,17 @@ def emit_record(**fields: Any) -> dict[str, Any]:
         incoming["item_id"] = incoming["decision_id"]
     if incoming.get("item_id") and not incoming.get("decision_id"):
         incoming["decision_id"] = incoming["item_id"]
+    if incoming.get("route") is not None or incoming.get("router_outcome") is not None:
+        try:
+            outcome = normalize_router_outcome(
+                route=incoming.get("route"),
+                router_outcome=incoming.get("router_outcome"),
+                record=incoming,
+            )
+            incoming["route"] = outcome
+            incoming["router_outcome"] = outcome
+        except ValueError:
+            pass
     if incoming.get("timestamp") is None:
         incoming["timestamp"] = utc_now()
     if incoming.get("jev_model") is None and incoming.get("classify_used", True):
@@ -41,9 +58,27 @@ def emit_record(**fields: Any) -> dict[str, Any]:
     incoming.pop("classify_used", None)
     if incoming.get("bot_exec") is None:
         incoming["bot_exec"] = BOT_EXEC_ENABLED
+    # Never invent a DF safety score.
+    if incoming.get("lane") == "polaris_df" and "safety" not in fields:
+        incoming["safety"] = None
 
     record.update(incoming)
     return record
+
+
+def missing_required_fields(record: dict[str, Any]) -> tuple[str, ...]:
+    """COO noise-archive apply requires safety/phase/gate. polaris_df may omit them."""
+    lane = record.get("lane")
+    if lane == "polaris_df":
+        return ()
+    if lane == "coo_noise_archive" and record.get("phase") == "apply":
+        missing = [key for key in COO_APPLY_REQUIRED_FIELDS if record.get(key) in (None, "")]
+        return tuple(missing)
+    return ()
+
+
+def polaris_optional_fields() -> tuple[str, ...]:
+    return POLARIS_OPTIONAL_FIELDS
 
 
 class AuditWriter:

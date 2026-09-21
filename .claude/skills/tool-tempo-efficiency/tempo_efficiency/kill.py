@@ -24,6 +24,7 @@ from tempo_efficiency.config import (
     NOISE_ARCHIVE_MIN_SAFETY,
     PROD_CLASSIFY_MODEL,
 )
+from tempo_efficiency.adapters.polaris_df import normalize_router_outcome
 from tempo_efficiency.gate import write_enabled_off
 from tempo_efficiency.types import KillVerdict
 
@@ -45,7 +46,10 @@ def evaluate_kill_conditions(
     phase = record.get("phase")
     confidence = _as_float(record.get("bucket_confidence", record.get("confidence")))
     safety = _as_float(record.get("safety"))
-    router_outcome = record.get("router_outcome")
+    try:
+        router_outcome = normalize_router_outcome(record=record)
+    except ValueError:
+        router_outcome = record.get("router_outcome") or record.get("route")
     ymyl = bool(record.get("ymyl") or record.get("claim_pack"))
     flags = {str(f).upper() for f in (record.get("flags") or [])}
 

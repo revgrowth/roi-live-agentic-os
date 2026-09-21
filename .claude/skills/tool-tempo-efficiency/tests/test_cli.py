@@ -64,6 +64,25 @@ class CliTests(unittest.TestCase):
             self.assertFalse(payload["bot_exec"])
         self.assertEqual(main(["thresholds"]), 0)
 
+    def test_route_alias(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "rec.json"
+            code = main(
+                [
+                    "resolve",
+                    "--pack-id",
+                    "G3.purity.v1",
+                    "--route",
+                    "llm_escalate",
+                    "-o",
+                    str(out),
+                ]
+            )
+            self.assertEqual(code, 0)
+            payload = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(payload["route"], "llm_escalate")
+            self.assertEqual(payload["work_tier"], "T1")
+
     def test_bot_exec_pin(self):
         self.assertFalse(BOT_EXEC_ENABLED)
 

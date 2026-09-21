@@ -14,6 +14,9 @@ FLOATING_CLASSIFY_MODEL = "jev-latest"
 # COO / Tempo hard pin. This package cannot turn BOT_EXEC on.
 BOT_EXEC_ENABLED = False
 
+# YMYL / claim: human only. T3 draft only if Jason later sets this True.
+ALLOW_YMYL_ASSIST_DRAFT = False
+
 MAX_ESCALATE_HOPS = 2
 
 GATE_ON_NAME = "ENABLED.on"
@@ -63,7 +66,10 @@ THRESHOLDS: dict[str, ThresholdRow] = {
         min_safety=None,
         router_outcome="auto",
         bucket=None,
-        notes="Per DF skill. Do not restate packs. YMYL/claim never auto.",
+        notes=(
+            "Per DF skill (~0.85 choice default; pack overrides). "
+            "Do NOT lift DF bands to COO 0.95. YMYL/claim never auto."
+        ),
     ),
     "polaris_df_escalate": ThresholdRow(
         id="polaris_df_escalate",

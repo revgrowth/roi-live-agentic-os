@@ -9,10 +9,12 @@ from typing import Iterable
 
 from tempo_efficiency.adapters.polaris_df import (
     any_flag_ymyl,
+    df_escalate_band,
+    normalize_router_outcome,
     pack_forces_human,
-    validate_router_outcome,
 )
 from tempo_efficiency.config import (
+    ALLOW_YMYL_ASSIST_DRAFT,
     BOT_EXEC_ENABLED,
     COST_CAPS,
     DEFAULT_TIER_MODEL,
@@ -72,7 +74,8 @@ def noise_archive_eligible(
 def resolve_recommendation(
     *,
     bucket: str | None = None,
-    router_outcome: str,
+    router_outcome: str | None = None,
+    route: str | None = None,
     decision_id: str | None = None,
     hops: int | None = None,
     ledger: HopLedger | None = None,
@@ -84,9 +87,12 @@ def resolve_recommendation(
     prefer_cheaper: bool = False,
     daily_budget_used_ratio: float | None = None,
     phase: str = "dry-run",
+    df_context: str | None = None,
+    client_facing: bool = False,
+    allow_ymyl_assist: bool | None = None,
 ) -> RouterRecommendation:
-    """Dry-run resolve of (bucket, router_outcome) → tier / model recommendation."""
-    outcome = validate_router_outcome(router_outcome)
+    """Dry-run resolve of (bucket, route/router_outcome) → tier / model recommendation."""
+    outcome = normalize_router_outcome(route=route, router_outcome=router_outcome)
     reasons: list[str] = [f"layer_a:{PROD_CLASSIFY_MODEL}", f"layer_b:{outcome}"]
     flag_list = tuple(flags or ())
     ymyl_hit = ymyl or claim_pack or any_flag_ymyl(flag_list) or pack_forces_human(
@@ -120,12 +126,15 @@ def resolve_recommendation(
 
     if ymyl_hit:
         reasons.append("ymyl_or_claim_never_auto")
-        effective = "human"
-        # Assist draft for a human — never auto-send.
+        assist = ALLOW_YMYL_ASSIST_DRAFT if allow_ymyl_assist is None else allow_ymyl_assist
+        # Human only. T3 draft only if Jason later allows assist — never auto-send.
+        work: WorkTier | None = "T3" if assist else None
+        if assist:
+            reasons.append("ymyl_assist_draft_for_human_only")
         return _rec(
             outcome,
             "human",
-            "T3" if outcome in {"llm_escalate", "human", "auto"} else None,
+            work,
             hops_used,
             reasons,
             for_human=True,
@@ -154,7 +163,17 @@ def resolve_recommendation(
         reasons.append("status_hygiene_no_work_model")
         return _rec(outcome, "human", None, hops_used, reasons, never_downgrade=never_downgrade, phase=phase)
 
-    work_tier = _tier_for_bucket(bucket, code_shaped=code_shaped, flags=flag_list)
+    work_tier = _tier_for_signal(
+        bucket,
+        pack_id=pack_id,
+        df_context=df_context,
+        ymyl=ymyl_hit,
+        claim_pack=claim_pack,
+        code_shaped=code_shaped,
+        flags=flag_list,
+        client_facing=client_facing,
+        reasons=reasons,
+    )
     if work_tier is None:
         reasons.append("no_tier_for_signal")
         return _rec(outcome, "human", None, hops_used, reasons, never_downgrade=never_downgrade, phase=phase)
@@ -209,6 +228,37 @@ def _budget_prefers_t1(daily_budget_used_ratio: float | None) -> bool:
     if daily_budget_used_ratio is None or not COST_CAPS.any_set():
         return False
     return daily_budget_used_ratio >= 0.80
+
+
+def _tier_for_signal(
+    bucket: str | None,
+    *,
+    pack_id: str | None,
+    df_context: str | None,
+    ymyl: bool,
+    claim_pack: bool,
+    code_shaped: bool,
+    flags: tuple[str, ...],
+    client_facing: bool,
+    reasons: list[str],
+) -> WorkTier | None:
+    band = df_escalate_band(pack_id, ymyl=ymyl, claim_pack=claim_pack, df_context=df_context)
+    if band == "ymyl_claim":
+        reasons.append("df_band:ymyl_claim")
+        return None
+    if band == "keyword_purity":
+        reasons.append("df_band:keyword_purity_t1")
+        return "T1"
+    if band == "audit":
+        if client_facing:
+            reasons.append("df_band:audit_t3_client_facing")
+            return "T3"
+        reasons.append("df_band:audit_t1")
+        return "T1"
+    if band == "qa_aeo_geo":
+        reasons.append("df_band:qa_aeo_geo_t3")
+        return "T3"
+    return _tier_for_bucket(bucket, code_shaped=code_shaped, flags=flags)
 
 
 def _tier_for_bucket(bucket: str | None, *, code_shaped: bool, flags: tuple[str, ...]) -> WorkTier | None:

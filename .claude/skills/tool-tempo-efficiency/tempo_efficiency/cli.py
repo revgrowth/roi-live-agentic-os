@@ -9,7 +9,10 @@ from pathlib import Path
 from typing import Any
 
 from tempo_efficiency.audit import default_log_path
+from tempo_efficiency.adapters.polaris_df import normalize_router_outcome
+from tempo_efficiency.confidence import bands_are_lane_local
 from tempo_efficiency.config import (
+    ALLOW_YMYL_ASSIST_DRAFT,
     BOT_EXEC_ENABLED,
     COST_CAPS,
     MAX_ESCALATE_HOPS,
@@ -21,9 +24,10 @@ from tempo_efficiency.router import resolve_recommendation
 
 
 def cmd_resolve(ns: argparse.Namespace) -> int:
+    outcome = normalize_router_outcome(route=ns.route, router_outcome=ns.router_outcome)
     rec = resolve_recommendation(
         bucket=ns.bucket,
-        router_outcome=ns.router_outcome,
+        route=outcome,
         decision_id=ns.decision_id,
         hops=ns.hops,
         flags=ns.flag or [],
@@ -33,6 +37,8 @@ def cmd_resolve(ns: argparse.Namespace) -> int:
         code_shaped=ns.code_shaped,
         prefer_cheaper=ns.prefer_cheaper,
         phase="dry-run",
+        df_context=ns.df_context,
+        client_facing=ns.client_facing,
     )
     payload = rec.to_dict()
     payload["decision_id"] = ns.decision_id
@@ -62,6 +68,8 @@ def cmd_thresholds(_ns: argparse.Namespace) -> int:
         "max_escalate_hops": MAX_ESCALATE_HOPS,
         "cost_caps": COST_CAPS.as_dict(),
         "thresholds": thresholds_as_dict(),
+        "lane_bands": bands_are_lane_local(),
+        "allow_ymyl_assist_draft": ALLOW_YMYL_ASSIST_DRAFT,
         "default_log": str(default_log_path()),
     }
     print(json.dumps(payload, indent=2))
@@ -98,10 +106,24 @@ def build_parser() -> argparse.ArgumentParser:
     resolve_p.add_argument("--output", "-o", help="Write JSON to this path (also prints)")
     resolve_p.add_argument("--bucket", help="COO bucket or DF claim class")
     resolve_p.add_argument(
-        "--router-outcome",
-        required=True,
+        "--route",
         choices=["auto", "llm_escalate", "human"],
-        help="Polaris DF outcome. Tempo does not recompute packs.",
+        help="DF-native key. Preferred if both --route and --router-outcome are set.",
+    )
+    resolve_p.add_argument(
+        "--router-outcome",
+        choices=["auto", "llm_escalate", "human"],
+        help="Tempo/COO name for the same DF values. Prefer --route when both are present.",
+    )
+    resolve_p.add_argument(
+        "--df-context",
+        choices=["keyword_purity", "audit", "qa_aeo_geo", "ymyl_claim"],
+        help="Polaris lane escalate band (overrides pack-id inference).",
+    )
+    resolve_p.add_argument(
+        "--client-facing",
+        action="store_true",
+        help="Audit mid-band bumps T3 when client-facing $ impact.",
     )
     resolve_p.add_argument("--decision-id", help="Stable id for hop accounting")
     resolve_p.add_argument("--hops", type=int, default=None, help="Escalate hops already consumed")
@@ -129,7 +151,11 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     parser = build_parser()
     ns = parser.parse_args(argv)
-    return int(ns.func(ns))
+    try:
+        return int(ns.func(ns))
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

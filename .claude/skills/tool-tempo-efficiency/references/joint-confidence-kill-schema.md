@@ -47,8 +47,8 @@ One threshold + field contract both lanes can import so:
 | COO classify → label only (shadow) | n/a (log all) | n/a | any | No mutate |
 | COO **NOISE archive** (apply) | `bucket_confidence >= 0.95` | `safety >= 0.70` | `auto` (or treat as auto-eligible) | Archive **not** delete; `BOT_EXEC` OFF |
 | COO any other bucket archive | — | — | — | **Forbidden** |
-| Polaris DF `auto` | Per DF skill (do not restate packs here) | Per DF | `auto` | YMYL / claim packs **never** auto |
-| Polaris DF escalate | Below DF auto band | — | `llm_escalate` | Work model per model-router draft (**PROPOSAL**) |
+| Polaris DF `auto` | Per DF skill (~0.85 choice default; pack overrides) | Per DF | `auto` / `route` | YMYL / claim packs **never** auto. **Do NOT** lift DF bands to COO 0.95 |
+| Polaris DF escalate | Below DF auto band | — | `llm_escalate` | Work model per model-router draft (**approved to build**) |
 | Polaris DF human | Low / YMYL / claim | — | `human` | Always for YMYL/claim packs |
 | Kill: first miss / FP | — | — | — | **n=1** → disable gate |
 | Kill: threshold breach | archived/auto below row mins | — | — | Immediate kill |
@@ -87,10 +87,32 @@ Polaris may keep additional DF-native fields. COO may keep shadow-only fields. *
 
 ---
 
+
+
+## Field aliases and confidence mapping (Polaris DF 2026-09-21)
+
+### `route` ↔ `router_outcome`
+Polaris DF emits **`route`** with values `auto` | `llm_escalate` | `human`.  
+COO / Tempo docs use **`router_outcome`** with the same values.  
+**Consumers MUST accept either key** (prefer `route` if both present). Do not require DF to rename.
+
+### Optional on Polaris DF lane
+`safety`, `phase`, `gate`, `kill_reason` are **optional** for `polaris_df`. Required for COO noise-archive apply. Tempo ENABLED.on + kill n=1 wraps apply paths; DF honors when Search Command soft gates wire.
+
+### Shared `confidence` mapping (do not invent DF safety)
+| DF mode | Shared `confidence` |
+|---------|---------------------|
+| choice / score | `min` of the relevant choice/score confidences |
+| noul | extremity `|p - 0.5| * 2` |
+| COO buckets | `bucket_confidence` (alias of `confidence`) |
+
+**Do not invent a `safety` score for DF.** Do **not** unify numeric auto bands across lanes: COO NOISE archive stays ≥0.95 conf + ≥0.70 safety; DF auto stays per DF skill (~0.85 choice defaults, pack overrides, YMYL never auto). Different blast radius is intentional.
+
+
 ## Kill → re-enable (pointer)
 
 Full checklist: [`kill-switch-sop-noise-archive.md`](./kill-switch-sop-noise-archive.md) §4–§5.  
-Work-model after escalate: [`model-router-policy-draft.md`](./model-router-policy-draft.md) (approved tier ladder; `$` caps TBD).
+Work-model after escalate: [`model-router-policy-draft.md`](./model-router-policy-draft.md) (**approved to build**).
 
 ---
 
