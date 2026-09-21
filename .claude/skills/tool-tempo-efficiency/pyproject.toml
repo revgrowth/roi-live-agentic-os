@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tempo-efficiency"
+version = "0.1.0"
+description = "Tempo shared efficiency layer: ENABLED.on gate, joint confidence/kill schema, JSONL audit, post-llm_escalate model router."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "ROI.LIVE / Tempo" }]
+
+[project.optional-dependencies]
+dev = []
+
+[project.scripts]
+tempo-router = "tempo_efficiency.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["tempo_efficiency*"]

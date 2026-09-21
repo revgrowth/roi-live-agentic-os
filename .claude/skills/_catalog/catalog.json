@@ -120,6 +120,13 @@
       "requires_services": ["TYPESAFE_API_KEY"],
       "dependencies": [],
       "mcp_servers": []
+    },
+    "tool-tempo-efficiency": {
+      "category": "utility",
+      "description": "Shared ENABLED.on/kill/JSONL packaging and post-llm_escalate model-tier routing. Does not fork Polaris DF.",
+      "requires_services": [],
+      "dependencies": [],
+      "mcp_servers": []
     }
   }
 }

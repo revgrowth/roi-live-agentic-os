@@ -112,6 +112,14 @@ jobs:
           python3 -m unittest discover -s .claude/skills/tool-polaris-df/tests -p 'test_*.py'
           python3 -m polaris_df --dry-run --no-log eval --fail-under 0.7
 
+      - name: Tempo efficiency tests (no Typesafe)
+        env:
+          PYTHONPATH: .claude/skills/tool-tempo-efficiency:.claude/skills/tool-polaris-df
+        run: |
+          python3 -m unittest discover -s .claude/skills/tool-tempo-efficiency/tests -p 'test_*.py'
+          python3 -m tempo_efficiency resolve --bucket NOISE --router-outcome auto
+          python3 -m tempo_efficiency thresholds
+
       - name: Validate SKILL.md frontmatter
         run: |
           EXIT_CODE=0

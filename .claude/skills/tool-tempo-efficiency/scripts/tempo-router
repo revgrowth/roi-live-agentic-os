@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DF_ROOT="$(cd "$ROOT/../tool-polaris-df" && pwd)"
+export PYTHONPATH="${ROOT}:${DF_ROOT}${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 -m tempo_efficiency "$@"
