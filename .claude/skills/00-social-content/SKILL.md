@@ -2,19 +2,13 @@
 name: 00-social-content
 version: 1.0.1
 description: >
-  Parent orchestrator for the social content pipeline. Handles seven scenarios:
-  (A) finished text â†’ images only; (B) YouTube/video URL â†’ post + images;
-  (C) topic or idea â†’ trending research â†’ post + images;
-  (D) no input / "from my sources" â†’ scrape LinkedIn + YouTube â†’ post + images;
-  (E) existing post â†’ repurpose for another platform;
-  (F) article/blog/non-video URL â†’ screenshot â†’ extract â†’ post + images;
-  (G) local video/audio file â†’ WhisperX transcribe â†’ post + images.
-  First run triggers onboarding. See README.md for the full pipeline diagram.
-  Triggers: "run social content", "generate post", "create post", "generate content",
-  "post linkedin", "post instagram", "just the images", "generate image",
-  "use my sources", "from my sources", "generate linkedin content".
-  Repurposing triggers (â†’ mkt-content-repurposing): "adapt for", "repurpose for",
-  "version for", "turn this into", "reformat for", "convert to", "create version for".
+  Social content pipeline orchestrator. Routes text, YouTube/video, topic
+  research, source scrape, repurpose, article URL, or local transcription.
+  Triggers: "run social content", "generate post", "create post",
+  "generate content", "post linkedin", "post instagram", "just the images",
+  "generate image", "use my sources", "from my sources",
+  "generate linkedin content", "adapt for", "repurpose for", "version for",
+  "turn this into", "reformat for", "convert to", "create version for".
 argument-hint: "[topic | URL | local file path | nothing]"
 allowed-tools:
   - Bash(*)

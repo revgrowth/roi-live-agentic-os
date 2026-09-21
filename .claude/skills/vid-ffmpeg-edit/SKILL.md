@@ -2,14 +2,13 @@
 name: vid-ffmpeg-edit
 version: 1.0.0
 description: >
-  Wraps FFmpeg to burn ASS subtitles and overlay illustration PNGs onto a reframed 9:16 clip.
-  Takes a clip MP4 plus word-level transcript data (JSON, SRT, or TS word file), converts words
-  to styled ASS captions via words_to_ass.py (phrase grouping, highlight color from design-tokens),
-  optionally generates 4-8 illustration PNGs via viz-image-gen at key moments, then burns everything
-  in a single FFmpeg pass. Outputs a final subtitled and illustrated MP4. ~55s per clip.
-  Triggers: "edit clip", "add subtitles", "burn captions", "illustrate clip", "edit short-form",
-  "add subtitles to clip", "edit this clip".
-  Not for: full pipeline orchestration, clip selection, reframing, transcription, or upload.
+  Burns ASS subtitles and illustration PNGs onto a reframed 9:16 clip via FFmpeg.
+  Takes a clip MP4 plus word-level transcript (JSON, SRT, or TS), builds styled
+  ASS captions, optionally generates 4-8 PNGs via viz-image-gen, then burns in
+  one pass. ~55s per clip. Triggers: "edit clip", "add subtitles", "burn
+  captions", "illustrate clip", "edit short-form", "add subtitles to clip",
+  "edit this clip". Not for: pipeline orchestration, clip selection,
+  reframing, transcription, or upload.
 argument-hint: clip_path
 allowed-tools: Bash(*), Read, Write, Edit, Glob, Grep, Agent
 dependencies:
