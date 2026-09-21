@@ -57,6 +57,10 @@
 
 - 2026-09-21: `str-search-command` is not in this repo snapshot. Soft gates go through `polaris_df.adapters.search_command`. Do not invent a second SOP. YMYL packs never auto-approve. CI must run `--dry-run`; live Jev needs `TYPESAFE_API_KEY`.
 
+## tool-tempo-efficiency
+
+- 2026-09-21: Tempo owns gate/kill/JSONL + post-`llm_escalate` tiers. Import DF `router_outcome` only — do not fork `tool-polaris-df` or add a second pack catalog. Prod classify pin is `jev-1.13.0`. `BOT_EXEC` stays OFF. Cost-cap dollars are null until Jason sets them; hop limit (max 2) still enforces.
+
 ## tool-dataforseo
 
 - 2026-04-28: Per-keyword JSON cache is a hard requirement. An earlier client-level helper lost ~$0.10 of paid SERP output to a mid-run filesystem reset because raw responses lived only in memory until end-of-run. Current design persists immediately on each call.

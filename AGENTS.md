@@ -277,6 +277,7 @@ Every skill and its output folder uses a category prefix.
 | `tool-stitch` | "fetch stitch design", "get stitch screens", "stitch project", "pull from stitch", "stitch code", "export stitch" |
 | `tool-dataforseo` | "keyword research", "search volume", "keyword difficulty", "validate keywords", "SERP analysis", "AI Overview citations", "AEO competitor audit", "DataForSEO", "what shows up for", "what's the volume for" |
 | `tool-polaris-df` | "polaris", "decision fabric", "jev", "purity gate", "serp shape", "audit triage", "keyword triage", "qa-content", "confidence router", "typed judgments" |
+| `tool-tempo-efficiency` | "tempo router", "ENABLED.on", "kill switch", "noise archive gate", "model tier", "llm_escalate hop", "joint confidence schema" |
 
 ### Operations Skills
 
@@ -309,6 +310,7 @@ Load only the `brand_context/` and `/agency/` files listed for each skill.
 | `tool-stitch` | — | — | — | — | — | — | `## tool-stitch` |
 | `tool-dataforseo` | — | — | — | — | — | — | `## tool-dataforseo` |
 | `tool-polaris-df` | — | summary | language section | — | — | — | `## tool-polaris-df` |
+| `tool-tempo-efficiency` | — | — | — | — | — | — | `## tool-tempo-efficiency` |
 | `viz-stitch-design` | tone only | summary | language section | — | — | — | `## viz-stitch-design` |
 | `viz-interface-design` | tone only | summary | language section | — | — | — | `## viz-interface-design` |
 | `ops-cron` | — | — | — | — | — | — | `## ops-cron` |
