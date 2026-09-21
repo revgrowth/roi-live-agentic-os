@@ -50,6 +50,9 @@ def attach_judgment(
     if "measured" not in out and locked:
         out["measured"] = True
     judgment = decision.provenance()
+    # Tempo joint schema: accept `route` or `router_outcome`. Prefer `route`.
+    if "route" in judgment and "router_outcome" not in judgment:
+        judgment["router_outcome"] = judgment["route"]
     if extra_judgment_fields:
         judgment.update(extra_judgment_fields)
     out["judgment"] = judgment

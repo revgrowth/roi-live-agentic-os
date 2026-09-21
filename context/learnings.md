@@ -56,6 +56,7 @@
 ## tool-polaris-df
 
 - 2026-09-21: `str-search-command` is not in this repo snapshot. Soft gates go through `polaris_df.adapters.search_command`. Do not invent a second SOP. YMYL packs never auto-approve. CI must run `--dry-run`; live Jev needs `TYPESAFE_API_KEY`.
+- 2026-09-21: A6-local SC should import `integrations/str_search_command_soft_gates.py` (dry_run default; `POLARIS_DF_SOFT_GATES=0` no-ops). Do not copy packs. Stamp `route` and Tempo alias `router_outcome`. Do not invent a DF `safety` score.
 
 ## tool-dataforseo
 

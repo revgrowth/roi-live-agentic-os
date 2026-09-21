@@ -38,6 +38,7 @@ class SearchCommandAdapterTests(unittest.TestCase):
         })
         self.assertEqual(out["disposition_source"], "judgment_added")
         self.assertIn(out["judgment"]["route"], {"auto", "llm_escalate", "human"})
+        self.assertEqual(out["judgment"]["router_outcome"], out["judgment"]["route"])
 
     def test_purity_rejects_excluded_jobs_query(self):
         row = {

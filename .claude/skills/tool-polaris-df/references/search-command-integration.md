@@ -2,6 +2,8 @@
 
 `str-search-command` is not present in this repo snapshot. This file is the contract that skill (or any operator script) should call. Do not invent a second SOP. Soft judgments only.
 
+Operator drop-in (kill switches, A6 hook points, patch snippet): [`INTEGRATION_SEARCH_COMMAND.md`](../INTEGRATION_SEARCH_COMMAND.md).
+
 ## Call sites
 
 Replace LLM-only judges with fabric calls. Keep measured validators in Python.

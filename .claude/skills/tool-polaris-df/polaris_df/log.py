@@ -58,6 +58,7 @@ class DecisionLog:
             "pack_version": decision.pack_version,
             "model": decision.model,
             "route": decision.route,
+            "router_outcome": decision.route,  # Tempo joint-schema alias
             "answers": decision.answers,
             "question_routes": decision.question_routes,
             "thresholds": decision.thresholds,

@@ -103,7 +103,13 @@ Soft gates only:
 | Semantic cannibal | `QA.semantic_cannibal.v1` | `verify_semantic_cannibal` |
 
 Dispositions get a `judgment` block. Measured volume / KD stay locked.
-See `references/search-command-integration.md`.
+
+`str-search-command` is still absent here. Drop-in kit (do not copy packs):
+
+- `INTEGRATION_SEARCH_COMMAND.md` — kill switches, A6 hook points, patch snippet
+- `integrations/str_search_command_soft_gates.py` — dry_run default, no-op if misconfigured
+
+See also `references/search-command-integration.md`.
 
 ## Eval
 
