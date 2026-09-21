@@ -93,6 +93,7 @@ Agentic OS is built on three layers:
 | `tool-stitch` | Fetch UI designs from Google Stitch projects | gcloud auth |
 | `viz-stitch-design` | Design and iterate on UI screens with Google Stitch | gcloud auth |
 | `tool-dataforseo` | Keyword research and SERP analysis (volume, KD, AI Overview citations) | `DATAFORSEO_LOGIN` + `DATAFORSEO_PASSWORD` |
+| `tool-polaris-df` | Typed Jev judgments for Search Command, audit, keyword, and QA | `TYPESAFE_API_KEY` (mock mode without it) |
 
 ---
 
@@ -356,6 +357,7 @@ For a quick reference, see [docs/cheat-sheet.md](docs/cheat-sheet.md).
 │   └── memory/            <- Daily session logs (auto-links to active projects)
 ├── brand_context/         <- Your brand data (voice, positioning, ICP)
 ├── .claude/skills/        <- Installed skill packs
+│   └── tool-polaris-df/   <- Polaris Decision Fabric (Jev judgments)
 ├── command-centre/        <- Local UI and runtime app (versioned with the repo)
 ├── cron/jobs/             <- Scheduled job definitions
 ├── projects/              <- All generated output

@@ -1,0 +1,8 @@
+{"id": "i1", "query": "how to replace a furnace filter", "volume": 5400, "labels": {"intent": "informational"}}
+{"id": "i2", "query": "best heat pump vs gas furnace", "volume": 2600, "labels": {"intent": "commercial"}}
+{"id": "i3", "query": "buy heat pump online", "volume": 880, "labels": {"intent": "transactional"}}
+{"id": "i4", "query": "hvac repair near me", "volume": 9900, "labels": {"intent": "local"}}
+{"id": "i5", "query": "trane official website login", "volume": 1300, "labels": {"intent": "navigational"}}
+{"id": "i6", "query": "what size ac do I need", "volume": 4400, "labels": {"intent": "informational"}}
+{"id": "i7", "query": "heat pump installation cost", "volume": 7200, "labels": {"intent": "transactional"}}
+{"id": "i8", "query": "compare mini split brands", "volume": 1500, "labels": {"intent": "commercial"}}

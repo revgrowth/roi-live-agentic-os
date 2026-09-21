@@ -276,6 +276,7 @@ Every skill and its output folder uses a category prefix.
 |-------|-------------|
 | `tool-stitch` | "fetch stitch design", "get stitch screens", "stitch project", "pull from stitch", "stitch code", "export stitch" |
 | `tool-dataforseo` | "keyword research", "search volume", "keyword difficulty", "validate keywords", "SERP analysis", "AI Overview citations", "AEO competitor audit", "DataForSEO", "what shows up for", "what's the volume for" |
+| `tool-polaris-df` | "polaris", "decision fabric", "jev", "purity gate", "serp shape", "audit triage", "keyword triage", "qa-content", "confidence router", "typed judgments" |
 
 ### Operations Skills
 
@@ -307,6 +308,7 @@ Load only the `brand_context/` and `/agency/` files listed for each skill.
 | `str-ai-seo` | tone only | summary | full | core + page-SOP | — | — | `## str-ai-seo` |
 | `tool-stitch` | — | — | — | — | — | — | `## tool-stitch` |
 | `tool-dataforseo` | — | — | — | — | — | — | `## tool-dataforseo` |
+| `tool-polaris-df` | — | summary | language section | — | — | — | `## tool-polaris-df` |
 | `viz-stitch-design` | tone only | summary | language section | — | — | — | `## viz-stitch-design` |
 | `viz-interface-design` | tone only | summary | language section | — | — | — | `## viz-interface-design` |
 | `ops-cron` | — | — | — | — | — | — | `## ops-cron` |
@@ -457,6 +459,7 @@ Some skills use external services for enhanced functionality. API keys are store
 | HeyGen | `HEYGEN_API_KEY` | `viz-ugc-heygen` | AI avatar video generation | No fallback |
 | Google Stitch | gcloud auth | `tool-stitch`, `viz-stitch-design` | UI design generation and export | No fallback |
 | DataForSEO | `DATAFORSEO_LOGIN` + `DATAFORSEO_PASSWORD` | `tool-dataforseo`, `str-ai-seo` | Keyword research (volume, KD, intent), SERP analysis, AI Overview citation detection | No fallback. Skill non-functional without credentials. |
+| TypeSafe Jev | `TYPESAFE_API_KEY` | `tool-polaris-df` | Typed noul/choice/score judgments for Search Command, audit, keyword, and QA | `--dry-run` / mock mode. Live calls skipped unless the key is set. |
 
 ### Rules for Skills Using External Services
 

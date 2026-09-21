@@ -1,0 +1,6 @@
+{"id": "c1", "query_a": "heat pump installation charleston", "query_b": "install a heat pump in charleston sc", "same_serp_signal": true, "recommended_owner": "a", "labels": {"same_serp": true, "recommended_owner": "a"}}
+{"id": "c2", "query_a": "heat pump installation charleston", "query_b": "commercial refrigeration charleston", "same_serp_signal": false, "recommended_owner": "both_ok", "labels": {"same_serp": false, "recommended_owner": "both_ok"}}
+{"id": "c3", "query_a": "ac repair near me", "query_b": "emergency air conditioning repair", "same_serp_signal": true, "recommended_owner": "b", "labels": {"same_serp": true, "recommended_owner": "b"}}
+{"id": "c4", "query_a": "furnace maintenance plan", "query_b": "what is a heat pump", "same_serp_signal": false, "recommended_owner": "both_ok", "labels": {"same_serp": false, "recommended_owner": "both_ok"}}
+{"id": "c5", "query_a": "ductless mini split vs central air", "query_b": "mini split versus central ac", "same_serp_signal": true, "recommended_owner": "a", "labels": {"same_serp": true, "recommended_owner": "a"}}
+{"id": "c6", "query_a": "hvac jobs charleston", "query_b": "ac repair charleston", "same_serp_signal": false, "recommended_owner": "neither", "labels": {"same_serp": false, "recommended_owner": "neither"}}

@@ -53,6 +53,10 @@
 
 ## tool-youtube
 
+## tool-polaris-df
+
+- 2026-09-21: `str-search-command` is not in this repo snapshot. Soft gates go through `polaris_df.adapters.search_command`. Do not invent a second SOP. YMYL packs never auto-approve. CI must run `--dry-run`; live Jev needs `TYPESAFE_API_KEY`.
+
 ## tool-dataforseo
 
 - 2026-04-28: Per-keyword JSON cache is a hard requirement. An earlier client-level helper lost ~$0.10 of paid SERP output to a mid-run filesystem reset because raw responses lived only in memory until end-of-run. Current design persists immediately on each call.
