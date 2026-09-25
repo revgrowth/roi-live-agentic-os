@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jev-dispatcher"
+version = "0.1.0"
+description = "Label a job with pinned Jev and queue a JSON handoff. Does not execute work."
+readme = "README.md"
+requires-python = ">=3.10"
+
+[project.scripts]
+jev-dispatcher = "jev_dispatcher.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["jev_dispatcher*"]

@@ -61,3 +61,13 @@ clients/*/.claude/hooks_info/ccnotify.log.*
 .trash/
 # Auto-backup log
 scripts/auto-backup.log
+
+# Jev dispatcher runtime. The build must not create ENABLED.on.
+clients/roi-live/projects/jev-dispatcher-2026-09/ENABLED.on
+clients/roi-live/projects/jev-dispatcher-2026-09/ENABLED.off
+clients/roi-live/projects/jev-dispatcher-2026-09/ENABLED.on.killed
+clients/roi-live/projects/jev-dispatcher-2026-09/KILL
+clients/roi-live/projects/jev-dispatcher-2026-09/queues/
+clients/roi-live/projects/jev-dispatcher-2026-09/out/
+clients/roi-live/projects/jev-dispatcher-2026-09/eval-run/
+clients/roi-live/projects/jev-dispatcher-2026-09/seat-capacity.json

@@ -278,6 +278,7 @@ Every skill and its output folder uses a category prefix.
 | `tool-dataforseo` | "keyword research", "search volume", "keyword difficulty", "validate keywords", "SERP analysis", "AI Overview citations", "AEO competitor audit", "DataForSEO", "what shows up for", "what's the volume for" |
 | `tool-polaris-df` | "polaris", "decision fabric", "jev", "purity gate", "serp shape", "audit triage", "keyword triage", "qa-content", "confidence router", "typed judgments" |
 | `tool-tempo-efficiency` | "tempo router", "ENABLED.on", "kill switch", "noise archive gate", "model tier", "llm_escalate hop", "joint confidence schema" |
+| `tool-jev-dispatcher` | "dispatcher", "route a job", "which seat", "which worker", "Jev dispatcher", "worker queue", "queue a handoff" |
 
 ### Operations Skills
 
@@ -311,6 +312,7 @@ Load only the `brand_context/` and `/agency/` files listed for each skill.
 | `tool-dataforseo` | — | — | — | — | — | — | `## tool-dataforseo` |
 | `tool-polaris-df` | — | summary | language section | — | — | — | `## tool-polaris-df` |
 | `tool-tempo-efficiency` | — | — | — | — | — | — | `## tool-tempo-efficiency` |
+| `tool-jev-dispatcher` | — | — | — | — | — | — | `## tool-jev-dispatcher` |
 | `viz-stitch-design` | tone only | summary | language section | — | — | — | `## viz-stitch-design` |
 | `viz-interface-design` | tone only | summary | language section | — | — | — | `## viz-interface-design` |
 | `ops-cron` | — | — | — | — | — | — | `## ops-cron` |
@@ -461,7 +463,7 @@ Some skills use external services for enhanced functionality. API keys are store
 | HeyGen | `HEYGEN_API_KEY` | `viz-ugc-heygen` | AI avatar video generation | No fallback |
 | Google Stitch | gcloud auth | `tool-stitch`, `viz-stitch-design` | UI design generation and export | No fallback |
 | DataForSEO | `DATAFORSEO_LOGIN` + `DATAFORSEO_PASSWORD` | `tool-dataforseo`, `str-ai-seo` | Keyword research (volume, KD, intent), SERP analysis, AI Overview citation detection | No fallback. Skill non-functional without credentials. |
-| TypeSafe Jev | `TYPESAFE_API_KEY` | `tool-polaris-df` | Typed noul/choice/score judgments for Search Command, audit, keyword, and QA | `--dry-run` / mock mode. Live calls skipped unless the key is set. |
+| TypeSafe Jev | `TYPESAFE_API_KEY` | `tool-polaris-df`, `tool-jev-dispatcher` | Typed noul/choice/score judgments. Dispatcher uses them only to label a seat and queue a handoff | Polaris: `--dry-run` / mock. Dispatcher: dry-run with no queue unless `ENABLED.on` exists. Live calls need the key. The key is never printed. |
 
 ### Rules for Skills Using External Services
 
