@@ -127,6 +127,13 @@
       "requires_services": [],
       "dependencies": [],
       "mcp_servers": []
+    },
+    "tool-jev-dispatcher": {
+      "category": "utility",
+      "description": "Label a job with pinned Jev and queue a JSON handoff. Does not execute work.",
+      "requires_services": ["TYPESAFE_API_KEY"],
+      "dependencies": ["tool-tempo-efficiency", "tool-polaris-df"],
+      "mcp_servers": []
     }
   }
 }

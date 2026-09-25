@@ -57,6 +57,11 @@
 
 - 2026-09-21: `str-search-command` is not in this repo snapshot. Soft gates go through `polaris_df.adapters.search_command`. Do not invent a second SOP. YMYL packs never auto-approve. CI must run `--dry-run`; live Jev needs `TYPESAFE_API_KEY`.
 
+## tool-jev-dispatcher
+
+- 2026-09-25: Dispatcher imports Tempo gate/kill/audit/hop limit/tier ladder and Polaris `HttpJevClient`. It does not fork them. Pin is `jev-1.13.0`. Grok Heavy is coordinator only. `ENABLED.on` is not created by the build. `handoff_complete` comes from a file read, not from Jev confidence. Jev 1.13 input price confirmed at $0.042 per million tokens from https://docs.typesafe.ai/models on 2026-09-25. Output is $0. Silent-intake path `clients/roi-live/projects/jev-silent-intake-golive-2026-09/` was not in the repo.
+- 2026-09-25: Tempo reviewed the eval labels on 2026-09-24. Score strict against the primary seat and lenient against `acceptable`. GLM 5.3 Max and Kimi K3 Max swap only on standard execution. ChatGPT Team sits in the ChatGPT family with 20X A/B/C. Human-review recall counts only rows whose acceptable set is human review alone.
+
 ## tool-tempo-efficiency
 
 - 2026-09-21: Tempo owns gate/kill/JSONL + post-`llm_escalate` tiers. Import DF `router_outcome` only — do not fork `tool-polaris-df` or add a second pack catalog. Prod classify pin is `jev-1.13.0`. `BOT_EXEC` stays OFF. Cost-cap dollars are null until Jason sets them; hop limit (max 2) still enforces.

@@ -1,0 +1,117 @@
+{
+  "confidence_threshold": 0.85,
+  "risk_noul_threshold": 0.5,
+  "model": "jev-1.13.0",
+  "seats": [
+    {
+      "id": "chatgpt-20x-max-a",
+      "display_name": "ChatGPT 20X Max A",
+      "capacity": "available",
+      "destination": true,
+      "coordinator_only": false,
+      "rotate_group": "chatgpt-20x-max",
+      "rotate_order": 0,
+      "tempo_tier": "T3",
+      "description": "ChatGPT 20X Max, Sol-class. Best for strategy, and for hard or high-stakes execution."
+    },
+    {
+      "id": "chatgpt-20x-max-b",
+      "display_name": "ChatGPT 20X Max B",
+      "capacity": "available",
+      "destination": true,
+      "coordinator_only": false,
+      "rotate_group": "chatgpt-20x-max",
+      "rotate_order": 1,
+      "tempo_tier": "T3",
+      "description": "ChatGPT 20X Max, Sol-class. Best for strategy, and for hard or high-stakes execution."
+    },
+    {
+      "id": "chatgpt-20x-max-c",
+      "display_name": "ChatGPT 20X Max C",
+      "capacity": "available",
+      "destination": true,
+      "coordinator_only": false,
+      "rotate_group": "chatgpt-20x-max",
+      "rotate_order": 2,
+      "tempo_tier": "T3",
+      "description": "ChatGPT 20X Max, Sol-class. Best for strategy, and for hard or high-stakes execution."
+    },
+    {
+      "id": "chatgpt-team",
+      "display_name": "ChatGPT Team",
+      "capacity": "available",
+      "destination": true,
+      "coordinator_only": false,
+      "rotate_group": null,
+      "rotate_order": null,
+      "tempo_tier": "T3",
+      "description": "ChatGPT Team. Lighter strategy drafts and shared planning when the job does not need 20X Sol-class depth."
+    },
+    {
+      "id": "claude-team",
+      "display_name": "Claude Team",
+      "capacity": "available",
+      "destination": true,
+      "coordinator_only": false,
+      "rotate_group": null,
+      "rotate_order": null,
+      "tempo_tier": "T3",
+      "description": "Claude Team, Opus-class. Best for strategy and for hard or high-stakes execution, especially long client-quality writing."
+    },
+    {
+      "id": "glm-5-3-max",
+      "display_name": "GLM 5.3 Max",
+      "capacity": "available",
+      "destination": true,
+      "coordinator_only": false,
+      "rotate_group": null,
+      "rotate_order": null,
+      "tempo_tier": "T1",
+      "description": "GLM 5.3 Max. Standard execution: routine research, extraction, tables, and first-pass drafts."
+    },
+    {
+      "id": "kimi-k3-max",
+      "display_name": "Kimi K3 Max",
+      "capacity": "available",
+      "destination": true,
+      "coordinator_only": false,
+      "rotate_group": null,
+      "rotate_order": null,
+      "tempo_tier": "T1",
+      "description": "Kimi K3 Max. Standard execution: routine research, extraction, and inexpensive drafts. Same band as GLM."
+    },
+    {
+      "id": "cursor-cloud",
+      "display_name": "Cursor cloud agent",
+      "capacity": "available",
+      "destination": true,
+      "coordinator_only": false,
+      "rotate_group": null,
+      "rotate_order": null,
+      "tempo_tier": "T2",
+      "description": "Cursor cloud agent. Code and repo jobs only: edits, scripts, tests, and implementation inside a repository."
+    },
+    {
+      "id": "human-review",
+      "display_name": "Human review",
+      "capacity": "available",
+      "destination": true,
+      "coordinator_only": false,
+      "rotate_group": null,
+      "rotate_order": null,
+      "tempo_tier": null,
+      "description": "Human review. A person should decide before any AI worker starts."
+    },
+    {
+      "id": "grok-heavy",
+      "display_name": "Grok Heavy",
+      "capacity": "available",
+      "destination": false,
+      "coordinator_only": true,
+      "rotate_group": null,
+      "rotate_order": null,
+      "tempo_tier": null,
+      "description": "Coordinator only. Never a destination. Do not route work here."
+    }
+  ]
+}
