@@ -24,7 +24,7 @@ PYTHONPATH=".claude/skills/tool-jev-dispatcher:.claude/skills/tool-tempo-efficie
   --goal "Extract the keyword table" --quality-bar execution --blast-radius internal
 ```
 
-Live eval on Windows (key must already be in the environment; the script does not print it):
+Live eval on Windows. If `TYPESAFE_API_KEY` is empty, the script reads it from the repo-root `.env` and does not print it:
 
 ```powershell
 .\.claude\skills\tool-jev-dispatcher\scripts\live-eval.ps1

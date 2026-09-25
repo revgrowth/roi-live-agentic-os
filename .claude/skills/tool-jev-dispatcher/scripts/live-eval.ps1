@@ -2,14 +2,37 @@
 # Does not create ENABLED.on. Does not print TYPESAFE_API_KEY.
 $ErrorActionPreference = "Stop"
 
-if ([string]::IsNullOrWhiteSpace($env:TYPESAFE_API_KEY)) {
-    Write-Error "TYPESAFE_API_KEY is not set. Set it in this session. This script does not read a key file and does not print the key."
-    exit 2
-}
-
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $skillRoot = (Resolve-Path (Join-Path $scriptDir "..")).Path
 $repoRoot = (Resolve-Path (Join-Path $skillRoot "..\..\..")).Path
+
+if ([string]::IsNullOrWhiteSpace($env:TYPESAFE_API_KEY)) {
+    $envFile = Join-Path $repoRoot ".env"
+    if (Test-Path -LiteralPath $envFile) {
+        foreach ($line in Get-Content -LiteralPath $envFile) {
+            if ($line -match '^\s*#' -or [string]::IsNullOrWhiteSpace($line)) { continue }
+            if ($line -match '^\s*TYPESAFE_API_KEY\s*=\s*(.*)$') {
+                $value = $Matches[1].Trim()
+                if (
+                    ($value.StartsWith('"') -and $value.EndsWith('"') -and $value.Length -ge 2) -or
+                    ($value.StartsWith("'") -and $value.EndsWith("'") -and $value.Length -ge 2)
+                ) {
+                    $value = $value.Substring(1, $value.Length - 2)
+                }
+                if (-not [string]::IsNullOrWhiteSpace($value)) {
+                    $env:TYPESAFE_API_KEY = $value
+                }
+                break
+            }
+        }
+    }
+}
+
+if ([string]::IsNullOrWhiteSpace($env:TYPESAFE_API_KEY)) {
+    Write-Error "TYPESAFE_API_KEY is not set. Set it in this session or in the repo-root .env. This script does not print the key."
+    exit 2
+}
+
 $tempo = Join-Path $repoRoot ".claude\skills\tool-tempo-efficiency"
 $polaris = Join-Path $repoRoot ".claude\skills\tool-polaris-df"
 $parts = @($skillRoot, $tempo, $polaris)

@@ -50,7 +50,7 @@ No brand context. Do not load agency page SOPs.
 bash scripts/jev-dispatcher --root clients/roi-live/projects/jev-dispatcher-2026-09 --job job.json
 ```
 
-On Windows, with `TYPESAFE_API_KEY` set in the session:
+On Windows. If `TYPESAFE_API_KEY` is empty, the script reads the repo-root `.env` and does not print the key:
 
 ```powershell
 .\.claude\skills\tool-jev-dispatcher\scripts\live-eval.ps1

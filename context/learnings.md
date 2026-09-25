@@ -60,6 +60,7 @@
 ## tool-jev-dispatcher
 
 - 2026-09-25: Dispatcher imports Tempo gate/kill/audit/hop limit/tier ladder and Polaris `HttpJevClient`. It does not fork them. Pin is `jev-1.13.0`. Grok Heavy is coordinator only. `ENABLED.on` is not created by the build. `handoff_complete` comes from a file read, not from Jev confidence. Jev 1.13 input price confirmed at $0.042 per million tokens from https://docs.typesafe.ai/models on 2026-09-25. Output is $0. Silent-intake path `clients/roi-live/projects/jev-silent-intake-golive-2026-09/` was not in the repo.
+- 2026-09-25: Tempo reviewed the eval labels on 2026-09-24. Score strict against the primary seat and lenient against `acceptable`. GLM 5.3 Max and Kimi K3 Max swap only on standard execution. ChatGPT Team sits in the ChatGPT family with 20X A/B/C. Human-review recall counts only rows whose acceptable set is human review alone.
 
 ## tool-tempo-efficiency
 
